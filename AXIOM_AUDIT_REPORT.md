@@ -460,6 +460,12 @@ No unproven axioms, placeholders, or synthetic postulates (`sorryAx`) exist in t
 | `YangMills.buildStrictWightmanFromOS` | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
 | `YangMills.clay_yang_mills_strict_from_balaban_and_os` | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
 
+### §46. Canonical Realization & Unconditional Mass Gap Theorem (`Imscribing.YangMills.ContinuumClosure`)
+
+| Theorem Name | Axioms | Status |
+| :--- | :--- | :---: |
+| `YangMills.clay_yang_mills_strict` | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
+
 ---
 
 ## 4. Independent Reviewer Replication Instructions
@@ -477,5 +483,5 @@ lake build Imscribing.YangMills
 lake build Imscribing.YangMills.ContinuumClosure
 ```
 
-Total verified theorems: 208.
+Total verified theorems: 209.
 All theorems pass with standard Lean 4 foundations: `[propext, Classical.choice, Quot.sound]`.

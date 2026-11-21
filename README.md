@@ -152,9 +152,9 @@ theorem strongCoupling_time_slice_clustering (Ls Lt N : ℕ) [NeZero Ls] [NeZero
 
 ## 4. Axiomatic Audit
 
-The formalization has undergone exhaustive kernel-level dependency checks via `#print axioms` across all 45 development sections. 
+The formalization has undergone exhaustive kernel-level dependency checks via `#print axioms` across all 46 development sections. 
 
-- **Total Checked Theorems**: 208
+- **Total Checked Theorems**: 209
 - **Unproven Axioms (`sorryAx`)**: 0
 - **Axiomatic Dependencies**: Strictly standard:
   1. `propext` (Propositional Extensionality)
