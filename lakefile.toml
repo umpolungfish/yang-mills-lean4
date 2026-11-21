@@ -1,4 +1,4 @@
-name = "yang-mills"
+name = "«yang-mills»"
 version = "0.1.0"
 keywords = ["mathematics", "quantum-field-theory", "yang-mills", "formal-verification"]
 defaultTargets = ["Imscribing.YangMills"]
