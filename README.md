@@ -1,5 +1,6 @@
 # Formal Verification of 4D $SU(N)$ Yang–Mills Theory and the Strict Mass Gap in Lean 4
 
+[![Docs](https://img.shields.io/badge/Documentation-GitHub%20Pages-blue.svg)](https://umpolungfish.github.io/yang-mills-lean4/)
 [![Lean 4](https://img.shields.io/badge/Lean%204-v4.28.0-blue.svg)](https://github.com/leanprover/lean4)
 [![Axioms](https://img.shields.io/badge/Axioms-Standard%20Only-brightgreen.svg)](#axiomatic-audit)
 [![Sorries](https://img.shields.io/badge/Sorries-0-brightgreen.svg)](#axiomatic-audit)
@@ -22,7 +23,7 @@ curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh 
 ### Build & Verification
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/yang-mills-lean4.git
+git clone https://github.com/umpolungfish/yang-mills-lean4.git
 cd yang-mills-lean4
 
 # 2. Compile the complete Yang–Mills library (8,035 targets)
