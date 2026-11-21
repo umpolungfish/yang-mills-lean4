@@ -153,7 +153,7 @@ html_content = """<!DOCTYPE html>
       </div>
       <div>
         <div class="text-3xl sm:text-4xl font-extrabold text-indigo-400">Standard</div>
-        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">ZFC / Lean 4 Foundations</div>
+        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Standard Lean 4 Foundations</div>
       </div>
     </div>
   </section>

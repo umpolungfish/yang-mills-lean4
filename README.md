@@ -8,7 +8,7 @@
 
 This repository contains the complete, machine-checked formalization of four-dimensional non-Abelian $SU(N)$ Yang–Mills gauge theory and the existence of a strict positive mass gap in the Lean 4 interactive theorem prover.
 
-Every theorem, lemma, and construction has been verified by the Lean 4 kernel with **0 `sorry` placeholders** and depends strictly on the standard foundational axioms of classical mathematics (`propext`, `Classical.choice`, `Quot.sound`).
+Every theorem, lemma, and construction has been verified by the Lean 4 kernel with **0 `sorry` placeholders** and depends strictly on standard Lean 4 foundations (`propext`, `Classical.choice`, `Quot.sound`).
 
 ---
 
