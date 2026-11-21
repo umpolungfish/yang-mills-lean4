@@ -56,6 +56,15 @@
     body { background-color: #070b14; color: #cbd5e1; }
     .glow { box-shadow: 0 0 35px -5px rgba(34, 197, 94, 0.15); }
     .glow-cyan { box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.15); }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+    .mermaid svg {
+      margin: 0 auto !important;
+      display: block;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans selection:bg-emerald-500 selection:text-white">
@@ -148,8 +157,8 @@
         </p>
       </div>
 
-      <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 glow overflow-x-auto">
-        <pre class="mermaid text-center">
+      <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 glow overflow-x-auto flex justify-center">
+        <pre class="mermaid text-center w-full flex justify-center">
 flowchart TD
   subgraph LATTICE["Lattice Foundation (§§1–11, §§22–26)"]
     L1["4D Spacetime Lattice (ℤ/Lℤ)⁴"] --> L2["Compact SU(N) Haar Measure"]
