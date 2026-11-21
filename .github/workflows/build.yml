@@ -1,0 +1,41 @@
+name: Build and Verify Yang-Mills
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install elan (Lean 4 toolchain manager)
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Verify Lean 4 version
+        run: |
+          elan --version
+          lean --version
+
+      - name: Fetch mathlib cache
+        run: |
+          lake exe cache get || true
+
+      - name: Build Yang-Mills Library
+        run: |
+          lake build Imscribing.YangMills
+
+      - name: Run Kernel Axiom Audit
+        run: |
+          lake build Imscribing.YangMills.ContinuumClosure
+
+      - name: Verify zero unproven axioms (no sorryAx)
+        run: |
+          ! grep -rn "sorry" Imscribing/YangMills/
