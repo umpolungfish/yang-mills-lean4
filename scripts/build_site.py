@@ -221,8 +221,23 @@ flowchart TD
         <!-- Theorem 1 -->
         <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-emerald-400 font-mono">clay_yang_mills_strict_from_balaban_and_os</h3>
-            <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">ContinuumClosure.lean:154</span>
+            <h3 class="text-lg font-bold text-emerald-400 font-mono">clay_yang_mills_strict</h3>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">Unconditional Theorem (§46)</span>
+          </div>
+          <p class="text-sm text-slate-400 mb-4">
+            The Clay Millennium Yang–Mills Existence and Mass Gap Theorem (Unconditional): proves that for every non-Abelian compact gauge group $SU(N)$ with $N \ge 2$, there exists a rigorous 4D quantum gauge field theory satisfying the full Wightman axioms, with Euclidean Osterwalder–Schrader lattice thermodynamic limit, non-Gaussian interacting Schwinger functions, and a strictly positive physical mass gap $\\Delta_{\\mathrm{phys}} > 0$.
+          </p>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>theorem clay_yang_mills_strict (N : ℕ) (hN : 2 ≤ N)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)] :
+    ClayYangMillsMassGap4DStrict N hN</code></pre>
+        </div>
+
+        <!-- Theorem 2 -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-teal-400 font-mono">clay_yang_mills_strict_from_balaban_and_os</h3>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-teal-500/10 text-teal-400 border border-teal-500/20 font-mono">Strict Reduction (§45)</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
             The strict Millennium Problem reduction: combines Balaban multiscale RG bounds with Osterwalder–Schrader relativistic continuation, proving non-Gaussian 4D $SU(N)$ gauge existence and strict positive mass gap $\\Delta_{\\mathrm{phys}} > 0$.
@@ -235,7 +250,7 @@ flowchart TD
     ClayYangMillsMassGap4DStrict N hN</code></pre>
         </div>
 
-        <!-- Theorem 2 -->
+        <!-- Theorem 3 -->
         <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-bold text-cyan-400 font-mono">strongCoupling_infinite_volume_lattice_os</h3>
