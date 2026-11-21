@@ -23,7 +23,7 @@ weak.linter.flexible = false
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "2b7ebefe8252ed16382c0b8e82fa83cf9cba7a4a"
+rev = "v4.28.0"
 
 [[lean_lib]]
 name = "Imscribing"
