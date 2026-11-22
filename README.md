@@ -80,15 +80,6 @@ The formalization rigorously constructs the continuous, non-Gaussian relativisti
 
 ## 3. Key Formal Theorems
 
-### Clay Millennium Yang-Mills Existence and Mass Gap (Unconditional)
-Proven in [`Imscribing/YangMills/ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean):
-```lean
-theorem clay_yang_mills_strict (N : ℕ) (hN : 2 ≤ N)
-    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)] :
-    ClayYangMillsMassGap4DStrict N hN
-```
-
 ### Main Millennium Reduction
 Proven in [`Imscribing/YangMills/ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean):
 ```lean

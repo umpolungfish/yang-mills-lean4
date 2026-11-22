@@ -37,5 +37,7 @@ globs = [
   "Imscribing.YangMills.FeynmanKac",
   "Imscribing.YangMills.StrongCouplingDobrushin",
   "Imscribing.YangMills.StrongCouplingInfVol",
-  "Imscribing.YangMills.ContinuumClosure"
+  "Imscribing.YangMills.ContinuumClosure",
+  "Imscribing.YangMills.CanonicalWitness",
+  "Imscribing.YangMills.BridgeStatements"
 ]

@@ -121,16 +121,7 @@ def ClayYangMillsMassGap4DStrict (N : ℕ) (hN : 2 ≤ N)
 
 ### 2. Millennium Theorems
 
-#### A. Unconditional Existence and Mass Gap Theorem
-Proven in [`ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean):
-```lean
-theorem clay_yang_mills_strict (N : ℕ) (hN : 2 ≤ N)
-    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)] :
-    ClayYangMillsMassGap4DStrict N hN
-```
-
-#### B. Main Reduction Theorem
+#### A. Main Reduction Theorem
 Proven in [`ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean#L154):
 ```lean
 theorem clay_yang_mills_strict_from_balaban_and_os (N : ℕ) (hN : 2 ≤ N)

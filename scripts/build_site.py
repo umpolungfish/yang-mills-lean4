@@ -14,7 +14,7 @@ html_content = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unconditional Formal Verification of 4D SU(N) Yang–Mills Theory & Mass Gap in Lean 4</title>
+  <title>Formal Verification of 4D SU(N) Yang–Mills Theory & Mass Gap in Lean 4</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -84,7 +84,7 @@ html_content = """<!DOCTYPE html>
   <nav class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-800/80 px-4 py-3.5">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <span class="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Unconditional • Lean 4 Certified</span>
+        <span class="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Lean 4 Certified</span>
         <span class="font-bold tracking-tight text-white">Yang–Mills 4D Formalization</span>
       </div>
       <div class="flex items-center space-x-6 text-sm font-medium">
@@ -106,7 +106,7 @@ html_content = """<!DOCTYPE html>
     <div class="max-w-5xl mx-auto px-4 text-center">
       <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/80 text-xs font-medium text-emerald-400 mb-8">
         <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>Unconditional Clay Millennium Prize Formulation in Lean 4</span>
+        <span>4D Yang–Mills Mass Gap Formalization in Lean 4</span>
       </div>
       
       <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
@@ -118,7 +118,7 @@ html_content = """<!DOCTYPE html>
       </h1>
 
       <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-        An unconditional, computer-verified proof of quantum 4D $SU(N)$ gauge existence and the strict positive mass gap $\\Delta_{\\mathrm{phys}} > 0$, formalized from first principles in the Lean 4 interactive theorem prover with zero unproven axioms.
+        A computer-verified formalization of quantum 4D $SU(N)$ gauge theory with a strict positive mass gap $\\Delta_{\\mathrm{phys}} > 0$, including the conditional Clay reduction and the infinite-volume strong-coupling lattice limit, in the Lean 4 interactive theorem prover with zero unproven axioms.
       </p>
 
       <div class="flex flex-wrap justify-center gap-4">
@@ -140,7 +140,7 @@ html_content = """<!DOCTYPE html>
   <section class="border-y border-slate-800 bg-slate-900/50 py-10">
     <div class="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
       <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400">Unconditional</div>
+        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400">Conditional</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Clay Millennium Status</div>
       </div>
       <div>
@@ -200,8 +200,8 @@ flowchart TD
   end
 
   subgraph CONTINUUM["Continuum Limit & Clay Specification (§§45–46)"]
-    C1["Balaban Multiscale RG Flow (§45)"] --> C2["Canonical Realization (§46)"]
-    C2 --> C3["ClayYangMillsMassGap4DStrict: Unconditional Δ_phys > 0"]
+    C1["Balaban Multiscale RG Flow (§45)"] --> C2["ClayYangMillsMassGap4DStrict (conditional)"]
+    C2 --> C3["Strict Positive Mass Gap Δ_phys > 0"]
   end
 
   LATTICE --> TRANSFER
@@ -223,21 +223,6 @@ flowchart TD
       </div>
 
       <div class="space-y-6">
-        <!-- Theorem 1 -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-emerald-400 font-mono">clay_yang_mills_strict</h3>
-            <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">Unconditional Theorem (§46)</span>
-          </div>
-          <p class="text-sm text-slate-400 mb-4">
-            The Clay Millennium Yang–Mills Existence and Mass Gap Theorem (Unconditional): proves that for every non-Abelian compact gauge group $SU(N)$ with $N \ge 2$, there exists a rigorous 4D quantum gauge field theory satisfying the full Wightman axioms, with Euclidean Osterwalder–Schrader lattice thermodynamic limit, non-Gaussian interacting Schwinger functions, and a strictly positive physical mass gap $\\Delta_{\\mathrm{phys}} > 0$.
-          </p>
-          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>theorem clay_yang_mills_strict (N : ℕ) (hN : 2 ≤ N)
-    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)] :
-    ClayYangMillsMassGap4DStrict N hN</code></pre>
-        </div>
-
         <!-- Theorem 2 -->
         <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
           <div class="flex items-center justify-between mb-3">
