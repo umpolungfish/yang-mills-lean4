@@ -39,5 +39,9 @@ globs = [
   "Imscribing.YangMills.StrongCouplingInfVol",
   "Imscribing.YangMills.ContinuumClosure",
   "Imscribing.YangMills.CanonicalWitness",
-  "Imscribing.YangMills.BridgeStatements"
+  "Imscribing.YangMills.BridgeStatements",
+  "Imscribing.YangMills.PlaquetteReflection",
+  "Imscribing.YangMills.Dicke",
+  "Imscribing.YangMills.UnifiedLattice",
+  "Imscribing.YangMills.MassGapInstances"
 ]

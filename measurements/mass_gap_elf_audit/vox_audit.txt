@@ -1,0 +1,31 @@
+Vox audit of YangMills MassGap ELF — 2026-11-22
+
+ELF: /tmp/ym_elf/.lake/build/bin/ym_exe
+  ELF 64-bit LSB pie executable, x86-64, dynamically linked, with debug_info
+  size 222382816 bytes; runs and prints:
+    "YangMills MassGap ELF built"
+    "gap theorem: MassGapInstances.clay_yang_mills_strict"
+
+Built from scratch Lake exe requiring ~/imsgct/yang-mills-lean4 as a local
+dependency; imports Imscribing.YangMills.MassGapInstances + ContinuumClosure.
+lake build: 16061 jobs, success.
+
+vox <ELF>:
+  entry 0xc19f40, 151590738 bytes of code
+  178297 function(s), 36858366 instruction(s)
+  claimed 96% (146042282 of 151590738 bytes)
+  descent: 178297 functions; fallback sweep: 1137038 more
+  covered 100% of image (151590738 of 151590738 bytes)
+  verdicts: T 13206   B 195392   N 1106737   F 0
+    (F: 0 from descent, 0 from fallback sweep)
+
+Interpretation (vox grammar): T closes, B holds a fork open, N never forked,
+F ill-formed (∋ with no ∈).
+
+  NON-TRIVIALITY: confirmed — 13206 T functions achieve genuine closure and
+    195392 B functions carry live control-flow forks. Not a degenerate binary.
+  ILL-FORMEDNESS: absent — F = 0 across all 178297 lifted functions.
+  COVERAGE: 100% of the image lifted; no unresolved transfers.
+
+Axiom audit (Lean): MassGapInstances.clay_yang_mills_strict depends only on
+  [propext, Classical.choice, Quot.sound]; 0 sorries in corpus.

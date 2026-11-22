@@ -489,6 +489,64 @@ theorem cubic4Schwinger_wilson_refl_pos_gen (Ls M N : ℕ) [NeZero Ls] [NeZero M
     (fun i _ U => normWilsonLoop4 (N:=N) (cubic4Plaquette (site i) (1:Fin 4) (2:Fin 4)) U)
     (fun i _ => hmeas i) 1 zero_le_one (fun i _ U => hbd i U) (fun i _ => hsupp i)
 
+/-- Negation in Fin L agrees with the scoped integer cast of the negation. -/
+theorem fin_neg_eq_intCast_neg (L : ℕ) [NeZero L] (z : ℤ) :
+    (-(z : Fin L)) = ((-z : ℤ) : Fin L) := by
+  apply Fin.ext
+  rw [Fin.val_neg]
+  rw [Fin.val_intCast]
+  rw [Fin.val_intCast]
+  by_cases hz0 : z % (L:ℤ) = 0
+  · have hfin0 : (z : Fin L) = 0 := by
+      apply Fin.ext
+      rw [Fin.val_intCast]
+      have hn : ((z % (L:ℤ)).toNat) = 0 := by simp [hz0]
+      rw [hn]
+      rfl
+    rw [if_pos hfin0]
+    have h' : (-z) % (L:ℤ) = 0 := by rw [Int.neg_emod]; simp [show (L:ℤ) ∣ z by exact Int.dvd_of_emod_eq_zero hz0]
+    simp [h']
+  · have hfin_ne : (z : Fin L) ≠ 0 := by
+      intro hf
+      apply hz0
+      have hv := congrArg Fin.val hf
+      rw [Fin.val_intCast] at hv
+      have hLpos : 0 < (L:ℤ) := by exact_mod_cast (NeZero.pos L)
+      have hznonneg : 0 ≤ z % (L:ℤ) := Int.emod_nonneg z (ne_of_gt hLpos)
+      have hztonat : ((z % (L:ℤ)).toNat : ℤ) = z % (L:ℤ) := Int.toNat_of_nonneg hznonneg
+      rw [show ((0 : Fin L).val) = 0 from rfl] at hv
+      omega
+    rw [if_neg hfin_ne]
+    have hneg : (-z) % (L:ℤ) = (L:ℤ) - z % (L:ℤ) := by
+      rw [Int.neg_emod]
+      have hdiv : ¬ (L:ℤ) ∣ z := by intro hd; exact hz0 (Int.emod_eq_zero_of_dvd hd)
+      simp [hdiv]
+    rw [hneg]
+    have hLpos : 0 < (L:ℤ) := by exact_mod_cast (NeZero.pos L)
+    have hznonneg : 0 ≤ z % (L:ℤ) := Int.emod_nonneg z (ne_of_gt hLpos)
+    have hztonat : ((z % (L:ℤ)).toNat : ℤ) = z % (L:ℤ) := Int.toNat_of_nonneg hznonneg
+    have hto : (((L:ℤ) - z % (L:ℤ)).toNat) = L - (z % (L:ℤ)).toNat := by
+      rw [← hztonat]
+      have hzlt : z % (L:ℤ) < (L:ℤ) := Int.emod_lt_of_pos z hLpos
+      omega
+    rw [hto]
+
+/-- Reflected-site loop (floor off by one) is a ℤ⁴ translate of the reflected-point loop. -/
+theorem reflected_site_loop_translate (L : ℕ) [NeZero L] (x : Space4)
+    (h : ⌊-x 0⌋ = -⌊x 0⌋ - 1) :
+    embedLoop4DZ L (canonicalLoop4DZ (fun i => if i = 0 then (-(⌊x 0⌋ : ℤ) : ℝ) else x i)) =
+      embedLoop4DZ L (transLoop4DZ (fun j => if j = 0 then (1 : ℤ) else 0) (canonicalLoop4DZ (euclidTimeReflect x))) := by
+  congr 1
+  unfold canonicalLoop4DZ transLoop4DZ euclidTimeReflect
+  congr 1
+  funext j
+  fin_cases j <;> simp only [Fin.isValue] <;> simp (config := {decide := true})
+  · rw [h]
+    have hf : Int.floor (-(⌊x 0⌋ : ℝ)) = -(⌊x 0⌋) := by
+      simpa using (Int.floor_intCast (R := ℝ) (-(⌊x 0⌋)))
+    rw [hf]
+    ring
+
 /-! ## Time reflection compatibility -/
 
 theorem normWilsonLoop4_spatial_timeReflect
@@ -508,6 +566,249 @@ theorem normWilsonLoop4_spatial_timeReflect
   unfold normWilsonLoop4 cubic4Plaquette
   simp only [pathHolonomy, cubic4TimeReflect, ↓reduceIte, show (1:Fin 4) ≠ 0 by decide,
     show (2:Fin 4) ≠ 0 by decide, hsh (1:Fin 4) (by decide), hsh (2:Fin 4) (by decide)]
+
+theorem sinf_reflected_site_eq (N : ℕ) (hN : 2 ≤ N)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (x : Space4) :
+    canonicalS_inf N hN 1 ![canonicalLoop4DZ (fun i => if i = 0 then (-(⌊x 0⌋ : ℤ) : ℝ) else x i)] =
+      canonicalS_inf N hN 1 ![canonicalLoop4DZ (euclidTimeReflect x)] := by
+  let y : Space4 := fun i => if i = 0 then (-(⌊x 0⌋ : ℤ) : ℝ) else x i
+  let z : Space4 := euclidTimeReflect x
+  have hf_int : Int.floor (-(⌊x 0⌋ : ℝ)) = -(⌊x 0⌋) := by
+    simpa using (Int.floor_intCast (R := ℝ) (-(⌊x 0⌋)))
+  change canonicalS_inf N hN 1 ![canonicalLoop4DZ y] = canonicalS_inf N hN 1 ![canonicalLoop4DZ z]
+  have hbase_y : ∀ j, ⌊y j⌋ = (if j = 0 then -(⌊x 0⌋) else ⌊x j⌋) := by
+    intro j; fin_cases j <;> simp [y, hf_int]
+  have hbase_z : ∀ j, ⌊z j⌋ = (if j = 0 then ⌊-x 0⌋ else ⌊x j⌋) := by
+    intro j; fin_cases j <;> simp [z, euclidTimeReflect]
+  rcases floor_neg_eq (x 0) with h | h
+  · have hloop : canonicalLoop4DZ y = canonicalLoop4DZ z := by
+      unfold canonicalLoop4DZ
+      congr 1
+      funext j
+      rw [hbase_y j, hbase_z j]
+      by_cases hj : j = 0 <;> simp [hj, h]
+    rw [hloop]
+  · let a : Fin 4 → ℤ := fun j => if j = 0 then 1 else 0
+    have hza : ∀ j, ⌊y j⌋ = ⌊z j⌋ + a j := by
+      intro j
+      rw [hbase_y j, hbase_z j]
+      by_cases hj : j = 0
+      · subst j; simp [a, h]
+      · simp [a, hj]
+    have hloop : canonicalLoop4DZ y = transLoop4DZ a (canonicalLoop4DZ z) := by
+      unfold canonicalLoop4DZ transLoop4DZ
+      congr 1
+      funext j
+      exact hza j
+    rw [hloop]
+    have ht := canonicalS_inf_trans N hN 1 a ![z]
+    have hvec1 : ![transLoop4DZ a (canonicalLoop4DZ z)] = (fun _ : Fin 1 => transLoop4DZ a (canonicalLoop4DZ z)) := by
+      ext i; fin_cases i; rfl
+    have hvec2 : ![canonicalLoop4DZ z] = (fun _ : Fin 1 => canonicalLoop4DZ z) := by
+      ext i; fin_cases i; rfl
+    rw [hvec1, hvec2]
+    have hvecz : ![z] = (fun _ : Fin 1 => z) := by ext i; fin_cases i; rfl
+    rw [hvecz] at ht
+    exact ht
+
+theorem cubic4Schwinger_star (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt] (β : ℝ)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (n : ℕ) (obs : Fin n → GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℂ) :
+    cubic4Schwinger Ls Lt N β n (fun i U => starRingEnd ℂ (obs i U)) =
+      starRingEnd ℂ (cubic4Schwinger Ls Lt N β n obs) := by
+  unfold cubic4Schwinger
+  rw [map_mul]
+  -- partition fn inverse is real
+  rw [show starRingEnd ℂ (((cubic4PartitionFn Ls Lt N β)⁻¹ : ℂ)) = ((cubic4PartitionFn Ls Lt N β)⁻¹ : ℂ) by simp]
+  -- integral of star(f * realweight) = star of integral
+  rw [← integral_conj]
+  congr 1
+  apply MeasureTheory.integral_congr_ae
+  filter_upwards with U
+  simp only [map_mul, map_prod, map_natCast]
+  rw [show starRingEnd ℂ (((cubic4WilsonWeight Ls Lt N β U : ℝ) : ℂ)) = ((cubic4WilsonWeight Ls Lt N β U : ℝ) : ℂ) by simp]
+
+theorem embedFromZ4_append (L : ℕ) [NeZero L] (cur : Fin 4 → ℤ)
+    (l₁ l₂ : List (Fin 4 × Bool)) :
+    embedFromZ4 L cur (l₁ ++ l₂) =
+      embedFromZ4 L cur l₁ ++ embedFromZ4 L (l₁.foldl stepZ4 cur) l₂ := by
+  induction l₁ generalizing cur with
+  | nil => rfl
+  | cons p tl ih =>
+    rcases p with ⟨d,b⟩
+    cases b
+    · rw [show embedFromZ4 L cur (((d,false)::tl)++l₂) =
+          ((projSite4 L (stepZ4 cur (d,false)), d), false) :: embedFromZ4 L (stepZ4 cur (d,false)) (tl++l₂) from rfl]
+      rw [show embedFromZ4 L cur ((d,false)::tl) =
+          ((projSite4 L (stepZ4 cur (d,false)), d), false) :: embedFromZ4 L (stepZ4 cur (d,false)) tl from rfl]
+      simp only [List.cons_append, List.foldl_cons]
+      rw [ih]
+    · rw [show embedFromZ4 L cur (((d,true)::tl)++l₂) =
+          ((projSite4 L cur, d), true) :: embedFromZ4 L (stepZ4 cur (d,true)) (tl++l₂) from rfl]
+      rw [show embedFromZ4 L cur ((d,true)::tl) =
+          ((projSite4 L cur, d), true) :: embedFromZ4 L (stepZ4 cur (d,true)) tl from rfl]
+      simp only [List.cons_append, List.foldl_cons]
+      rw [ih]
+
+-- pathHolonomy under append: hol(l₁++l₂) = hol l₁ * hol l₂
+theorem ph_append (L : ℕ) [NeZero L] (N : ℕ)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (U : GaugeField (cubicTorus4 L L) (Matrix.specialUnitaryGroup (Fin N) ℂ))
+    (l₁ l₂ : List ((cubicTorus4 L L).Link × Bool)) :
+    pathHolonomy U (l₁ ++ l₂) = pathHolonomy U l₁ * pathHolonomy U l₂ := by
+  induction l₁ with
+  | nil => simp [pathHolonomy]
+  | cons hd tl ih => rcases hd with ⟨e,b⟩; cases b <;> simp [pathHolonomy, ih, mul_assoc]
+
+-- unfold embedFromZ4 at a cons
+theorem embed_cons (L : ℕ) [NeZero L] (cur : Fin 4 → ℤ) (d : Fin 4) (b : Bool)
+    (tl : List (Fin 4 × Bool)) :
+    embedFromZ4 L cur ((d,b)::tl) =
+      (if b then ((projSite4 L cur, d), true) else ((projSite4 L (stepZ4 cur (d,false)), d), false)) ::
+        embedFromZ4 L (stepZ4 cur (d,b)) tl := by
+  cases b <;> rfl
+
+
+noncomputable def contTimeRefl (x : Space4) : Space4 :=
+  fun i => if i = 0 then -(⌊x 0⌋ : ℝ) + (x 0 - ⌊x 0⌋) else x i
+
+theorem floor_contTimeRefl (x : Space4) : ⌊contTimeRefl x 0⌋ = -⌊x 0⌋ := by
+  unfold contTimeRefl
+  simp only [if_pos rfl]
+  rw [Int.floor_eq_iff]
+  constructor
+  · have h : 0 ≤ x 0 - (⌊x 0⌋ : ℝ) := sub_nonneg.mpr (Int.floor_le (x 0))
+    push_cast
+    linarith
+  · have h : x 0 - (⌊x 0⌋ : ℝ) < 1 := by linarith [Int.lt_floor_add_one (x 0)]
+    push_cast
+    linarith
+
+-- The embedded loop at contTimeRefl x equals the reflectConj-translate of the loop at x:
+-- base time floor negates exactly; spatial coords unchanged; steps (spatial plaquette 1,2) unchanged.
+theorem canonicalLoop_contTimeRefl (x : Space4) :
+    canonicalLoop4DZ (contTimeRefl x) =
+      transLoop4DZ (fun j => if j = 0 then -2 * ⌊x 0⌋ else 0) (canonicalLoop4DZ x) := by
+  unfold canonicalLoop4DZ transLoop4DZ
+  congr 1
+  funext j
+  fin_cases j
+  · change ⌊contTimeRefl x 0⌋ = ⌊x 0⌋ + (-2 * ⌊x 0⌋)
+    rw [floor_contTimeRefl]
+    ring
+  · change ⌊x 1⌋ = ⌊x 1⌋ + 0; ring
+  · change ⌊x 2⌋ = ⌊x 2⌋ + 0; ring
+  · change ⌊x 3⌋ = ⌊x 3⌋ + 0; ring
+
+def reflZ (x : Fin 4 → ℤ) : Fin 4 → ℤ := fun i => if i = 0 then -x 0 else x i
+
+theorem foldl_reflZ (steps : List (Fin 4 × Bool)) (x : Fin 4 → ℤ) :
+    (steps.map fun p => if p.1 = 0 then (0, p.2) else (p.1, !p.2)).reverse.foldl stepZ4 (reflZ (steps.foldl stepZ4 x)) =
+      reflZ x := by
+  induction steps generalizing x with
+  | nil => rfl
+  | cons p tl ih =>
+    simp only [List.map_cons, List.reverse_cons, List.foldl_append, List.foldl_cons, List.foldl_nil]
+    rw [ih (stepZ4 x p)]
+    rcases p with ⟨d,b⟩
+    by_cases hd : d = 0
+    · subst d
+      funext i; fin_cases i <;> cases b <;> simp [reflZ, stepZ4] <;> ring_nf
+    · funext i; fin_cases i <;> cases b <;> simp [reflZ, stepZ4, hd, Ne.symm hd] <;> split_ifs <;> omega
+
+
+theorem foldl_mapflip_spatial (steps : List (Fin 4 × Bool)) (hsp : ∀ p ∈ steps, p.1 ≠ 0) (cur : Fin 4 → ℤ) :
+    (steps.map fun p => (p.1, !p.2)).reverse.foldl stepZ4 (steps.foldl stepZ4 cur) = cur := by
+  induction steps generalizing cur with
+  | nil => rfl
+  | cons p tl ih =>
+    rcases p with ⟨d,b⟩
+    have hd : d ≠ 0 := hsp (d,b) (by simp)
+    simp only [List.map_cons, List.reverse_cons, List.foldl_cons]
+    rw [List.foldl_append]
+    rw [ih (by intro q hq; exact hsp q (by simp [hq])) (stepZ4 cur (d,b))]
+    cases b
+    · ext i; by_cases hi : i = d <;> simp [stepZ4, hi]
+    · ext i; by_cases hi : i = d <;> simp [stepZ4, hi]
+
+def flipStepT (p : Fin 4 × Bool) : Fin 4 × Bool :=
+  if p.1 = 0 then (0, !p.2) else (p.1, p.2)
+theorem stepZ4_reflZ (x : Fin 4 → ℤ) (p : Fin 4 × Bool) :
+    stepZ4 (reflZ x) (flipStepT p) = reflZ (stepZ4 x p) := by
+  rcases p with ⟨d,b⟩
+  unfold reflZ flipStepT stepZ4
+  by_cases hd : d = 0
+  · subst d
+    cases b <;> funext i <;> fin_cases i <;> simp <;> ring_nf
+  · cases b <;> funext i <;> fin_cases i <;> simp [hd, Ne.symm hd] <;> ring_nf
+
+def revFlip {L : ℕ} [NeZero L] : List ((cubicTorus4 L L).Link × Bool) → List ((cubicTorus4 L L).Link × Bool)
+  | [] => []
+  | (e,b)::tl => revFlip tl ++ [(e, !b)]
+
+theorem hol_revFlip (L : ℕ) [NeZero L] (N : ℕ) (U : GaugeField (cubicTorus4 L L) (Matrix.specialUnitaryGroup (Fin N) ℂ))
+    (γ : List ((cubicTorus4 L L).Link × Bool)) :
+    pathHolonomy U (revFlip γ) = (pathHolonomy U γ)⁻¹ := by
+  have happ : ∀ l₁ l₂, pathHolonomy U (l₁ ++ l₂) = pathHolonomy U l₁ * pathHolonomy U l₂ := by
+    intro l₁ l₂; induction l₁ with
+    | nil => simp [pathHolonomy]
+    | cons hd tl ih => rcases hd with ⟨e,b⟩; cases b <;> simp [pathHolonomy, ih, mul_assoc]
+  induction γ with
+  | nil => simp [pathHolonomy, revFlip]
+  | cons hd tl ih =>
+    rcases hd with ⟨e,b⟩
+    simp only [revFlip, happ, pathHolonomy]
+    cases b <;> simp [pathHolonomy, ih, mul_inv_rev]
+
+theorem star_normWilsonLoop4 (L : ℕ) [NeZero L] (N : ℕ)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (U : GaugeField (cubicTorus4 L L) (Matrix.specialUnitaryGroup (Fin N) ℂ))
+    (γ : List ((cubicTorus4 L L).Link × Bool)) :
+    starRingEnd ℂ (normWilsonLoop4 γ U) = normWilsonLoop4 (revFlip γ) U := by
+  unfold normWilsonLoop4
+  change star (((N : ℝ)⁻¹ : ℂ) * (Matrix.trace ((pathHolonomy U γ : Matrix.specialUnitaryGroup (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ))) = _
+  rw [star_mul]
+  change star (Matrix.trace ((pathHolonomy U γ : Matrix.specialUnitaryGroup (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ)) * star ((N:ℝ)⁻¹ : ℂ) = _
+  have hstarN : star (((N:ℝ)⁻¹ : ℂ)) = ((N:ℝ)⁻¹ : ℂ) := by simp
+  rw [hstarN]
+  rw [hol_revFlip]
+  let A : Matrix (Fin N) (Fin N) ℂ := (pathHolonomy U γ : Matrix.specialUnitaryGroup (Fin N) ℂ)
+  have hct : star (Matrix.trace A) = Matrix.trace (A.conjTranspose) := (Matrix.trace_conjTranspose A).symm
+  rw [hct]
+  have hAinv : A.conjTranspose = ((pathHolonomy U γ)⁻¹ : Matrix.specialUnitaryGroup (Fin N) ℂ) := by
+    change star A = ((pathHolonomy U γ)⁻¹ : Matrix.specialUnitaryGroup (Fin N) ℂ)
+    exact (su_inv_val_eq_star (pathHolonomy U γ)).symm
+  rw [hAinv]
+  -- trace of inverse matrix
+  change (Matrix.trace (((pathHolonomy U γ)⁻¹ : Matrix.specialUnitaryGroup (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ)) * (↑N)⁻¹ = (↑N)⁻¹ * (Matrix.trace (((pathHolonomy U γ)⁻¹ : Matrix.specialUnitaryGroup (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ))
+  ring
+
+
+/-! ### Reflection positivity limit — assembly checklist
+
+The pieces above suffice to pass 2-point reflection positivity to the
+infinite-volume limit via `thermodynamic_limit_refl_pos_eventually`:
+
+* `G_seq r i j := cubic4Schwinger (Lm r) (Lm r) N standardBeta0 2
+    ![star(W_{site_i r} ∘ Θ_latt), W_{site_j r}]` with `Lm r = 2(φ r + 1)`.
+* `G_inf i j := canonicalSContA N hN 2 ![Θ x_i, x_j]`.
+* Convergence: `normWilsonLoop4_spatial_timeReflect` rewrites the reflected
+  observable to the reflected site; `reflected_site_loop_translate` and
+  `floor_neg_eq` show that loop is an integer translate of the reflected-point
+  loop; `canonicalS_inf_trans` making their `S_inf` values equal; then
+  `canonicalS_inf_conv` gives `hlim`.
+* Finite positivity: `cubic4Schwinger_wilson_refl_pos_gen` applies whenever
+  the site time coordinate `⌊x_i 0⌋ mod Lm r < φ r + 1`, which holds eventually
+  since `φ r → ∞` (canonicalPhi_mono).
+* `thermodynamic_limit_refl_pos_eventually c G_seq G_inf hlim hrp` concludes.
+
+The final `canonicalSContA_refl2` theorem is the remaining assembly.
+-/
 
 /-! ## §46W. Canonical non-constancy witness for the embedded plaquette observable -/
 
@@ -735,6 +1036,92 @@ theorem cubic4Plaquette_floor (L : ℕ) [NeZero L] (x : Space4) :
   rw [embedLoop4DZ_canonicalPlaqW]
   unfold cubic4Plaquette
   rw [hsite2, hsite3, hstep4]
+
+theorem schwinger_star_first (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt] (β : ℝ)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (n : ℕ) (i0 : Fin n) (obs : Fin n → GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℂ) :
+    cubic4Schwinger Ls Lt N β n (fun i U => if i = i0 then starRingEnd ℂ (obs i U) else obs i U) =
+      starRingEnd ℂ (cubic4Schwinger Ls Lt N β n (fun i U => if i = i0 then obs i U else starRingEnd ℂ (obs i U))) := by
+  unfold cubic4Schwinger
+  rw [map_mul]
+  -- RHS: star(prefactor * integral) = star(prefactor) * star(integral); prefactor real
+  rw [show starRingEnd ℂ (((cubic4PartitionFn Ls Lt N β)⁻¹ : ℂ)) = ((cubic4PartitionFn Ls Lt N β)⁻¹ : ℂ) by simp]
+  rw [← integral_conj]
+  congr 1
+  apply integral_congr_ae
+  filter_upwards with U
+  simp only [map_mul, map_prod]
+  have hprod : (∏ i, (if i = i0 then starRingEnd ℂ (obs i U) else obs i U)) =
+      starRingEnd ℂ (∏ i, (if i = i0 then obs i U else starRingEnd ℂ (obs i U))) := by
+    rw [map_prod]
+    apply Finset.prod_congr rfl
+    intro i hi
+    by_cases h : i = i0 <;> simp [h]
+  rw [hprod]
+  have hp2 : (∏ x, (starRingEnd ℂ) (if x = i0 then obs x U else (starRingEnd ℂ) (obs x U))) =
+      starRingEnd ℂ (∏ x, (if x = i0 then obs x U else (starRingEnd ℂ) (obs x U))) := by
+    rw [map_prod]
+  rw [hp2]
+  congr 1
+  simp
+
+theorem wilson_refl_eq (L : ℕ) [NeZero L] (N : ℕ)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (x : Space4) (U : GaugeField (cubicTorus4 L L) (Matrix.specialUnitaryGroup (Fin N) ℂ)) :
+    normWilsonLoop4 (cubic4Plaquette (projSite4 L (fun i => ⌊x i⌋)) 1 2) (cubic4TimeReflect L L N U) =
+      normWilsonLoop4 (embedLoop4DZ L (canonicalLoop4DZ (contTimeRefl x))) U := by
+  rw [normWilsonLoop4_spatial_timeReflect]
+  -- LHS: W(plaquette at -site) U. Site = projSite4(floor(contTimeRefl x)) by exact floor neg
+  rw [← cubic4Plaquette_floor]
+  congr 2
+  -- site equality
+  unfold projSite4
+  simp only
+  congr 1
+  rw [floor_contTimeRefl]
+  rw [fin_neg_eq_intCast_neg]
+
+/-- Trace of the inverse of an SU(N) matrix is the conjugate of its trace. -/
+theorem su_trace_inv_eq_star (N : ℕ) (A : Matrix.specialUnitaryGroup (Fin N) ℂ) :
+    Matrix.trace (((A⁻¹ : Matrix.specialUnitaryGroup (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ)) =
+      starRingEnd ℂ (Matrix.trace ((A : Matrix (Fin N) (Fin N) ℂ))) := by
+  change (↑A⁻¹ : Matrix (Fin N) (Fin N) ℂ).trace = star (↑A : Matrix (Fin N) (Fin N) ℂ).trace
+  rw [← Matrix.trace_conjTranspose]
+  congr 1
+
+theorem sinf_revFlip (N : ℕ) (hN : 2 ≤ N)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)] (γ : Loop4DZ) :
+    Filter.Tendsto
+      (fun m =>
+        let L := 2*(canonicalPhi N hN m+1)
+        cubic4Schwinger L L N standardBeta0 1
+          ![fun U => normWilsonLoop4 (revFlip (embedLoop4DZ L γ)) U])
+      Filter.atTop (nhds (starRingEnd ℂ (canonicalS_inf N hN 1 ![γ]))) := by
+  -- finite: Wilson(revFlip embed γ) = star(Wilson(embed γ)) pointwise
+  have hfin : ∀ m,
+      (let L := 2*(canonicalPhi N hN m+1)
+       cubic4Schwinger L L N standardBeta0 1 ![fun U => normWilsonLoop4 (revFlip (embedLoop4DZ L γ)) U]) =
+      starRingEnd ℂ ((let L := 2*(canonicalPhi N hN m+1)
+       cubic4Schwinger L L N standardBeta0 1 ![fun U => normWilsonLoop4 (embedLoop4DZ L γ) U])) := by
+    intro m
+    dsimp only
+    let L := 2*(canonicalPhi N hN m+1)
+    have hfun : (fun U : GaugeField (cubicTorus4 L L) (Matrix.specialUnitaryGroup (Fin N) ℂ) =>
+        normWilsonLoop4 (revFlip (embedLoop4DZ L γ)) U) =
+        (fun U => starRingEnd ℂ (normWilsonLoop4 (embedLoop4DZ L γ) U)) := by
+      funext U
+      exact (star_normWilsonLoop4 L N U (embedLoop4DZ L γ)).symm
+    rw [hfun]
+    simpa using (cubic4Schwinger_star L L N standardBeta0 1
+      (fun i => normWilsonLoop4 (embedLoop4DZ L γ) : Fin 1 → GaugeField (cubicTorus4 L L) (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℂ))
+  have h := canonicalS_inf_conv N hN 1 ![γ]
+  have hs := (Complex.continuous_conj.continuousAt.tendsto).comp h
+  convert hs using 1
+  funext m
+  simpa only [Function.comp_apply] using (hfin m)
 
 end YangMills
 

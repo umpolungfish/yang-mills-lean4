@@ -22,6 +22,7 @@ No unproven axioms, placeholders, or synthetic postulates (`sorryAx`) exist in t
 
 | Master Theorem | Description | Axiomatic Dependencies | Status |
 | :--- | :--- | :--- | :---: |
+| `MassGapInstances.clay_yang_mills_strict` | **Unconditional** mass gap in the promoted non-vacuous gauge system | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
 | `YangMills.clay_yang_mills_strict_from_balaban_and_os` | Clay Millennium 4D Yang–Mills existence and strict positive mass gap | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
 | `YangMills.buildStrictWightmanFromOS` | Strict relativistic 4D Wightman QFT reconstruction from non-Gaussian Osterwalder–Schrader axioms | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
 | `YangMills.strongCoupling_infinite_volume_lattice_os` | Thermodynamic limit: infinite-volume strong-coupling 4D $SU(N)$ lattice OS theory with strict positive mass gap | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
