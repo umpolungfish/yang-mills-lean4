@@ -109,11 +109,61 @@ instance sunHaar_isProbability (N : ℕ) : IsProbabilityMeasure (sunHaar N) := b
 instance sunHaar_leftInvariant (N : ℕ) : (sunHaar N).IsMulLeftInvariant :=
   Measure.isMulLeftInvariant_haarMeasure _
 
-end YangMills
+
 
 namespace YangMills
 
 #print axioms YangMills.sunHaar
 #print axioms YangMills.sun_compactSpace
+
+end YangMills
+
+/-- A nontrivial element of SU(N) for N >= 2: diagonal (-1,-1,1,...,1). -/
+noncomputable def sunFlip (N : ℕ) (h : 2 ≤ N) : SUN N := by
+  let i0 : Fin N := ⟨0, by omega⟩
+  let i1 : Fin N := ⟨1, by omega⟩
+  let d : Fin N → ℂ := fun i => if i = i0 ∨ i = i1 then (-1 : ℂ) else 1
+  let A : Matrix (Fin N) (Fin N) ℂ := Matrix.diagonal d
+  have hdsq : ∀ i, d i * d i = 1 := by
+    intro i; by_cases hd : i = i0 ∨ i = i1 <;> simp [d, hd]
+  have hstar : star A = A := by
+    ext i j
+    by_cases hij : i = j
+    · subst j; by_cases hd : i = i0 ∨ i = i1 <;> simp [A, star_apply, d, hd]
+    · simp [A, star_apply, Matrix.diagonal, hij]
+      intro hji; exact (hij hji.symm).elim
+  have hAA : A * A = 1 := by
+    rw [← Matrix.diagonal_one (n := Fin N)]
+    dsimp [A]
+    rw [Matrix.diagonal_mul_diagonal]
+    ext i j
+    by_cases hij : i = j
+    · subst j; simp [Matrix.diagonal, hdsq]
+    · simp [Matrix.diagonal, hij]
+  refine ⟨A, ?_⟩
+  rw [Matrix.mem_specialUnitaryGroup_iff]
+  constructor
+  · constructor
+    · rw [hstar]; exact hAA
+    · rw [hstar]; exact hAA
+  · dsimp [A]
+    rw [Matrix.det_diagonal]
+    have hi01 : i0 ≠ i1 := by intro he; have := congrArg Fin.val he; simp [i0,i1] at this
+    rw [Finset.prod_eq_mul_prod_diff_singleton (Finset.mem_univ i0)]
+    have hi1mem : i1 ∈ Finset.univ \ {i0} := by simp [hi01.symm]
+    rw [Finset.prod_eq_mul_prod_diff_singleton hi1mem]
+    have hrest : ∀ x ∈ (Finset.univ \ {i0}) \ {i1}, d x = 1 := by
+      intro x hx
+      simp only [Finset.mem_sdiff, Finset.mem_univ, true_and, Finset.mem_singleton] at hx
+      simp [d, hx.1, hx.2]
+    rw [Finset.prod_congr rfl hrest]
+    simp [d, hi01]
+
+lemma sunFlip_ne_one (N : ℕ) (h : 2 ≤ N) : (sunFlip N h : SUN N) ≠ 1 := by
+  intro heq
+  have hval := congrArg (fun U : SUN N => U.1 ⟨0, by omega⟩ ⟨0, by omega⟩) heq
+  change (if (⟨0, by omega⟩ : Fin N) = ⟨0, by omega⟩ ∨
+              (⟨0, by omega⟩ : Fin N) = ⟨1, by omega⟩ then (-1 : ℂ) else 1) = 1 at hval
+  norm_num at hval
 
 end YangMills
