@@ -50,5 +50,7 @@ globs = [
   "Imscribing.YangMills.IIDSchwinger",
   "Imscribing.YangMills.IIDWilsonLimit",
   "Imscribing.YangMills.IIDScaling",
-  "Imscribing.YangMills.RademacherL1"
+  "Imscribing.YangMills.RademacherL1",
+  "Imscribing.YangMills.RademacherMulti",
+  "Imscribing.YangMills.SUNHaar"
 ]
