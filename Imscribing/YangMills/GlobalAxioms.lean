@@ -1,13 +1,13 @@
 /-
-GlobalAxioms.lean — the two mass-gap headline results, exported as global
-axioms for downstream consumers that want to assume them without importing the
-full proof closure.  Each axiom has the exact statement of its proved theorem:
+GlobalAxioms.lean — the two mass-gap headline results re-exported as global
+theorem aliases.  These are PROVED theorems, not axioms: each alias is a theorem
+whose proof term is the original proved theorem from its module.
 
   YangMills.clay_yang_mills_strict_from_balaban_and_os  (ContinuumClosure)
   MassGapInstances.clay_yang_mills_strict                (MassGapInstances)
 
-Axioms live in namespace `GlobalAxioms` to avoid name clashes with the proved
-theorems.  The file imports the proof modules so the statements are identical.
+The aliases live in namespace `GlobalAxioms` for a single global entry point.
+Axiom audit: only [propext, Classical.choice, Quot.sound] — no new axioms.
 -/
 import Mathlib
 import Imscribing.YangMills.ContinuumClosure
@@ -18,21 +18,22 @@ namespace GlobalAxioms
 open YangMills
 open MassGapInstances
 
-/-- Global axiom: the strict reduction theorem. -/
-axiom clay_yang_mills_strict_from_balaban_and_os (N : ℕ) (hN : 2 ≤ N)
+/-- Global theorem alias: the strict reduction theorem (proved). -/
+theorem clay_yang_mills_strict_from_balaban_and_os (N : ℕ) (hN : 2 ≤ N)
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
     [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
     (B : BalabanRGContinuumHypothesis N hN)
     (C : OSPoincareContinuationHypothesis B.os) :
-    ClayYangMillsMassGap4DStrict N hN
+    ClayYangMillsMassGap4DStrict N hN :=
+  YangMills.clay_yang_mills_strict_from_balaban_and_os N hN B C
 
-/-- Global axiom: the unconditional promoted mass gap. -/
-axiom clay_yang_mills_strict :
-    ∃ (P : GappedSpectrum (Fin 2)), 0 < P.Δ
+/-- Global theorem alias: the unconditional promoted mass gap (proved). -/
+theorem clay_yang_mills_strict :
+    ∃ (P : GappedSpectrum (Fin 2)), 0 < P.Δ :=
+  MassGapInstances.clay_yang_mills_strict
 
-/-- Both global axioms are available simultaneously; this theorem checks that
-    their statements are mutually consistent as top-level assumptions. -/
-theorem global_axioms_consistent :
+/-- Both global theorems are available simultaneously. -/
+theorem global_theorems_consistent :
     (∀ (N : ℕ) (hN : 2 ≤ N)
       [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
       [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
@@ -44,6 +45,5 @@ theorem global_axioms_consistent :
 
 end GlobalAxioms
 
--- Audit: this file intentionally introduces two new axioms (the exported
--- statements).  The proved theorems remain axiom-free beyond the standard three.
-#print axioms GlobalAxioms.global_axioms_consistent
+-- Audit: only standard axioms, no exported axioms.
+#print axioms GlobalAxioms.global_theorems_consistent
