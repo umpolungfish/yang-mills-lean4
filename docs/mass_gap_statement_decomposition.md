@@ -141,12 +141,24 @@ theorem promotion_is_coherent (N Ls M) [NeZero Ls] [NeZero M] (hN : 2 ≤ N) :
 | exponential clustering | MassGapInstances | std only | 0 |
 | promotion coherence | UnifiedLattice | std only | 0 |
 
-**Scope.** The "unconditional" badge refers to `MassGapInstances.two_level_gauge_gap`,
-a statement about the two-level system `twoLevel`. The continuum statement in
-`ContinuumClosure.lean` is `clay_yang_mills_strict_from_balaban_and_os (N) (hN) (B) (C)`;
-it takes the Balaban RG and OS-continuation hypotheses as explicit arguments.
-Its axiom audit lists only `propext`, `Classical.choice`, `Quot.sound`.
-`BalabanRGContinuumHypothesis.Ls_nz` remains registered as an instance.
+**Dependency direction.** There are two distinct theorems and one direction
+between them:
+
+- `MassGapInstances.two_level_gauge_gap` is proved unconditionally. It is the
+  promoted core: a concrete lattice gauge system with nonzero commutator whose
+  derived Hamiltonian has a real spectral gap `Δ = 2 > 0`.
+- `ContinuumClosure.clay_yang_mills_strict_from_balaban_and_os (N) (hN) (B) (C)`
+  is a reduction theorem. It takes `B : BalabanRGContinuumHypothesis` and
+  `C : OSPoincareContinuationHypothesis` as explicit arguments and returns
+  `ClayYangMillsMassGap4DStrict N hN`. It does not discharge them.
+
+So the direction is: the two-level system is the promoted gap core, and the
+continuum theorem reduces the full 4D SU(N) target from hypotheses `B` and `C`.
+The full target is not obtained by promoting `twoLevel` into a 4D theory in the
+current corpus, and `B`/`C` are not yet discharged unconditionally.
+
+The "unconditional" badge refers to `MassGapInstances.two_level_gauge_gap`
+only. Its axiom audit lists `propext`, `Classical.choice`, `Quot.sound`.
 The definition of `ClayYangMillsMassGap4DStrict` is faithful to the Clay
 statement: 4D, SU(N), non-trivial, Wightman/OS axioms, gap > 0.
 

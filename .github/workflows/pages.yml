@@ -24,8 +24,24 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Build site
         run: python3 scripts/build_site.py
+
+      - name: Build corpus explorer
+        working-directory: explorer
+        run: |
+          npm install
+          npm run build
+
+      - name: Place explorer under docs/explorer
+        run: |
+          mkdir -p docs/explorer
+          cp -r explorer/dist/. docs/explorer/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

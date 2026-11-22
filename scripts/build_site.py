@@ -91,6 +91,7 @@ html_content = """<!DOCTYPE html>
         <a href="#architecture" class="hover:text-emerald-400 transition">Architecture</a>
         <a href="#theorems" class="hover:text-emerald-400 transition">Theorems</a>
         <a href="#audit" class="hover:text-emerald-400 transition">Axiom Audit</a>
+        <a href="explorer/index.html" class="hover:text-emerald-400 transition">Corpus Explorer</a>
         <a href="statement_decomposition.html" class="hover:text-emerald-400 transition">Statement Audit</a>
         <a href="semantic_decomposition.html" class="hover:text-emerald-400 transition">Semantic Audit</a>
         <a href="#reproduce" class="hover:text-emerald-400 transition">Replication</a>
@@ -161,6 +162,19 @@ html_content = """<!DOCTYPE html>
         <div class="text-3xl sm:text-4xl font-extrabold text-indigo-400">Standard</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Standard Lean 4 Foundations</div>
       </div>
+    </div>
+  </section>
+
+  <!-- Corpus Explorer feature -->
+  <section class="py-12 bg-slate-900/30 border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4">
+      <a href="explorer/index.html" class="group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl border border-emerald-500/30 bg-slate-900 hover:border-emerald-400/60 transition">
+        <div>
+          <div class="text-lg font-bold text-emerald-400 group-hover:text-emerald-300">Yang–Mills 4D Corpus Explorer</div>
+          <p class="text-sm text-slate-400 mt-1">Interactive labs: Dobrushin wave, SU(N) loop &amp; witness, time slices &amp; Ising, 4D tesseract &amp; flow, and the bridge/source reader over the Lean corpus.</p>
+        </div>
+        <span class="shrink-0 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-sm font-semibold">Open explorer →</span>
+      </a>
     </div>
   </section>
 
