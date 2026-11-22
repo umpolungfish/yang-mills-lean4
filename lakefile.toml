@@ -56,5 +56,6 @@ globs = [
   "Imscribing.YangMills.ProbIntegralTransform",
   "Imscribing.YangMills.PiFubini",
   "Imscribing.YangMills.SubmersionDensity",
-  "Imscribing.YangMills.IIDSchwingerFromWilson"
+  "Imscribing.YangMills.IIDSchwingerFromWilson",
+  "Imscribing.YangMills.IIDOS"
 ]

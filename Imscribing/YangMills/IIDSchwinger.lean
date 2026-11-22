@@ -85,7 +85,7 @@ lemma iidSchwinger_so4 (n : ℕ) (R : Matrix.specialOrthogonalGroup (Fin 4) ℝ)
 
 /-! ### Property 3: reflection positivity -/
 
-private lemma timeReflect_neg (x : Space4) (hpos : 0 < x 0) (y : Space4) (hypos : 0 < y 0) :
+lemma timeReflect_neg (x : Space4) (hpos : 0 < x 0) (y : Space4) (hypos : 0 < y 0) :
     euclidTimeReflect x ≠ y := by
   intro h
   have h0 := congrFun h 0
