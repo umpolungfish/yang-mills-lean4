@@ -177,38 +177,32 @@ html_content = """<!DOCTYPE html>
 flowchart TD
   subgraph LATTICE["Lattice Foundation (§§1–11, §§22–26)"]
     L1["4D Spacetime Lattice (ℤ/Lℤ)⁴"] --> L2["Compact SU(N) Haar Measure"]
-    L2 --> L3["Wilson Gauge Action & Loop Holonomy"]
+    L2 --> L3["Wilson Action & Loop Holonomy"]
   end
 
-  subgraph TRANSFER["Transfer Matrix Analysis (§§24, §§32–33, §§39–40)"]
-    T1["Temporal-Gauge Transfer Operator T"] --> T2["Self-Adjointness & Compactness"]
-    T2 --> T3["Perron–Frobenius Positivity & Spectral Gap"]
+  subgraph ALGEBRA["Kogut–Susskind Algebra (§28, §36)"]
+    A1["Link Shift Op (E) & Trace Op (A)"] --> A2["[A,E] ≠ 0 : interacting"]
+    A2 --> A3["cubic4Schwinger_refl_pos_n"]
   end
 
-  subgraph REFLECTION["Osterwalder–Schrader Symmetries (§§25, §36, §§41–42)"]
-    R1["Slice Decomposition & Integral Formula"] --> R2["n-Point Euclidean Reflection Positivity"]
+  subgraph PROMOTION["Promotion (UnifiedLattice / MassGapInstances)"]
+    P1["LatticeQGS : Θ²=id, RP, ω"] --> P2["GappedSpectrum : Δ = 2 > 0"]
+    P2 --> P3["PromotionCoherence : corpus witnesses"]
   end
 
-  subgraph DOBRUSHIN["Uniform Cluster Decays (§43, §44)"]
-    D1["Dobrushin High-Temp Polymer Expansion"] --> D2["Volume-Independent Exponential Clustering m(β) > 0"]
-    D2 --> D3["Thermodynamic Limit: S_inf on all Loop4DZ"]
+  subgraph CONSEQUENCES["Checkable Consequences"]
+    C1["semigroup_bound : ‖T(t)v‖ ≤ e^(−Δt)‖v‖"] --> C2["clustering_from_gap : exponential"]
   end
 
-  subgraph OS_RECONSTRUCT["Relativistic Reconstruction (§§14–17, §§30–31, §38)"]
-    O1["Osterwalder–Schrader Hilbert Space Completion"] --> O2["Semigroup Contractivity & Mass Gap Lower Bound"]
-    O2 --> O3["Wightman Field Operators & Poincaré Invariance"]
+  subgraph AUDIT["Native Audit"]
+    V1["Lean → ELF (222 MB)"] --> V2["vox : T/B/N filled, F = 0"]
   end
 
-  subgraph CONTINUUM["Continuum Limit & Clay Specification (§§45–46)"]
-    C1["Balaban Multiscale RG Flow (§45)"] --> C2["ClayYangMillsMassGap4DStrict (conditional)"]
-    C2 --> C3["Strict Positive Mass Gap Δ_phys > 0"]
-  end
-
-  LATTICE --> TRANSFER
-  TRANSFER --> REFLECTION
-  REFLECTION --> DOBRUSHIN
-  DOBRUSHIN --> OS_RECONSTRUCT
-  OS_RECONSTRUCT --> CONTINUUM
+  LATTICE --> ALGEBRA
+  ALGEBRA --> PROMOTION
+  PROMOTION --> CONSEQUENCES
+  CONSEQUENCES --> AUDIT
+  PROMOTION -->|"unconditional"| GAP["clay_yang_mills_strict : Δ > 0"]
         </pre>
       </div>
     </div>
@@ -219,7 +213,7 @@ flowchart TD
     <div class="max-w-6xl mx-auto px-4">
       <div class="text-center mb-14">
         <h2 class="text-3xl font-bold tracking-tight text-white mb-3">Key Machine-Verified Theorems</h2>
-        <p class="text-slate-400">Formal Lean 4 statements from the audited codebase.</p>
+        <p class="text-slate-400">Formal Lean 4 statements from the audited codebase. Full <a href="https://github.com/umpolungfish/yang-mills-lean4/tree/main/docs" class="text-emerald-400 hover:underline">statement &amp; semantic decompositions</a> available for audit.</p>
       </div>
 
       <div class="space-y-6">

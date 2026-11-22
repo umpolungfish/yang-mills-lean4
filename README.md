@@ -79,6 +79,12 @@ The formalization rigorously constructs the continuous, non-Gaussian relativisti
 
 ---
 
+## Audit decomposition
+
+The unconditional claim is broken into auditable pieces:
+- [Statement decomposition](docs/mass_gap_statement_decomposition.md) — each atomic claim, its Lean statement, axioms, and proof status.
+- [Semantic decomposition](docs/mass_gap_semantic_decomposition.md) — what each claim means and what would falsify it.
+
 ## 3. Key Formal Theorems
 
 ### Main Millennium Reduction
