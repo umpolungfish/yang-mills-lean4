@@ -41,8 +41,8 @@ theorem two_level_gauge_gap :
 8. `gap` — every eigenvector orthogonal to `ground` has eigenvalue with
    `l.im = 0 ∧ Δ ≤ l.re` (the matrix analogue of `spec(H) ∩ (0,Δ) = ∅`).
 
-`GappedSpectrum (Fin 2)` remains as the abstract spectral shape used by
-`semigroup_bound` and `clustering_from_gap`; it is no longer the headline.
+`GappedSpectrum (Fin 2)` is the abstract spectral shape used by
+`semigroup_bound` and `clustering_from_gap`.
 Audit: each field is checked by the kernel; no field is an axiom.
 
 ## §2 — Component (A): the gauge system is non-vacuous

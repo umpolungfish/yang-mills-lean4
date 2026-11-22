@@ -3,9 +3,7 @@
 
   The gap statement's type depends on the gauge system.
 
-  In MassGapInstances, `clay_yang_mills_strict : ∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`
-  never mentions `LatticeQGS`, and `0 < P.Δ` is already the field `Δ_pos`.
-  Here the Hamiltonian is DEFINED from the gauge data (`H = 1 - S`), the ground
+  The Hamiltonian is defined from the gauge data (`H = 1 - S`), the ground
   state is a genuine eigenvector, and the gap is a statement about eigenvalues
   of that matrix on the orthogonal complement of the ground state.
 -/
