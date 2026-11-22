@@ -58,3 +58,29 @@ which still takes `BalabanRGContinuumHypothesis` (B) and
 hard analytic core: the Wilson-lattice scaling limit with $\beta\to\infty$,
 $a\to0$. It is stored in the corpus as the open `SUYangMillsRGConjecture`.
 Nothing here asserts it without a proof.
+
+## Analytic rungs for item 5 (the Wilson scaling limit)
+
+Item 5 is the hard analytic core and remains a hypothesis.  The following
+rungs are proved unconditionally in Lean and supply the ingredients one would
+assemble to attack it; they do **not** by themselves establish item 5.
+
+| Rung | Theorem | File |
+|---|---|---|
+| 1 — multi-dimensional Rademacher annihilation | `radI_multidim` (Stone–Weierstrass + Fubini) | `RademacherMulti.lean` |
+| 2 — probability integral transform | `map_cdf_eq_uniform_Ioc` | `ProbIntegralTransform.lean` |
+| 3 — SU(N) topological group, compactness, Haar probability | `sunHaar`, `sun_compactSpace`, `sun_isTopologicalGroup` | `SUNHaar.lean` |
+| 4 — submersion ⇒ L¹ density | `submersion_map_has_L1_density` (Jacobian + Radon–Nikodym) | `SubmersionDensity.lean` |
+| Fubini splitting of `Measure.pi` | `integral_pi_split_at` | `PiFubini.lean` |
+
+All of these depend only on `propext`, `Classical.choice`, `Quot.sound`, with
+zero sorries.  The Wilson expectation itself is concrete — Haar measure on the
+gauge group times the Boltzmann weight, normalized by the partition function
+(`cubic4Schwinger` in `CubicHaar4D.lean`), with no `wilsonExpect` axiom.
+
+`iidSchwinger_from_wilson` (`IIDSchwingerFromWilson.lean`) is the conditional
+bridge: **if** the concrete Wilson Schwinger functions converge to
+`iidSchwinger` (item 5), **then** that limit carries all six Euclidean axioms.
+The convergence hypothesis is the open analytic content and is not discharged
+here.
+

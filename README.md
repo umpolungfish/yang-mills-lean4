@@ -124,6 +124,24 @@ theorem iidSchwinger_non_gaussian :
 ```
 The construction uses moments of the law $Z \in \{1,2\}$ with equal weight; its value depends only on the equality classes of its argument, which makes each axiom a direct computation. All five theorems use only standard axioms.
 
+### Analytic rungs toward the Wilson scaling limit
+The following are proved unconditionally (standard axioms, zero sorries) and supply the
+ingredients for the hard Wilson-lattice scaling limit, which remains an explicit hypothesis:
+
+| Rung | Theorem | File |
+|---|---|---|
+| Multi-dimensional Rademacher annihilation | `radI_multidim` | `Imscribing/YangMills/RademacherMulti.lean` |
+| Probability integral transform | `map_cdf_eq_uniform_Ioc` | `Imscribing/YangMills/ProbIntegralTransform.lean` |
+| SU(N) topological group, compactness, Haar probability | `sunHaar`, `sun_compactSpace` | `Imscribing/YangMills/SUNHaar.lean` |
+| Submersion ⇒ L¹ density | `submersion_map_has_L1_density` | `Imscribing/YangMills/SubmersionDensity.lean` |
+| Fubini coordinate splitting | `integral_pi_split_at` | `Imscribing/YangMills/PiFubini.lean` |
+
+The Wilson expectation is concrete — Haar measure on the gauge group times the Boltzmann
+weight, normalized by the partition function (`cubic4Schwinger`), with no `wilsonExpect` axiom.
+The bridge theorem `iidSchwinger_from_wilson` is **conditional**: if the Wilson Schwinger
+functions converge to `iidSchwinger`, then that limit carries all six Euclidean axioms. The
+convergence hypothesis is the open analytic core and is not discharged here.
+
 ### Main Millennium Reduction
 Proven in [`Imscribing/YangMills/ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean):
 ```lean

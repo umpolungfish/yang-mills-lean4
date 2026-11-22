@@ -635,9 +635,16 @@ for line in [
     "  YangMills.iidSchwinger_refl_pos_2     — reflection positivity",
     "  YangMills.iidSchwinger_cluster        — exponential clustering (rate 1)",
     "  YangMills.iidSchwinger_non_gaussian   — connected 4-point nonzero",
+    "  YangMills.radI_multidim               — multi-dim Rademacher annihilation",
+    "  YangMills.map_cdf_eq_uniform_Ioc      — probability integral transform",
+    "  YangMills.sunHaar                     — SU(N) Haar probability measure",
+    "  YangMills.submersion_map_has_L1_density — submersion to L1 density",
+    "  YangMills.integral_pi_split_at        — Fubini coordinate splitting",
 ]:
     print(line)
 print()
+print("CONDITIONAL BRIDGE (limit hypothesis is the open analytic core)")
+print("  YangMills.iidSchwinger_from_wilson : Wilson limit => six Euclidean axioms")
 print("HARDENED TARGET (reduction theorem; hypotheses B and C still explicit)")
 print("  clay_yang_mills_strict_from_balaban_and_os : ClayYangMillsMassGap4DStrict")
 print("=" * 72)
