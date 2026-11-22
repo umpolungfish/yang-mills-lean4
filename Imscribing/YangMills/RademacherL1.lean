@@ -52,7 +52,7 @@ noncomputable def dyadicCell (K : ℕ) (n : ℤ) : Set ℝ :=
   Set.Ico ((n : ℝ) / (2 : ℝ)^K) (((n + 1 : ℤ) : ℝ) / (2 : ℝ)^K)
 
 /-- r_K is measurable. -/
-private lemma rademacher_measurable (K : ℕ) : Measurable (rademacher K) := by
+lemma rademacher_measurable (K : ℕ) : Measurable (rademacher K) := by
   unfold rademacher
   have hfloor : Measurable (fun u : ℝ => Int.floor ((2 : ℝ)^K * u)) := by fun_prop
   have hsetZ : MeasurableSet {z : ℤ | Even z} := (Set.to_countable _).measurableSet
@@ -411,7 +411,7 @@ private lemma integrable_mul_rademacher (f : ℝ → ℝ) (C : ℝ)
     exact hbound u hu)
 
 /-- L1 annihilation for continuous functions on [0,1]. -/
-private lemma rademacher_annihilate_continuous (q : ℝ → ℝ) (hq : Continuous q) :
+lemma rademacher_annihilate_continuous (q : ℝ → ℝ) (hq : Continuous q) :
     Tendsto (fun K : ℕ => ∫ u in Set.Ico 0 1, q u * rademacher K u) atTop (𝓝 0) := by
   rw [Metric.tendsto_atTop]
   intro eps heps
