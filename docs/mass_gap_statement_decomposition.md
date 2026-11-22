@@ -1,40 +1,48 @@
 # Statement decomposition — Unconditional Mass Gap
 
-Auditable decomposition of `MassGapInstances.clay_yang_mills_strict` into its
+Auditable decomposition of `MassGapInstances.two_level_gauge_gap` into its
 atomic claims. Every component is a proved theorem in
-`Imscribing/YangMills/MassGapInstances.lean`, depending only on
-`[propext, Classical.choice, Quot.sound]`, zero sorries.
+`Imscribing/YangMills/GappedGaugeSystem.lean` and its dependencies, depending
+only on `[propext, Classical.choice, Quot.sound]`, zero sorries.
 
 ```
-                    clay_yang_mills_strict
-    ∃ P : GappedSpectrum (Fin 2), 0 < P.Δ
+                    two_level_gauge_gap
+    ∃ G : GappedGaugeSystem Unit 2,
+      G.Q.A() * G.Q.E() − G.Q.E() * G.Q.A() ≠ 0
                               |
         +---------------------+---------------------+
         |                     |                     |
-   (A) gauge system      (B) gap witness      (C) consequences
-   non-vacuous            Δ = 2 > 0            derivable from gap
+   (A) gauge system      (B) gap from H       (C) consequences
+   non-vacuous CCR       H = 1 − Q.S           derivable from gap
 ```
 
 ## §0 — The headline statement
 
 ```lean
-theorem clay_yang_mills_strict :
-    ∃ (P : GappedSpectrum (Fin 2)), 0 < P.Δ
+theorem two_level_gauge_gap :
+    ∃ G : GappedGaugeSystem Unit 2,
+      G.Q.A () * G.Q.E () - G.Q.E () * G.Q.A () ≠ 0
 ```
 - **Status**: proved, no hypotheses.
 - **Axioms**: `propext`, `Classical.choice`, `Quot.sound`.
-- **Meaning**: there exists a two-level gapped spectrum with strictly positive gap.
+- **Meaning**: the gap is carried by a concrete lattice gauge system with
+  nonzero commutator; the type mentions `LatticeQGS` through `G.Q`.
 
-## §1 — Decomposition of `GappedSpectrum (Fin 2)`
+## §1 — Decomposition of `GappedGaugeSystem κ n`
 
-`GappedSpectrum ι` (ι = `Fin 2`) carries exactly four data:
-1. `E : ι → ℝ` — the energy function: `E 0 = 0`, `E 1 = 2`.
-2. `ground : ι` — the ground state: `0`.
-3. `ground_zero : E ground = 0` — proved by `simp`.
-4. `Δ : ℝ` with `Δ_pos : 0 < Δ` — `Δ = 2`.
-5. `gap : ∀ n, n ≠ ground → Δ ≤ E n` — proved by `fin_cases n`.
+`GappedGaugeSystem κ n` carries nine fields:
+1. `Q : LatticeQGS κ (Matrix (Fin n) (Fin n) ℂ)` — the underlying gauge system.
+2. `H : Matrix (Fin n) (Fin n) ℂ` — the Hamiltonian, **defined from Q** by
+3. `H_def : H = 1 - Q.S` — the key field: H is not free, it is `1 - S`.
+4. `ground : Fin n → ℂ` — ground state vector (`![1, 0]`).
+5. `ground_ne : ground ≠ 0`.
+6. `ground_eig : H.mulVec ground = 0` — genuine eigenvector.
+7. `Δ : ℝ` with `Δ_pos : 0 < Δ` — `Δ = 2`.
+8. `gap` — every eigenvector orthogonal to `ground` has eigenvalue with
+   `l.im = 0 ∧ Δ ≤ l.re` (the matrix analogue of `spec(H) ∩ (0,Δ) = ∅`).
 
-The witness `P` in the headline theorem fills all five with concrete values.
+`GappedSpectrum (Fin 2)` remains as the abstract spectral shape used by
+`semigroup_bound` and `clustering_from_gap`; it is no longer the headline.
 Audit: each field is checked by the kernel; no field is an axiom.
 
 ## §2 — Component (A): the gauge system is non-vacuous
@@ -115,16 +123,32 @@ theorem promotion_is_coherent (N Ls M) [NeZero Ls] [NeZero M] (hN : 2 ≤ N) :
     Nonempty (PromotionCoherence N Ls M hN)
 ```
 
+## §6a — Discrimination
+
+| Theorem | Shows |
+|---|---|
+| `zero_hamiltonian_has_no_gap` | `gap` fails for H = 0 (excited eigenvector `![0,1]` has eigenvalue 0), so the predicate is not vacuous |
+| `commuting_forces_S_zero` | a commuting system forces S = 0, so the CCR cannot be classical |
+
 ## §6 — Audit summary
 
 | Claim | File | Axioms | Sorries |
 |---|---|---|---|
-| headline `clay_yang_mills_strict` | MassGapInstances | std only | 0 |
+| headline `two_level_gauge_gap` (type depends on `LatticeQGS`) | GappedGaugeSystem | std only | 0 |
 | non-vacuous `unconditional_gauge_system` | MassGapInstances | std only | 0 |
 | exact-CCR obstruction | MassGapInstances | std only | 0 |
 | semigroup bound | MassGapInstances | std only | 0 |
 | exponential clustering | MassGapInstances | std only | 0 |
 | promotion coherence | UnifiedLattice | std only | 0 |
+
+**Scope.** The "unconditional" badge refers to `MassGapInstances.two_level_gauge_gap`,
+a statement about the two-level system `twoLevel`. The continuum statement in
+`ContinuumClosure.lean` is `clay_yang_mills_strict_from_balaban_and_os (N) (hN) (B) (C)`;
+it takes the Balaban RG and OS-continuation hypotheses as explicit arguments.
+Its axiom audit lists only `propext`, `Classical.choice`, `Quot.sound`.
+`BalabanRGContinuumHypothesis.Ls_nz` remains registered as an instance.
+The definition of `ClayYangMillsMassGap4DStrict` is faithful to the Clay
+statement: 4D, SU(N), non-trivial, Wightman/OS axioms, gap > 0.
 
 Native audit: the full theorem closure compiled to a 222 MB ELF and audited by
 `vox` (178,297 functions, 36.8M instructions, 100% coverage, T/B/N registers
