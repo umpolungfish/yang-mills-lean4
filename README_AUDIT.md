@@ -30,7 +30,7 @@ Build completed successfully (8035 jobs).
 ```
 
 ### Step 3: Kernel Axiom Audit
-Run the kernel-level `#print axioms` audit across all 45 development sections:
+Run the kernel-level `#print axioms` audit across all 46 development sections:
 ```bash
 lake build Imscribing.YangMills.ContinuumClosure
 ```
@@ -187,11 +187,11 @@ theorem strongCoupling_time_slice_clustering (Ls Lt N : ℕ) [NeZero Ls] [NeZero
 
 ## 5. Axiomatic Verification Summary
 
-All 209 checked theorems rely exclusively on:
+All 224 checked theorems rely exclusively on:
 1. `propext`: Propositional extensionality (`(P ↔ Q) → P = Q`).
 2. `Classical.choice`: Axiom of choice for non-empty types.
 3. `Quot.sound`: Soundness of quotient relations (`a ≈ b → ⟦a⟧ = ⟦b⟧`).
 
 **No non-standard axioms. No placeholders. No `sorry`.**
 
-Detailed breakdown for all 209 theorems is available in [AXIOM_AUDIT_REPORT.md](./AXIOM_AUDIT_REPORT.md).
+Detailed breakdown for all 224 theorems is available in [AXIOM_AUDIT_REPORT.md](./AXIOM_AUDIT_REPORT.md).

@@ -34,6 +34,7 @@ const LAYER_ORDER: Array<{
   { layer: 'feynman_kac', label: '04 · Transfer Op & Slice FK', sublabel: '§§39–42 · Wilson4DOp + FeynmanKac' },
   { layer: 'strong_coupling', label: '05 · Dobrushin & Inf-Vol', sublabel: '§§43–44 · Strong Coupling' },
   { layer: 'bridge_closure', label: '06 · Clay Bridge & Witness', sublabel: '§§45–46W · Closure + 9 Props' },
+  { layer: 'analytic_rungs', label: '07 · Analytic Rungs & Schwinger Bridge', sublabel: 'R1–R4 · Haar, PIT, Rademacher, Density, Bridge' },
 ];
 
 function StatusMark({ status }: { status: ProofStatus }) {

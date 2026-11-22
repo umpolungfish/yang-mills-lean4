@@ -478,5 +478,5 @@ lake build Imscribing.YangMills
 lake build Imscribing.YangMills.ContinuumClosure
 ```
 
-Total verified theorems: 209.
+Total verified theorems: 224.
 All theorems pass with standard Lean 4 foundations: `[propext, Classical.choice, Quot.sound]`.

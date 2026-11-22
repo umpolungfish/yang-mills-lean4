@@ -43,7 +43,7 @@ cd yang-mills-lean4
 # 2. Compile the complete Yang–Mills library (8,035 targets)
 lake build Imscribing.YangMills
 
-# 3. Run the kernel axiom audit across all 45 development sections
+# 3. Run the kernel axiom audit across all 46 development sections
 lake build Imscribing.YangMills.ContinuumClosure
 ```
 
@@ -100,7 +100,7 @@ The unconditional claim is broken into auditable pieces:
 
 ## 3. Key Formal Theorems
 
-### Schwinger function with all five continuum properties
+### Schwinger function with all six Euclidean properties
 Proven in [`Imscribing/YangMills/IIDSchwinger.lean`](./Imscribing/YangMills/IIDSchwinger.lean):
 ```lean
 noncomputable def iidSchwinger (n : ℕ) (xs : Fin n → Space4) : ℂ :=
@@ -122,7 +122,7 @@ theorem iidSchwinger_cluster (n m : ℕ) :
 theorem iidSchwinger_non_gaussian :
     ∃ xs : Fin 4 → Space4, connected4 iidSchwinger xs ≠ 0
 ```
-The construction uses moments of the law $Z \in \{1,2\}$ with equal weight; its value depends only on the equality classes of its argument, which makes each axiom a direct computation. All five theorems use only standard axioms.
+The construction uses moments of the law $Z \in \{1,2\}$ with equal weight; its value depends only on the equality classes of its argument, which makes each axiom a direct computation. All six theorems use only standard axioms.
 
 ### Analytic rungs toward the Wilson scaling limit
 The following are proved unconditionally (standard axioms, zero sorries) and supply the
@@ -211,7 +211,7 @@ theorem strongCoupling_time_slice_clustering (Ls Lt N : ℕ) [NeZero Ls] [NeZero
 
 The formalization has undergone exhaustive kernel-level dependency checks via `#print axioms` across all 46 development sections. 
 
-- **Total Checked Theorems**: 209
+- **Total Checked Theorems**: 224
 - **Unproven Axioms (`sorryAx`)**: 0
 - **Axiomatic Dependencies**: Strictly standard:
   1. `propext` (Propositional Extensionality)

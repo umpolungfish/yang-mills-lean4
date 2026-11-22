@@ -8,6 +8,9 @@ with open(theorems_file) as f:
     theorems_data = json.load(f)
 
 theorems_json = json.dumps(theorems_data)
+THEOREM_COUNT = len(theorems_data)
+BUILD_JOBS = '8,035'
+MILESTONES = '58'
 
 html_content = """<!DOCTYPE html>
 <html lang="en" class="dark">
@@ -94,6 +97,7 @@ html_content = """<!DOCTYPE html>
         <a href="explorer/index.html" class="hover:text-emerald-400 transition">Corpus Explorer</a>
         <a href="statement_decomposition.html" class="hover:text-emerald-400 transition">Statement Audit</a>
         <a href="semantic_decomposition.html" class="hover:text-emerald-400 transition">Semantic Audit</a>
+        <a href="clay_27_components.html" class="hover:text-emerald-400 transition">27-Component Audit</a>
         <a href="#reproduce" class="hover:text-emerald-400 transition">Replication</a>
         <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -121,7 +125,7 @@ html_content = """<!DOCTYPE html>
       </h1>
 
       <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-        The unconditional mass gap is proved in a promoted, non-vacuous gauge system: lattice CCR $[A,E]=i\\hbar S \\neq 0$, reflection $\\Theta^2 = \\mathrm{id}$, reflection positivity, and a strictly positive spectral gap $\\Delta > 0$ — a promoted exceptional point, not a continuum-limit artifact. Verified in Lean 4 with zero unproven axioms.
+        The unconditional mass gap is proved in a promoted, non-vacuous gauge system: lattice CCR $[A,E]=i\\hbar S \\neq 0$, reflection $\\Theta^2 = \\mathrm{id}$, reflection positivity, and a strictly positive spectral gap $\\Delta > 0$ — a promoted exceptional point, not a continuum-limit artifact. Verified in Lean 4 with zero unproven axioms. The Wilson-to-Schwinger bridge is conditional on the lattice scaling limit; four analytic rungs toward it are proved unconditionally.
       </p>
 
       <div class="flex flex-wrap justify-center gap-4">
@@ -133,7 +137,7 @@ html_content = """<!DOCTYPE html>
           View Master Theorems
         </a>
         <a href="#audit" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition border border-slate-700">
-          Axiom Report (209 Theorems)
+          Axiom Report (__THEOREM_COUNT__ Theorems)
         </a>
       </div>
     </div>
@@ -147,7 +151,7 @@ html_content = """<!DOCTYPE html>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Promoted Mass Gap</div>
       </div>
       <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-teal-400">8,035</div>
+        <div class="text-3xl sm:text-4xl font-extrabold text-teal-400">__BUILD_JOBS__</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Compilation Jobs Verified</div>
       </div>
       <div>
@@ -155,8 +159,8 @@ html_content = """<!DOCTYPE html>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Unproven Axioms (<code>sorry</code>)</div>
       </div>
       <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-blue-400">46</div>
-        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Mathematical Milestones</div>
+        <div class="text-3xl sm:text-4xl font-extrabold text-blue-400">__MILESTONES__</div>
+        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Formal Milestones (46 § + 12 modules)</div>
       </div>
       <div>
         <div class="text-3xl sm:text-4xl font-extrabold text-indigo-400">Standard</div>
@@ -182,7 +186,7 @@ html_content = """<!DOCTYPE html>
   <section class="py-20" id="architecture">
     <div class="max-w-6xl mx-auto px-4">
       <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold tracking-tight text-white mb-4">46-Section Construction Pipeline</h2>
+        <h2 class="text-3xl font-bold tracking-tight text-white mb-4">46-Section Pipeline + 4 Analytic Rungs &amp; Bridge</h2>
         <p class="text-slate-400 max-w-2xl mx-auto">
           The theorem reduces the full Millennium Problem to a constructive, step-by-step mathematical ladder connecting compact lattice gauge theories to continuous relativistic quantum fields.
         </p>
@@ -210,6 +214,16 @@ flowchart TD
     C1["semigroup_bound : ‖T(t)v‖ ≤ e^(−Δt)‖v‖"] --> C2["clustering_from_gap : exponential"]
   end
 
+  subgraph RUNGS["Analytic Rungs (unconditional)"]
+    R1["Rademacher annihilation (R1)"] --> R2["PIT (R2) + Haar on SU(N) (R3)"]
+    R2 --> R4["Submersion ⇒ L1 density (R4)"]
+  end
+
+  subgraph BRIDGE["Conditional Schwinger Bridge"]
+    B1["cubic4Schwinger (Haar × Boltzmann)"] --> B2["Wilson limit hypothesis"]
+    B2 --> B3["wilsonLimitSchwinger : six axioms + glut"]
+  end
+
   subgraph AUDIT["Native Audit"]
     V1["Lean → ELF (222 MB)"] --> V2["vox : T/B/N filled, F = 0"]
   end
@@ -217,6 +231,9 @@ flowchart TD
   LATTICE --> ALGEBRA
   ALGEBRA --> PROMOTION
   PROMOTION --> CONSEQUENCES
+  LATTICE --> RUNGS
+  RUNGS --> BRIDGE
+  BRIDGE -->|"conditional on limit"| AUDIT
   CONSEQUENCES --> AUDIT
   PROMOTION -->|"unconditional"| GAP["two_level_gauge_gap : Δ = 2 > 0"]
         </pre>
@@ -247,11 +264,11 @@ flowchart TD
       G.Q.A () * G.Q.E () - G.Q.E () * G.Q.A () ≠ 0</code></pre>
         </div>
 
-        <!-- Schwinger function: all five continuum properties -->
+        <!-- Schwinger function: all six Euclidean properties -->
         <div class="p-6 rounded-2xl bg-slate-900 border border-sky-500/30">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-bold text-sky-400 font-mono">YangMills.iidSchwinger</h3>
-            <span class="text-xs px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono">All 5 continuum axioms</span>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono">All 6 Euclidean axioms</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
             An explicit Schwinger function built from a non-Gaussian independent field. Its value depends only on the equality classes of its argument tuple, so each Euclidean axiom is a direct computation. Six proved theorems, standard axioms only, zero sorries.
@@ -262,6 +279,34 @@ iidSchwinger_so4          : continuous SO(4) invariance
 iidSchwinger_refl_pos_2   : reflection positivity
 iidSchwinger_cluster      : exponential clustering (rate 1)
 iidSchwinger_non_gaussian : connected 4-point ≠ 0</code></pre>
+        </div>
+
+        <!-- Analytic rungs and conditional bridge -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-indigo-500/30">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-indigo-400 font-mono">Four analytic rungs (unconditional)</h3>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">Standard axioms · 0 sorries</span>
+          </div>
+          <p class="text-sm text-slate-400 mb-4">
+            `radI_multidim` (R1), `map_cdf_eq_uniform_Ioc` (R2), `sunHaar` (R3) and `submersion_map_has_L1_density` (R4) are proved from Mathlib foundations and supply the ingredients for the Wilson scaling limit.
+          </p>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>radI_multidim                  — multi-dim Rademacher annihilation
+map_cdf_eq_uniform_Ioc        — probability integral transform
+sunHaar                       — SU(N) Haar probability measure
+submersion_map_has_L1_density — Jacobian + Radon–Nikodym density</code></pre>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900 border border-amber-500/30">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-amber-400 font-mono">YangMills.iidSchwinger_from_wilson</h3>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">Conditional bridge · limit hypothesis essential</span>
+          </div>
+          <p class="text-sm text-slate-400 mb-4">
+            The Wilson limit object `wilsonLimitSchwinger` is the `lim` of concrete Wilson expectations. The limit hypothesis identifies it with `iidSchwinger`, so the six Euclidean axioms transfer. `wilson_limit_glut` shows distinct observation families with the same limit determine the same continuum theory — a glut of equivalent derivations.
+          </p>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>wilsonLimitSchwinger_eq_iid : limit hypothesis => S = iidSchwinger
+iidSchwinger_from_wilson    : S has all six Euclidean axioms
+wilson_limit_glut           : obs₁, obs₂ with same limit => S₁ = S₂</code></pre>
         </div>
 
         <!-- Theorem 2 -->
@@ -339,7 +384,7 @@ iidSchwinger_non_gaussian : connected 4-point ≠ 0</code></pre>
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
         <div>
           <h2 class="text-3xl font-bold tracking-tight text-white mb-2">Automated Axiom Audit</h2>
-          <p class="text-slate-400">All 209 printed theorems certified by the Lean 4 kernel with standard axioms only.</p>
+          <p class="text-slate-400">All __THEOREM_COUNT__ printed theorems certified by the Lean 4 kernel with standard axioms only.</p>
         </div>
         <div class="w-full md:w-80">
           <input type="text" id="searchInput" placeholder="Search theorems or sections..." 
@@ -362,7 +407,7 @@ iidSchwinger_non_gaussian : connected 4-point ≠ 0</code></pre>
           </tbody>
         </table>
       </div>
-      <div class="text-xs text-slate-500 mt-3 text-right">Showing <span id="displayedCount">209</span> of 209 theorems</div>
+      <div class="text-xs text-slate-500 mt-3 text-right">Showing <span id="displayedCount">__THEOREM_COUNT__</span> of __THEOREM_COUNT__ theorems</div>
     </div>
   </section>
 
@@ -382,7 +427,7 @@ cd yang-mills-lean4</code></pre>
         </div>
 
         <div>
-          <span class="text-xs font-semibold text-emerald-400 tracking-wider uppercase">Step 2: Build Complete Library (8,035 Jobs)</span>
+          <span class="text-xs font-semibold text-emerald-400 tracking-wider uppercase">Step 2: Build Complete Library (__BUILD_JOBS__ Jobs)</span>
           <pre class="mt-2 p-3.5 rounded-xl bg-slate-950 text-slate-300 text-sm overflow-x-auto"><code>lake build Imscribing.YangMills</code></pre>
         </div>
 
@@ -442,6 +487,8 @@ cd yang-mills-lean4</code></pre>
 """
 
 full_html = html_content.replace('__THEOREMS_JSON__', theorems_json)
+for _k, _v in [('__THEOREM_COUNT__', str(THEOREM_COUNT)), ('__BUILD_JOBS__', BUILD_JOBS), ('__MILESTONES__', MILESTONES)]:
+    full_html = full_html.replace(_k, _v)
 
 docs_dir = os.path.join(ROOT_DIR, 'docs')
 os.makedirs(docs_dir, exist_ok=True)
@@ -596,6 +643,7 @@ def _decomp_page(title, md_path, out_name):
 _decomp_specs = [
     ("Statement decomposition", "mass_gap_statement_decomposition.md", "statement_decomposition.html"),
     ("Semantic decomposition", "mass_gap_semantic_decomposition.md", "semantic_decomposition.html"),
+    ("27-Component Clay Audit", "clay_27_components.md", "clay_27_components.html"),
 ]
 for _title, _md, _out in _decomp_specs:
     _md_path = os.path.join(docs_dir, _md)
