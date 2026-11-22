@@ -139,8 +139,12 @@ ingredients for the hard Wilson-lattice scaling limit, which remains an explicit
 The Wilson expectation is concrete — Haar measure on the gauge group times the Boltzmann
 weight, normalized by the partition function (`cubic4Schwinger`), with no `wilsonExpect` axiom.
 The bridge theorem `iidSchwinger_from_wilson` is **conditional**: if the Wilson Schwinger
-functions converge to `iidSchwinger`, then that limit carries all six Euclidean axioms. The
-convergence hypothesis is the open analytic core and is not discharged here.
+functions converge to `iidSchwinger`, then the Wilson limit object `wilsonLimitSchwinger`
+carries all six Euclidean axioms. The hypothesis is used essentially (the limit object is the
+`lim` of the Wilson expectations, identified with `iidSchwinger` by uniqueness of limits);
+`wilson_limit_glut` shows that distinct observation families with the same limit determine the
+same continuum object — a glut of equivalent derivations. The convergence hypothesis itself is
+the open analytic core and is not discharged here.
 
 ### Main Millennium Reduction
 Proven in [`Imscribing/YangMills/ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean):

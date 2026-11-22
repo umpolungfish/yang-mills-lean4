@@ -80,7 +80,12 @@ gauge group times the Boltzmann weight, normalized by the partition function
 
 `iidSchwinger_from_wilson` (`IIDSchwingerFromWilson.lean`) is the conditional
 bridge: **if** the concrete Wilson Schwinger functions converge to
-`iidSchwinger` (item 5), **then** that limit carries all six Euclidean axioms.
-The convergence hypothesis is the open analytic content and is not discharged
-here.
+`iidSchwinger` (item 5), **then** the Wilson limit object
+`wilsonLimitSchwinger` carries all six Euclidean axioms. The limit hypothesis is
+used essentially — `wilsonLimitSchwinger` is defined as the `lim` of the Wilson
+expectations and the hypothesis identifies it with `iidSchwinger` by uniqueness
+of limits. `wilson_limit_glut` records that two different observation families
+with the same limit hypothesis determine the same continuum object: a glut of
+equivalent derivations of one theory. The convergence hypothesis itself is the
+open analytic content and is not discharged here.
 

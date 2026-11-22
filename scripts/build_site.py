@@ -645,6 +645,7 @@ for line in [
 print()
 print("CONDITIONAL BRIDGE (limit hypothesis is the open analytic core)")
 print("  YangMills.iidSchwinger_from_wilson : Wilson limit => six Euclidean axioms")
+print("  YangMills.wilson_limit_glut         : equivalent derivations, same limit")
 print("HARDENED TARGET (reduction theorem; hypotheses B and C still explicit)")
 print("  clay_yang_mills_strict_from_balaban_and_os : ClayYangMillsMassGap4DStrict")
 print("=" * 72)
