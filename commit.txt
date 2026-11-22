@@ -1,1 +1,4 @@
-Unconditional Yang-Mills in 4D
+I add truth and information order support to the Yang-Mills carrier
+
+I prove reflexivity, transitivity, and antisymmetry for the truth, falsity,
+and information orders, and witness that their comparisons remain distinct.

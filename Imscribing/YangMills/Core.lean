@@ -1106,7 +1106,11 @@ structure TrilatticeModel where
   le_f       : S → S → Prop
   le_i       : S → S → Prop
   le_t_refl  : ∀ x, le_t x x
+  le_t_trans : ∀ {x y z}, le_t x y → le_t y z → le_t x z
+  le_t_anti  : ∀ {x y}, le_t x y → le_t y x → x = y
   le_f_refl  : ∀ x, le_f x x
+  le_f_trans : ∀ {x y z}, le_f x y → le_f y z → le_f x z
+  le_f_anti  : ∀ {x y}, le_f x y → le_f y x → x = y
   le_i_refl  : ∀ x, le_i x x
   le_i_trans : ∀ {x y z}, le_i x y → le_i y z → le_i x z
   le_i_anti  : ∀ {x y}, le_i x y → le_i y x → x = y
@@ -1346,6 +1350,57 @@ def le16_t (x y : S16) : Prop :=
 def le16_f (x y : S16) : Prop :=
   y.1 ≤ x.1 ∧ x.2.1 ≤ y.2.1 ∧ y.2.2.1 ≤ x.2.2.1 ∧ y.2.2.2 ≤ x.2.2.2
 
+theorem le16_i_trans {x y z : S16} (hxy : le16_i x y) (hyz : le16_i y z) :
+    le16_i x z := by
+  rcases hxy with ⟨hxy0, hxy1, hxy2, hxy3⟩
+  rcases hyz with ⟨hyz0, hyz1, hyz2, hyz3⟩
+  exact ⟨le_trans hxy0 hyz0, le_trans hxy1 hyz1,
+    le_trans hxy2 hyz2, le_trans hxy3 hyz3⟩
+
+theorem le16_i_anti {x y : S16} (hxy : le16_i x y) (hyx : le16_i y x) :
+    x = y := by
+  rcases x with ⟨a0, a1, a2, a3⟩
+  rcases y with ⟨b0, b1, b2, b3⟩
+  rcases hxy with ⟨h10, h11, h12, h13⟩
+  rcases hyx with ⟨h20, h21, h22, h23⟩
+  exact Prod.ext (le_antisymm h10 h20)
+    (Prod.ext (le_antisymm h11 h21)
+      (Prod.ext (le_antisymm h12 h22) (le_antisymm h13 h23)))
+
+theorem le16_t_trans {x y z : S16} (hxy : le16_t x y) (hyz : le16_t y z) :
+    le16_t x z := by
+  rcases hxy with ⟨hxy0, hxy1, hxy2, hxy3⟩
+  rcases hyz with ⟨hyz0, hyz1, hyz2, hyz3⟩
+  exact ⟨le_trans hyz0 hxy0, le_trans hyz1 hxy1,
+    le_trans hxy2 hyz2, le_trans hxy3 hyz3⟩
+
+theorem le16_t_anti {x y : S16} (hxy : le16_t x y) (hyx : le16_t y x) :
+    x = y := by
+  rcases x with ⟨a0, a1, a2, a3⟩
+  rcases y with ⟨b0, b1, b2, b3⟩
+  rcases hxy with ⟨h10, h11, h12, h13⟩
+  rcases hyx with ⟨h20, h21, h22, h23⟩
+  exact Prod.ext (le_antisymm h20 h10)
+    (Prod.ext (le_antisymm h21 h11)
+      (Prod.ext (le_antisymm h12 h22) (le_antisymm h13 h23)))
+
+theorem le16_f_trans {x y z : S16} (hxy : le16_f x y) (hyz : le16_f y z) :
+    le16_f x z := by
+  rcases hxy with ⟨hxy0, hxy1, hxy2, hxy3⟩
+  rcases hyz with ⟨hyz0, hyz1, hyz2, hyz3⟩
+  exact ⟨le_trans hyz0 hxy0, le_trans hxy1 hyz1,
+    le_trans hyz2 hxy2, le_trans hyz3 hxy3⟩
+
+theorem le16_f_anti {x y : S16} (hxy : le16_f x y) (hyx : le16_f y x) :
+    x = y := by
+  rcases x with ⟨a0, a1, a2, a3⟩
+  rcases y with ⟨b0, b1, b2, b3⟩
+  rcases hxy with ⟨h10, h11, h12, h13⟩
+  rcases hyx with ⟨h20, h21, h22, h23⟩
+  exact Prod.ext (le_antisymm h20 h10)
+    (Prod.ext (le_antisymm h11 h21)
+      (Prod.ext (le_antisymm h22 h12) (le_antisymm h23 h13)))
+
 def walk16 : S16 → S16
   | (false, b1, b2, b3) => (true, b1, b2, b3)
   | (true, false, b2, b3) => (true, true, b2, b3)
@@ -1364,16 +1419,14 @@ def trilattice16 : TrilatticeModel where
   le_f := le16_f
   le_i := le16_i
   le_t_refl := fun _ => ⟨le_rfl, le_rfl, le_rfl, le_rfl⟩
+  le_t_trans := le16_t_trans
+  le_t_anti := le16_t_anti
   le_f_refl := fun _ => ⟨le_rfl, le_rfl, le_rfl, le_rfl⟩
+  le_f_trans := le16_f_trans
+  le_f_anti := le16_f_anti
   le_i_refl := fun _ => ⟨le_rfl, le_rfl, le_rfl, le_rfl⟩
-  le_i_trans := fun h1 h2 =>
-    ⟨le_trans h1.1 h2.1, le_trans h1.2.1 h2.2.1,
-     le_trans h1.2.2.1 h2.2.2.1, le_trans h1.2.2.2 h2.2.2.2⟩
-  le_i_anti := by
-    rintro ⟨a0, a1, a2, a3⟩ ⟨b0, b1, b2, b3⟩ ⟨h10, h11, h12, h13⟩ ⟨h20, h21, h22, h23⟩
-    exact Prod.ext (le_antisymm h10 h20)
-      (Prod.ext (le_antisymm h11 h21)
-        (Prod.ext (le_antisymm h12 h22) (le_antisymm h13 h23)))
+  le_i_trans := le16_i_trans
+  le_i_anti := le16_i_anti
   void := (false, false, false, false)
   trueVal := (false, false, true, false)
   falseVal := (false, true, false, false)
@@ -1399,6 +1452,61 @@ def trilattice16 : TrilatticeModel where
     rintro ⟨a0, a1, a2, a3⟩
     cases a0 <;> cases a1 <;> cases a2 <;> cases a3 <;> decide
   W_fixed := by decide
+
+/-- The truth, falsity, and information relations on `S16` are partial orders. -/
+theorem trilattice16_order_support :
+    (∀ x : S16, le16_t x x) ∧
+    (∀ {x y z : S16}, le16_t x y → le16_t y z → le16_t x z) ∧
+    (∀ {x y : S16}, le16_t x y → le16_t y x → x = y) ∧
+    (∀ x : S16, le16_f x x) ∧
+    (∀ {x y z : S16}, le16_f x y → le16_f y z → le16_f x z) ∧
+    (∀ {x y : S16}, le16_f x y → le16_f y x → x = y) ∧
+    (∀ x : S16, le16_i x x) ∧
+    (∀ {x y z : S16}, le16_i x y → le16_i y z → le16_i x z) ∧
+    (∀ {x y : S16}, le16_i x y → le16_i y x → x = y) := by
+  exact ⟨trilattice16.le_t_refl, trilattice16.le_t_trans, trilattice16.le_t_anti,
+    trilattice16.le_f_refl, trilattice16.le_f_trans, trilattice16.le_f_anti,
+    trilattice16.le_i_refl, trilattice16.le_i_trans, trilattice16.le_i_anti⟩
+
+/-- No one of the three orders on `S16` subsumes another. -/
+theorem trilattice16_order_nonimplications :
+    (¬ ∀ x y : S16, le16_i x y → le16_t x y) ∧
+    (¬ ∀ x y : S16, le16_t x y → le16_i x y) ∧
+    (¬ ∀ x y : S16, le16_i x y → le16_f x y) ∧
+    (¬ ∀ x y : S16, le16_f x y → le16_i x y) ∧
+    (¬ ∀ x y : S16, le16_t x y → le16_f x y) ∧
+    (¬ ∀ x y : S16, le16_f x y → le16_t x y) := by
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  · intro h
+    have hbad := h (false, false, false, false) (false, true, false, false)
+      (by simp [le16_i])
+    simp [le16_t] at hbad
+    exact (by decide : ¬ (true ≤ false)) hbad
+  · intro h
+    have hbad := h (false, true, false, false) (false, false, false, false)
+      (by simp [le16_t])
+    simp [le16_i] at hbad
+    exact (by decide : ¬ (true ≤ false)) hbad
+  · intro h
+    have hbad := h (false, false, false, false) (false, false, true, false)
+      (by simp [le16_i])
+    simp [le16_f] at hbad
+    exact (by decide : ¬ (true ≤ false)) hbad
+  · intro h
+    have hbad := h (false, false, true, false) (false, false, false, false)
+      (by simp [le16_f])
+    simp [le16_i] at hbad
+    exact (by decide : ¬ (true ≤ false)) hbad
+  · intro h
+    have hbad := h (false, true, false, false) (false, false, true, false)
+      (by simp [le16_t])
+    simp [le16_f] at hbad
+    exact (by decide : ¬ (true ≤ false)) hbad
+  · intro h
+    have hbad := h (false, false, false, false) (false, true, false, false)
+      (by simp [le16_f])
+    simp [le16_t] at hbad
+    exact (by decide : ¬ (true ≤ false)) hbad
 
 /-- Order independence and non-commutativity of `Inc` and `W` in `trilattice16`. -/
 theorem trilattice16_properties :

@@ -2464,16 +2464,14 @@ def trilattice16Strict : TrilatticeModel where
   le_f := le16_f
   le_i := le16_i
   le_t_refl := fun _ => ⟨le_rfl, le_rfl, le_rfl, le_rfl⟩
+  le_t_trans := le16_t_trans
+  le_t_anti := le16_t_anti
   le_f_refl := fun _ => ⟨le_rfl, le_rfl, le_rfl, le_rfl⟩
+  le_f_trans := le16_f_trans
+  le_f_anti := le16_f_anti
   le_i_refl := fun _ => ⟨le_rfl, le_rfl, le_rfl, le_rfl⟩
-  le_i_trans := fun h1 h2 =>
-    ⟨le_trans h1.1 h2.1, le_trans h1.2.1 h2.2.1,
-     le_trans h1.2.2.1 h2.2.2.1, le_trans h1.2.2.2 h2.2.2.2⟩
-  le_i_anti := by
-    rintro ⟨a0, a1, a2, a3⟩ ⟨b0, b1, b2, b3⟩ ⟨h10, h11, h12, h13⟩ ⟨h20, h21, h22, h23⟩
-    exact Prod.ext (le_antisymm h10 h20)
-      (Prod.ext (le_antisymm h11 h21)
-        (Prod.ext (le_antisymm h12 h22) (le_antisymm h13 h23)))
+  le_i_trans := le16_i_trans
+  le_i_anti := le16_i_anti
   void := (false, false, false, false)
   trueVal := (false, false, true, false)
   falseVal := (false, true, false, false)

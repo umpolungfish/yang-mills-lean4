@@ -165,3 +165,16 @@ statement: 4D, SU(N), non-trivial, Wightman/OS axioms, gap > 0.
 Native audit: the full theorem closure compiled to a 222 MB ELF and audited by
 `vox` (178,297 functions, 36.8M instructions, 100% coverage, T/B/N registers
 populated, F = 0). See `measurements/mass_gap_elf_audit/vox_audit.txt`.
+
+## §7 — Three-order support in the SIXTEEN_3 carrier
+
+`TrilatticeModel` carries independent truth, falsity, and information
+relations. Each relation has its own reflexivity, transitivity, and
+antisymmetry proof fields. For the 16-state `S16` carrier, the coordinate
+orders are proved to satisfy all three partial-order laws and are installed in
+both `trilattice16` and `trilattice16Strict`.
+
+`trilattice16_order_support` exposes the nine order laws together as a Lean
+theorem. `trilattice16_order_nonimplications` gives concrete witnesses in
+both directions for every pair of these orders, preserving the truth,
+falsity, and information comparisons as distinct relations.
