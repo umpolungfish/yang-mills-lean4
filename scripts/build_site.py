@@ -254,9 +254,10 @@ flowchart TD
             <span class="text-xs px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono">All 5 continuum axioms</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
-            An explicit Schwinger function built from a non-Gaussian independent field. Its value depends only on the equality classes of its argument tuple, so each Euclidean axiom is a direct computation. Five proved theorems, standard axioms only, zero sorries.
+            An explicit Schwinger function built from a non-Gaussian independent field. Its value depends only on the equality classes of its argument tuple, so each Euclidean axiom is a direct computation. Six proved theorems, standard axioms only, zero sorries.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>iidSchwinger_trans        : translation invariance
+iidSchwinger_perm         : permutation symmetry
 iidSchwinger_so4          : continuous SO(4) invariance
 iidSchwinger_refl_pos_2   : reflection positivity
 iidSchwinger_cluster      : exponential clustering (rate 1)
@@ -629,6 +630,7 @@ print("UNCONDITIONAL RESULTS (proved, standard axioms only, 0 sorries)")
 for line in [
     "  MassGapInstances.two_level_gauge_gap  — gap in a GappedGaugeSystem",
     "  YangMills.iidSchwinger_trans          — Euclidean translation invariance",
+    "  YangMills.iidSchwinger_perm           — permutation symmetry",
     "  YangMills.iidSchwinger_so4            — continuous SO(4) invariance",
     "  YangMills.iidSchwinger_refl_pos_2     — reflection positivity",
     "  YangMills.iidSchwinger_cluster        — exponential clustering (rate 1)",

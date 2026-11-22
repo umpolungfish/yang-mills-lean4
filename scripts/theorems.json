@@ -2138,5 +2138,15 @@
       "propext"
     ],
     "status": "PASS"
+  },
+  {
+    "section": "§47. Explicit Schwinger function with all five continuum properties",
+    "name": "YangMills.iidSchwinger_perm",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
   }
 ]

@@ -14,12 +14,13 @@ The **Schwinger function with all continuum axioms** is also proved, uncondition
 | Property | Theorem |
 |---|---|
 | Euclidean translation invariance | `iidSchwinger_trans` |
+| Permutation symmetry | `iidSchwinger_perm` |
 | Continuous SO(4) invariance | `iidSchwinger_so4` |
 | Reflection positivity | `iidSchwinger_refl_pos_2` |
 | Exponential clustering (rate 1) | `iidSchwinger_cluster` |
 | Non-Gaussian (connected 4-point ≠ 0) | `iidSchwinger_non_gaussian` |
 
-All five depend only on `propext`, `Classical.choice`, `Quot.sound`, with zero sorries.
+All six depend only on `propext`, `Classical.choice`, `Quot.sound`, with zero sorries.
 
 Every theorem, lemma, and construction has been verified by the Lean 4 kernel with **0 `sorry` placeholders** and depends strictly on standard Lean 4 foundations (`propext`, `Classical.choice`, `Quot.sound`).
 
@@ -107,6 +108,8 @@ noncomputable def iidSchwinger (n : ℕ) (xs : Fin n → Space4) : ℂ :=
 
 theorem iidSchwinger_trans (a : Space4) (xs : Fin n → Space4) :
     iidSchwinger n (fun i j => xs i j + a j) = iidSchwinger n xs
+theorem iidSchwinger_perm (σ : Equiv.Perm (Fin n)) :
+    iidSchwinger n (fun i => xs (σ i)) = iidSchwinger n xs
 theorem iidSchwinger_so4 (R : Matrix.specialOrthogonalGroup (Fin 4) ℝ) :
     iidSchwinger n (fun i => Matrix.mulVec R.1 (xs i)) = iidSchwinger n xs
 theorem iidSchwinger_refl_pos_2 (c : Fin m → ℂ) (xs : Fin m → Space4) :
