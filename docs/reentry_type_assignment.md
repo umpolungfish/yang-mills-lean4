@@ -64,10 +64,17 @@ All other coordinates unchanged.
 - prot 𐑟: non-Abelian braid protection — the B state holds trivial and
   non-trivial topological classes simultaneously, unresolved.
 
-## Audit boundary
+## Lean verification
 
-The `IGProtocol` scaffold verifies the protocol term and `μ∘δ = id` on the
-imscription. It does not, by itself, prove the analytic properties of the
-continuum Schwinger function in `ContinuumClosure.lean`. The p4ramill build-state
-guard reports drift in `lakefile.toml` and `toolchain/lib/libleanshared.so`; no
-Lake build was started there.
+`p4rakernel/p4ramill/Imscribing/SchwingerReentry.lean` constructs both assignments
+and proves, with zero axioms:
+
+- `corrected_topology : ImscriptiveTopology corrected`
+- `corrected_closure : ImscriptiveClosure corrected`
+- `corrected_chirality : WindingNeedsChirality corrected`
+- `prior_violates_closure : ¬ ImscriptiveClosure prior`
+- `prior_violates_chirality : ¬ WindingNeedsChirality prior`
+
+The corrected coordinates pol=𐑹 and chir=𐑖 are therefore forced by the
+framework's own checked predicates, not assigned by taste. Build:
+`lake build Imscribing.SchwingerReentry` (p4rakernel, commit `9a39695c`).
