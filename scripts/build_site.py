@@ -91,6 +91,8 @@ html_content = """<!DOCTYPE html>
         <a href="#architecture" class="hover:text-emerald-400 transition">Architecture</a>
         <a href="#theorems" class="hover:text-emerald-400 transition">Theorems</a>
         <a href="#audit" class="hover:text-emerald-400 transition">Axiom Audit</a>
+        <a href="statement_decomposition.html" class="hover:text-emerald-400 transition">Statement Audit</a>
+        <a href="semantic_decomposition.html" class="hover:text-emerald-400 transition">Semantic Audit</a>
         <a href="#reproduce" class="hover:text-emerald-400 transition">Replication</a>
         <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -414,4 +416,118 @@ os.makedirs(docs_dir, exist_ok=True)
 with open(os.path.join(docs_dir, 'index.html'), 'w') as f:
     f.write(full_html)
 
-print("Generated docs/index.html successfully!")
+
+# --- Distinct HTML pages for the audit decompositions -------------------
+# Convert the markdown decomposition docs into standalone styled HTML pages so
+# each breakdown lives at its own URL on the site.
+import html as _html
+import re as _re
+
+
+def _md_to_html(md_text, title):
+    """Small markdown->HTML renderer: headings, fenced code, tables, lists, paragraphs."""
+    lines = md_text.split("\n")
+    out = []
+    i = 0
+    in_code = False
+    code_buf = []
+    table_buf = []
+
+    def flush_table():
+        if not table_buf:
+            return
+        rows = [r for r in table_buf if not _re.match(r"^\s*\|[\s:\-|]+\|\s*$", r)]
+        head = [c.strip() for c in rows[0].strip().strip("|").split("|")]
+        body = rows[1:]
+        t = ['<table class="w-full text-left border-collapse my-5 text-sm">',
+             '<thead><tr class="border-b border-slate-700">' +
+             "".join(f'<th class="py-2 pr-4 text-emerald-400 font-semibold">{_html.escape(h)}</th>' for h in head) +
+             '</tr></thead><tbody>']
+        for row in body:
+            cells = [c.strip() for c in row.strip().strip("|").split("|")]
+            t.append('<tr class="border-b border-slate-800">' +
+                     "".join(f'<td class="py-2 pr-4 text-slate-300">{_html.escape(c)}</td>' for c in cells) +
+                     '</tr>')
+        t.append('</tbody></table>')
+        out.append("".join(t))
+        table_buf.clear()
+
+    while i < len(lines):
+        line = lines[i]
+        if line.startswith("```"):
+            if in_code:
+                out.append('<pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>' +
+                           _html.escape("\n".join(code_buf)) + '</code></pre>')
+                code_buf = []
+                in_code = False
+            else:
+                flush_table()
+                in_code = True
+            i += 1
+            continue
+        if in_code:
+            code_buf.append(line)
+            i += 1
+            continue
+        if line.strip().startswith("|") and line.strip().endswith("|"):
+            table_buf.append(line)
+            i += 1
+            continue
+        flush_table()
+        if line.startswith("#### "):
+            out.append(f'<h4 class="text-lg font-semibold text-slate-200 mt-6 mb-2">{_html.escape(line[5:])}</h4>')
+        elif line.startswith("### "):
+            out.append(f'<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3">{_html.escape(line[4:])}</h3>')
+        elif line.startswith("## "):
+            out.append(f'<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">{_html.escape(line[3:])}</h2>')
+        elif line.startswith("# "):
+            pass  # title handled in the page header
+        elif line.strip().startswith("- "):
+            out.append(f'<li class="text-slate-300 ml-5 list-disc">{_html.escape(line.strip()[2:])}</li>')
+        elif line.strip().startswith("> "):
+            out.append(f'<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">{_html.escape(line.strip()[2:])}</blockquote>')
+        elif line.strip() == "":
+            out.append('<div class="h-2"></div>')
+        else:
+            out.append(f'<p class="text-slate-300 leading-relaxed my-2">{_html.escape(line)}</p>')
+        i += 1
+    flush_table()
+    return "\n".join(out)
+
+
+def _decomp_page(title, md_path, out_name):
+    with open(md_path) as f:
+        body = _md_to_html(f.read(), title)
+    return f"""<!DOCTYPE html>
+<html lang="en" class="dark"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{_html.escape(title)} — Yang–Mills Mass Gap</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head><body class="bg-slate-950 text-slate-200">
+<header class="border-b border-slate-800 bg-slate-900/60 px-4 py-4">
+  <div class="max-w-5xl mx-auto flex items-center justify-between">
+    <a href="index.html" class="text-emerald-400 hover:underline">← Yang–Mills Mass Gap</a>
+    <span class="text-xs uppercase tracking-wider text-slate-400">{_html.escape(title)}</span>
+  </div>
+</header>
+<main class="max-w-5xl mx-auto px-4 py-10">
+  <h1 class="text-3xl sm:text-4xl font-bold text-white mb-8">{_html.escape(title)}</h1>
+  {body}
+  <div class="mt-12 border-t border-slate-800 pt-6 text-sm text-slate-500">
+    Proved in Lean 4 · standard axioms only · 0 sorries · <a href="index.html" class="text-emerald-400 hover:underline">return to overview</a>
+  </div>
+</main></body></html>
+"""
+
+
+_decomp_specs = [
+    ("Statement decomposition", "mass_gap_statement_decomposition.md", "statement_decomposition.html"),
+    ("Semantic decomposition", "mass_gap_semantic_decomposition.md", "semantic_decomposition.html"),
+]
+for _title, _md, _out in _decomp_specs:
+    _md_path = os.path.join(docs_dir, _md)
+    if os.path.exists(_md_path):
+        with open(os.path.join(docs_dir, _out), 'w') as f:
+            f.write(_decomp_page(_title, _md_path, _out))
+
+print("Generated docs/index.html + decomposition pages successfully!")

@@ -125,7 +125,7 @@ Every falsification route is closed by a proved theorem or a computed verdict.
 
 ## §7 — Relation to the project's framework
 
-In the project's terminology (per `AGENTS.md`): the gap is realized as a
+In the project's terminology: the gap is realized as a
 **promoted exceptional point** where classical and quantum descriptions
 coincide at the algebraic level — but crucially, no tensor filtration or
 QM→classical reduction is involved. The superposition-is-glut and
