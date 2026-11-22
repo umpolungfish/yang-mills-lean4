@@ -144,7 +144,7 @@ lemma iidSchwinger_refl_pos_2 (m : ℕ) (c : Fin m → ℂ) (xs : Fin m → Spac
 
 /-! ### Property 4: exponential clustering -/
 
-private lemma iidMom_norm_le (k : ℕ) : ‖iidMom k‖ ≤ (2 : ℝ) ^ k := by
+lemma iidMom_norm_le (k : ℕ) : ‖iidMom k‖ ≤ (2 : ℝ) ^ k := by
   unfold iidMom
   rw [norm_div]
   norm_num

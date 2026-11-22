@@ -30,6 +30,11 @@ lemma euclidTimeReflect_injective : Function.Injective euclidTimeReflect := by
   · have hi' := congrFun h i
     simpa [euclidTimeReflect, hi] using hi'
 
+
+lemma euclidTimeReflect_involutive (x : Space4) : euclidTimeReflect (euclidTimeReflect x) = x := by
+  funext i
+  by_cases hi : i = 0 <;> simp [euclidTimeReflect, hi]
+
 /-- Schwinger value at a time-reflected tuple equals the original. -/
 lemma iidSchwinger_timeReflect (n : ℕ) (xs : Fin n → Space4) :
     iidSchwinger n (fun i => euclidTimeReflect (xs i)) = iidSchwinger n xs :=

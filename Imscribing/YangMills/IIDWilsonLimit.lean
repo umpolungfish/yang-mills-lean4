@@ -44,10 +44,10 @@ theorem plaquetteDensity_gauge_inv (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
 
 /-! ### Fiber regrouping (finite combinatorics, no axioms) -/
 
-private noncomputable def iidSupport {n : ℕ} (xs : Fin n → Space4) : Finset Space4 :=
+noncomputable def iidSupport {n : ℕ} (xs : Fin n → Space4) : Finset Space4 :=
   Finset.univ.image xs
 
-private noncomputable def iidFiber {n : ℕ} (xs : Fin n → Space4) (y : Space4) : Finset (Fin n) :=
+noncomputable def iidFiber {n : ℕ} (xs : Fin n → Space4) (y : Space4) : Finset (Fin n) :=
   Finset.univ.filter (fun i => xs i = y)
 
 private lemma prod_regroup {n : ℕ} (f : Space4 → ℂ) (xs : Fin n → Space4) :
@@ -65,7 +65,7 @@ private lemma prod_regroup {n : ℕ} (f : Space4 → ℂ) (xs : Fin n → Space4
               (g := xs) (f := f)
               (by intro i hi; exact Finset.mem_image.mpr ⟨i, Finset.mem_univ _, rfl⟩))
 
-private lemma iidClasses_eq_fibers {n : ℕ} (xs : Fin n → Space4) :
+lemma iidClasses_eq_fibers {n : ℕ} (xs : Fin n → Space4) :
     iidClasses xs = (iidSupport xs).image (iidFiber xs) := by
   unfold iidClasses iidSupport iidFiber
   ext C
@@ -77,7 +77,7 @@ private lemma iidClasses_eq_fibers {n : ℕ} (xs : Fin n → Space4) :
     subst hi
     exact ⟨i, rfl⟩
 
-private lemma iidFiber_injective {n : ℕ} (xs : Fin n → Space4) :
+lemma iidFiber_injective {n : ℕ} (xs : Fin n → Space4) :
     Set.InjOn (iidFiber xs) (iidSupport xs) := by
   intro y hy y' hy' heq
   have hyf : ∃ i, xs i = y := by simpa [iidSupport] using hy
