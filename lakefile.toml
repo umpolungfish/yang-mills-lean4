@@ -58,5 +58,6 @@ globs = [
   "Imscribing.YangMills.SubmersionDensity",
   "Imscribing.YangMills.IIDSchwingerFromWilson",
   "Imscribing.YangMills.IIDOS",
-  "Imscribing.YangMills.IIDContinuation"
+  "Imscribing.YangMills.IIDContinuation",
+  "Imscribing.YangMills.TrivialWightman"
 ]
