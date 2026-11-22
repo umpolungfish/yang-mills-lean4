@@ -363,3 +363,49 @@ end YangMills
 #print axioms YangMills.iidSchwinger_refl_pos_2
 #print axioms YangMills.iidSchwinger_cluster
 #print axioms YangMills.iidSchwinger_non_gaussian
+
+namespace YangMills
+
+/-! ### Property 6: permutation symmetry (item 8 of the Clay decomposition) -/
+
+private lemma iidClasses_perm {n : ℕ} (σ : Equiv.Perm (Fin n)) (xs : Fin n → Space4) :
+    iidClasses (fun i => xs (σ i)) = (iidClasses xs).image (fun C => C.image σ.symm) := by
+  unfold iidClasses
+  ext C
+  simp only [Finset.mem_image, Finset.mem_univ, true_and]
+  constructor
+  · rintro ⟨i, rfl⟩
+    refine ⟨Finset.univ.filter (fun j => xs j = xs (σ i)), ⟨σ i, rfl⟩, ?_⟩
+    ext j
+    simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_univ, true_and]
+    constructor
+    · rintro ⟨k, hk, rfl⟩
+      simpa using hk
+    · intro hj
+      exact ⟨σ j, hj, by simp⟩
+  · rintro ⟨A, ⟨i, rfl⟩, rfl⟩
+    refine ⟨σ.symm i, ?_⟩
+    ext j
+    simp only [Finset.mem_filter, Finset.mem_image, Finset.mem_univ, true_and]
+    constructor
+    · intro hj
+      exact ⟨σ j, by simpa using hj, by simp⟩
+    · rintro ⟨k, hk, hval⟩
+      have : k = σ j := by simpa using congrArg σ hval
+      subst k
+      simpa using hk
+
+lemma iidSchwinger_perm {n : ℕ} (σ : Equiv.Perm (Fin n)) (xs : Fin n → Space4) :
+    iidSchwinger n (fun i => xs (σ i)) = iidSchwinger n xs := by
+  unfold iidSchwinger
+  rw [iidClasses_perm]
+  rw [Finset.prod_image]
+  · apply Finset.prod_congr rfl
+    intro C hC
+    rw [Finset.card_image_of_injective _ σ.symm.injective]
+  · intro a ha b hb hab
+    exact Finset.image_injective σ.symm.injective hab
+
+#print axioms YangMills.iidSchwinger_perm
+
+end YangMills
