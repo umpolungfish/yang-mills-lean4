@@ -25,7 +25,7 @@ private lemma iidMom_three : iidMom 3 = 9 / 2 := by norm_num [iidMom]
 private lemma iidMom_four : iidMom 4 = 17 / 2 := by norm_num [iidMom]
 
 /-- Equality classes of a finite family of points. -/
-private noncomputable def iidClasses {n : ℕ} (xs : Fin n → Space4) : Finset (Finset (Fin n)) :=
+noncomputable def iidClasses {n : ℕ} (xs : Fin n → Space4) : Finset (Finset (Fin n)) :=
   Finset.univ.image (fun i : Fin n => Finset.univ.filter (fun j : Fin n => xs j = xs i))
 
 /-- The Schwinger function: product of moments over equality classes. -/

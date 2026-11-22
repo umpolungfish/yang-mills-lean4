@@ -47,5 +47,6 @@ globs = [
   "Imscribing.YangMills.GlobalAxioms",
   "Imscribing.YangMills.GappedGaugeSystem",
   "Imscribing.YangMills.ContinuumDecomposition",
-  "Imscribing.YangMills.IIDSchwinger"
+  "Imscribing.YangMills.IIDSchwinger",
+  "Imscribing.YangMills.IIDWilsonLimit"
 ]
