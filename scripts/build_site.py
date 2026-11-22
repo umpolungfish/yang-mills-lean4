@@ -424,14 +424,53 @@ import html as _html
 import re as _re
 
 
+def _inline(text):
+    """Render inline markdown: `code`, **bold**, [text](url), then escape the rest."""
+    # placeholder tokens so escaping doesn't touch generated tags
+    store = []
+
+    def stash(html):
+        store.append(html)
+        return f"\x00{len(store) - 1}\x00"
+
+    # inline code first
+    text = _re.sub(r"`([^`]+)`",
+                   lambda m: stash('<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">' + _html.escape(m.group(1)) + '</code>'),
+                   text)
+    # links
+    text = _re.sub(r"\[([^\]]+)\]\(([^)]+)\)",
+                   lambda m: stash('<a href="' + _html.escape(m.group(2), quote=True) + '" class="text-emerald-400 hover:underline">' + _html.escape(m.group(1)) + '</a>'),
+                   text)
+    # bold
+    text = _re.sub(r"\*\*([^*]+)\*\*",
+                   lambda m: stash('<strong class="text-slate-100 font-semibold">' + _html.escape(m.group(1)) + '</strong>'),
+                   text)
+    # escape remaining literal text (won't touch \x00 digit \x00 placeholders)
+    text = _html.escape(text)
+    # restore stashed html; stashed HTML may itself contain placeholders, so
+    # iterate until none remain (e.g. **bold with `code`**)
+    for _ in range(10):
+        if "\x00" not in text:
+            break
+        text = _re.sub(r"\x00(\d+)\x00", lambda m: store[int(m.group(1))], text)
+    return text
+
+
 def _md_to_html(md_text, title):
-    """Small markdown->HTML renderer: headings, fenced code, tables, lists, paragraphs."""
+    """Markdown -> HTML: headings, fenced code, tables, lists, blockquotes, paragraphs."""
     lines = md_text.split("\n")
     out = []
     i = 0
     in_code = False
     code_buf = []
     table_buf = []
+    list_buf = []
+
+    def flush_list():
+        if list_buf:
+            items = "".join(f'<li class="ml-5 list-disc leading-relaxed my-1">{_inline(x)}</li>' for x in list_buf)
+            out.append(f'<ul class="my-4">{items}</ul>')
+            list_buf.clear()
 
     def flush_table():
         if not table_buf:
@@ -439,29 +478,29 @@ def _md_to_html(md_text, title):
         rows = [r for r in table_buf if not _re.match(r"^\s*\|[\s:\-|]+\|\s*$", r)]
         head = [c.strip() for c in rows[0].strip().strip("|").split("|")]
         body = rows[1:]
-        t = ['<table class="w-full text-left border-collapse my-5 text-sm">',
+        t = ['<div class="overflow-x-auto my-5"><table class="w-full text-left border-collapse text-sm">',
              '<thead><tr class="border-b border-slate-700">' +
-             "".join(f'<th class="py-2 pr-4 text-emerald-400 font-semibold">{_html.escape(h)}</th>' for h in head) +
+             "".join(f'<th class="py-2 pr-4 text-emerald-400 font-semibold">{_inline(h)}</th>' for h in head) +
              '</tr></thead><tbody>']
         for row in body:
             cells = [c.strip() for c in row.strip().strip("|").split("|")]
             t.append('<tr class="border-b border-slate-800">' +
-                     "".join(f'<td class="py-2 pr-4 text-slate-300">{_html.escape(c)}</td>' for c in cells) +
+                     "".join(f'<td class="py-2 pr-4 text-slate-300">{_inline(c)}</td>' for c in cells) +
                      '</tr>')
-        t.append('</tbody></table>')
+        t.append('</tbody></table></div>')
         out.append("".join(t))
         table_buf.clear()
 
     while i < len(lines):
         line = lines[i]
         if line.startswith("```"):
+            flush_list(); flush_table()
             if in_code:
                 out.append('<pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>' +
                            _html.escape("\n".join(code_buf)) + '</code></pre>')
                 code_buf = []
                 in_code = False
             else:
-                flush_table()
                 in_code = True
             i += 1
             continue
@@ -470,28 +509,30 @@ def _md_to_html(md_text, title):
             i += 1
             continue
         if line.strip().startswith("|") and line.strip().endswith("|"):
+            flush_list()
             table_buf.append(line)
             i += 1
             continue
         flush_table()
         if line.startswith("#### "):
-            out.append(f'<h4 class="text-lg font-semibold text-slate-200 mt-6 mb-2">{_html.escape(line[5:])}</h4>')
+            flush_list(); out.append(f'<h4 class="text-lg font-semibold text-slate-200 mt-6 mb-2">{_inline(line[5:])}</h4>')
         elif line.startswith("### "):
-            out.append(f'<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3">{_html.escape(line[4:])}</h3>')
+            flush_list(); out.append(f'<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3">{_inline(line[4:])}</h3>')
         elif line.startswith("## "):
-            out.append(f'<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">{_html.escape(line[3:])}</h2>')
+            flush_list(); out.append(f'<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">{_inline(line[3:])}</h2>')
         elif line.startswith("# "):
-            pass  # title handled in the page header
+            flush_list()  # title handled in the page header
         elif line.strip().startswith("- "):
-            out.append(f'<li class="text-slate-300 ml-5 list-disc">{_html.escape(line.strip()[2:])}</li>')
+            list_buf.append(line.strip()[2:])
         elif line.strip().startswith("> "):
-            out.append(f'<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">{_html.escape(line.strip()[2:])}</blockquote>')
+            flush_list(); out.append(f'<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">{_inline(line.strip()[2:])}</blockquote>')
         elif line.strip() == "":
-            out.append('<div class="h-2"></div>')
+            flush_list(); out.append('<div class="h-2"></div>')
         else:
-            out.append(f'<p class="text-slate-300 leading-relaxed my-2">{_html.escape(line)}</p>')
+            flush_list()
+            out.append(f'<p class="text-slate-300 leading-relaxed my-2">{_inline(line)}</p>')
         i += 1
-    flush_table()
+    flush_list(); flush_table()
     return "\n".join(out)
 
 

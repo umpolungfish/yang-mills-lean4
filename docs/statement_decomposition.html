@@ -13,10 +13,10 @@
 <main class="max-w-5xl mx-auto px-4 py-10">
   <h1 class="text-3xl sm:text-4xl font-bold text-white mb-8">Statement decomposition</h1>
   <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Auditable decomposition of `MassGapInstances.clay_yang_mills_strict` into its</p>
+<p class="text-slate-300 leading-relaxed my-2">Auditable decomposition of <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">MassGapInstances.clay_yang_mills_strict</code> into its</p>
 <p class="text-slate-300 leading-relaxed my-2">atomic claims. Every component is a proved theorem in</p>
-<p class="text-slate-300 leading-relaxed my-2">`Imscribing/YangMills/MassGapInstances.lean`, depending only on</p>
-<p class="text-slate-300 leading-relaxed my-2">`[propext, Classical.choice, Quot.sound]`, zero sorries.</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Imscribing/YangMills/MassGapInstances.lean</code>, depending only on</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[propext, Classical.choice, Quot.sound]</code>, zero sorries.</p>
 <div class="h-2"></div>
 <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>                    clay_yang_mills_strict
     ∃ P : GappedSpectrum (Fin 2), 0 &lt; P.Δ
@@ -30,20 +30,18 @@
 <div class="h-2"></div>
 <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>theorem clay_yang_mills_strict :
     ∃ (P : GappedSpectrum (Fin 2)), 0 &lt; P.Δ</code></pre>
-<li class="text-slate-300 ml-5 list-disc">**Status**: proved, no hypotheses.</li>
-<li class="text-slate-300 ml-5 list-disc">**Axioms**: `propext`, `Classical.choice`, `Quot.sound`.</li>
-<li class="text-slate-300 ml-5 list-disc">**Meaning**: there exists a two-level gapped spectrum with strictly positive gap.</li>
+<ul class="my-4"><li class="ml-5 list-disc leading-relaxed my-1"><strong class="text-slate-100 font-semibold">Status</strong>: proved, no hypotheses.</li><li class="ml-5 list-disc leading-relaxed my-1"><strong class="text-slate-100 font-semibold">Axioms</strong>: <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">propext</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Classical.choice</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Quot.sound</code>.</li><li class="ml-5 list-disc leading-relaxed my-1"><strong class="text-slate-100 font-semibold">Meaning</strong>: there exists a two-level gapped spectrum with strictly positive gap.</li></ul>
 <div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§1 — Decomposition of `GappedSpectrum (Fin 2)`</h2>
+<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§1 — Decomposition of <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">GappedSpectrum (Fin 2)</code></h2>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">`GappedSpectrum ι` (ι = `Fin 2`) carries exactly four data:</p>
-<p class="text-slate-300 leading-relaxed my-2">1. `E : ι → ℝ` — the energy function: `E 0 = 0`, `E 1 = 2`.</p>
-<p class="text-slate-300 leading-relaxed my-2">2. `ground : ι` — the ground state: `0`.</p>
-<p class="text-slate-300 leading-relaxed my-2">3. `ground_zero : E ground = 0` — proved by `simp`.</p>
-<p class="text-slate-300 leading-relaxed my-2">4. `Δ : ℝ` with `Δ_pos : 0 &lt; Δ` — `Δ = 2`.</p>
-<p class="text-slate-300 leading-relaxed my-2">5. `gap : ∀ n, n ≠ ground → Δ ≤ E n` — proved by `fin_cases n`.</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">GappedSpectrum ι</code> (ι = <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Fin 2</code>) carries exactly four data:</p>
+<p class="text-slate-300 leading-relaxed my-2">1. <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">E : ι → ℝ</code> — the energy function: <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">E 0 = 0</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">E 1 = 2</code>.</p>
+<p class="text-slate-300 leading-relaxed my-2">2. <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground : ι</code> — the ground state: <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">0</code>.</p>
+<p class="text-slate-300 leading-relaxed my-2">3. <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground_zero : E ground = 0</code> — proved by <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">simp</code>.</p>
+<p class="text-slate-300 leading-relaxed my-2">4. <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ : ℝ</code> with <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ_pos : 0 &lt; Δ</code> — <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ = 2</code>.</p>
+<p class="text-slate-300 leading-relaxed my-2">5. <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">gap : ∀ n, n ≠ ground → Δ ≤ E n</code> — proved by <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">fin_cases n</code>.</p>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">The witness `P` in the headline theorem fills all five with concrete values.</p>
+<p class="text-slate-300 leading-relaxed my-2">The witness <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">P</code> in the headline theorem fills all five with concrete values.</p>
 <p class="text-slate-300 leading-relaxed my-2">Audit: each field is checked by the kernel; no field is an axiom.</p>
 <div class="h-2"></div>
 <h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§2 — Component (A): the gauge system is non-vacuous</h2>
@@ -57,12 +55,8 @@
   ω : 𝔄 →ₗ[ℂ] ℂ ; ω_one : ω 1 = 1
   refl_pos : ∀ F, (ω (Θ F * F)).im = 0 ∧ 0 ≤ (ω (Θ F * F)).re</code></pre>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Concrete instance `twoLevel : LatticeQGS Unit (Matrix (Fin 2) (Fin 2) ℂ)`:</p>
-<li class="text-slate-300 ml-5 list-disc">`ħ = 2`, `A = X` (Pauli X), `E = Y` (Pauli Y), `S = Z` (Pauli Z);</li>
-<li class="text-slate-300 ml-5 list-disc">`ccr_lattice`: `[X,Y] = 2i·Z = i·ħ·S` — proved by `comm_X_Y`;</li>
-<li class="text-slate-300 ml-5 list-disc">`Θ = conjTranspose`, `Θ_invol` — proved;</li>
-<li class="text-slate-300 ml-5 list-disc">`ω = ½·trace`, `ω_one` — proved;</li>
-<li class="text-slate-300 ml-5 list-disc">`refl_pos`: `trace(F†F) = Σ|Fᵢⱼ|² ≥ 0` real — proved.</li>
+<p class="text-slate-300 leading-relaxed my-2">Concrete instance <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">twoLevel : LatticeQGS Unit (Matrix (Fin 2) (Fin 2) ℂ)</code>:</p>
+<ul class="my-4"><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ħ = 2</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">A = X</code> (Pauli X), <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">E = Y</code> (Pauli Y), <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">S = Z</code> (Pauli Z);</li><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ccr_lattice</code>: <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[X,Y] = 2i·Z = i·ħ·S</code> — proved by <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">comm_X_Y</code>;</li><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Θ = conjTranspose</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Θ_invol</code> — proved;</li><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ω = ½·trace</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ω_one</code> — proved;</li><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">refl_pos</code>: <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">trace(F†F) = Σ|Fᵢⱼ|² ≥ 0</code> real — proved.</li></ul>
 <div class="h-2"></div>
 <p class="text-slate-300 leading-relaxed my-2">Non-triviality witness:</p>
 <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>theorem twoLevel_nontrivial :
@@ -70,7 +64,7 @@
 theorem unconditional_gauge_system :
     ∃ Q : LatticeQGS Unit (Matrix (Fin 2) (Fin 2) ℂ),
       Q.A () * Q.E () - Q.E () * Q.A () ≠ 0</code></pre>
-<p class="text-slate-300 leading-relaxed my-2">The commutator is `2i·Z ≠ 0` — the system is genuinely non-abelian/interacting.</p>
+<p class="text-slate-300 leading-relaxed my-2">The commutator is <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">2i·Z ≠ 0</code> — the system is genuinely non-abelian/interacting.</p>
 <div class="h-2"></div>
 <h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§3 — Component (A′): why the lattice CCR, not the exact CCR</h2>
 <div class="h-2"></div>
@@ -78,9 +72,9 @@ theorem unconditional_gauge_system :
     (n) (hn : 0 &lt; n) (ħ) (hħ : 0 &lt; ħ)
     (A E : Matrix (Fin n) (Fin n) ℂ)
     (hccr : A*E - E*A = (i·ħ) • 1) : False</code></pre>
-<p class="text-slate-300 leading-relaxed my-2">Trace argument: `tr([A,E]) = 0` but `tr(i·ħ·1) = i·ħ·n ≠ 0`.</p>
+<p class="text-slate-300 leading-relaxed my-2">Trace argument: <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">tr([A,E]) = 0</code> but <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">tr(i·ħ·1) = i·ħ·n ≠ 0</code>.</p>
 <p class="text-slate-300 leading-relaxed my-2">This is why the promoted finite-dimensional system uses the shift form</p>
-<p class="text-slate-300 leading-relaxed my-2">`[A,E] = i·ħ·S` with `tr S = 0` (here `S = Pauli Z`). The trace obstruction</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[A,E] = i·ħ·S</code> with <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">tr S = 0</code> (here <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">S = Pauli Z</code>). The trace obstruction</p>
 <p class="text-slate-300 leading-relaxed my-2">is itself a proved theorem, not an assumption.</p>
 <div class="h-2"></div>
 <h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§4 — Component (C): checkable consequences of the gap</h2>
@@ -89,14 +83,14 @@ theorem unconditional_gauge_system :
 <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>theorem semigroup_bound (S : GappedSpectrum ι) {v : ι → ℂ}
     (hv : v S.ground = 0) {t} (ht : 0 ≤ t) :
     l2norm (semigroup S t v) ≤ Real.exp (-S.Δ * t) * l2norm v</code></pre>
-<p class="text-slate-300 leading-relaxed my-2">Proof: termwise `|e^{-tE_n}| ≤ e^{-Δt}` for `n ≠ ground` (from `S.gap`),</p>
-<p class="text-slate-300 leading-relaxed my-2">ground term vanishes by `hv`, sum and sqrt preserve the bound.</p>
+<p class="text-slate-300 leading-relaxed my-2">Proof: termwise <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">|e^{-tE_n}| ≤ e^{-Δt}</code> for <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">n ≠ ground</code> (from <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">S.gap</code>),</p>
+<p class="text-slate-300 leading-relaxed my-2">ground term vanishes by <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">hv</code>, sum and sqrt preserve the bound.</p>
 <div class="h-2"></div>
 <h3 class="text-xl font-bold text-slate-100 mt-8 mb-3">(C2) Exponential clustering</h3>
 <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>theorem clustering_from_gap (S : GappedSpectrum ι) (a : ι → ℂ) {t} (ht : 0 ≤ t) :
     correlator S.E a S.ground t ≤
       (∑ n ∈ univ.erase S.ground, ‖a n‖²) · Real.exp (-S.Δ * t)</code></pre>
-<p class="text-slate-300 leading-relaxed my-2">Derived from the corpus&#x27;s `correlator_le` with the gap hypothesis.</p>
+<p class="text-slate-300 leading-relaxed my-2">Derived from the corpus&#x27;s <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">correlator_le</code> with the gap hypothesis.</p>
 <div class="h-2"></div>
 <p class="text-slate-300 leading-relaxed my-2">The gap is not a mere label: it has two independently proved, quantitative</p>
 <p class="text-slate-300 leading-relaxed my-2">implications.</p>
@@ -104,21 +98,19 @@ theorem unconditional_gauge_system :
 <h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§5 — Coherence of the promoted axioms with the corpus</h2>
 <div class="h-2"></div>
 <p class="text-slate-300 leading-relaxed my-2">The promoted fields are not arbitrary; each is witnessed by a proved lemma of</p>
-<p class="text-slate-300 leading-relaxed my-2">the finite SU(N) lattice theory (`UnifiedLattice.lean`):</p>
-<li class="text-slate-300 ml-5 list-disc">`Θ² = id` ← `cubic4TimeReflect_involutive`</li>
-<li class="text-slate-300 ml-5 list-disc">reflection positivity ← `cubic4Schwinger_refl_pos_n`</li>
-<li class="text-slate-300 ml-5 list-disc">CCR non-degeneracy ← `ks_electric_link_noncommute`</li>
+<p class="text-slate-300 leading-relaxed my-2">the finite SU(N) lattice theory (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">UnifiedLattice.lean</code>):</p>
+<ul class="my-4"><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Θ² = id</code> ← <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">cubic4TimeReflect_involutive</code></li><li class="ml-5 list-disc leading-relaxed my-1">reflection positivity ← <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">cubic4Schwinger_refl_pos_n</code></li><li class="ml-5 list-disc leading-relaxed my-1">CCR non-degeneracy ← <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ks_electric_link_noncommute</code></li></ul>
 <div class="h-2"></div>
 <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>theorem promotion_is_coherent (N Ls M) [NeZero Ls] [NeZero M] (hN : 2 ≤ N) :
     Nonempty (PromotionCoherence N Ls M hN)</code></pre>
 <div class="h-2"></div>
 <h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§6 — Audit summary</h2>
 <div class="h-2"></div>
-<table class="w-full text-left border-collapse my-5 text-sm"><thead><tr class="border-b border-slate-700"><th class="py-2 pr-4 text-emerald-400 font-semibold">Claim</th><th class="py-2 pr-4 text-emerald-400 font-semibold">File</th><th class="py-2 pr-4 text-emerald-400 font-semibold">Axioms</th><th class="py-2 pr-4 text-emerald-400 font-semibold">Sorries</th></tr></thead><tbody><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">headline `clay_yang_mills_strict`</td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">non-vacuous `unconditional_gauge_system`</td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">exact-CCR obstruction</td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">semigroup bound</td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">exponential clustering</td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">promotion coherence</td><td class="py-2 pr-4 text-slate-300">UnifiedLattice</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr></tbody></table>
+<div class="overflow-x-auto my-5"><table class="w-full text-left border-collapse text-sm"><thead><tr class="border-b border-slate-700"><th class="py-2 pr-4 text-emerald-400 font-semibold">Claim</th><th class="py-2 pr-4 text-emerald-400 font-semibold">File</th><th class="py-2 pr-4 text-emerald-400 font-semibold">Axioms</th><th class="py-2 pr-4 text-emerald-400 font-semibold">Sorries</th></tr></thead><tbody><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">headline <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">clay_yang_mills_strict</code></td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">non-vacuous <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">unconditional_gauge_system</code></td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">exact-CCR obstruction</td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">semigroup bound</td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">exponential clustering</td><td class="py-2 pr-4 text-slate-300">MassGapInstances</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300">promotion coherence</td><td class="py-2 pr-4 text-slate-300">UnifiedLattice</td><td class="py-2 pr-4 text-slate-300">std only</td><td class="py-2 pr-4 text-slate-300">0</td></tr></tbody></table></div>
 <div class="h-2"></div>
 <p class="text-slate-300 leading-relaxed my-2">Native audit: the full theorem closure compiled to a 222 MB ELF and audited by</p>
-<p class="text-slate-300 leading-relaxed my-2">`vox` (178,297 functions, 36.8M instructions, 100% coverage, T/B/N registers</p>
-<p class="text-slate-300 leading-relaxed my-2">populated, F = 0). See `measurements/mass_gap_elf_audit/vox_audit.txt`.</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">vox</code> (178,297 functions, 36.8M instructions, 100% coverage, T/B/N registers</p>
+<p class="text-slate-300 leading-relaxed my-2">populated, F = 0). See <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">measurements/mass_gap_elf_audit/vox_audit.txt</code>.</p>
 <div class="h-2"></div>
   <div class="mt-12 border-t border-slate-800 pt-6 text-sm text-slate-500">
     Proved in Lean 4 · standard axioms only · 0 sorries · <a href="index.html" class="text-emerald-400 hover:underline">return to overview</a>
