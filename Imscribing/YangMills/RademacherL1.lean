@@ -7,6 +7,7 @@
 -/
 import Mathlib
 import Mathlib.Probability.CDF
+import Mathlib.MeasureTheory.Integral.Pi
 
 set_option maxHeartbeats 8000000
 set_option maxRecDepth 20000
@@ -513,10 +514,4 @@ private lemma rademacher_annihilate_continuous (q : ℝ → ℝ) (hq : Continuou
 
 end YangMills
 
-namespace YangMills
 
-end YangMills
-
-namespace YangMills
-
-end YangMills

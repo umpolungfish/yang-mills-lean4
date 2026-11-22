@@ -53,5 +53,6 @@ globs = [
   "Imscribing.YangMills.RademacherL1",
   "Imscribing.YangMills.RademacherMulti",
   "Imscribing.YangMills.SUNHaar",
-  "Imscribing.YangMills.ProbIntegralTransform"
+  "Imscribing.YangMills.ProbIntegralTransform",
+  "Imscribing.YangMills.PiFubini"
 ]
