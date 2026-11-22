@@ -43,5 +43,6 @@ globs = [
   "Imscribing.YangMills.PlaquetteReflection",
   "Imscribing.YangMills.Dicke",
   "Imscribing.YangMills.UnifiedLattice",
-  "Imscribing.YangMills.MassGapInstances"
+  "Imscribing.YangMills.MassGapInstances",
+  "Imscribing.YangMills.GlobalAxioms"
 ]
