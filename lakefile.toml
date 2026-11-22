@@ -49,5 +49,6 @@ globs = [
   "Imscribing.YangMills.ContinuumDecomposition",
   "Imscribing.YangMills.IIDSchwinger",
   "Imscribing.YangMills.IIDWilsonLimit",
-  "Imscribing.YangMills.IIDScaling"
+  "Imscribing.YangMills.IIDScaling",
+  "Imscribing.YangMills.RademacherL1"
 ]
