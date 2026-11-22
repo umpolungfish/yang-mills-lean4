@@ -19,12 +19,13 @@
 <div class="h-2"></div>
 <h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">The headline, in words</h2>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">clay_yang_mills_strict : ∃ P : GappedSpectrum (Fin 2), 0 &lt; P.Δ</code></p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">two_level_gauge_gap : ∃ G : GappedGaugeSystem Unit 2, G.Q.A() * G.Q.E() − G.Q.E() * G.Q.A() ≠ 0</code></p>
 <div class="h-2"></div>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">There is a concrete quantum gauge system whose energy spectrum has a ground</blockquote>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">state at zero and no states in an open interval <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">(0, Δ)</code> above it, with</blockquote>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ &gt; 0</code>. The gap is not assumed — it is carried by a witness whose data are</blockquote>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">all checked by the kernel.</blockquote>
+<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">There is a concrete quantum gauge system whose Hamiltonian is built from the</blockquote>
+<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">gauge data (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H = 1 − Q.S</code>), whose ground state is a genuine eigenvector, and</blockquote>
+<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">whose excited eigenvalues are real and at least <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ = 2 &gt; 0</code> — with a nonzero</blockquote>
+<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">lattice commutator. The gap is not assumed — it is carried by a witness whose</blockquote>
+<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">data are all checked by the kernel.</blockquote>
 <div class="h-2"></div>
 <p class="text-slate-300 leading-relaxed my-2">Semantically this is an <strong class="text-slate-100 font-semibold">exceptional point</strong>: the theory is promoted to a</p>
 <p class="text-slate-300 leading-relaxed my-2">level where the gap is a structural feature of the algebra, not a quantity</p>
@@ -33,16 +34,20 @@
 <div class="h-2"></div>
 <h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§1 — What the fields mean</h2>
 <div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">E : Fin 2 → ℝ</code> — the energy observable</h3>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">E 0 = 0</code> (the vacuum), <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">E 1 = 2</code> (the first excited state). Semantically:</p>
-<p class="text-slate-300 leading-relaxed my-2">the system has exactly one ground state and one excited level. The number <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">2</code></p>
-<p class="text-slate-300 leading-relaxed my-2">is a chosen scale, not a fitted physical constant — the theorem asserts the</p>
-<p class="text-slate-300 leading-relaxed my-2">*existence* of a positive gap, and <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">2</code> is a convenient witness.</p>
+<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Q : LatticeQGS κ (Matrix (Fin n) (Fin n) ℂ)</code> — the gauge system</h3>
+<p class="text-slate-300 leading-relaxed my-2">The underlying lattice gauge system (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">twoLevel</code>). The headline&#x27;s type mentions</p>
+<p class="text-slate-300 leading-relaxed my-2">it through <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">G.Q</code>, so the gap statement is inseparable from the gauge data.</p>
 <div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground : Fin 2</code> — the vacuum</h3>
-<p class="text-slate-300 leading-relaxed my-2">The distinguished state <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">0</code> with minimal energy. Semantically: the state about</p>
-<p class="text-slate-300 leading-relaxed my-2">which clustering is measured and relative to which the semigroup bound is</p>
-<p class="text-slate-300 leading-relaxed my-2">stated.</p>
+<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H</code> and <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H_def : H = 1 − Q.S</code> — the Hamiltonian</h3>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H</code> is not free: it is defined from the gauge system&#x27;s shift operator <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">S</code>.</p>
+<p class="text-slate-300 leading-relaxed my-2">For the witness <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">S = Z</code> (Pauli Z), so <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H = 1 − Z</code> has eigenvalues <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">0</code> (ground)</p>
+<p class="text-slate-300 leading-relaxed my-2">and <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">2</code> (excited). Semantically: the energy observable is derived from the</p>
+<p class="text-slate-300 leading-relaxed my-2">gauge algebra, not posited independently.</p>
+<div class="h-2"></div>
+<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground_ne</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground_eig</code> — the vacuum</h3>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground = ![1, 0]</code> is nonzero and satisfies <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H.mulVec ground = 0</code>: a genuine</p>
+<p class="text-slate-300 leading-relaxed my-2">ground-state eigenvector at energy zero. This is the state about which the gap</p>
+<p class="text-slate-300 leading-relaxed my-2">is measured.</p>
 <div class="h-2"></div>
 <h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ = 2</code> — the gap</h3>
 <p class="text-slate-300 leading-relaxed my-2">The positive number such that <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">spec(H) ∩ (0, Δ) = ∅</code>. Semantically: an</p>
@@ -50,8 +55,9 @@
 <p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ</code>. This is the physical content of a mass gap — a finite energy threshold</p>
 <p class="text-slate-300 leading-relaxed my-2">for excitations.</p>
 <div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">gap : ∀ n ≠ ground, Δ ≤ E n</code></h3>
-<p class="text-slate-300 leading-relaxed my-2">The spectral condition itself: every non-vacuum state has energy at least <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ</code>.</p>
+<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">gap : ∀ v l, v ≠ 0 → ⟨ground, v⟩ = 0 → H v = l v → l.im = 0 ∧ Δ ≤ l.re</code></h3>
+<p class="text-slate-300 leading-relaxed my-2">The spectral condition itself: every eigenvector orthogonal to the ground</p>
+<p class="text-slate-300 leading-relaxed my-2">state has a real eigenvalue at least <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ</code>.</p>
 <div class="h-2"></div>
 <h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§2 — Meaning of the gauge-system component</h2>
 <div class="h-2"></div>

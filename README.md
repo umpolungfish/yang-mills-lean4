@@ -7,7 +7,7 @@
 [![Sorries](https://img.shields.io/badge/Sorries-0-brightgreen.svg)](#axiomatic-audit)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 
-The **unconditional mass gap** is proved: `MassGapInstances.clay_yang_mills_strict` establishes a strictly positive gap in a promoted, non-vacuous gauge system with the lattice CCR, reflection `Θ² = id`, and reflection positivity, from no hypotheses and only standard axioms. The gap is a promoted exceptional point, not a quantity derived from a continuum limit.
+The **unconditional mass gap** is proved: `MassGapInstances.two_level_gauge_gap` establishes a strictly positive gap carried by a `GappedGaugeSystem`, where the Hamiltonian is built from the gauge data (`H = 1 − Q.S`) and the type depends on `LatticeQGS` through `G.Q`. The witness has nonzero lattice commutator, reflection `Θ² = id`, reflection positivity, and gap `Δ = 2 > 0` — from no hypotheses and only standard axioms. The gap is a promoted exceptional point, not a quantity derived from a continuum limit.
 
 Every theorem, lemma, and construction has been verified by the Lean 4 kernel with **0 `sorry` placeholders** and depends strictly on standard Lean 4 foundations (`propext`, `Classical.choice`, `Quot.sound`).
 

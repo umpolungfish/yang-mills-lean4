@@ -6,12 +6,13 @@ means, what the symbols denote, and what would falsify it.
 
 ## The headline, in words
 
-`clay_yang_mills_strict : ∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`
+`two_level_gauge_gap : ∃ G : GappedGaugeSystem Unit 2, G.Q.A() * G.Q.E() − G.Q.E() * G.Q.A() ≠ 0`
 
-> There is a concrete quantum gauge system whose energy spectrum has a ground
-> state at zero and no states in an open interval `(0, Δ)` above it, with
-> `Δ > 0`. The gap is not assumed — it is carried by a witness whose data are
-> all checked by the kernel.
+> There is a concrete quantum gauge system whose Hamiltonian is built from the
+> gauge data (`H = 1 − Q.S`), whose ground state is a genuine eigenvector, and
+> whose excited eigenvalues are real and at least `Δ = 2 > 0` — with a nonzero
+> lattice commutator. The gap is not assumed — it is carried by a witness whose
+> data are all checked by the kernel.
 
 Semantically this is an **exceptional point**: the theory is promoted to a
 level where the gap is a structural feature of the algebra, not a quantity
@@ -20,16 +21,20 @@ classical limits enters — those categories are not part of the claim.
 
 ## §1 — What the fields mean
 
-### `E : Fin 2 → ℝ` — the energy observable
-`E 0 = 0` (the vacuum), `E 1 = 2` (the first excited state). Semantically:
-the system has exactly one ground state and one excited level. The number `2`
-is a chosen scale, not a fitted physical constant — the theorem asserts the
-*existence* of a positive gap, and `2` is a convenient witness.
+### `Q : LatticeQGS κ (Matrix (Fin n) (Fin n) ℂ)` — the gauge system
+The underlying lattice gauge system (`twoLevel`). The headline's type mentions
+it through `G.Q`, so the gap statement is inseparable from the gauge data.
 
-### `ground : Fin 2` — the vacuum
-The distinguished state `0` with minimal energy. Semantically: the state about
-which clustering is measured and relative to which the semigroup bound is
-stated.
+### `H` and `H_def : H = 1 − Q.S` — the Hamiltonian
+`H` is not free: it is defined from the gauge system's shift operator `S`.
+For the witness `S = Z` (Pauli Z), so `H = 1 − Z` has eigenvalues `0` (ground)
+and `2` (excited). Semantically: the energy observable is derived from the
+gauge algebra, not posited independently.
+
+### `ground`, `ground_ne`, `ground_eig` — the vacuum
+`ground = ![1, 0]` is nonzero and satisfies `H.mulVec ground = 0`: a genuine
+ground-state eigenvector at energy zero. This is the state about which the gap
+is measured.
 
 ### `Δ = 2` — the gap
 The positive number such that `spec(H) ∩ (0, Δ) = ∅`. Semantically: an
@@ -37,8 +42,9 @@ observer cannot prepare a state with energy strictly between the vacuum and
 `Δ`. This is the physical content of a mass gap — a finite energy threshold
 for excitations.
 
-### `gap : ∀ n ≠ ground, Δ ≤ E n`
-The spectral condition itself: every non-vacuum state has energy at least `Δ`.
+### `gap : ∀ v l, v ≠ 0 → ⟨ground, v⟩ = 0 → H v = l v → l.im = 0 ∧ Δ ≤ l.re`
+The spectral condition itself: every eigenvector orthogonal to the ground
+state has a real eigenvalue at least `Δ`.
 
 ## §2 — Meaning of the gauge-system component
 

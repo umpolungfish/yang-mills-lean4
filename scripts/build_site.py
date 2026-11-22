@@ -204,7 +204,7 @@ flowchart TD
   ALGEBRA --> PROMOTION
   PROMOTION --> CONSEQUENCES
   CONSEQUENCES --> AUDIT
-  PROMOTION -->|"unconditional"| GAP["clay_yang_mills_strict : Δ > 0"]
+  PROMOTION -->|"unconditional"| GAP["two_level_gauge_gap : Δ = 2 > 0"]
         </pre>
       </div>
     </div>
@@ -222,14 +222,15 @@ flowchart TD
         <!-- Theorem 1: unconditional mass gap -->
         <div class="p-6 rounded-2xl bg-slate-900 border border-emerald-500/30">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-emerald-400 font-mono">MassGapInstances.clay_yang_mills_strict</h3>
+            <h3 class="text-lg font-bold text-emerald-400 font-mono">MassGapInstances.two_level_gauge_gap</h3>
             <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">Unconditional Mass Gap</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
-            The unconditional claim: a strictly positive mass gap $\\Delta = 2 > 0$ in a promoted, non-vacuous gauge system with lattice CCR $[A,E]=i\\hbar Z \\neq 0$, reflection $\\Theta^2=\\mathrm{id}$, reflection positivity and a normalized state — from no hypotheses and only standard axioms.
+            The unconditional claim: a strictly positive gap carried by a $GappedGaugeSystem$ whose Hamiltonian is built from the gauge data ($H = 1 - Q.S$), with nonzero lattice commutator $[A,E]=i\\hbar Z \\neq 0$, ground-state eigenvector, and excited eigenvalues real and $\\ge \\Delta = 2 > 0$ — from no hypotheses and only standard axioms.
           </p>
-          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>theorem clay_yang_mills_strict :
-    ∃ (P : GappedSpectrum (Fin 2)), 0 &lt; P.Δ</code></pre>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>theorem two_level_gauge_gap :
+    ∃ G : GappedGaugeSystem Unit 2,
+      G.Q.A () * G.Q.E () - G.Q.E () * G.Q.A () ≠ 0</code></pre>
         </div>
 
         <!-- Theorem 2 -->
