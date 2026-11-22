@@ -1,4 +1,5 @@
-I add truth and information order support to the Yang-Mills carrier
+I add lattice operations to the Yang-Mills partial orders
 
-I prove reflexivity, transitivity, and antisymmetry for the truth, falsity,
-and information orders, and witness that their comparisons remain distinct.
+I define joins and meets for the truth, falsity, and information orders on
+the 16-state carrier, prove their least-upper-bound and greatest-lower-bound
+laws, and install them in both carrier models.

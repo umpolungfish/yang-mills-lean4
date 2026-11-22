@@ -170,11 +170,13 @@ populated, F = 0). See `measurements/mass_gap_elf_audit/vox_audit.txt`.
 
 `TrilatticeModel` carries independent truth, falsity, and information
 relations. Each relation has its own reflexivity, transitivity, and
-antisymmetry proof fields. For the 16-state `S16` carrier, the coordinate
-orders are proved to satisfy all three partial-order laws and are installed in
-both `trilattice16` and `trilattice16Strict`.
+antisymmetry proof fields, together with a join and meet satisfying the least
+upper-bound and greatest lower-bound laws. For the 16-state `S16` carrier, the
+coordinate orders and their joins and meets are proved and installed in both
+`trilattice16` and `trilattice16Strict`.
 
 `trilattice16_order_support` exposes the nine order laws together as a Lean
-theorem. `trilattice16_order_nonimplications` gives concrete witnesses in
-both directions for every pair of these orders, preserving the truth,
-falsity, and information comparisons as distinct relations.
+theorem. `trilattice16_lattice_support` exposes the join and meet laws.
+`trilattice16_order_nonimplications` gives concrete witnesses in both
+directions for every pair of these orders, preserving the truth, falsity, and
+information comparisons as distinct relations.
