@@ -1,5 +1,5 @@
-I add lattice operations to the Yang-Mills partial orders
+I unify the corpus explorer with the site theme
 
-I define joins and meets for the truth, falsity, and information orders on
-the 16-state carrier, prove their least-upper-bound and greatest-lower-bound
-laws, and install them in both carrier models.
+I align the explorer's typography, navigation, panels, controls, and diagrams
+with the site's dark slate and emerald palette, then refresh its published
+GitHub Pages assets.

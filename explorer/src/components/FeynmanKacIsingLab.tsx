@@ -105,7 +105,7 @@ export function FeynmanKacIsingLab() {
     ctx.lineWidth = 1.5;
     ctx.stroke();
     ctx.fillStyle = 'rgba(226, 232, 240, 0.72)';
-    ctx.font = '600 10px "IBM Plex Mono", monospace';
+    ctx.font = '600 10px "Fira Code", monospace';
     ctx.fillText('a₀ →', w - 34, h / 2 - 6);
     ctx.fillText('a₁ ↑', w / 2 + 6, 14);
   }, [probeA0, probeA1, isingCheck.translationInvariant]);
@@ -158,12 +158,12 @@ export function FeynmanKacIsingLab() {
   return (
     <div className="space-y-5">
       {/* Header Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-5 py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate-800 bg-slate-900 px-5 py-3.5">
         <div>
-          <div className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+          <div className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
             §§39–42 Feynman–Kac Slice Transfer · §§34/37 Ising Toy Obstruction
           </div>
-          <h1 className="text-lg font-semibold text-slate-900">
+          <h1 className="text-lg font-semibold text-slate-100">
             Euclidean Transfer Cylinder, Reflection Plane Θ &amp; Radial Peak Collapse
           </h1>
         </div>
@@ -171,7 +171,7 @@ export function FeynmanKacIsingLab() {
         <button
           type="button"
           onClick={() => setPlaying((p) => !p)}
-          className="inline-flex items-center gap-1.5 rounded border border-slate-200 bg-slate-50 px-3 py-1.5 font-mono text-xs text-slate-800 hover:bg-white"
+          className="inline-flex items-center gap-1.5 rounded border border-slate-800 bg-slate-800 px-3 py-1.5 font-mono text-xs text-slate-200 hover:bg-slate-700"
         >
           {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
           {playing ? 'Pause Motion' : 'Play Motion'}
@@ -181,25 +181,25 @@ export function FeynmanKacIsingLab() {
       {/* Dual Visual Figures */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
         {/* LEFT FIGURE: Feynman-Kac Time-Slice Ring + Reflection Mirror */}
-        <div className="rounded-lg border border-slate-200 bg-white p-5 lg:col-span-6">
+        <div className="rounded-lg border border-slate-800 bg-slate-900 p-5 lg:col-span-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-semibold text-slate-100">
                 Feynman–Kac Transfer Chain: Z = Tr(T_4D^L_t)
               </h2>
-              <div className="font-mono text-[11px] text-slate-500">
+              <div className="font-mono text-[11px] text-slate-400">
                 slice4DFieldEquiv: U_sl(t) + temporal g_tm(t)
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex rounded border border-slate-200 bg-slate-50 p-0.5 font-mono text-xs">
+              <div className="flex rounded border border-slate-800 bg-slate-800 p-0.5 font-mono text-xs">
                 {[2, 4, 6, 8].map((lt) => (
                   <button
                     key={lt}
                     type="button"
                     onClick={() => setLtSlices(lt)}
                     className={`rounded px-2 py-0.5 ${
-                      ltSlices === lt ? 'bg-slate-900 text-white' : 'text-slate-700'
+                      ltSlices === lt ? 'bg-slate-900 text-white' : 'text-slate-300'
                     }`}
                   >
                     L_t={lt}
@@ -211,8 +211,8 @@ export function FeynmanKacIsingLab() {
                 onClick={() => setShowMirror((m) => !m)}
                 className={`rounded border px-2 py-1 font-mono text-xs ${
                   showMirror
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
-                    : 'border-slate-200 bg-white text-slate-600'
+                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+                    : 'border-slate-800 bg-slate-900 text-slate-400'
                 }`}
               >
                 Mirror Θ
@@ -306,13 +306,13 @@ export function FeynmanKacIsingLab() {
         </div>
 
         {/* RIGHT FIGURE: Interactive Ising Radial Obstruction Heatmap */}
-        <div className="rounded-lg border border-slate-200 bg-white p-5 lg:col-span-6">
+        <div className="rounded-lg border border-slate-800 bg-slate-900 p-5 lg:col-span-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-semibold text-slate-100">
                 Ising Toy Translation Obstruction (§34/§37)
               </h2>
-              <div className="font-mono text-[11px] text-slate-500">
+              <div className="font-mono text-[11px] text-slate-400">
                 Click spacetime heatmap or animate shift a = (a₀, a₁, 0, 0)
               </div>
             </div>
@@ -323,8 +323,8 @@ export function FeynmanKacIsingLab() {
                 onClick={() => setAutoSweep((s) => !s)}
                 className={`rounded border px-2.5 py-1 font-mono text-xs ${
                   autoSweep
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
-                    : 'border-slate-200 bg-slate-50 text-slate-700'
+                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
+                    : 'border-slate-800 bg-slate-800 text-slate-300'
                 }`}
               >
                 {autoSweep ? 'Orbiting a' : 'Auto Sweep'}
@@ -336,7 +336,7 @@ export function FeynmanKacIsingLab() {
                   setProbeA0(1.0);
                   setProbeA1(0.0);
                 }}
-                className="rounded border border-slate-200 bg-white px-2.5 py-1 font-mono text-xs text-slate-700 hover:bg-slate-50"
+                className="rounded border border-slate-800 bg-slate-900 px-2.5 py-1 font-mono text-xs text-slate-300 hover:bg-slate-700"
               >
                 a=(1,0)
               </button>
@@ -348,27 +348,27 @@ export function FeynmanKacIsingLab() {
               <canvas
                 ref={heatmapCanvasRef}
                 onClick={handleHeatmapClick}
-                className="w-full cursor-crosshair rounded border border-slate-200"
+                className="w-full cursor-crosshair rounded border border-slate-800"
               />
             </div>
 
             <div className="space-y-3 sm:col-span-5">
-              <div className="rounded border border-slate-200 bg-slate-50 p-3">
-                <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+              <div className="rounded border border-slate-800 bg-slate-800 p-3">
+                <div className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
                   Origin S₂(0, 0)
                 </div>
-                <div className="font-mono text-xl font-semibold text-emerald-700 tabular-nums">
+                <div className="font-mono text-xl font-semibold text-emerald-400 tabular-nums">
                   {isingCheck.unshiftedS2.toFixed(4)}
                 </div>
               </div>
 
-              <div className="rounded border border-slate-200 bg-slate-50 p-3">
-                <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+              <div className="rounded border border-slate-800 bg-slate-800 p-3">
+                <div className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
                   Shifted S₂({probeA0}, {probeA1})
                 </div>
                 <div
                   className={`font-mono text-xl font-semibold tabular-nums ${
-                    isingCheck.translationInvariant ? 'text-emerald-700' : 'text-rose-700'
+                    isingCheck.translationInvariant ? 'text-emerald-400' : 'text-rose-400'
                   }`}
                 >
                   {isingCheck.shiftedS2.toFixed(4)}
@@ -385,7 +385,7 @@ export function FeynmanKacIsingLab() {
 
               <div
                 className={`font-mono text-xs font-semibold ${
-                  isingCheck.translationInvariant ? 'text-emerald-700' : 'text-rose-700'
+                  isingCheck.translationInvariant ? 'text-emerald-400' : 'text-rose-400'
                 }`}
               >
                 {isingCheck.translationInvariant

@@ -139,7 +139,7 @@ export function TesseractAndFlowLab() {
                   : '#94a3b8';
             ctx.fill();
             if (isSel || isInc || isWalk) {
-              ctx.font = '600 10px "IBM Plex Mono", monospace';
+              ctx.font = '600 10px "Fira Code", monospace';
               ctx.fillStyle = '#e2e8f0';
               ctx.textAlign = 'center';
               const lx = Math.max(36, Math.min(w - 36, pt.x));
@@ -180,12 +180,12 @@ export function TesseractAndFlowLab() {
   return (
     <div className="space-y-5">
       {/* Compact Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-5 py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate-800 bg-slate-900 px-5 py-3.5">
         <div>
-          <div className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+          <div className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
             §8 / §37 4D Tesseract S16 · §45 Proof Reduction &amp; 9 Bridge Targets
           </div>
-          <h1 className="text-lg font-semibold text-slate-900">
+          <h1 className="text-lg font-semibold text-slate-100">
             Rotating 4D Hypercube (S₁₆) &amp; Visual Proof Pipeline
           </h1>
         </div>
@@ -194,14 +194,14 @@ export function TesseractAndFlowLab() {
           <button
             type="button"
             onClick={() => setShowStrictOp((v) => !v)}
-            className="rounded border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-xs text-slate-800 hover:bg-white"
+            className="rounded border border-slate-800 bg-slate-800 px-2.5 py-1 font-mono text-xs text-slate-200 hover:bg-slate-700"
           >
             Op: {showStrictOp ? 'inc16Strict (§37)' : 'inc16 Legacy (§8)'}
           </button>
           <button
             type="button"
             onClick={() => setPlaying((p) => !p)}
-            className="inline-flex items-center gap-1 rounded border border-slate-200 bg-white px-2.5 py-1 font-mono text-xs text-slate-700 hover:bg-slate-50"
+            className="inline-flex items-center gap-1 rounded border border-slate-800 bg-slate-900 px-2.5 py-1 font-mono text-xs text-slate-300 hover:bg-slate-700"
           >
             {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             {playing ? 'Pause 4D' : 'Rotate 4D'}
@@ -212,7 +212,7 @@ export function TesseractAndFlowLab() {
       {/* Main Grid: 4D Rotating Tesseract Canvas (5 cols) + Visual Proof Pipeline & 9-Bridge Grid (7 cols) */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
         {/* LEFT: 4D Rotating Tesseract */}
-        <div className="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-slate-950 text-slate-100 lg:col-span-5">
+        <div className="flex flex-col overflow-hidden rounded-lg border border-slate-800 bg-slate-950 text-slate-100 lg:col-span-5">
           <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-2 font-mono text-xs">
             <span>4D Tesseract S₁₆ (Click vertex)</span>
             <span className="text-cyan-300">
@@ -250,19 +250,19 @@ export function TesseractAndFlowLab() {
         {/* RIGHT: Visual Proof Flow Diagram (SVG) + Compact 9-Bridge Status Strip */}
         <div className="space-y-4 lg:col-span-7">
           {/* SVG Visual Proof DAG Diagram */}
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <span className="font-mono text-xs font-semibold text-slate-800">
+              <span className="font-mono text-xs font-semibold text-slate-200">
                 Proof Reduction Graph (Click node to peek .lean)
               </span>
-              <span className="font-mono text-[11px] text-slate-500">
+              <span className="font-mono text-[11px] text-slate-400">
                 ● Proved · ✖ Toy · ▲ Open
               </span>
             </div>
 
             <svg viewBox="0 0 640 205" className="w-full" role="img" aria-label="Visual proof dependency graph">
               {/* Edges */}
-              <g stroke="#cbd5e1" strokeWidth="1.8" fill="none">
+              <g stroke="#475569" strokeWidth="1.8" fill="none">
                 <line x1="110" y1="55" x2="150" y2="55" />
                 <line x1="255" y1="55" x2="295" y2="55" />
                 <line x1="400" y1="55" x2="440" y2="55" />
@@ -274,17 +274,17 @@ export function TesseractAndFlowLab() {
 
               {/* Top Row: Proved Unconditional Spine */}
               {[
-                { id: 'Core', x: 15, y: 30, w: 95, label: 'Core (§§1–21)', sub: 'Wilson + S16', color: '#059669', bg: '#ecfdf5' },
-                { id: 'CubicHaar4D', x: 150, y: 30, w: 105, label: 'Haar 4D (§36)', sub: 'SU(N) + RP', color: '#059669', bg: '#ecfdf5' },
-                { id: 'FeynmanKac', x: 295, y: 30, w: 105, label: 'FK Slices (§42)', sub: 'Z = Tr(T^Lt)', color: '#059669', bg: '#ecfdf5' },
-                { id: 'StrongCouplingDobrushin', x: 440, y: 30, w: 185, label: 'Dobrushin Gap (§43–44)', sub: 'α<1 ⇒ m=-½log α > 0', color: '#059669', bg: '#ecfdf5' },
+                { id: 'Core', x: 15, y: 30, w: 95, label: 'Core (§§1–21)', sub: 'Wilson + S16', color: '#34d399', bg: '#052e2b' },
+                { id: 'CubicHaar4D', x: 150, y: 30, w: 105, label: 'Haar 4D (§36)', sub: 'SU(N) + RP', color: '#34d399', bg: '#052e2b' },
+                { id: 'FeynmanKac', x: 295, y: 30, w: 105, label: 'FK Slices (§42)', sub: 'Z = Tr(T^Lt)', color: '#34d399', bg: '#052e2b' },
+                { id: 'StrongCouplingDobrushin', x: 440, y: 30, w: 185, label: 'Dobrushin Gap (§43–44)', sub: 'α<1 ⇒ m=-½log α > 0', color: '#34d399', bg: '#052e2b' },
               ].map((n) => (
                 <g key={n.id} onClick={() => setDrawerModuleId(n.id)} className="cursor-pointer">
                   <rect x={n.x} y={n.y} width={n.w} height="50" rx="6" fill={n.bg} stroke={n.color} strokeWidth="1.5" />
-                  <text x={n.x + n.w / 2} y={n.y + 21} textAnchor="middle" className="fill-slate-900 font-mono text-[10px] font-semibold">
+                  <text x={n.x + n.w / 2} y={n.y + 21} textAnchor="middle" className="fill-slate-100 font-mono text-[10px] font-semibold">
                     {n.label}
                   </text>
-                  <text x={n.x + n.w / 2} y={n.y + 37} textAnchor="middle" className="fill-emerald-800 font-mono text-[9px]">
+                  <text x={n.x + n.w / 2} y={n.y + 37} textAnchor="middle" className="fill-emerald-300 font-mono text-[9px]">
                     ● {n.sub}
                   </text>
                 </g>
@@ -292,42 +292,42 @@ export function TesseractAndFlowLab() {
 
               {/* Bottom Left: Rejected Ising Toy */}
               <g onClick={() => setDrawerModuleId('OSCompletion')} className="cursor-pointer">
-                <rect x="15" y="122" width="140" height="54" rx="6" fill="#fff1f2" stroke="#e11d48" strokeWidth="1.5" />
-                <text x="85" y="144" textAnchor="middle" className="fill-rose-900 font-mono text-[10px] font-semibold">
+                <rect x="15" y="122" width="140" height="54" rx="6" fill="#4c0519" stroke="#fb7185" strokeWidth="1.5" />
+                <text x="85" y="144" textAnchor="middle" className="fill-rose-100 font-mono text-[10px] font-semibold">
                   Ising Toy (§34/§37)
                 </text>
-                <text x="85" y="160" textAnchor="middle" className="fill-rose-700 font-mono text-[9px]">
+                <text x="85" y="160" textAnchor="middle" className="fill-rose-300 font-mono text-[9px]">
                   ✖ Fails trans_inv
                 </text>
               </g>
 
               {/* Bottom Right-to-Left: Inf-Vol -> Open RG -> Clay Strict */}
               <g onClick={() => setDrawerModuleId('CanonicalWitness')} className="cursor-pointer">
-                <rect x="440" y="122" width="185" height="54" rx="6" fill="#ecfdf5" stroke="#059669" strokeWidth="1.5" />
-                <text x="532" y="144" textAnchor="middle" className="fill-slate-900 font-mono text-[10px] font-semibold">
+                <rect x="440" y="122" width="185" height="54" rx="6" fill="#052e2b" stroke="#34d399" strokeWidth="1.5" />
+                <text x="532" y="144" textAnchor="middle" className="fill-slate-100 font-mono text-[10px] font-semibold">
                   S_inf &amp; Witness (§46W)
                 </text>
-                <text x="532" y="160" textAnchor="middle" className="fill-emerald-800 font-mono text-[9px]">
+                <text x="532" y="160" textAnchor="middle" className="fill-emerald-300 font-mono text-[9px]">
                   ● 1 vs (N−4)/N at β₀=1/300
                 </text>
               </g>
 
               <g onClick={() => setDrawerModuleId('ContinuumClosure')} className="cursor-pointer">
-                <rect x="295" y="122" width="105" height="54" rx="6" fill="#fffbeb" stroke="#d97706" strokeWidth="1.5" />
-                <text x="347" y="144" textAnchor="middle" className="fill-amber-950 font-mono text-[10px] font-semibold">
+                <rect x="295" y="122" width="105" height="54" rx="6" fill="#451a03" stroke="#fbbf24" strokeWidth="1.5" />
+                <text x="347" y="144" textAnchor="middle" className="fill-amber-100 font-mono text-[10px] font-semibold">
                   Balaban + OS
                 </text>
-                <text x="347" y="160" textAnchor="middle" className="fill-amber-800 font-mono text-[9px]">
+                <text x="347" y="160" textAnchor="middle" className="fill-amber-300 font-mono text-[9px]">
                   ▲ Open β→∞ Hyps
                 </text>
               </g>
 
               <g onClick={() => setDrawerModuleId('BridgeStatements')} className="cursor-pointer">
-                <rect x="175" y="122" width="80" height="54" rx="6" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
-                <text x="215" y="144" textAnchor="middle" className="fill-blue-950 font-mono text-[10px] font-semibold">
+                <rect x="175" y="122" width="80" height="54" rx="6" fill="#0c1a36" stroke="#60a5fa" strokeWidth="1.5" />
+                <text x="215" y="144" textAnchor="middle" className="fill-sky-100 font-mono text-[10px] font-semibold">
                   Clay 4D
                 </text>
-                <text x="215" y="160" textAnchor="middle" className="fill-blue-800 font-mono text-[9px]">
+                <text x="215" y="160" textAnchor="middle" className="fill-sky-300 font-mono text-[9px]">
                   Wightman QFT
                 </text>
               </g>
@@ -335,10 +335,10 @@ export function TesseractAndFlowLab() {
           </div>
 
           {/* Visual 3x3 Matrix of the 9 BridgeStatements */}
-          <div className="rounded-lg border border-slate-200 bg-white p-4">
+          <div className="rounded-lg border border-slate-800 bg-slate-900 p-4">
             <div className="mb-2.5 flex items-center justify-between font-mono text-xs">
-              <span className="font-semibold text-slate-800">9 BridgeStatements Scoreboard</span>
-              <span className="text-slate-500">6 Strong-Coupling Proved · 3 Partial on Z⁴ · Weak Limit Open</span>
+              <span className="font-semibold text-slate-200">9 BridgeStatements Scoreboard</span>
+              <span className="text-slate-400">6 Strong-Coupling Proved · 3 Partial on Z⁴ · Weak Limit Open</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
               {BRIDGE_STATEMENTS.map((b) => (
@@ -346,21 +346,21 @@ export function TesseractAndFlowLab() {
                   key={b.id}
                   type="button"
                   onClick={() => setDrawerModuleId('BridgeStatements')}
-                  className="rounded border border-slate-200 bg-slate-50 px-2.5 py-2 text-left hover:border-blue-400 hover:bg-white"
+                  className="rounded border border-slate-800 bg-slate-800 px-2.5 py-2 text-left hover:border-emerald-400 hover:bg-slate-700"
                 >
                   <div className="flex items-center justify-between font-mono text-[10px]">
-                    <span className="font-semibold text-slate-800">#{b.index}</span>
+                    <span className="font-semibold text-slate-200">#{b.index}</span>
                     <span
                       className={
                         b.finiteStrongCouplingStatus === 'proved'
-                          ? 'font-semibold text-emerald-700'
-                          : 'font-semibold text-amber-700'
+                          ? 'font-semibold text-emerald-400'
+                          : 'font-semibold text-amber-400'
                       }
                     >
                       {b.finiteStrongCouplingStatus === 'proved' ? '● PROVED' : '▲ PARTIAL'}
                     </span>
                   </div>
-                  <div className="mt-0.5 truncate font-mono text-[11px] text-slate-700">
+                  <div className="mt-0.5 truncate font-mono text-[11px] text-slate-300">
                     {b.leanName}
                   </div>
                 </button>
@@ -376,7 +376,7 @@ export function TesseractAndFlowLab() {
           <div className="flex h-full w-full max-w-2xl flex-col bg-slate-950 text-slate-100 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
               <div className="flex items-center gap-2 font-mono text-xs">
-                <Code2 className="h-4 w-4 text-blue-400" />
+                <Code2 className="h-4 w-4 text-emerald-300" />
                 <span>{drawerModuleId}.lean (First 140 lines)</span>
               </div>
               <button
@@ -391,7 +391,7 @@ export function TesseractAndFlowLab() {
             <div className="flex-1 overflow-auto p-4 font-mono text-[11.5px] leading-relaxed">
               {sourceLines.map((line, i) => (
                 <div key={i} className="flex gap-3">
-                  <span className="w-8 shrink-0 text-right text-slate-500 tabular-nums">{i + 1}</span>
+                  <span className="w-8 shrink-0 text-right text-slate-400 tabular-nums">{i + 1}</span>
                   <span className="whitespace-pre">{line}</span>
                 </div>
               ))}

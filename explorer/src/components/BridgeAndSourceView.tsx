@@ -117,13 +117,13 @@ export function BridgeAndSourceView({
   return (
     <div className="space-y-6">
       {/* 9 BridgeStatements Matrix */}
-      <section className="rounded-lg border border-slate-200 bg-white p-5">
-        <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="rounded-lg border border-slate-800 bg-slate-900 p-5">
+        <div className="flex flex-col gap-3 border-b border-slate-800 pb-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-mono text-xs uppercase tracking-wider text-slate-500">
+            <p className="font-mono text-xs uppercase tracking-wider text-slate-400">
               BridgeStatements.lean · Infinite-Volume &amp; Continuum Target Matrix
             </p>
-            <h1 className="mt-1 text-xl font-semibold text-slate-900">
+            <h1 className="mt-1 text-xl font-semibold text-slate-100">
               The 9 Formal Bridge Properties: Proved Lattice Core vs Weak-Coupling Gap
             </h1>
           </div>
@@ -142,8 +142,8 @@ export function BridgeAndSourceView({
                 onClick={() => setBridgeFilter(f.id)}
                 className={`rounded border px-2.5 py-1 text-xs font-medium ${
                   bridgeFilter === f.id
-                    ? 'border-slate-900 bg-slate-900 text-white'
-                    : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-white'
+                    ? 'border-slate-700 bg-slate-900 text-white'
+                    : 'border-slate-800 bg-slate-800 text-slate-300 hover:bg-slate-700'
                 }`}
               >
                 {f.label}
@@ -156,38 +156,38 @@ export function BridgeAndSourceView({
           {filteredBridge.map((item) => (
             <div
               key={item.id}
-              className="flex flex-col justify-between rounded-md border border-slate-200 bg-slate-50/50 p-3.5"
+              className="flex flex-col justify-between rounded-md border border-slate-800 bg-slate-800/50 p-3.5"
             >
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs font-semibold text-slate-900">
+                  <span className="font-mono text-xs font-semibold text-slate-100">
                     {item.index}. {item.leanName}
                   </span>
                   {item.finiteStrongCouplingStatus === 'proved' ? (
-                    <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-emerald-700">
+                    <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-emerald-400">
                       <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                       LATTICE PROVED
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-amber-700">
+                    <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-amber-400">
                       <HelpCircle className="h-3 w-3" aria-hidden="true" />
                       PARTIAL ON Z⁴
                     </span>
                   )}
                 </div>
-                <h2 className="mt-1 text-sm font-medium text-slate-800">{item.title}</h2>
-                <pre className="mt-2 whitespace-pre-wrap break-words rounded border border-slate-200 bg-white px-2.5 py-1.5 font-mono text-[11px] leading-snug text-slate-700">
+                <h2 className="mt-1 text-sm font-medium text-slate-200">{item.title}</h2>
+                <pre className="mt-2 whitespace-pre-wrap break-words rounded border border-slate-800 bg-slate-900 px-2.5 py-1.5 font-mono text-[11px] leading-snug text-slate-300">
                   {item.leanTargetSignature}
                 </pre>
               </div>
 
-              <div className="mt-3 space-y-1.5 border-t border-slate-200 pt-2.5 text-xs leading-relaxed">
-                <p className="text-slate-700">
-                  <strong className="font-semibold text-emerald-800">Finite / β=1/300:</strong>{' '}
+              <div className="mt-3 space-y-1.5 border-t border-slate-800 pt-2.5 text-xs leading-relaxed">
+                <p className="text-slate-300">
+                  <strong className="font-semibold text-emerald-300">Finite / β=1/300:</strong>{' '}
                   {item.finiteVolumeLemma}
                 </p>
-                <p className="text-slate-600">
-                  <strong className="font-semibold text-amber-800">Open a→0⁺, β→∞:</strong>{' '}
+                <p className="text-slate-400">
+                  <strong className="font-semibold text-amber-300">Open a→0⁺, β→∞:</strong>{' '}
                   {item.remainingContinuumGap}
                 </p>
               </div>
@@ -199,12 +199,12 @@ export function BridgeAndSourceView({
       {/* Theorem Search + Live Source Reader Split */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
         {/* Left: Theorem & Module Index */}
-        <section className="space-y-4 rounded-lg border border-slate-200 bg-white p-5 xl:col-span-5">
+        <section className="space-y-4 rounded-lg border border-slate-800 bg-slate-900 p-5 xl:col-span-5">
           <div>
-            <h2 className="text-sm font-semibold text-slate-900">
+            <h2 className="text-sm font-semibold text-slate-100">
               Verified Theorem &amp; Obstruction Index
             </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-400">
               Filter key theorems and click any entry to load its module source on the right.
             </p>
           </div>
@@ -220,7 +220,7 @@ export function BridgeAndSourceView({
               onChange={(e) => setTheoremQuery(e.target.value)}
               placeholder="Search theorems (e.g. dobrushin, suFlip2, ising, §38)..."
               aria-label="Search theorems"
-              className="w-full rounded-md border border-slate-200 bg-slate-50 py-1.5 pl-8 pr-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:bg-white focus:outline-none"
+              className="w-full rounded-md border border-slate-800 bg-slate-800 py-1.5 pl-8 pr-3 text-xs text-slate-100 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-slate-900 focus:outline-none"
             />
           </div>
 
@@ -237,24 +237,24 @@ export function BridgeAndSourceView({
                   }}
                   className={`w-full rounded-md border p-3 text-left transition-colors ${
                     activeMod
-                      ? 'border-blue-300 bg-blue-50/40'
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                      ? 'border-emerald-500/40 bg-emerald-500/10'
+                      : 'border-slate-800 bg-slate-900 hover:border-slate-600 hover:bg-slate-700'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate font-mono text-xs font-semibold text-slate-900">
+                    <span className="truncate font-mono text-xs font-semibold text-slate-100">
                       {thm.name}
                     </span>
-                    <span className="shrink-0 font-mono text-[11px] text-slate-500">
+                    <span className="shrink-0 font-mono text-[11px] text-slate-400">
                       {thm.moduleId} · {thm.section}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs leading-relaxed text-slate-600">{thm.statement}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-400">{thm.statement}</p>
                 </button>
               );
             })}
             {filteredTheorems.length === 0 && (
-              <p className="py-6 text-center text-xs text-slate-500">
+              <p className="py-6 text-center text-xs text-slate-400">
                 No theorem matched "{theoremQuery}".
               </p>
             )}
@@ -262,15 +262,15 @@ export function BridgeAndSourceView({
         </section>
 
         {/* Right: Genuine Lean Source File Viewer */}
-        <section className="flex flex-col rounded-lg border border-slate-200 bg-white p-5 xl:col-span-7">
-          <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <section className="flex flex-col rounded-lg border border-slate-800 bg-slate-900 p-5 xl:col-span-7">
+          <div className="flex flex-col gap-3 border-b border-slate-800 pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
-              <FileCode2 className="h-4 w-4 text-blue-600" aria-hidden="true" />
+              <FileCode2 className="h-4 w-4 text-emerald-400" aria-hidden="true" />
               <div>
-                <h2 className="font-mono text-sm font-semibold text-slate-900">
+                <h2 className="font-mono text-sm font-semibold text-slate-100">
                   {selectedModule.fileName} ({selectedModule.sections})
                 </h2>
-                <div className="font-mono text-[11px] text-slate-500 tabular-nums">
+                <div className="font-mono text-[11px] text-slate-400 tabular-nums">
                   {sourceLines.length.toLocaleString()} lines · loaded directly from corpus asset
                 </div>
               </div>
@@ -287,7 +287,7 @@ export function BridgeAndSourceView({
                   setSourceSearch('');
                   onSelectModule(e.target.value);
                 }}
-                className="rounded border border-slate-200 bg-slate-50 px-2.5 py-1.5 font-mono text-xs text-slate-800 focus:border-blue-600 focus:outline-none"
+                className="rounded border border-slate-800 bg-slate-800 px-2.5 py-1.5 font-mono text-xs text-slate-200 focus:border-emerald-500 focus:outline-none"
               >
                 {CORPUS_MODULES.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -299,14 +299,14 @@ export function BridgeAndSourceView({
           </div>
 
           {/* Section quick-jump & source filter */}
-          <div className="mt-3 flex flex-wrap items-center gap-2 border-b border-slate-100 pb-3">
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
             <input
               type="text"
               value={sourceSearch}
               onChange={(e) => setSourceSearch(e.target.value)}
               placeholder="Grep within active file..."
               aria-label="Filter lines within active Lean source file"
-              className="min-w-[200px] flex-1 rounded border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-xs text-slate-800 placeholder:text-slate-400 focus:border-blue-600 focus:bg-white focus:outline-none"
+              className="min-w-[200px] flex-1 rounded border border-slate-800 bg-slate-800 px-2.5 py-1 font-mono text-xs text-slate-200 placeholder:text-slate-400 focus:border-emerald-500 focus:bg-slate-900 focus:outline-none"
             />
             {sectionAnchors.length > 0 && (
               <select
@@ -319,7 +319,7 @@ export function BridgeAndSourceView({
                     setStartLine(line);
                   }
                 }}
-                className="max-w-[260px] rounded border border-slate-200 bg-white px-2.5 py-1 font-mono text-xs text-slate-700"
+                className="max-w-[260px] rounded border border-slate-800 bg-slate-900 px-2.5 py-1 font-mono text-xs text-slate-300"
               >
                 <option value="">Jump to § section ({sectionAnchors.length})…</option>
                 {sectionAnchors.map((a) => (
@@ -332,7 +332,7 @@ export function BridgeAndSourceView({
           </div>
 
           {/* Source Code Window */}
-          <div className="mt-3 flex-1 overflow-hidden rounded-md border border-slate-200 bg-slate-950 text-slate-100">
+          <div className="mt-3 flex-1 overflow-hidden rounded-md border border-slate-800 bg-slate-950 text-slate-100">
             {loadingSource ? (
               <div className="p-6 font-mono text-xs text-slate-400">Loading {selectedModule.fileName}…</div>
             ) : sourceError ? (
@@ -343,7 +343,7 @@ export function BridgeAndSourceView({
               <div className="max-h-[480px] overflow-auto p-3 font-mono text-[11.5px] leading-relaxed">
                 {visibleWindowLines.map((row) => (
                   <div key={row.lineNum} className="flex gap-3 hover:bg-slate-900">
-                    <span className="w-11 shrink-0 select-none text-right text-slate-500 tabular-nums">
+                    <span className="w-11 shrink-0 select-none text-right text-slate-400 tabular-nums">
                       {row.lineNum}
                     </span>
                     <span className="whitespace-pre text-slate-100">{row.text}</span>
@@ -360,7 +360,7 @@ export function BridgeAndSourceView({
 
           {/* Pagination when not searching */}
           {!sourceSearch && sourceLines.length > 140 && (
-            <div className="mt-3 flex items-center justify-between font-mono text-xs text-slate-600 tabular-nums">
+            <div className="mt-3 flex items-center justify-between font-mono text-xs text-slate-400 tabular-nums">
               <span>
                 Showing lines {startLine}–{Math.min(sourceLines.length, startLine + 139)} of{' '}
                 {sourceLines.length}
@@ -370,7 +370,7 @@ export function BridgeAndSourceView({
                   type="button"
                   disabled={startLine <= 1}
                   onClick={() => setStartLine((s) => Math.max(1, s - 120))}
-                  className="rounded border border-slate-200 bg-white px-2.5 py-1 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded border border-slate-800 bg-slate-900 px-2.5 py-1 hover:bg-slate-700 disabled:opacity-40"
                 >
                   Prev 120
                 </button>
@@ -378,7 +378,7 @@ export function BridgeAndSourceView({
                   type="button"
                   disabled={startLine + 140 > sourceLines.length}
                   onClick={() => setStartLine((s) => Math.min(sourceLines.length, s + 120))}
-                  className="rounded border border-slate-200 bg-white px-2.5 py-1 hover:bg-slate-50 disabled:opacity-40"
+                  className="rounded border border-slate-800 bg-slate-900 px-2.5 py-1 hover:bg-slate-700 disabled:opacity-40"
                 >
                   Next 120
                 </button>

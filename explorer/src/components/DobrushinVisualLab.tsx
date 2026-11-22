@@ -142,12 +142,12 @@ export function DobrushinVisualLab() {
   return (
     <div className="space-y-5">
       {/* Compact Visual Header + Quick Presets */}
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate-200 bg-white px-5 py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate-800 bg-slate-900 px-5 py-3.5">
         <div>
-          <div className="font-mono text-[11px] uppercase tracking-wider text-slate-500">
+          <div className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
             §43–§44 · 4D Plaquette Neighborhood &amp; Dobrushin Contraction
           </div>
-          <h1 className="text-lg font-semibold text-slate-900">
+          <h1 className="text-lg font-semibold text-slate-100">
             6 Plaquettes · 18 Neighbors · Exponential Mass Gap Wave
           </h1>
         </div>
@@ -158,8 +158,8 @@ export function DobrushinVisualLab() {
             onClick={() => setBeta(STANDARD_BETA0)}
             className={`rounded border px-2.5 py-1 font-mono text-xs ${
               Math.abs(beta - STANDARD_BETA0) < 1e-6
-                ? 'border-blue-600 bg-blue-50 font-semibold text-blue-800'
-                : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-white'
+                ? 'border-emerald-500 bg-emerald-500/10 font-semibold text-emerald-300'
+                : 'border-slate-800 bg-slate-800 text-slate-300 hover:bg-slate-700'
             }`}
           >
             β₀ = 1/300 (Proved)
@@ -167,21 +167,21 @@ export function DobrushinVisualLab() {
           <button
             type="button"
             onClick={() => setBeta(0.0018)}
-            className="rounded border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-xs text-slate-700 hover:bg-white"
+            className="rounded border border-slate-800 bg-slate-800 px-2.5 py-1 font-mono text-xs text-slate-300 hover:bg-slate-700"
           >
             Deep Strong (0.0018)
           </button>
           <button
             type="button"
             onClick={() => setBeta(0.0046)}
-            className="rounded border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-xs text-slate-700 hover:bg-white"
+            className="rounded border border-slate-800 bg-slate-800 px-2.5 py-1 font-mono text-xs text-slate-300 hover:bg-slate-700"
           >
             Near Critical (0.0046)
           </button>
           <button
             type="button"
             onClick={() => setBeta(0.0064)}
-            className="rounded border border-slate-200 bg-slate-50 px-2.5 py-1 font-mono text-xs text-rose-700 hover:bg-rose-50"
+            className="rounded border border-slate-800 bg-slate-800 px-2.5 py-1 font-mono text-xs text-rose-400 hover:bg-rose-500/10"
           >
             Supercritical α&gt;1 (0.0064)
           </button>
@@ -191,7 +191,7 @@ export function DobrushinVisualLab() {
       {/* Main Split: Animated 3D/4D Canvas (7 cols) + Live Controls & Curve Figure (5 cols) */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
         {/* LEFT: 60fps Animated Canvas Stage */}
-        <div className="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-slate-950 lg:col-span-7">
+        <div className="flex flex-col overflow-hidden rounded-lg border border-slate-800 bg-slate-950 lg:col-span-7">
           {/* Canvas Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 bg-slate-900 px-4 py-2.5">
             <div className="flex items-center gap-1.5">
@@ -200,7 +200,7 @@ export function DobrushinVisualLab() {
                 onClick={() => setSceneMode('plaquette_star')}
                 className={`rounded px-2.5 py-1 font-mono text-xs transition-colors ${
                   sceneMode === 'plaquette_star'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-emerald-600 text-white'
                     : 'bg-slate-800 text-slate-300 hover:text-white'
                 }`}
               >
@@ -211,7 +211,7 @@ export function DobrushinVisualLab() {
                 onClick={() => setSceneMode('wave_lattice')}
                 className={`rounded px-2.5 py-1 font-mono text-xs transition-colors ${
                   sceneMode === 'wave_lattice'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-emerald-600 text-white'
                     : 'bg-slate-800 text-slate-300 hover:text-white'
                 }`}
               >
@@ -310,55 +310,55 @@ export function DobrushinVisualLab() {
         <div className="space-y-4 lg:col-span-5">
           {/* Live Numerical Telemetry Strip */}
           <div className="grid grid-cols-3 gap-2.5">
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+            <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">
+              <div className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
                 α = 18(1−e⁻¹²ᵝ)
               </div>
               <div
                 className={`mt-1 font-mono text-xl font-semibold tabular-nums ${
-                  metrics.alpha < 1 ? 'text-emerald-700' : 'text-rose-700'
+                  metrics.alpha < 1 ? 'text-emerald-400' : 'text-rose-400'
                 }`}
               >
                 {metrics.alpha.toFixed(4)}
               </div>
-              <div className="font-mono text-[10px] text-slate-500">
+              <div className="font-mono text-[10px] text-slate-400">
                 {metrics.alpha < 1 ? '● α < 1 Contractive' : '✖ α ≥ 1 Breakdown'}
               </div>
             </div>
 
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+            <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">
+              <div className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
                 Mass Gap m(β)
               </div>
-              <div className="mt-1 font-mono text-xl font-semibold text-blue-700 tabular-nums">
+              <div className="mt-1 font-mono text-xl font-semibold text-emerald-400 tabular-nums">
                 {metrics.clusterRate && Number.isFinite(metrics.clusterRate)
                   ? metrics.clusterRate.toFixed(4)
                   : '—'}
               </div>
-              <div className="font-mono text-[10px] text-slate-500">−½ log α</div>
+              <div className="font-mono text-[10px] text-slate-400">−½ log α</div>
             </div>
 
-            <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <div className="font-mono text-[10px] uppercase tracking-wider text-slate-500">
+            <div className="rounded-lg border border-slate-800 bg-slate-900 p-3">
+              <div className="font-mono text-[10px] uppercase tracking-wider text-slate-400">
                 Bound (D={distanceD})
               </div>
-              <div className="mt-1 font-mono text-xl font-semibold text-slate-900 tabular-nums">
+              <div className="mt-1 font-mono text-xl font-semibold text-slate-100 tabular-nums">
                 {boundAtD === null ? '∞' : boundAtD.toFixed(3)}
               </div>
-              <div className="font-mono text-[10px] text-slate-500">
+              <div className="font-mono text-[10px] text-slate-400">
                 ρ = {metrics.rho.toFixed(3)}
               </div>
             </div>
           </div>
 
           {/* Sliders */}
-          <div className="space-y-3.5 rounded-lg border border-slate-200 bg-white p-4">
+          <div className="space-y-3.5 rounded-lg border border-slate-800 bg-slate-900 p-4">
             <div>
               <div className="flex justify-between text-xs font-medium">
-                <label htmlFor="dob-beta" className="text-slate-700">
+                <label htmlFor="dob-beta" className="text-slate-300">
                   Inverse Coupling β
                 </label>
-                <span className="font-mono font-semibold text-slate-900 tabular-nums">
+                <span className="font-mono font-semibold text-slate-100 tabular-nums">
                   {beta.toFixed(5)} (β_crit ≈ {DOBRUSHIN_CRITICAL_BETA.toFixed(5)})
                 </span>
               </div>
@@ -370,16 +370,16 @@ export function DobrushinVisualLab() {
                 step={0.00005}
                 value={beta}
                 onChange={(e) => setBeta(Number(e.target.value))}
-                className="mt-1.5 w-full accent-blue-600"
+                className="mt-1.5 w-full accent-emerald-500"
               />
             </div>
 
             <div>
               <div className="flex justify-between text-xs font-medium">
-                <label htmlFor="dob-dist" className="text-slate-700">
+                <label htmlFor="dob-dist" className="text-slate-300">
                   Graph Separation D
                 </label>
-                <span className="font-mono font-semibold text-slate-900 tabular-nums">
+                <span className="font-mono font-semibold text-slate-100 tabular-nums">
                   {distanceD} hops
                 </span>
               </div>
@@ -391,14 +391,14 @@ export function DobrushinVisualLab() {
                 step={1}
                 value={distanceD}
                 onChange={(e) => setDistanceD(Number(e.target.value))}
-                className="mt-1.5 w-full accent-blue-600"
+                className="mt-1.5 w-full accent-emerald-500"
               />
             </div>
           </div>
 
           {/* SVG Decay Curve Figure */}
-          <div className="rounded-lg border border-slate-200 bg-white p-3.5">
-            <div className="mb-1 flex items-center justify-between font-mono text-[11px] text-slate-600">
+          <div className="rounded-lg border border-slate-800 bg-slate-900 p-3.5">
+            <div className="mb-1 flex items-center justify-between font-mono text-[11px] text-slate-400">
               <span>|S²(f,g) − S¹(f)S¹(g)| ≤ C(β)·4·ρ^D</span>
               <span className="tabular-nums">D = 1…12</span>
             </div>
@@ -417,7 +417,7 @@ export function DobrushinVisualLab() {
                       x2={svgW - padR}
                       y1={y}
                       y2={y}
-                      stroke="#e2e8f0"
+                      stroke="#334155"
                       strokeDasharray="3 3"
                     />
                     <text x={padL - 6} y={y + 3} textAnchor="end" className="fill-slate-400 font-mono text-[9px]">
@@ -441,14 +441,14 @@ export function DobrushinVisualLab() {
 
               {metrics.regime === 'contractive' ? (
                 <>
-                  <path d={areaPath} fill="rgba(37, 99, 235, 0.1)" />
-                  <path d={boundPath} fill="none" stroke="#2563eb" strokeWidth={2.5} />
+                  <path d={areaPath} fill="rgba(16, 185, 129, 0.12)" />
+                  <path d={boundPath} fill="none" stroke="#34d399" strokeWidth={2.5} />
                   <line
                     x1={xForD(distanceD)}
                     x2={xForD(distanceD)}
                     y1={padT}
                     y2={padT + plotH}
-                    stroke="#0284c7"
+                    stroke="#22d3ee"
                     strokeDasharray="3 3"
                   />
                   {curve.map((pt) => (
@@ -460,7 +460,7 @@ export function DobrushinVisualLab() {
                       className={
                         pt.d === distanceD
                           ? 'fill-cyan-500 stroke-white stroke-2'
-                          : 'fill-blue-600'
+                          : 'fill-emerald-400'
                       }
                     />
                   ))}
@@ -639,7 +639,7 @@ function drawWaveLattice(
   ctx.fillStyle = m.alpha < 1 ? '#38bdf8' : '#f43f5e';
   ctx.fill();
 
-  ctx.font = '600 11px "IBM Plex Mono", monospace';
+  ctx.font = '600 11px "Fira Code", monospace';
   ctx.fillStyle = '#a7f3d0';
   ctx.textAlign = 'center';
   ctx.fillText('S_f', sx, sy - 14);
