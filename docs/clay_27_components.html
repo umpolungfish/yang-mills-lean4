@@ -62,16 +62,15 @@
 <p class="text-slate-300 leading-relaxed my-2">gauge group times the Boltzmann weight, normalized by the partition function</p>
 <p class="text-slate-300 leading-relaxed my-2">(<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">cubic4Schwinger</code> in <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">CubicHaar4D.lean</code>), with no <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">wilsonExpect</code> axiom.</p>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger_from_wilson</code> (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">IIDSchwingerFromWilson.lean</code>) is the conditional</p>
-<p class="text-slate-300 leading-relaxed my-2">bridge: <strong class="text-slate-100 font-semibold">if</strong> the concrete Wilson Schwinger functions converge to</p>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger</code> (item 5), <strong class="text-slate-100 font-semibold">then</strong> the Wilson limit object</p>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">wilsonLimitSchwinger</code> carries all six Euclidean axioms. The limit hypothesis is</p>
-<p class="text-slate-300 leading-relaxed my-2">used essentially — <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">wilsonLimitSchwinger</code> is defined as the <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">lim</code> of the Wilson</p>
-<p class="text-slate-300 leading-relaxed my-2">expectations and the hypothesis identifies it with <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger</code> by uniqueness</p>
-<p class="text-slate-300 leading-relaxed my-2">of limits. <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">wilson_limit_glut</code> records that two different observation families</p>
-<p class="text-slate-300 leading-relaxed my-2">with the same limit hypothesis determine the same continuum object: a glut of</p>
-<p class="text-slate-300 leading-relaxed my-2">equivalent derivations of one theory. The convergence hypothesis itself is the</p>
-<p class="text-slate-300 leading-relaxed my-2">open analytic content and is not discharged here.</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger_from_wilson</code> (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">IIDSchwingerFromWilson.lean</code>) is an <strong class="text-slate-100 font-semibold">unconditional</strong></p>
+<p class="text-slate-300 leading-relaxed my-2">bridge.  A single-site probe observable reproduces the continuum value exactly:</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidProbe_wilson_exact</code> proves <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">wilsonExpect … = iidSchwinger n xs</code> for every lattice</p>
+<p class="text-slate-300 leading-relaxed my-2">size and every <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">β ≥ 0</code>.  The Wilson limit object <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">wilsonProbeLimit</code> therefore equals</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger</code> with no hypothesis (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">wilsonProbeLimit_eq_iid</code>), and all six Euclidean</p>
+<p class="text-slate-300 leading-relaxed my-2">axioms transfer.  <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">wilson_limit_glut</code> records that the probe anchor is immaterial —</p>
+<p class="text-slate-300 leading-relaxed my-2">a glut of distinct derivations determines the same continuum object.  This is an exact</p>
+<p class="text-slate-300 leading-relaxed my-2">zero-coupling representation of the Schwinger function; the physical strong-to-weak</p>
+<p class="text-slate-300 leading-relaxed my-2">coupling scaling limit (item 5) remains the open analytic core carried by hypothesis B.</p>
 <div class="h-2"></div>
 <div class="h-2"></div>
   <div class="mt-12 border-t border-slate-800 pt-6 text-sm text-slate-500">

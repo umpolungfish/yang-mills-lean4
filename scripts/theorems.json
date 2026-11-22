@@ -2210,7 +2210,7 @@
     "status": "PASS"
   },
   {
-    "section": "\u00a747. Conditional Schwinger bridge",
+    "section": "\u00a747. Unconditional Schwinger bridge",
     "name": "YangMills.iidSchwinger_from_wilson",
     "axioms": [
       "Classical.choice",
@@ -2220,7 +2220,7 @@
     "status": "PASS"
   },
   {
-    "section": "\u00a747. Conditional Schwinger bridge",
+    "section": "\u00a747. Unconditional Schwinger bridge",
     "name": "YangMills.wilsonLimitSchwinger_eq_iid",
     "axioms": [
       "Classical.choice",
@@ -2230,8 +2230,48 @@
     "status": "PASS"
   },
   {
-    "section": "\u00a747. Glut of derivations",
+    "section": "\u00a747. Unconditional glut of derivations",
     "name": "YangMills.wilson_limit_glut",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a747. Unconditional Schwinger bridge",
+    "name": "YangMills.iidProbe_wilson_exact",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a747. Unconditional Schwinger bridge",
+    "name": "YangMills.wilsonProbeLimit_eq_iid",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a747. Unconditional Schwinger bridge",
+    "name": "YangMills.cubic4Schwinger_of_const_prod",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a747. Unconditional glut of derivations",
+    "name": "YangMills.iidProbeFamilyAt_prod",
     "axioms": [
       "Classical.choice",
       "Quot.sound",

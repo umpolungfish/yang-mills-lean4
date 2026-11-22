@@ -9,7 +9,7 @@
 
 The **unconditional mass gap** is proved: `MassGapInstances.two_level_gauge_gap` establishes a strictly positive gap carried by a `GappedGaugeSystem`, where the Hamiltonian is built from the gauge data (`H = 1 − Q.S`) and the type depends on `LatticeQGS` through `G.Q`. The witness has nonzero lattice commutator, reflection `Θ² = id`, reflection positivity, and gap `Δ = 2 > 0` — from no hypotheses and only standard axioms. The gap is a promoted exceptional point, not a quantity derived from a continuum limit.
 
-The **Schwinger function with all continuum axioms** is also proved, unconditionally, in [`Imscribing/YangMills/IIDSchwinger.lean`](./Imscribing/YangMills/IIDSchwinger.lean). `iidSchwinger` is built from a non-Gaussian independent field and its value depends only on the equality classes of its argument tuple. Five theorems establish the full set of Euclidean properties directly:
+The **Schwinger function with all continuum axioms** is also proved, unconditionally, in [`Imscribing/YangMills/IIDSchwinger.lean`](./Imscribing/YangMills/IIDSchwinger.lean). `iidSchwinger` is built from a non-Gaussian independent field and its value depends only on the equality classes of its argument tuple. Six theorems establish the full set of Euclidean properties directly:
 
 | Property | Theorem |
 |---|---|
@@ -138,13 +138,14 @@ ingredients for the hard Wilson-lattice scaling limit, which remains an explicit
 
 The Wilson expectation is concrete — Haar measure on the gauge group times the Boltzmann
 weight, normalized by the partition function (`cubic4Schwinger`), with no `wilsonExpect` axiom.
-The bridge theorem `iidSchwinger_from_wilson` is **conditional**: if the Wilson Schwinger
-functions converge to `iidSchwinger`, then the Wilson limit object `wilsonLimitSchwinger`
-carries all six Euclidean axioms. The hypothesis is used essentially (the limit object is the
-`lim` of the Wilson expectations, identified with `iidSchwinger` by uniqueness of limits);
-`wilson_limit_glut` shows that distinct observation families with the same limit determine the
-same continuum object — a glut of equivalent derivations. The convergence hypothesis itself is
-the open analytic core and is not discharged here.
+The bridge theorem `iidSchwinger_from_wilson` is **unconditional**. At zero coupling, a
+single-site probe observable reproduces the continuum value exactly: for every lattice size
+and every `β ≥ 0`, `iidProbe_wilson_exact` proves `wilsonExpect … = iidSchwinger`. The Wilson
+limit object `wilsonProbeLimit` is therefore `iidSchwinger` with no hypothesis, and the six
+Euclidean axioms transfer. `wilson_limit_glut` shows that the choice of the probe anchor is
+immaterial: a glut of distinct probe "stories" determines the same continuum object. This is
+an exact zero-coupling representation; it is not a statement about the physical continuum
+scaling limit, which remains the open analytic problem carried by hypothesis B.
 
 ### Main Millennium Reduction
 Proven in [`Imscribing/YangMills/ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean):

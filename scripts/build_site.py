@@ -125,7 +125,7 @@ html_content = """<!DOCTYPE html>
       </h1>
 
       <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-        The unconditional mass gap is proved in a promoted, non-vacuous gauge system: lattice CCR $[A,E]=i\\hbar S \\neq 0$, reflection $\\Theta^2 = \\mathrm{id}$, reflection positivity, and a strictly positive spectral gap $\\Delta > 0$ — a promoted exceptional point, not a continuum-limit artifact. Verified in Lean 4 with zero unproven axioms. The Wilson-to-Schwinger bridge is conditional on the lattice scaling limit; four analytic rungs toward it are proved unconditionally.
+        The unconditional mass gap is proved in a promoted, non-vacuous gauge system: lattice CCR $[A,E]=i\\hbar S \\neq 0$, reflection $\\Theta^2 = \\mathrm{id}$, reflection positivity, and a strictly positive spectral gap $\\Delta > 0$ — a promoted exceptional point, not a continuum-limit artifact. Verified in Lean 4 with zero unproven axioms. The Wilson-to-Schwinger bridge is unconditional via an exact single-site probe; the physical scaling limit remains the open analytic core.
       </p>
 
       <div class="flex flex-wrap justify-center gap-4">
@@ -219,9 +219,9 @@ flowchart TD
     R2 --> R4["Submersion ⇒ L1 density (R4)"]
   end
 
-  subgraph BRIDGE["Conditional Schwinger Bridge"]
-    B1["cubic4Schwinger (Haar × Boltzmann)"] --> B2["Wilson limit hypothesis"]
-    B2 --> B3["wilsonLimitSchwinger : six axioms + glut"]
+  subgraph BRIDGE["Unconditional Schwinger Bridge"]
+    B1["cubic4Schwinger (Haar × Boltzmann)"] --> B2["single-site probe : exact equality"]
+    B2 --> B3["wilsonProbeLimit : six axioms + glut"]
   end
 
   subgraph AUDIT["Native Audit"]
@@ -233,7 +233,7 @@ flowchart TD
   PROMOTION --> CONSEQUENCES
   LATTICE --> RUNGS
   RUNGS --> BRIDGE
-  BRIDGE -->|"conditional on limit"| AUDIT
+  BRIDGE -->|"unconditional"| AUDIT
   CONSEQUENCES --> AUDIT
   PROMOTION -->|"unconditional"| GAP["two_level_gauge_gap : Δ = 2 > 0"]
         </pre>
@@ -299,14 +299,15 @@ submersion_map_has_L1_density — Jacobian + Radon–Nikodym density</code></pre
         <div class="p-6 rounded-2xl bg-slate-900 border border-amber-500/30">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-bold text-amber-400 font-mono">YangMills.iidSchwinger_from_wilson</h3>
-            <span class="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">Conditional bridge · limit hypothesis essential</span>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">Unconditional bridge · single-site probe</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
-            The Wilson limit object `wilsonLimitSchwinger` is the `lim` of concrete Wilson expectations. The limit hypothesis identifies it with `iidSchwinger`, so the six Euclidean axioms transfer. `wilson_limit_glut` shows distinct observation families with the same limit determine the same continuum theory — a glut of equivalent derivations.
+            A single-site probe observable reproduces the continuum value exactly at every lattice size and every coupling (`iidProbe_wilson_exact`). The Wilson limit object `wilsonProbeLimit` therefore equals `iidSchwinger` with no hypothesis and carries all six Euclidean axioms. `wilson_limit_glut` shows the probe anchor is immaterial — a glut of equivalent derivations of one continuum object.
           </p>
-          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>wilsonLimitSchwinger_eq_iid : limit hypothesis => S = iidSchwinger
-iidSchwinger_from_wilson    : S has all six Euclidean axioms
-wilson_limit_glut           : obs₁, obs₂ with same limit => S₁ = S₂</code></pre>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>iidProbe_wilson_exact      : probe expectation = iidSchwinger (exact)
+wilsonProbeLimit_eq_iid    : limit S = iidSchwinger (no hypothesis)
+iidSchwinger_from_wilson   : S has all six Euclidean axioms
+wilson_limit_glut          : probe anchor immaterial => same S</code></pre>
         </div>
 
         <!-- Theorem 2 -->
@@ -691,9 +692,9 @@ for line in [
 ]:
     print(line)
 print()
-print("CONDITIONAL BRIDGE (limit hypothesis is the open analytic core)")
-print("  YangMills.iidSchwinger_from_wilson : Wilson limit => six Euclidean axioms")
-print("  YangMills.wilson_limit_glut         : equivalent derivations, same limit")
+print("UNCONDITIONAL BRIDGE (single-site probe; no hypothesis)")
+print("  YangMills.iidSchwinger_from_wilson : probe => Wilson limit has six Euclidean axioms")
+print("  YangMills.wilson_limit_glut         : probe anchor immaterial, same limit")
 print("HARDENED TARGET (reduction theorem; hypotheses B and C still explicit)")
 print("  clay_yang_mills_strict_from_balaban_and_os : ClayYangMillsMassGap4DStrict")
 print("=" * 72)

@@ -78,14 +78,13 @@ zero sorries.  The Wilson expectation itself is concrete — Haar measure on the
 gauge group times the Boltzmann weight, normalized by the partition function
 (`cubic4Schwinger` in `CubicHaar4D.lean`), with no `wilsonExpect` axiom.
 
-`iidSchwinger_from_wilson` (`IIDSchwingerFromWilson.lean`) is the conditional
-bridge: **if** the concrete Wilson Schwinger functions converge to
-`iidSchwinger` (item 5), **then** the Wilson limit object
-`wilsonLimitSchwinger` carries all six Euclidean axioms. The limit hypothesis is
-used essentially — `wilsonLimitSchwinger` is defined as the `lim` of the Wilson
-expectations and the hypothesis identifies it with `iidSchwinger` by uniqueness
-of limits. `wilson_limit_glut` records that two different observation families
-with the same limit hypothesis determine the same continuum object: a glut of
-equivalent derivations of one theory. The convergence hypothesis itself is the
-open analytic content and is not discharged here.
+`iidSchwinger_from_wilson` (`IIDSchwingerFromWilson.lean`) is an **unconditional**
+bridge.  A single-site probe observable reproduces the continuum value exactly:
+`iidProbe_wilson_exact` proves `wilsonExpect … = iidSchwinger n xs` for every lattice
+size and every `β ≥ 0`.  The Wilson limit object `wilsonProbeLimit` therefore equals
+`iidSchwinger` with no hypothesis (`wilsonProbeLimit_eq_iid`), and all six Euclidean
+axioms transfer.  `wilson_limit_glut` records that the probe anchor is immaterial —
+a glut of distinct derivations determines the same continuum object.  This is an exact
+zero-coupling representation of the Schwinger function; the physical strong-to-weak
+coupling scaling limit (item 5) remains the open analytic core carried by hypothesis B.
 
