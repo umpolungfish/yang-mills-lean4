@@ -1,6 +1,6 @@
 # Yang–Mills ELF build and Vox audit
 
-Built the full Yang–Mills import bundle with `/home/mrnob0dy666/imsgct/lean2elf.sh`, using the project Lean 4.28.0 Lake environment and local package cache.
+Built the full Yang–Mills import bundle with `/home/mrnob0dy666/imsgct/lean2elf.sh --project /home/mrnob0dy666/imsgct/yang-mills-lean4`, using the project Lean 4.28.0 Lake environment and local package cache. The script accepts an explicit Lake root for any project and retains automatic discovery and the canonical-corpus fallback for existing callers.
 
 - Bundle: `YangMillsELFBundle.lean`, importing the project modules and checking the seven principal declarations and their kernel axiom reports.
 - Build: `16,125` Lake jobs completed successfully.

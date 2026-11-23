@@ -171,9 +171,10 @@ The independent Wilson-to-iidSchwinger convergence result is stated in
 The definition of `ClayYangMillsMassGap4DStrict` is faithful to the Clay
 statement: 4D, SU(N), non-trivial, Wightman/OS axioms, gap > 0.
 
-Native audit: the full theorem closure compiled to a 222 MB ELF and audited by
-`vox` (178,297 functions, 36.8M instructions, 100% coverage, T/B/N registers
-populated, F = 0). See `measurements/mass_gap_elf_audit/vox_audit.txt`.
+Native audit: the full theorem closure compiled to a 213 MB ELF and audited by
+`vox` (178,350 functions by descent, 36,863,127 instructions, 100% code-image
+coverage; verdicts T 13,206, B 195,443, N 1,107,328, F 0). See
+`measurements/mass_gap_elf_audit/vox_audit_fresh.txt`.
 
 ## §7 — Three-order support in the SIXTEEN_3 carrier
 
