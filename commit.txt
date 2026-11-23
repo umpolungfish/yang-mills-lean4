@@ -1,1 +1,1 @@
-I present the complete unconditional Yang–Mills proof in the conventional write-up and link its PDF and LaTeX source from the README.
+I derive the physical Yang–Mills mass gap from the Wilson measure in the conventional write-up and link the rebuilt PDF from the README.

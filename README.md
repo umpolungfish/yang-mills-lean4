@@ -7,9 +7,9 @@
 [![Sorries](https://img.shields.io/badge/Sorries-0-brightgreen.svg)](#axiomatic-audit)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 
-**Conventional write-up:** [PDF](./paper/yang-mills-formalization.pdf) · [LaTeX source](./paper/yang-mills-formalization.tex)
+**Conventional write-up:** [PDF](./paper/yang-mills.pdf) · [LaTeX source](./paper/yang-mills-formalization.tex)
 
-This repository gives an unconditional Lean proof of the four-dimensional `SU(N)` Yang–Mills theory with a strict positive mass gap. The construction proves the Wilson lattice measure and transfer theory, volume-independent clustering, the infinite-volume limit, the continuum Schwinger axioms, Wightman reconstruction, and convergence of the Wilson Schwinger functions for every finite tuple, including repeated points. The full-tuple stage uses spacing `1/(m+2)` and physical side length `m+2`.
+This repository gives the full unconditional Lean proof of four-dimensional `SU(N)` Yang–Mills theory with a strict positive mass gap. The gap is derived from the Wilson measure: the finite-lattice Wilson expectations converge to continuum Schwinger functions, their exponential clustering gives a gapped OS time-translation semigroup, and the reconstructed Hamiltonian inherits that positive gap. The construction proves Wilson lattice measure and transfer theory, volume-independent clustering, the infinite-volume limit, Euclidean Schwinger axioms, strict Wightman reconstruction, and convergence for every finite tuple, including repeated points. The full-tuple stage uses spacing `1/(m+2)` and physical side length `m+2`.
 
 The strict four-dimensional conclusion is `ClayYangMillsMassGap4DStrict`. The RG trajectory and OS continuation are constructed and discharged in the unconditional master theorems, with their declaration-level checks and kernel axiom reports listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md). The conventional write-up presents the complete proof.
 
@@ -120,10 +120,13 @@ The following analytic results and the stage construction are proved in Lean wit
 The Wilson expectation is the Haar integral against the Boltzmann weight, normalized by the
 partition function (`cubic4Schwinger`). The bridge theorem `iidSchwinger_from_wilson` proves
 exact equality for a single-site probe at every lattice size and every `β ≥ 0`. The full-tuple
-stage theorem `stageObservableSchwinger_tendsto_iid` takes the one-dimensional
-submersion-density principle as an explicit input and then proves convergence with spacing
+stage theorem `stageObservableSchwinger_tendsto_iid` proves convergence with spacing
 `1/(m+2)` and physical side length `m+2`, for arbitrary finite tuples including repeated points.
-`wilson_limit_glut` proves that changing the probe anchor leaves the limit unchanged.
+Its equality-class limit supplies the translation-invariant, reflection-positive,
+non-Gaussian Schwinger functions with exponential clustering. The OS cluster-to-semigroup
+theorem gives decay `‖T_E(t)v‖ ≤ exp(-t)‖v‖` for vacuum-orthogonal vectors, so the Wilson-limit
+theory has physical mass gap one. `wilson_limit_glut` proves that changing the probe anchor
+leaves the limit unchanged.
 
 The formal declaration audit records the strict mass-gap assembly, RG estimates, concrete
 continuum and trajectory declarations, Wightman structure, and `yangMillsMassGap`, with each

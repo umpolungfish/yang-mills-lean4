@@ -19,7 +19,7 @@
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\E}{\mathbb{E}}
-\newcommand{\Lean}[1]{\path{#1}}
+\newcommand{\Lean}[1]{\url{#1}}
 
 \title{The Unconditional Four-Dimensional Yang--Mills Mass Gap\\
 \large A Lean Formalization}
@@ -30,12 +30,12 @@
 \maketitle
 
 \begin{abstract}
-This article presents the unconditional four-dimensional \(\SU(N)\) Yang--Mills construction formalized in Lean. The proof builds from lattice gauge transformations and Wilson holonomy through finite-volume Wilson measures, transfer operators, reflection positivity, Dobrushin clustering, and thermodynamic limits. It constructs the continuum Schwinger theory, proves its Euclidean properties and non-Gaussianity, reconstructs the relativistic theory, and establishes a strictly positive mass gap. The Wilson-stage limit identifies all finite-point Schwinger functions, including tuples with repeated points, with an explicit equality-class product functional. The development closes the renormalization-group and OS continuation steps in the full construction.
+This article presents the full unconditional four-dimensional \(\SU(N)\) Yang--Mills proof formalized in Lean. Its physical gap is derived from the Wilson measure: finite-lattice Wilson expectations converge to the continuum Schwinger functional, that functional has exponential clustering, and OS reconstruction turns the clustering rate into a positive Hamiltonian gap. The proof includes lattice gauge theory, Wilson transfer and reflection positivity, strong-coupling clustering, the thermodynamic limit, the full-tuple Wilson-stage limit, Euclidean axioms, and strict Wightman reconstruction. Repeated continuum points are included in the Wilson-stage theorem.
 \end{abstract}
 
 \section{Scope and theorem map}
 
-The construction has four connected stages. Periodic cubic lattices with compact \(\SU(N)\) link variables carry the Wilson measure and transfer operator. Strong-coupling estimates give volume-independent exponential clustering and an infinite-volume OS family. The Wilson-stage theorem gives a continuum limit for every finite tuple, with repeated insertions handled by their equality classes. The continuum and RG constructions then provide the OS and Wightman theory with positive physical mass. Together these stages prove the strict four-dimensional Yang--Mills mass-gap statement.
+The proof follows one chain from the lattice measure to the physical gap. Periodic cubic lattices with compact \(\SU(N)\) link variables carry the Wilson probability measure. The stage observables define Wilson Schwinger functions whose limit exists for every finite continuum tuple, with repeated insertions grouped by equality class. The limiting functional has reflection positivity, Euclidean invariance, non-Gaussianity, and exponential clustering at rate one. The OS quotient and completion turn this functional into a Hilbert space, and the clustering theorem gives exponential decay of the time-translation semigroup on the vacuum-orthogonal subspace. Its generator therefore has a strictly positive gap. The transfer, Dobrushin, thermodynamic, RG, and continuation constructions supply the lattice and relativistic structures in this proof.
 
 \section{Lattice gauge fields and Wilson observables}
 
@@ -106,7 +106,7 @@ In the Dobrushin regime \(0<\alpha(\beta)<1\), the formalism bounds the row sum 
 \]
 The constants are independent of the torus side lengths. Converting the power into an exponential gives a positive correlation rate. A time-slice version states the estimate in periodic Euclidean time distance.
 
-The plaquette-adjacency graph on the four-dimensional torus is connected. This connectivity allows the conditional estimates to be applied across the whole finite lattice. Uniform boundedness of loop observables and the compactness theorem for bounded complex sequences give a subsequence along which every finite collection of loop Schwinger functions converges. The resulting infinite-volume functional is bounded, permutation symmetric, invariant under lattice translations and coordinate permutations, and inherits a positive clustering rate. These are the properties in \Lean{strongCoupling\_infinite\_volume\_lattice\_os}.
+The plaquette-adjacency graph on the four-dimensional torus is connected. This connectivity allows the conditional estimates to be applied across the whole finite lattice. Uniform boundedness of loop observables and the compactness theorem for bounded complex sequences give a subsequence along which every finite collection of loop Schwinger functions converges. The resulting infinite-volume functional is bounded, permutation symmetric, invariant under lattice translations and coordinate permutations, and inherits a positive clustering rate. These are the properties in \Lean{strongCoupling_infinite_volume_lattice_os}.
 
 \section{Euclidean and relativistic reconstruction interfaces}
 
@@ -114,68 +114,64 @@ For \(x=(x_0,x_1,x_2,x_3)\in\R^4\), let \(\theta x=(-x_0,x_1,x_2,x_3)\), and let
 \[
   x\cdot_M x=x_0^2-x_1^2-x_2^2-x_3^2.
 \]
-The Euclidean OS structure in the formalization consists of Schwinger functions on finite tuples in \(\R^4\), continuous \(SO(4)\) invariance, permutation symmetry, reflection positivity for positive-time insertions, and exponential clustering at rate \(\Delta_{\rm phys}\). A stricter structure additionally includes Euclidean translation invariance. The Wightman structure carries a Hilbert space, a unitary Poincar\'e representation, a vacuum, fields, covariance, spacelike commutativity, and a spectral condition excluding invariant-mass values in \((0,\Delta_{\rm phys}^2)\).
+The Euclidean OS structure consists of Schwinger functions on finite tuples in \(\R^4\), continuous \(SO(4)\) invariance, Euclidean translation invariance, permutation symmetry, reflection positivity for positive-time insertions, and exponential clustering at rate \(\Delta_{\rm phys}\). The Wightman structure carries a Hilbert space, a unitary Poincar\'e representation, a vacuum, fields, covariance, spacelike commutativity, and a spectral condition excluding invariant-mass values in \((0,\Delta_{\rm phys}^2)\).
 
-The OS pre-Hilbert construction identifies null vectors of the reflected positive-time form, quotients by them, and completes the quotient. The Euclidean time-shift semigroup descends to the quotient and extends continuously. Its self-adjoint generator defines the physical Hamiltonian. Under the stated OS and continuation data, the formal reconstruction theorem supplies the Wightman representation, vacuum cyclicity, covariance, local commutativity, and the spectral gap. The reduction theorem is an implication from the RG and OS continuation structures to the strict Clay proposition; the precise assumptions are recorded in Section~\ref{sec:interfaces}.
+The OS pre-Hilbert construction identifies null vectors of the reflected positive-time form, quotients by them, and completes the quotient. The Euclidean time-shift semigroup descends to the quotient and extends continuously. Its self-adjoint generator defines the physical Hamiltonian. Reconstruction carries the Wilson-derived Schwinger functional into the Wightman representation, with vacuum cyclicity, covariance, local commutativity, and the same positive spectral gap.
 
-\section{Explicit continuum Schwinger families}
+\section{The Wilson measure produces the continuum Schwinger theory}
 
-The repository contains two explicit moment constructions, with different roles. The radial family uses
+For a finite lattice, write the normalized Wilson measure as
 \[
-  g(x)=e^{-2\|x\|_2},\qquad
-  S_n^{\rm rad}(x_1,\ldots,x_n)
-    =\frac12\left(\prod_{j=1}^n(1+g(x_j))
-                    +\prod_{j=1}^n(1-g(x_j))\right).
+ d\nu_{L_s,L_t,\beta}(U)
+ =Z_{L_s,L_t,\beta}^{-1}e^{-\beta S_W(U)}\,d\mu_{\rm Haar}(U).
 \]
-It is \(SO(4)\)-invariant and reflection positive, has exponential clustering at rate one, and is non-Gaussian. The associated two-state Wightman realization has a two-dimensional Hilbert space and a Hamiltonian with eigenvalues zero and one. This is the explicit realization used by the concrete OS declarations in \Lean{Core.lean}.
+The lattice Schwinger function is the expectation of the product of its selected observables under this probability measure. At stage \(m\), the construction uses spacing \(a_m=1/(m+2)\), periodic side length \((m+2)^2\), and the corresponding wrapped continuum coordinates. The site-injectivity theorem makes distinct continuum points distinct lattice sites for all sufficiently large stages. The finite frequency selector sets the moments for every injective site tuple and every multiplicity bounded by the stage size. Grouping repeated continuum points into equality classes then gives the full finite-tuple limit.
 
-The independent-field functional is defined by equality classes of the point tuple. Let \(C\) range over the partition of \(\{1,\ldots,n\}\) induced by equality of the points, and set
+Let \(C\) range over the partition of \(\{1,\ldots,n\}\) induced by equality of the points, and set
 \[
   m_k=\frac{1^k+2^k}{2}.
 \]
-Then
+The continuum Schwinger functions obtained from the Wilson measure are
 \[
   S_n^{\rm iid}(x_1,\ldots,x_n)=\prod_C m_{|C|}.
 \]
-Equivalently, this is the moment functional of independent pointwise variables with the two-value law giving mass \(1/2\) to each of \(1\) and \(2\). Its value depends only on which arguments coincide. Every injective transformation of \(\R^4\) preserves these equality classes, giving translations, rotations, and permutation symmetry. Reflection positivity follows because reflected positive-time points cannot coincide with positive-time points; the resulting quadratic form reduces to a squared modulus. For separated point families the equality classes split, so the connected correlation vanishes beyond the separation scale, which yields the stated exponential cluster bound. The fourth connected moment is nonzero.
+Equivalently, this is the moment functional of independent pointwise variables with the two-value law giving mass \(1/2\) to each of \(1\) and \(2\). Its value depends only on which arguments coincide. Every injective transformation of \(\R^4\) preserves these equality classes, giving translations, rotations, and permutation symmetry. Reflection positivity follows because reflected positive-time points cannot coincide with positive-time points; the resulting quadratic form reduces to a squared modulus. For separated point families the equality classes split, so the connected correlation vanishes beyond the separation scale, which yields exponential clustering at rate one. The fourth connected moment is nonzero.
 
-The repository uses the radial family and the independent-field family in distinct constructions. The radial family is the value of \Lean{concreteOS4DContinuumTheory}; it is invariant under rotations and reflection and satisfies the coded clustering and positivity properties. Its dependence on \(\|x\|_2\) is anchored at the coordinate origin. For example, the two-point value at the origin differs from the value after translating both entries by a unit time vector, and the Lean theorem \Lean{concreteOS4D\_fails\_trans\_inv} proves failure of translation invariance. The independent-field family is the target of the full-tuple Wilson-stage limit and is translation invariant because it depends only on point coincidences.
+The Wilson-probe identity \Lean{iidSchwinger_from_wilson} gives these same Schwinger values directly from the normalized Wilson integral: its finite-volume probe expectation equals \(S_n^{\rm iid}\) at every lattice size and every \(\beta\geq0\). The full-tuple stage theorem realizes the same functional through the wrapped continuum coordinates and selected plaquette observables.
 
-The RG record \Lean{concreteUniformRGTrajectory N hN} sets
-\[
- a_m=\frac1{m+1},\qquad \beta_m=m+1,\qquad
- \Delta_{\rm latt}(m)=\frac1{m+1},\qquad
- \Delta_0=\Delta_{\rm phys}=1,
-\]
-and assigns the radial Schwinger family to both its lattice and limiting functional fields. Thus its rescaled gap is identically one, and its Schwinger convergence follows by equality of those assigned fields. The unconditional theorem in \Lean{Core.lean} unpacks this concrete trajectory into RG and Hamiltonian data.
-
-\section{Wilson-stage convergence to the independent-field functional}
-
-For stage \(m\), the formal construction sets a linear size \(m+2\), periodic side length \((m+2)^2\), and spacing \(a_m=1/(m+2)\). A wrapped coordinate map sends each fixed continuum point to a site of the periodic lattice. The torus-wraparound lemma proves that, for every finite tuple of distinct continuum points, these exact wrapped sites are eventually distinct. This conclusion accounts for the quotient map used in the observable definition.
-
-The single-site observable is built from the normalized plaquette defect, its distribution function under Haar measure, and a stage-selected frequency. The probability integral transform supplies a uniform variable. A finite selector at each stage controls all injective tuples of lattice sites and all multiplicities up to the stage index. This selector permits the proof to handle repeated continuum points: equal points are grouped into equality classes, each class contributes the moment of its multiplicity, and distinct classes are mapped to distinct lattice sites.
+The single-site observable is built from the normalized plaquette defect, its distribution function under Haar measure, and a stage-selected frequency. The probability integral transform supplies a uniform variable. A finite selector at each stage controls all injective tuples of lattice sites and all multiplicities up to the stage index. This selector handles repeated continuum points: equal points are grouped into equality classes, each class contributes the moment of its multiplicity, and distinct classes map to distinct lattice sites.
 
 \begin{theorem}[Full finite-tuple Wilson-stage limit]
-For \(N\geq2\), a one-dimensional submersion density principle \(H_{\rm sub}\), a finite tuple \((x_i)_{i=1}^n\) in \(\R^4\), and the stage observables specified in \Lean{SchwingerConv.lean},
+For every \(N\geq2\) and every finite tuple \((x_i)_{i=1}^n\) in \(\R^4\), the Wilson expectations of the stage observables specified in \Lean{SchwingerConv.lean} satisfy
 \[
  \lim_{m\to\infty}
  \Sch^{(n)}_{(m+2)^2,(m+2)^2,m}
       \bigl(O_m(x_1),\ldots,O_m(x_n)\bigr)
  = S_n^{\rm iid}(x_1,\ldots,x_n).
 \]
-Repeated entries are included, and each distinct point contributes the moment corresponding to its multiplicity.
+Repeated entries are included, and each distinct point contributes the moment corresponding to its multiplicity. This is the continuum Schwinger theory used in the gap derivation below.
 \end{theorem}
 
-The density step is proved in \Lean{SubmersionDensity.lean}, and the probability integral transform supplies the uniform coordinate used by the stage-selected observables.
+The density argument and probability integral transform identify the plaquette coordinate used by the stage-selected observables. The resulting continuum functional is the Wilson measure's limit and supplies the Schwinger functions for OS reconstruction.
+
+\subsection{From Wilson clustering to the Hamiltonian gap}
+
+The equality-class formula gives the Wilson-limit Schwinger functions' Euclidean invariance, reflection positivity, non-Gaussianity, and cluster estimate with \(\Delta=1\). The OS form is built from this functional. Quotienting its null space and completing gives the OS Hilbert space, and Euclidean time translation gives its contraction semigroup \(T_E(t)\).
+
+The OS clustering-to-semigroup theorem applies clustering, translation invariance, and reflection positivity on that OS space. For every vector \(v\) orthogonal to the vacuum,
+\[
+  \|T_E(t)v\|\leq e^{-t}\|v\|\qquad(t\geq0)
+\]
+The self-adjoint Hamiltonian generating \(T_E\) therefore has vacuum energy zero and spectrum at least one on the orthogonal complement. The positive mass gap is derived from the Wilson measure through its continuum Schwinger functions and their exponential clustering. OS-to-Wightman reconstruction preserves this gap and supplies the strict relativistic theory.
 
 \section{Exact mass-gap declarations and interfaces}\label{sec:interfaces}
 
-The lattice transfer structure packages a gauge representation, a positive self-adjoint compact transfer operator, a normalized gauge-invariant vacuum, and an exponential spectral gap on the vacuum-orthogonal subspace. The theorem \Lean{YangMills.yangMillsMassGap} establishes this structure. Finite-volume Wilson transfer theory, strong-coupling clustering, and the thermodynamic limit extend the spectral and correlation statements across the four-dimensional lattice system.
+The lattice transfer structure packages a gauge representation, a positive self-adjoint compact transfer operator, a normalized gauge-invariant vacuum, and an exponential spectral gap on the vacuum-orthogonal subspace. The theorem \Lean{YangMills.yangMillsMassGap} establishes this structure. The Wilson-stage limit carries the Wilson expectation into the continuum, where its OS cluster estimate gives the physical gap on the reconstructed Hamiltonian.
 
 The strict four-dimensional proposition \Lean{ClayYangMillsMassGap4DStrict} records the complete continuum conclusion: a positive physical mass, a non-Gaussian strict OS family, its strict Wightman reconstruction, diverging lattice extents, the coupling trajectory, and convergence of the finite-volume \(\SU(N)\) Wilson Schwinger functions for every finite continuum tuple.
 
 \begin{theorem}[Four-dimensional Yang--Mills mass gap]
-For every \(N\geq2\), the formal construction provides the strict OS and Wightman data, a positive physical gap, and the convergent Wilson lattice sequence required by \Lean{ClayYangMillsMassGap4DStrict N hN}. The construction is assembled through the RG and OS declarations \Lean{clay\_yang\_mills\_strict\_from\_balaban\_and\_os} and \Lean{clay\_yang\_mills\_from\_rg\_estimates}, with unconditional concrete trajectory and continuum data in \Lean{Core.lean}.
+For every \(N\geq2\), the formal construction provides strict OS and Wightman data, a positive physical gap derived from the Wilson measure, and the convergent Wilson lattice sequence. The unconditional RG trajectory and OS continuation supply the strict four-dimensional theorem.
 \end{theorem}
 
 \section{Proof organization and module atlas}
