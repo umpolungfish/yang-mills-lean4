@@ -66,5 +66,6 @@ globs = [
   "Imscribing.YangMills.PlaquetteDensity",
   "Imscribing.YangMills.PlaquetteStep2",
   "Imscribing.YangMills.PlaquetteStep3",
-  "Imscribing.YangMills.RademacherStep4"
+  "Imscribing.YangMills.RademacherStep4",
+  "Imscribing.YangMills.SchwingerConv"
 ]
