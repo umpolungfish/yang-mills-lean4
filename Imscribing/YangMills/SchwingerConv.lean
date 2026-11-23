@@ -98,6 +98,42 @@ private theorem map_absolutelyContinuous_of_absolutelyContinuous
   rw [Measure.map_apply hf hs] at hzero ⊢
   exact hμν hzero
 
+/-- Absolute continuity is preserved by finite products of marginals. -/
+theorem pi_absolutelyContinuous_fin {r : ℕ} {α : Type*} [MeasurableSpace α]
+    (μ ν : Fin r → Measure α) [∀ i, SigmaFinite (μ i)] [∀ i, SigmaFinite (ν i)]
+    (h : ∀ i, μ i ≪ ν i) : Measure.pi μ ≪ Measure.pi ν := by
+  induction r with
+  | zero =>
+      rw [Measure.pi_of_empty, Measure.pi_of_empty]
+  | succ r ih =>
+      let μtail : Fin r → Measure α := fun j => μ (Fin.succAbove 0 j)
+      let νtail : Fin r → Measure α := fun j => ν (Fin.succAbove 0 j)
+      let e : (Fin (r + 1) → α) ≃ᵐ α × (Fin r → α) :=
+        MeasurableEquiv.piFinSuccAbove (fun _ : Fin (r + 1) => α) 0
+      have hμe : (Measure.pi μ).map e = (μ 0).prod (Measure.pi μtail) := by
+        simpa [e, μtail] using
+          (measurePreserving_piFinSuccAbove μ (0 : Fin (r + 1))).map_eq
+      have hνe : (Measure.pi ν).map e = (ν 0).prod (Measure.pi νtail) := by
+        simpa [e, νtail] using
+          (measurePreserving_piFinSuccAbove ν (0 : Fin (r + 1))).map_eq
+      have htail : Measure.pi μtail ≪ Measure.pi νtail :=
+        ih μtail νtail (fun j => h (Fin.succAbove 0 j))
+      have hprod : (μ 0).prod (Measure.pi μtail) ≪
+          (ν 0).prod (Measure.pi νtail) := (h 0).prod htail
+      have hmap : (Measure.pi μ).map e ≪ (Measure.pi ν).map e := by
+        rw [hμe, hνe]
+        exact hprod
+      refine Measure.AbsolutelyContinuous.mk ?_
+      intro s hs hzero
+      let t := e '' s
+      have ht : MeasurableSet t := e.measurableSet_image.mpr hs
+      have hzero' : ((Measure.pi ν).map e) t = 0 := by
+        rw [Measure.map_apply e.measurable ht]
+        simpa [t, e.injective.preimage_image] using hzero
+      have h := hmap hzero'
+      rw [Measure.map_apply e.measurable ht, e.injective.preimage_image] at h
+      exact h
+
 /-- The normalized Wilson density has total mass one. -/
 theorem wilsonMeasure_isProbability (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt] (β : ℝ)
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
@@ -300,6 +336,55 @@ theorem cdfI01_map_eq_volume (μ : Measure ℝ) (hμ : IsProbabilityMeasure μ)
 /-- A coordinate marginal of a vector-valued probability measure. -/
 noncomputable def coordinateMarginal {r : ℕ} (ν : Measure (Fin r → ℝ)) (i : Fin r) :
     Measure ℝ := ν.map (fun x => x i)
+
+/-- If the product-Haar law of a lattice observable vector factors into its
+coordinate marginals, then the Wilson law is dominated by the product of its
+own marginals. This transfers independence through the strictly positive
+Wilson density without assuming independence under the Wilson measure. -/
+theorem wilson_joint_dominated_by_marginals_of_haar_independent
+    (Ls Lt N r : ℕ) [NeZero Ls] [NeZero Lt] (β : ℝ) (hβ : 0 ≤ β)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (F : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) →
+      Fin r → ℝ) (hF : Measurable F)
+    (hhaar : (spacetimeHaarMeasure Ls Lt N).map F =
+      Measure.pi (fun i : Fin r => coordinateMarginal
+        ((spacetimeHaarMeasure Ls Lt N).map F) i)) :
+    (wilsonMeasure Ls Lt N β).map F ≪ Measure.pi (fun i : Fin r => coordinateMarginal
+      ((wilsonMeasure Ls Lt N β).map F) i) := by
+  let η := (spacetimeHaarMeasure Ls Lt N).map F
+  let ν := (wilsonMeasure Ls Lt N β).map F
+  haveI : IsProbabilityMeasure (spacetimeHaarMeasure Ls Lt N) :=
+    spacetimeHaarMeasure_prob Ls Lt N
+  haveI : IsProbabilityMeasure (wilsonMeasure Ls Lt N β) :=
+    wilsonMeasure_isProbability Ls Lt N β hβ
+  haveI : IsProbabilityMeasure η := Measure.isProbabilityMeasure_map hF.aemeasurable
+  haveI : IsProbabilityMeasure ν := Measure.isProbabilityMeasure_map hF.aemeasurable
+  haveI (i : Fin r) : IsProbabilityMeasure (coordinateMarginal η i) :=
+    Measure.isProbabilityMeasure_map (measurable_pi_apply i).aemeasurable
+  haveI (i : Fin r) : IsProbabilityMeasure (coordinateMarginal ν i) :=
+    Measure.isProbabilityMeasure_map (measurable_pi_apply i).aemeasurable
+  have hην : η ≪ ν := map_absolutelyContinuous_of_absolutelyContinuous F hF
+    (spacetimeHaarMeasure Ls Lt N) (wilsonMeasure Ls Lt N β)
+    (haar_abs_cont_wilsonMeasure Ls Lt N β hβ)
+  have hνη : ν ≪ η := map_absolutelyContinuous_of_absolutelyContinuous F hF
+    (wilsonMeasure Ls Lt N β) (spacetimeHaarMeasure Ls Lt N)
+    (wilsonMeasure_abs_cont_haar Ls Lt N β hβ)
+  have hMarg : ∀ i : Fin r, coordinateMarginal η i ≪ coordinateMarginal ν i := by
+    intro i
+    exact map_absolutelyContinuous_of_absolutelyContinuous (fun x : Fin r → ℝ => x i)
+      (measurable_pi_apply i) η ν hην
+  have hpi : Measure.pi (fun i : Fin r => coordinateMarginal η i) ≪
+      Measure.pi (fun i : Fin r => coordinateMarginal ν i) := by
+    apply pi_absolutelyContinuous_fin
+    exact hMarg
+  have hηpi : η ≪ Measure.pi (fun i : Fin r => coordinateMarginal η i) := by
+    have hhaar' : η = Measure.pi (fun i : Fin r => coordinateMarginal η i) := by
+      simpa [η] using hhaar
+    exact Measure.absolutelyContinuous_of_eq hhaar'
+  have hνη' : ν ≪ Measure.pi (fun i : Fin r => coordinateMarginal ν i) := by
+    exact hνη.trans (hηpi.trans hpi)
+  simpa [η, ν] using hνη'
 
 /-- Apply the probability integral transform in every coordinate. -/
 noncomputable def cdfCubeMap {r : ℕ} (ν : Measure (Fin r → ℝ))
@@ -754,6 +839,43 @@ theorem stageObservable_distinctSite_moments_tendsto
     exact hEq K
   rw [hEqFun]
   simpa [μ, ν, X] using hpull
+
+/-- The distinct-site moment limit with product-marginal domination derived
+from the corresponding product-Haar law. -/
+theorem stageObservable_distinctSite_moments_tendsto_of_haar_independent
+    (Ls Lt N r : ℕ) [NeZero Ls] [NeZero Lt]
+    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (ha : 0 < a)
+    (xs : Fin r → Space4) (k : Fin r → ℕ)
+    (hN : 2 ≤ N) (hLt2 : 2 ≤ Lt)
+    (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U → ContDiffOn ℝ 1 g U →
+      (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (hhaar : (spacetimeHaarMeasure Ls Lt N).map
+      (fun U i => plaquetteDefect Ls Lt N
+        (stageSiteMap Ls Lt a ha (xs i)) U) =
+      Measure.pi (fun i : Fin r => coordinateMarginal
+        ((spacetimeHaarMeasure Ls Lt N).map
+          (fun U i => plaquetteDefect Ls Lt N
+            (stageSiteMap Ls Lt a ha (xs i)) U)) i)) :
+    Tendsto (fun K : ℕ =>
+      ∫ U, ∏ i : Fin r,
+        (stageObservable Ls Lt N β hβ a ha (xs i) K U) ^ k i
+          ∂(wilsonMeasure Ls Lt N β)) atTop
+      (𝓝 (∏ i : Fin r, ((1 : ℝ) ^ k i + (2 : ℝ) ^ k i) / 2)) := by
+  let F : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) →
+      Fin r → ℝ := fun U i =>
+        plaquetteDefect Ls Lt N (stageSiteMap Ls Lt a ha (xs i)) U
+  have hF : Measurable F := by
+    apply measurable_pi_iff.mpr
+    intro i
+    exact measurable_plaquetteDefect Ls Lt N (stageSiteMap Ls Lt a ha (xs i))
+  have hdom : (wilsonMeasure Ls Lt N β).map F ≪
+      Measure.pi (fun i : Fin r => coordinateMarginal
+        ((wilsonMeasure Ls Lt N β).map F) i) := by
+    exact wilson_joint_dominated_by_marginals_of_haar_independent
+      Ls Lt N r β hβ F hF (by simpa [F] using hhaar)
+  exact stageObservable_distinctSite_moments_tendsto
+    Ls Lt N r β hβ a ha xs k hN hLt2 submersion_1d (by simpa [F] using hdom)
 
 theorem stageObservable_range (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
