@@ -10,6 +10,8 @@ import Imscribing.YangMills.PlaquetteStep3
 import Imscribing.YangMills.RademacherMulti
 import Imscribing.YangMills.ProbIntegralTransform
 import Imscribing.YangMills.SUNHaar
+import Imscribing.Millennium.ContinuumLatticeBridge
+import Imscribing.Millennium.TorusWraparoundBridge
 
 set_option maxHeartbeats 8000000
 set_option maxRecDepth 20000
@@ -274,8 +276,9 @@ theorem wilson_plaquette_joint_absolutelyContinuous
     ⟨fun g => suHaar_map_mul_left N g⟩
   haveI : (suHaar N).IsMulRightInvariant :=
     ⟨fun g => suHaar_map_mul_right N g⟩
-  have hhaar := plaquette_joint_absolutelyContinuous (suHaar N) hN
+  have hhaar := (plaquette_joint_absolutelyContinuous (suHaar N) hN
     hLt2 submersion_1d lat r hr v hv
+    ).1
   let F : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) →
       (Fin r → ℝ) := fun U i => plaquetteDefect Ls Lt N (v i) U
   have hF : Measurable F := by
@@ -337,6 +340,12 @@ theorem cdfI01_map_eq_volume (μ : Measure ℝ) (hμ : IsProbabilityMeasure μ)
 noncomputable def coordinateMarginal {r : ℕ} (ν : Measure (Fin r → ℝ)) (i : Fin r) :
     Measure ℝ := ν.map (fun x => x i)
 
+theorem coordinateMarginal_pi {r : ℕ} (μ : Measure ℝ) [IsProbabilityMeasure μ]
+    (i : Fin r) : coordinateMarginal (Measure.pi (fun _ : Fin r => μ)) i = μ := by
+  unfold coordinateMarginal
+  rw [Measure.pi_map_eval]
+  simp
+
 /-- If the product-Haar law of a lattice observable vector factors into its
 coordinate marginals, then the Wilson law is dominated by the product of its
 own marginals. This transfers independence through the strictly positive
@@ -385,6 +394,62 @@ theorem wilson_joint_dominated_by_marginals_of_haar_independent
   have hνη' : ν ≪ Measure.pi (fun i : Fin r => coordinateMarginal ν i) := by
     exact hνη.trans (hηpi.trans hpi)
   simpa [η, ν] using hνη'
+
+/-- The Wilson law of distinct cubic plaquettes is dominated by the product of
+its marginals. The product-Haar law is proved in `PlaquetteStep3`; positivity
+of the Wilson density transfers that law to the product of Wilson marginals. -/
+theorem wilson_plaquette_joint_dominated_by_marginals
+    (Ls Lt N r : ℕ) [NeZero Ls] [NeZero Lt] (β : ℝ) (hβ : 0 ≤ β)
+    (hN : 2 ≤ N) (hLt2 : 2 ≤ Lt) (hr : r + 1 ≤ Lt)
+    (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U → ContDiffOn ℝ 1 g U →
+      (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (v : Fin r → (cubicTorus4 Ls Lt).Site) (hv : Function.Injective v) :
+    (wilsonMeasure Ls Lt N β).map
+      (fun U i => plaquetteDefect Ls Lt N (v i) U) ≪
+      Measure.pi (fun i : Fin r => coordinateMarginal
+        ((wilsonMeasure Ls Lt N β).map
+          (fun U i => plaquetteDefect Ls Lt N (v i) U)) i) := by
+  let lat := cubicPlaquetteLattice Ls Lt
+  haveI : IsProbabilityMeasure (suHaar N) := suHaar_prob N
+  haveI : (suHaar N).IsMulLeftInvariant := ⟨fun g => suHaar_map_mul_left N g⟩
+  haveI : (suHaar N).IsMulRightInvariant := ⟨fun g => suHaar_map_mul_right N g⟩
+  let F : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) →
+      Fin r → ℝ := fun U i => plaquetteDefect Ls Lt N (v i) U
+  have hF : Measurable F := by
+    apply measurable_pi_iff.mpr
+    intro i
+    exact measurable_plaquetteDefect Ls Lt N (v i)
+  have hLaw : (spacetimeHaarMeasure Ls Lt N).map F =
+      Measure.pi (fun _ : Fin r => (suHaar N).map (f0 N)) := by
+    have hAbstract := (plaquette_joint_absolutelyContinuous (suHaar N) hN hLt2
+      submersion_1d lat r hr v hv).2
+    have hF_eq : F = fun U i => plaquetteObs lat N (v i) U := by
+      funext U i
+      exact plaquetteDefect_eq_abstract_plaquette Ls Lt N (v i) U
+    rw [hF_eq]
+    simpa [haarConfigMeasure, spacetimeHaarMeasure, lat] using hAbstract
+  haveI : IsProbabilityMeasure ((suHaar N).map (f0 N)) :=
+    Measure.isProbabilityMeasure_map (f0_continuous N).measurable.aemeasurable
+  have hmarg : ∀ i : Fin r,
+      coordinateMarginal ((spacetimeHaarMeasure Ls Lt N).map F) i =
+        (suHaar N).map (f0 N) := by
+    intro i
+    rw [hLaw]
+    exact coordinateMarginal_pi ((suHaar N).map (f0 N)) i
+  have hhaar : (spacetimeHaarMeasure Ls Lt N).map F =
+      Measure.pi (fun i : Fin r => coordinateMarginal
+        ((spacetimeHaarMeasure Ls Lt N).map F) i) := by
+    calc
+      (spacetimeHaarMeasure Ls Lt N).map F =
+          Measure.pi (fun _ : Fin r => (suHaar N).map (f0 N)) := hLaw
+      _ = Measure.pi (fun i : Fin r => coordinateMarginal
+          ((spacetimeHaarMeasure Ls Lt N).map F) i) := by
+            congr 1
+            funext i
+            exact (hmarg i).symm
+  exact wilson_joint_dominated_by_marginals_of_haar_independent
+    Ls Lt N r β hβ F hF hhaar
 
 /-- Apply the probability integral transform in every coordinate. -/
 noncomputable def cdfCubeMap {r : ℕ} (ν : Measure (Fin r → ℝ))
@@ -743,6 +808,34 @@ noncomputable def stageSiteMap (Ls Lt : ℕ) [NeZero Ls] [NeZero Lt]
   (stateWrap Lt a ha (x 0), stateWrap Ls a ha (x 1),
     stateWrap Ls a ha (x 2), stateWrap Ls a ha (x 3))
 
+noncomputable def stageSitePoint (Ls Lt : ℕ) [NeZero Ls] [NeZero Lt]
+    (a : ℝ) (v : (cubicTorus4 Ls Lt).Site) : Space4 :=
+  ![((v.1.val : ℝ) * a), ((v.2.1.val : ℝ) * a),
+    ((v.2.2.1.val : ℝ) * a), ((v.2.2.2.val : ℝ) * a)]
+
+private theorem stateWrap_finVal (L : ℕ) [NeZero L] (a : ℝ) (ha : 0 < a)
+    (v : Fin L) : stateWrap L a ha ((v.val : ℝ) * a) = v := by
+  have hfloor : ⌊(v.val : ℝ) * a / a⌋ = (v.val : ℤ) := by
+    rw [mul_div_cancel_right₀ _ ha.ne']
+    simp
+  have hrem : (v.val : ℤ) % (L : ℤ) = (v.val : ℤ) :=
+    Int.emod_eq_of_lt (by positivity) (by exact_mod_cast v.isLt)
+  apply Fin.ext
+  change (Int.natMod ⌊(v.val : ℝ) * a / a⌋ L) % L = v.val
+  simp [Int.natMod, hfloor, hrem, Nat.mod_eq_of_lt v.isLt]
+
+theorem stageSiteMap_stageSitePoint (Ls Lt : ℕ) [NeZero Ls] [NeZero Lt]
+    (a : ℝ) (ha : 0 < a) (v : (cubicTorus4 Ls Lt).Site) :
+    stageSiteMap Ls Lt a ha (stageSitePoint Ls Lt a v) = v := by
+  rcases v with ⟨t, x, y, z⟩
+  change (stateWrap Lt a ha ((t.val : ℝ) * a),
+    stateWrap Ls a ha ((x.val : ℝ) * a),
+    stateWrap Ls a ha ((y.val : ℝ) * a),
+    stateWrap Ls a ha ((z.val : ℝ) * a)) = (t, x, y, z)
+  exact Prod.ext (stateWrap_finVal Lt a ha t)
+    (Prod.ext (stateWrap_finVal Ls a ha x)
+      (Prod.ext (stateWrap_finVal Ls a ha y) (stateWrap_finVal Ls a ha z)))
+
 /-- The observable: O_m(x, U) = ψ_{K_m}(F_m(X_{p(v_m(x))}(U))). -/
 noncomputable def stageObservable (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
@@ -876,6 +969,30 @@ theorem stageObservable_distinctSite_moments_tendsto_of_haar_independent
       Ls Lt N r β hβ F hF (by simpa [F] using hhaar)
   exact stageObservable_distinctSite_moments_tendsto
     Ls Lt N r β hβ a ha xs k hN hLt2 submersion_1d (by simpa [F] using hdom)
+
+/-- For distinct stage sites, the product-Haar lattice law and positivity of the
+Wilson density derive the domination required by the probability-transform
+moment theorem directly from the lattice maps. -/
+theorem stageObservable_distinctSite_moments_tendsto_of_lattice_maps
+    (Ls Lt N r : ℕ) [NeZero Ls] [NeZero Lt]
+    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (ha : 0 < a)
+    (xs : Fin r → Space4) (k : Fin r → ℕ)
+    (hN : 2 ≤ N) (hLt2 : 2 ≤ Lt) (hr : r + 1 ≤ Lt)
+    (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U → ContDiffOn ℝ 1 g U →
+      (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (hsite : Function.Injective (fun i => stageSiteMap Ls Lt a ha (xs i))) :
+    Tendsto (fun K : ℕ =>
+      ∫ U, ∏ i : Fin r,
+        (stageObservable Ls Lt N β hβ a ha (xs i) K U) ^ k i
+          ∂(wilsonMeasure Ls Lt N β)) atTop
+      (𝓝 (∏ i : Fin r, ((1 : ℝ) ^ k i + (2 : ℝ) ^ k i) / 2)) := by
+  let v : Fin r → (cubicTorus4 Ls Lt).Site :=
+    fun i => stageSiteMap Ls Lt a ha (xs i)
+  have hdom := wilson_plaquette_joint_dominated_by_marginals
+    Ls Lt N r β hβ hN hLt2 hr submersion_1d v hsite
+  exact stageObservable_distinctSite_moments_tendsto
+    Ls Lt N r β hβ a ha xs k hN hLt2 submersion_1d (by simpa [v] using hdom)
 
 theorem stageObservable_range (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]

@@ -67,5 +67,7 @@ globs = [
   "Imscribing.YangMills.PlaquetteStep2",
   "Imscribing.YangMills.PlaquetteStep3",
   "Imscribing.YangMills.RademacherStep4",
-  "Imscribing.YangMills.SchwingerConv"
+  "Imscribing.YangMills.SchwingerConv",
+  "Imscribing.Millennium.ContinuumLatticeBridge",
+  "Imscribing.Millennium.TorusWraparoundBridge"
 ]

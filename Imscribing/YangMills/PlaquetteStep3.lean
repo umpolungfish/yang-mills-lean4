@@ -379,6 +379,50 @@ lemma ac_map_measurePreserving {α β : Type*} [MeasurableSpace α] [MeasurableS
   rw [← Measure.map_apply hmp.measurable hS, hs0]
   exact hSvol
 
+/-- A parameter-dependent left and right translation of the last Haar
+coordinate preserves the product measure. -/
+private theorem measurePreserving_parametricHaarMul
+    {α : Type*} [MeasurableSpace α]
+    (μ : Measure α)
+    (A B : α → specialUnitaryGroup (Fin N) ℂ)
+    (hT : Measurable (fun p : α × specialUnitaryGroup (Fin N) ℂ =>
+      (p.1, A p.1 * p.2 * B p.1)))
+    (htrans : ∀ a b : specialUnitaryGroup (Fin N) ℂ,
+      suHaar.map (fun g => a * g * b) = suHaar) :
+    MeasurePreserving (fun p : α × specialUnitaryGroup (Fin N) ℂ =>
+      (p.1, A p.1 * p.2 * B p.1)) (μ.prod suHaar) (μ.prod suHaar) := by
+  let T : α × specialUnitaryGroup (Fin N) ℂ → α × specialUnitaryGroup (Fin N) ℂ :=
+    fun p => (p.1, A p.1 * p.2 * B p.1)
+  change MeasurePreserving T (μ.prod suHaar) (μ.prod suHaar)
+  refine ⟨hT, ?_⟩
+  apply Measure.ext
+  intro s hs
+  have hsection (x : α) :
+      suHaar {g | (x, A x * g * B x) ∈ s} = suHaar {g | (x, g) ∈ s} := by
+    let φ : specialUnitaryGroup (Fin N) ℂ → specialUnitaryGroup (Fin N) ℂ :=
+      fun g => A x * g * B x
+    let secset : Set (specialUnitaryGroup (Fin N) ℂ) := {g | (x, g) ∈ s}
+    have hφ : Measurable φ := by
+      change Measurable (fun g => (T (x, g)).2)
+      exact measurable_snd.comp (hT.comp (measurable_const.prodMk measurable_id))
+    have hsx : MeasurableSet secset := by
+      exact hs.preimage (measurable_const.prodMk measurable_id)
+    calc
+      suHaar {g | (x, A x * g * B x) ∈ s} = suHaar (φ ⁻¹' secset) := by
+        congr 1
+      _ = (suHaar.map φ) secset := (Measure.map_apply hφ hsx).symm
+      _ = suHaar secset := by rw [htrans (A x) (B x)]
+  calc
+    (μ.prod suHaar).map T s = (μ.prod suHaar) (T ⁻¹' s) :=
+      Measure.map_apply hT hs
+    _ = ∫⁻ x, suHaar (Prod.mk x ⁻¹' (T ⁻¹' s)) ∂μ :=
+      Measure.prod_apply (hs.preimage hT)
+    _ = ∫⁻ x, suHaar (Prod.mk x ⁻¹' s) ∂μ := by
+      apply lintegral_congr_ae
+      filter_upwards [] with x
+      simpa [T] using hsection x
+    _ = (μ.prod suHaar) s := (Measure.prod_apply hs).symm
+
 /-- There is a time slice unused by finitely many sites. -/
 
 theorem plaquette_joint_absolutelyContinuous (hN' : 2 ≤ N) (hLt2 : 2 ≤ L_t)
@@ -387,39 +431,78 @@ theorem plaquette_joint_absolutelyContinuous (hN' : 2 ≤ N) (hLt2 : 2 ≤ L_t)
       ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
     (lat : LatticeSetup d L_t) :
     ∀ (r : ℕ), r + 1 ≤ L_t → ∀ (v : Fin r → lat.Site), Function.Injective v →
+      ((haarConfigMeasure suHaar lat).map
+        (fun U i => plaquetteObs lat N (v i) U) ≪ (volume : Measure (Fin r → ℝ))) ∧
       (haarConfigMeasure suHaar lat).map
-        (fun U i => plaquetteObs lat N (v i) U) ≪ (volume : Measure (Fin r → ℝ)) := by
+        (fun U i => plaquetteObs lat N (v i) U) =
+          Measure.pi (fun _ : Fin r => suHaar.map (f0 N)) := by
   intro r
   induction r with
   | zero =>
       intro hsize v hinj
-      have hFmeas : Measurable (fun U : LatLink lat → specialUnitaryGroup (Fin N) ℂ =>
-          (fun i : Fin 0 => plaquetteObs lat N (v i) U)) := by
-        rw [measurable_pi_iff]
-        intro i
-        exact i.elim0
-      have hvol : (volume : Measure (Fin 0 → ℝ)) =
-          Measure.dirac (fun i : Fin 0 => isEmptyElim i) := by
-        rw [volume_pi]
-        exact Measure.pi_of_empty _
-      refine Measure.AbsolutelyContinuous.mk ?_
-      intro S hS hSvol
-      rw [Measure.map_apply hFmeas hS]
-      rw [hvol] at hSvol
-      by_cases hmem : (fun i : Fin 0 => isEmptyElim i) ∈ S
-      · have hdir : (Measure.dirac (fun i : Fin 0 => isEmptyElim i)) S = 1 := by simp [hmem]
-        rw [hdir] at hSvol
-        norm_num at hSvol
-      · have hpre : (fun U : LatLink lat → specialUnitaryGroup (Fin N) ℂ =>
-            (fun i : Fin 0 => plaquetteObs lat N (v i) U)) ⁻¹' S = ∅ := by
-          ext U
-          simp only [Set.mem_preimage, Set.mem_empty_iff_false, iff_false]
-          intro hU
-          apply hmem
-          simpa only [Subsingleton.elim
-            (fun i : Fin 0 => plaquetteObs lat N (v i) U)
-            (fun i : Fin 0 => isEmptyElim i)] using hU
-        rw [hpre, measure_empty]
+      constructor
+      ·
+        have hFmeas : Measurable (fun U : LatLink lat → specialUnitaryGroup (Fin N) ℂ =>
+            (fun i : Fin 0 => plaquetteObs lat N (v i) U)) := by
+          rw [measurable_pi_iff]
+          intro i
+          exact i.elim0
+        have hvol : (volume : Measure (Fin 0 → ℝ)) =
+            Measure.dirac (fun i : Fin 0 => isEmptyElim i) := by
+          rw [volume_pi]
+          exact Measure.pi_of_empty _
+        refine Measure.AbsolutelyContinuous.mk ?_
+        intro S hS hSvol
+        rw [Measure.map_apply hFmeas hS]
+        rw [hvol] at hSvol
+        by_cases hmem : (fun i : Fin 0 => isEmptyElim i) ∈ S
+        · have hdir : (Measure.dirac (fun i : Fin 0 => isEmptyElim i)) S = 1 := by simp [hmem]
+          rw [hdir] at hSvol
+          norm_num at hSvol
+        · have hpre : (fun U : LatLink lat → specialUnitaryGroup (Fin N) ℂ =>
+              (fun i : Fin 0 => plaquetteObs lat N (v i) U)) ⁻¹' S = ∅ := by
+            ext U
+            simp only [Set.mem_preimage, Set.mem_empty_iff_false, iff_false]
+            intro hU
+            apply hmem
+            simpa only [Subsingleton.elim
+              (fun i : Fin 0 => plaquetteObs lat N (v i) U)
+              (fun i : Fin 0 => isEmptyElim i)] using hU
+          rw [hpre, measure_empty]
+      ·
+        let F : (LatLink lat → specialUnitaryGroup (Fin N) ℂ) → (Fin 0 → ℝ) :=
+          fun U i => plaquetteObs lat N (v i) U
+        have hF : Measurable F := by
+          rw [measurable_pi_iff]
+          intro i
+          exact i.elim0
+        let z : Fin 0 → ℝ := fun i => Fin.elim0 i
+        have hmap : (haarConfigMeasure suHaar lat).map F = Measure.dirac z := by
+          apply Measure.ext
+          intro s hs
+          by_cases hz : z ∈ s
+          · rw [Measure.map_apply hF hs]
+            have hpre : F ⁻¹' s = Set.univ := by
+              ext U
+              simp only [Set.mem_preimage, Set.mem_univ, iff_true]
+              have hFU : F U = z := Subsingleton.elim _ _
+              simpa [hFU] using hz
+            rw [hpre]
+            simp [hz]
+          · rw [Measure.map_apply hF hs]
+            have hpre : F ⁻¹' s = ∅ := by
+              ext U
+              simp only [Set.mem_preimage, Set.mem_empty_iff_false, iff_false]
+              intro hmem
+              apply hz
+              rw [← Subsingleton.elim (F U) z]
+              exact hmem
+            rw [hpre]
+            simp [hz]
+        have hpi : Measure.pi (fun _ : Fin 0 => suHaar.map (f0 N)) =
+            Measure.dirac z := by
+          simpa [z] using (Measure.pi_of_empty (fun _ : Fin 0 => suHaar.map (f0 N)))
+        rw [hmap, hpi]
   | succ r ih =>
       intro hsize v hinj
       have hsize' : r + 1 ≤ L_t := by omega
@@ -589,7 +672,7 @@ theorem plaquette_joint_absolutelyContinuous (hN' : 2 ≤ N) (hLt2 : 2 ≤ L_t)
         have hB₀vol : volume B₀ = 0 := by
           exact ae_iff.mp ((Measure.measure_prod_null hS).mp hSvol)
         have hih_null : haarConfigMeasure suHaar lat {U | Y U ∈ B₀} = 0 := by
-          have hh := hih hB₀vol
+          have hh := hih.1 hB₀vol
           rw [Measure.map_apply hYmeas hB₀meas] at hh
           exact hh
         have hrest_null : μrest {uRest | Y (Ubase uRest) ∈ B₀} = 0 := by
@@ -613,6 +696,70 @@ theorem plaquette_joint_absolutelyContinuous (hN' : 2 ≤ N) (hLt2 : 2 ≤ L_t)
             (((measurable_const.mul measurable_id).mul measurable_const))
         rw [Measure.map_apply hmeasfunc hSymeas] at hz
         simpa [Φ, Y] using hz
+      let fRest : ({l : LatLink lat // l ≠ e} → specialUnitaryGroup (Fin N) ℂ) →
+          Fin r → ℝ := fun uRest => Y (Ubase uRest)
+      have hfRest : Measurable fRest := by
+        change Measurable (fun uRest => Y (Ubase uRest))
+        exact hYmeas.comp (hUbase_meas.comp measurable_id)
+      have hRestlaw : μrest.map fRest =
+          Measure.pi (fun _ : Fin r => suHaar.map (f0 N)) := by
+        calc
+          μrest.map fRest = (haarConfigMeasure suHaar lat).map Y := by
+            apply Measure.ext
+            intro S hS
+            calc
+              μrest.map fRest S = μrest {uRest | Y (Ubase uRest) ∈ S} := by
+                rw [Measure.map_apply hfRest hS]
+                rfl
+              _ = haarConfigMeasure suHaar lat {U | Y U ∈ S} :=
+                haarConfigMeasure_preimage_Ubase suHaar lat e Y hYmeas hYindep S hS
+              _ = (haarConfigMeasure suHaar lat).map Y S := by
+                rw [Measure.map_apply hYmeas hS]
+                rfl
+          _ = Measure.pi (fun _ : Fin r => suHaar.map (f0 N)) := hih.2
+      let T : ({l : LatLink lat // l ≠ e} → specialUnitaryGroup (Fin N) ℂ) ×
+          specialUnitaryGroup (Fin N) ℂ →
+          ({l : LatLink lat // l ≠ e} → specialUnitaryGroup (Fin N) ℂ) ×
+            specialUnitaryGroup (Fin N) ℂ :=
+        fun p => (p.1, A p.1 * p.2 * B p.1)
+      have hTmeas : Measurable T := by
+        dsimp [T]
+        exact measurable_fst.prodMk
+          (((hAmeas.comp measurable_fst).mul measurable_snd).mul
+            (hBmeas.comp measurable_fst))
+      have htrans (a b : specialUnitaryGroup (Fin N) ℂ) :
+          suHaar.map (fun g => a * g * b) = suHaar := by
+        have hleft : suHaar.map (fun g : specialUnitaryGroup (Fin N) ℂ => a * g) = suHaar := by
+          simpa using map_mul_left_eq_self suHaar a
+        have hright : suHaar.map (fun g : specialUnitaryGroup (Fin N) ℂ => g * b) = suHaar := by
+          simpa using map_mul_right_eq_self suHaar b
+        have hcomp : (fun g : specialUnitaryGroup (Fin N) ℂ => a * g * b) =
+            (fun g => g * b) ∘ (fun g => a * g) := rfl
+        rw [hcomp, ← Measure.map_map (continuous_mul_right b).measurable
+          (continuous_mul_left a).measurable, hleft, hright]
+      have hTpres := measurePreserving_parametricHaarMul suHaar μrest A B hTmeas htrans
+      let ψ : ({l : LatLink lat // l ≠ e} → specialUnitaryGroup (Fin N) ℂ) ×
+          specialUnitaryGroup (Fin N) ℂ → (Fin r → ℝ) × ℝ :=
+        fun p => (fRest p.1, f0 N p.2)
+      have hψmeas : Measurable ψ := by
+        dsimp [ψ]
+        exact hfRest.comp measurable_fst |>.prod
+          ((f0_continuous N).measurable.comp measurable_snd)
+      have hΦcomp : Φ = ψ ∘ T := by
+        funext p
+        rfl
+      have hΦlaw : νprod.map Φ =
+          (Measure.pi (fun _ : Fin r => suHaar.map (f0 N))).prod
+            (suHaar.map (f0 N)) := by
+        calc
+          νprod.map Φ = (νprod.map T).map ψ := by
+            rw [hΦcomp, Measure.map_map hψmeas hTmeas]
+          _ = νprod.map ψ := by
+            rw [hTpres.map_eq]
+          _ = (μrest.map fRest).prod (suHaar.map (f0 N)) := by
+            exact (Measure.map_prod_map μrest suHaar hfRest
+              (f0_continuous N).measurable).symm
+          _ = _ := by rw [hRestlaw]
       let E : (Fin (r + 1) → ℝ) ≃ᵐ (Fin r → ℝ) × ℝ :=
         (MeasurableEquiv.piFinSuccAbove (fun _ : Fin (r + 1) => ℝ) (Fin.last r)).trans
           MeasurableEquiv.prodComm
@@ -690,6 +837,22 @@ theorem plaquette_joint_absolutelyContinuous (hN' : 2 ≤ N) (hLt2 : 2 ≤ L_t)
         have ht := ac_of_map_ac_equiv E (volume : Measure (Fin (r + 1) → ℝ))
           (volume : Measure ((Fin r → ℝ) × ℝ)) hEvol _ hmapped
         simpa [Measure.map_map E.symm.measurable E.measurable] using ht
+      let μ0 : Measure ℝ := suHaar.map (f0 N)
+      have hF'law : Measure.map E
+          ((haarConfigMeasure suHaar lat).map
+            (fun U i => plaquetteObs lat N (v' i) U)) =
+          (Measure.pi (fun _ : Fin r => μ0)).prod μ0 := by
+        rw [hF'comp, hΦlaw]
+      have hEpi : (Measure.pi (fun _ : Fin (r + 1) => μ0)).map E =
+          (Measure.pi (fun _ : Fin r => μ0)).prod μ0 := by
+        exact (Measure.measurePreserving_swap.comp
+          (measurePreserving_piFinSuccAbove (fun _ : Fin (r + 1) => μ0)
+            (Fin.last r))).map_eq
+      have hF'law' : (haarConfigMeasure suHaar lat).map
+          (fun U i => plaquetteObs lat N (v' i) U) =
+          Measure.pi (fun _ : Fin (r + 1) => μ0) := by
+        apply E.measurableEmbedding.map_injective
+        rw [hF'law, hEpi]
       let π : (Fin (r + 1) → ℝ) ≃ᵐ (Fin (r + 1) → ℝ) :=
         MeasurableEquiv.piCongrLeft (fun _ : Fin (r + 1) => ℝ) σ
       have hπvol : Measure.map π (volume : Measure (Fin (r + 1) → ℝ)) =
@@ -707,6 +870,20 @@ theorem plaquette_joint_absolutelyContinuous (hN' : 2 ≤ N) (hLt2 : 2 ≤ L_t)
         rw [measurable_pi_iff]
         intro i
         exact plaquetteObs_measurable lat N (v' i)
+      have hπlaw : (Measure.pi (fun _ : Fin (r + 1) => μ0)).map π =
+          Measure.pi (fun _ : Fin (r + 1) => μ0) := by
+        simpa [π, μ0] using
+          (Measure.pi_map_piCongrLeft σ (fun _ : Fin (r + 1) => suHaar.map (f0 N)))
+      have hF'π : (haarConfigMeasure suHaar lat).map
+          (fun U => π (fun i => plaquetteObs lat N (v' i) U)) =
+          Measure.pi (fun _ : Fin (r + 1) => μ0) := by
+        calc
+          _ = ((haarConfigMeasure suHaar lat).map
+              (fun U i => plaquetteObs lat N (v' i) U)).map π := by
+                simpa [Function.comp_def] using
+                  (Measure.map_map π.measurable hFmeas').symm
+          _ = (Measure.pi (fun _ : Fin (r + 1) => μ0)).map π := by rw [hF'law']
+          _ = Measure.pi (fun _ : Fin (r + 1) => μ0) := hπlaw
       have hres : (haarConfigMeasure suHaar lat).map
           (fun U => π (fun i => plaquetteObs lat N (v' i) U)) ≪
           (volume : Measure (Fin (r + 1) → ℝ)) := by
@@ -715,8 +892,16 @@ theorem plaquette_joint_absolutelyContinuous (hN' : 2 ≤ N) (hLt2 : 2 ≤ L_t)
             (volume : Measure (Fin (r + 1) → ℝ))
             (volume_measurePreserving_piCongrLeft (fun _ : Fin (r + 1) => ℝ) σ)
             _ hF'ac)
-      rw [← hπcomp]
-      exact hres
+      constructor
+      · rw [← hπcomp]
+        exact hres
+      · calc
+          (haarConfigMeasure suHaar lat).map
+              (fun U i => plaquetteObs lat N (v i) U) =
+              (haarConfigMeasure suHaar lat).map
+                (fun U => π (fun i => plaquetteObs lat N (v' i) U)) := by
+                  rw [hπcomp]
+          _ = Measure.pi (fun _ : Fin (r + 1) => μ0) := hF'π
 lemma exists_unused_tslice (lat : LatticeSetup d L_t) (r : ℕ)
     (hsize : r + 2 ≤ L_t) (v : Fin (r + 1) → lat.Site) :
     ∃ tStar : Fin L_t, ∀ i : Fin (r + 1), lat.tCoord (v i) ≠ tStar := by
