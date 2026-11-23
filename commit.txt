@@ -1,1 +1,1 @@
-I add screenshots of the Corpus Explorer source reader and four interactive labs to the Pages landing page.
+I write a conventional mathematical account of the Lean Yang–Mills development and link its PDF and LaTeX source from the README.

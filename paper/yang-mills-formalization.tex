@@ -1,0 +1,247 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{xurl}
+\usepackage{booktabs,longtable}
+\usepackage{listings}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\SU}{\mathrm{SU}}
+\newcommand{\Sch}{S}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Lean}[1]{\path{#1}}
+
+\title{A Lean Formalization of Four-Dimensional Yang--Mills Structures\\
+\large Lattice Gauge Theory, Schwinger Limits, and Spectral-Gap Interfaces}
+\author{ }
+\date{ }
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This article gives a mathematical account of the definitions, constructions, and proved interfaces in the Lean development \Lean{Imscribing.YangMills}. The development formalizes lattice gauge transformations and Wilson holonomy, finite-volume \(\SU(N)\) measures, transfer operators, reflection positivity, Dobrushin clustering, thermodynamic limits, Osterwalder--Schrader reconstruction structures, explicit continuum Schwinger families, and a full-tuple Wilson-stage convergence theorem. It also contains general spectral and renormalization-group interfaces and concrete inhabitants of several such structures. We state these results by their actual mathematical content and distinguish the unconditional constructions from the conditional Clay-interface theorems. The principal continuum limit theorem identifies the Wilson-stage observables with an explicit equality-class product functional, including tuples with repeated points. The manuscript follows the formal declarations and records their dependency structure so that each mathematical statement can be checked against its Lean source.
+\end{abstract}
+
+\section{Scope and theorem map}
+
+The formalization contains several related but distinct mathematical outputs. Its finite-volume gauge theory is built on periodic cubic lattices with compact \(\SU(N)\) link variables. Its strong-coupling arguments prove a volume-independent correlation estimate and construct subsequential infinite-volume loop Schwinger functions. A separate stage construction proves convergence of finite-volume Wilson expectations to an explicit continuum functional. The development also defines general Osterwalder--Schrader and Wightman interfaces and proves implications between them.
+
+The Lean namespace contains three headline declarations with different types. The proposition \Lean{YangMillsMassGap} is existential: it asks for a spatial lattice, an integer \(N\geq2\), a complex Hilbert space, and a lattice transfer setup with a positive gap. The theorem \Lean{MassGapInstances.clay\_yang\_mills\_strict} produces a positive-gap spectrum on \(\mathrm{Fin}(2)\). The four-dimensional strict Clay interface \Lean{ClayYangMillsMassGap4DStrict} is a stronger, explicitly defined proposition about a non-Gaussian OS theory, a strict Wightman theory, a positive physical gap, and convergence of \(\SU(N)\) lattice Schwinger functions. Its reduction theorem is stated in Section~\ref{sec:interfaces}. Keeping these types separate is necessary to state the formal results exactly.
+
+\section{Lattice gauge fields and Wilson observables}
+
+Let \(L\) be a directed spatial lattice with site set \(L_0\), link set \(L_1\), and source and target maps. A gauge field is a map \(U:L_1\to G\), and a gauge transformation is a map \(g:L_0\to G\). The action on an oriented link \(e\) is
+\[
+  (g\cdot U)(e)=g(\mathrm{src}(e))\,U(e)\,g(\mathrm{tgt}(e))^{-1}.
+\]
+For a path \(\gamma=(e_1,\ldots,e_k)\), the holonomy is the ordered product of link variables, using inverses on reversed links. The endpoint factors telescope under a gauge transformation. Thus a closed-path holonomy is conjugated at its base point, and every conjugation-invariant function of that holonomy, in particular the normalized trace in a representation, is gauge invariant.
+
+For the four-dimensional periodic lattice, the site set is a product of four cyclic coordinate sets, and each link is a site-direction pair. For every pair of coordinate directions, a plaquette is the oriented four-link boundary of an elementary square. If \(U_p\) denotes its holonomy, the Wilson action is the sum of normalized plaquette defects. The finite-volume Wilson measure has density proportional to \(\exp(-\beta S_W(U))\) with respect to the product of normalized Haar measures on the link variables. The partition function is the integral of this density, and the \(n\)-point Wilson Schwinger functional is
+\[
+  \Sch^{(n)}_{L_s,L_t,\beta}(O_1,\ldots,O_n)
+  =\frac{1}{Z_{L_s,L_t,\beta}}
+    \int \prod_{j=1}^{n}O_j(U)\,e^{-\beta S_W(U)}\,d\mu_{\rm Haar}(U).
+\]
+The corresponding probability measure is absolutely continuous with respect to product Haar measure; for nonnegative coupling the converse absolute continuity also holds because the Wilson density is positive.
+
+The formal development proves compactness and measurability properties of \(\SU(N)\), constructs its normalized Haar probability measure, and lifts these facts to finite products of lattice links. It proves gauge invariance of the plaquette action and of closed Wilson loops. The finite-volume theory also has exact coordinate translations, hypercubic symmetries, and time-reflection identities at the level stated by the corresponding declarations.
+
+\section{Transfer operators and the spectral-gap mechanism}
+
+The abstract transfer setup consists of a Hilbert space \(\mathcal H\), a normalized vacuum vector \(\Omega\), a self-adjoint positive transfer operator \(T\), and a time spacing \(a>0\). The vacuum is fixed by \(T\). On the orthogonal complement of the vacuum, the formal gap estimate is
+\[
+  \operatorname{Re}\langle v,Tv\rangle
+  \leq e^{-\Delta a}\,\|v\|^2,
+  \qquad \langle v,\Omega\rangle=0,
+\]
+for \(\Delta>0\). Compact self-adjoint spectral theory gives an eigenvector expansion, and the spectral gap suppresses every non-vacuum component exponentially under repeated transfer. The resulting clustering theorem bounds the connected correlation of separated observables by an exponential in the number of time steps.
+
+For a finite-dimensional diagonal Hamiltonian, the development proves the corresponding decay directly from eigenvalues. It then proves the rescaling identity
+\[
+  \lim_{a\downarrow0}\frac{1-e^{-\Delta a}}{a}=\Delta,
+\]
+which relates a uniform lattice transfer gap to a positive physical rate. The general RG data package a lattice-spacing sequence \(a_m\to0\), lattice gaps \(\Delta_{\rm latt}(m)\), coupling parameters, and convergence of the lattice Schwinger functionals. The uniform-gap statement requires a common positive lower bound on \(\Delta_{\rm latt}(m)/a_m\), and the continuum statement identifies the limit of this ratio with \(\Delta_{\rm phys}>0\).
+
+\subsection{The finite-state four-dimensional carrier}
+
+The early concrete realization in \Lean{Core.lean} uses the 16-element carrier \(\{0,1\}^4\), the vertices of a four-dimensional hypercube. It equips these vertices with information, truth, and falsity partial orders. Each order has explicit coordinatewise joins and meets; the three orders are independent in the sense proved by the nonimplication results. The coordinate increment and walk maps have an order-dependent action, and the formal proofs record their noncommutation. The four bit flips are commuting involutions on the vertices.
+
+On the Hilbert space of complex-valued functions on these 16 vertices, each bit flip induces a self-adjoint unitary. Its two spectral projections \(P_d^+=(I+X_d)/2\) and \(P_d^-=(I-X_d)/2\) define the axis heat factor
+\[
+  Q_d(a)=P_d^+ + e^{-a}P_d^-.
+\]
+The four factors commute, and their product is the tesseract transfer operator. The same section connects the discrete carriers to generic lattice gauge data through a GNS bridge and states the rescaled-gap convergence implications.
+
+The algebraic Hamiltonian material supplies finite-dimensional canonical phase spaces, coordinate and momentum observables, Poisson brackets, Hamiltonian trajectories, and conservation of functions with vanishing bracket against the Hamiltonian. The Wilson and Kogut--Susskind portions separately define link and electric operators and prove their canonical noncommutation and gauge covariance. These constructions provide the algebraic support packaged by the RG and dynamics data structures.
+
+\section{The four-dimensional Wilson transfer construction}
+
+The \(\SU(N)\) lattice theory is first split into spatial slices. The temporal-gauge transfer kernel is an integral kernel on the spatial link configuration space. Its factors are the temporal plaquette weights, while the adjacent spatial slices carry the spatial Wilson interaction. The formal proof establishes continuity, symmetry, gauge covariance, positivity, and compactness of the resulting transfer operator. Positivity follows by expressing the kernel as a Gram form. Compactness follows from continuity of the kernel on the compact configuration space.
+
+The transfer operator fixes the vacuum and has a positive spectral gap on its vacuum-orthogonal subspace in the stated finite-volume construction. Reflection positivity of the four-dimensional Wilson functional is obtained from the same transfer representation. The Feynman--Kac files make the slice factorization explicit and prove the exact relation between the four-dimensional Wilson integral and iterated slice transfer. The OS quotient construction then turns the positive-time semidefinite form into a Hilbert-space inner product and completes the quotient.
+
+\section{Strong-coupling clustering and the thermodynamic limit}
+
+Write
+\[
+  \alpha(\beta)=18\bigl(1-e^{-12\beta}\bigr).
+\]
+In the Dobrushin regime \(0<\alpha(\beta)<1\), the formalism bounds the row sum of the link interdependence matrix by \(\alpha(\beta)\). Iterating the conditional Gibbs expectation contracts oscillations along plaquette-adjacent links. If bounded observables \(f\) and \(g\) have supports separated by plaquette distance at least \(D\), the proved estimate has the form
+\[
+ \left|\Sch^{(2)}(f,g)-\Sch^{(1)}(f)\Sch^{(1)}(g)\right|
+ \leq
+ \frac{2(1-e^{-12\beta})}
+      {\sqrt{\alpha(\beta)}(1-\sqrt{\alpha(\beta)})}
+ |S_g|\,\|f\|_\infty\,\|g\|_\infty\,
+ \bigl(\sqrt{\alpha(\beta)}\bigr)^D.
+\]
+The constants are independent of the torus side lengths. Converting the power into an exponential gives a positive correlation rate. A time-slice version states the estimate in periodic Euclidean time distance.
+
+The plaquette-adjacency graph on the four-dimensional torus is connected. This connectivity allows the conditional estimates to be applied across the whole finite lattice. Uniform boundedness of loop observables and the compactness theorem for bounded complex sequences give a subsequence along which every finite collection of loop Schwinger functions converges. The resulting infinite-volume functional is bounded, permutation symmetric, invariant under lattice translations and coordinate permutations, and inherits a positive clustering rate. These are the properties in \Lean{strongCoupling\_infinite\_volume\_lattice\_os}.
+
+\section{Euclidean and relativistic reconstruction interfaces}
+
+For \(x=(x_0,x_1,x_2,x_3)\in\R^4\), let \(\theta x=(-x_0,x_1,x_2,x_3)\), and let
+\[
+  x\cdot_M x=x_0^2-x_1^2-x_2^2-x_3^2.
+\]
+The Euclidean OS structure in the formalization consists of Schwinger functions on finite tuples in \(\R^4\), continuous \(SO(4)\) invariance, permutation symmetry, reflection positivity for positive-time insertions, and exponential clustering at rate \(\Delta_{\rm phys}\). A stricter structure additionally includes Euclidean translation invariance. The Wightman structure carries a Hilbert space, a unitary Poincar\'e representation, a vacuum, fields, covariance, spacelike commutativity, and a spectral condition excluding invariant-mass values in \((0,\Delta_{\rm phys}^2)\).
+
+The OS pre-Hilbert construction identifies null vectors of the reflected positive-time form, quotients by them, and completes the quotient. The Euclidean time-shift semigroup descends to the quotient and extends continuously. Its self-adjoint generator defines the physical Hamiltonian. Under the stated OS and continuation data, the formal reconstruction theorem supplies the Wightman representation, vacuum cyclicity, covariance, local commutativity, and the spectral gap. The reduction theorem is an implication from the RG and OS continuation structures to the strict Clay proposition; the precise assumptions are recorded in Section~\ref{sec:interfaces}.
+
+\section{Explicit continuum Schwinger families}
+
+The repository contains two explicit moment constructions, with different roles. The radial family uses
+\[
+  g(x)=e^{-2\|x\|_2},\qquad
+  S_n^{\rm rad}(x_1,\ldots,x_n)
+    =\frac12\left(\prod_{j=1}^n(1+g(x_j))
+                    +\prod_{j=1}^n(1-g(x_j))\right).
+\]
+It is \(SO(4)\)-invariant and reflection positive, has exponential clustering at rate one, and is non-Gaussian. The associated two-state Wightman realization has a two-dimensional Hilbert space and a Hamiltonian with eigenvalues zero and one. This is the explicit realization used by the concrete OS declarations in \Lean{Core.lean}.
+
+The independent-field functional is defined by equality classes of the point tuple. Let \(C\) range over the partition of \(\{1,\ldots,n\}\) induced by equality of the points, and set
+\[
+  m_k=\frac{1^k+2^k}{2}.
+\]
+Then
+\[
+  S_n^{\rm iid}(x_1,\ldots,x_n)=\prod_C m_{|C|}.
+\]
+Equivalently, this is the moment functional of independent pointwise variables with the two-value law giving mass \(1/2\) to each of \(1\) and \(2\). Its value depends only on which arguments coincide. Every injective transformation of \(\R^4\) preserves these equality classes, giving translations, rotations, and permutation symmetry. Reflection positivity follows because reflected positive-time points cannot coincide with positive-time points; the resulting quadratic form reduces to a squared modulus. For separated point families the equality classes split, so the connected correlation vanishes beyond the separation scale, which yields the stated exponential cluster bound. The fourth connected moment is nonzero.
+
+The repository uses the radial family and the independent-field family in distinct constructions. The radial family is the value of \Lean{concreteOS4DContinuumTheory}; it is invariant under rotations and reflection and satisfies the coded clustering and positivity properties. Its dependence on \(\|x\|_2\) is anchored at the coordinate origin. For example, the two-point value at the origin differs from the value after translating both entries by a unit time vector, and the Lean theorem \Lean{concreteOS4D\_fails\_trans\_inv} proves failure of translation invariance. The independent-field family is the target of the full-tuple Wilson-stage limit and is translation invariant because it depends only on point coincidences.
+
+The RG record \Lean{concreteUniformRGTrajectory N hN} sets
+\[
+ a_m=\frac1{m+1},\qquad \beta_m=m+1,\qquad
+ \Delta_{\rm latt}(m)=\frac1{m+1},\qquad
+ \Delta_0=\Delta_{\rm phys}=1,
+\]
+and assigns the radial Schwinger family to both its lattice and limiting functional fields. Thus its rescaled gap is identically one, and its Schwinger convergence follows by equality of those assigned fields. The unconditional theorem in \Lean{Core.lean} unpacks this concrete trajectory into RG and Hamiltonian data.
+
+\section{Wilson-stage convergence to the independent-field functional}
+
+For stage \(m\), the formal construction sets a linear size \(m+2\), periodic side length \((m+2)^2\), and spacing \(a_m=1/(m+2)\). A wrapped coordinate map sends each fixed continuum point to a site of the periodic lattice. The torus-wraparound lemma proves that, for every finite tuple of distinct continuum points, these exact wrapped sites are eventually distinct. This conclusion accounts for the quotient map used in the observable definition.
+
+The single-site observable is built from the normalized plaquette defect, its distribution function under Haar measure, and a stage-selected frequency. The probability integral transform supplies a uniform variable. A finite selector at each stage controls all injective tuples of lattice sites and all multiplicities up to the stage index. This selector permits the proof to handle repeated continuum points: equal points are grouped into equality classes, each class contributes the moment of its multiplicity, and distinct classes are mapped to distinct lattice sites.
+
+\begin{theorem}[Full finite-tuple Wilson-stage limit]
+For \(N\geq2\), a one-dimensional submersion density principle \(H_{\rm sub}\), a finite tuple \((x_i)_{i=1}^n\) in \(\R^4\), and the stage observables specified in \Lean{SchwingerConv.lean},
+\[
+ \lim_{m\to\infty}
+ \Sch^{(n)}_{(m+2)^2,(m+2)^2,m}
+      \bigl(O_m(x_1),\ldots,O_m(x_n)\bigr)
+ = S_n^{\rm iid}(x_1,\ldots,x_n).
+\]
+Repeated entries are included, and each distinct point contributes the moment corresponding to its multiplicity.
+\end{theorem}
+
+The theorem's Lean type takes \(H_{\rm sub}\) as an explicit argument: for every open interval and continuously differentiable map with nowhere-vanishing derivative, the push-forward of restricted Lebesgue measure has an \(L^1\) density. The proof uses this principle in the plaquette-law absolute-continuity argument. The theorem is unconditional in the remaining quantified data \(N\) and the tuple once this density principle is supplied.
+
+\section{Exact mass-gap declarations and interfaces}\label{sec:interfaces}
+
+The formal predicate \Lean{YangMillsMassGap} is the existence of a spatial lattice, \(N\geq2\), a complex Hilbert space, and a \Lean{LatticeGaugeSetup} for \(\SU(N)\). A setup includes a gauge representation, a positive self-adjoint compact transfer operator, a normalized gauge-invariant vacuum, a positive number \(\Delta\), and an exponential quadratic-form gap on the vacuum-orthogonal subspace. The theorem \Lean{YangMills.yangMillsMassGap} proves this predicate. Its displayed concrete inhabitant uses \Lean{unitSpatialLattice}, a one-site and one-link lattice, a Dirac probability measure at the identity configuration, and a rank-one projection transfer operator.
+
+The finite-dimensional promotion in \Lean{MassGapInstances.clay\_yang\_mills\_strict} is the proposition
+\[
+  \exists P:\mathrm{GappedSpectrum}(\mathrm{Fin}(2)),\quad 0<P.\Delta.
+\]
+The witness has energy values zero and two, so its gap is two. The companion \Lean{unconditional\_gauge\_system} supplies noncommuting two-level matrices. These theorems are exactly the unconditional declarations in \Lean{MassGapInstances.lean}.
+
+The strict four-dimensional proposition \Lean{ClayYangMillsMassGap4DStrict} contains a positive physical mass, a non-Gaussian strict OS family, a strict Wightman theory with that mass gap, diverging spatial and temporal extents, nonnegative coupling tending to infinity, and convergence of the finite-volume \(\SU(N)\) Wilson Schwinger functions to the OS family for every finite tuple of continuum points.
+
+\begin{theorem}[Strict Clay reduction]
+For every \(N\geq2\), the structures \Lean{BalabanRGContinuumHypothesis N hN} and \Lean{OSPoincareContinuationHypothesis B.os} imply \Lean{ClayYangMillsMassGap4DStrict N hN}. The Lean declaration is \Lean{clay\_yang\_mills\_strict\_from\_balaban\_and\_os}.
+\end{theorem}
+
+The theorem \Lean{clay\_yang\_mills\_from\_rg\_estimates} instead takes \Lean{SUYangMillsRGConjecture N hN} and concludes the non-strict \Lean{ClayYangMillsMassGap4D N hN}. The unconditional theorems in \Lean{Core.lean} instantiate the specified uniform RG trajectory and the explicit radial OS/Wightman data. The radial OS family is origin-anchored; \Lean{concreteOS4D\_fails\_trans\_inv} proves it is not translation invariant. These are distinct from the iid target of the Wilson-stage convergence theorem. The Lean declarations therefore provide unconditional results for the concrete structures named above and a conditional reduction for the strict Clay interface.
+
+\section{Proof organization and module atlas}
+
+The proof is layered. \Lean{Core.lean} develops the abstract gauge, spectral, scaling, trilattice, phase-space, and concrete radial constructions in Sections~1--21. \Lean{CubicHaar4D.lean} defines the cubic tori, Haar theory, Wilson action, transfer and Schwinger functions, thermodynamic statements, Kogut--Susskind algebra, and reflection positivity across Sections~23--36. \Lean{OSCompletion.lean} supplies quotient completion, Poincar\'e and Wightman structures, end-to-end OS interfaces, and Clay reduction, including Sections~22, 27, 29--31, and 34--38.
+
+\Lean{Wilson4DOp.lean} proves the temporal-gauge kernel and transfer-operator properties in Sections~39--40. \Lean{FeynmanKac.lean} gives the slice decomposition and exact slice-transfer representation in Sections~41--42. \Lean{StrongCouplingDobrushin.lean} proves the uniform strong-coupling correlation estimate in Section~43, and \Lean{StrongCouplingInfVol.lean} constructs the thermodynamic subsequence in Section~44. \Lean{ContinuumClosure.lean} packages the RG/OS continuation interface and the canonical strong-coupling data in Section~45.
+
+The remaining modules provide specialized arguments used by these layers. \Lean{SUNHaar.lean} constructs compact-group topology and Haar probability; \Lean{PlaquetteDensity.lean}, \Lean{PlaquetteStep2.lean}, \Lean{PlaquetteStep3.lean}, and \Lean{PlaquetteReflection.lean} establish the plaquette push-forward and reflection lemmas; \Lean{SubmersionDensity.lean} proves the Euclidean submersion density theorem; \Lean{ProbIntegralTransform.lean} proves the probability integral transform; \Lean{LatticeLimitDensity.lean} packages the density argument at the lattice limit; \Lean{PiFubini.lean} develops finite product integration; and \Lean{RademacherL1.lean}, \Lean{RademacherMulti.lean}, and \Lean{RademacherStep4.lean} formalize the moment and multivariate uniform-law calculations. \Lean{IIDSchwinger.lean}, \Lean{IIDWilsonLimit.lean}, \Lean{IIDSchwingerFromWilson.lean}, \Lean{IIDScaling.lean}, \Lean{IIDContinuation.lean}, and \Lean{IIDOS.lean} build the equality-class functional, its stage limit, and its Euclidean properties. \Lean{SchwingerConv.lean} joins the finite-volume Wilson measure, selected observables, and repeated-point limit. \Lean{CanonicalWitness.lean} proves the canonical loop embedding and the nonconstancy of the chosen Wilson observable. \Lean{UnifiedLattice.lean}, \Lean{GappedGaugeSystem.lean}, \Lean{MassGapInstances.lean}, \Lean{GlobalAxioms.lean}, \Lean{Dicke.lean}, and \Lean{TrivialWightman.lean} contain the unified lattice interfaces, finite spectral witnesses, global theorem entry points, and associated algebraic constructions. \Lean{ContinuumDecomposition.lean} and \Lean{ConstMomSchwinger.lean} organize the continuum symmetry and moment obligations. \Lean{BridgeStatements.lean} records the nine continuum properties in a common interface, while \Lean{FeynmanKacAndStrongCoupling.lean} joins slice transfer with strong-coupling estimates. The two files under \Lean{Imscribing/Millennium} prove eventual injectivity of grid and torus coordinate maps.
+
+\section{Kernel verification}
+
+The principal declarations are checked by Lean 4's kernel. Their reported foundational dependencies are \Lean{propext}, \Lean{Classical.choice}, and \Lean{Quot.sound}; the audited theorem declarations contain no \Lean{sorryAx}. The audit is reproducible from the repository with \Lean{lake build Imscribing.YangMills} and the declaration-specific \Lean{\#check} and \Lean{\#print axioms} commands in \Lean{docs/formal\_declaration\_audit.md}. The proposition proved by each command remains the Lean type shown by \Lean{\#check}; the axiom report certifies the proof term against the kernel foundations.
+
+\appendix
+\section{Declaration checks for the principal interfaces}
+
+The following Lean block records the types and kernel axioms requested for the principal declarations. Each \Lean{\#check} prints the exact proposition or structure type; each succeeding command reports the axioms used by its proof term.
+\begin{lstlisting}[basicstyle=\ttfamily\small,breaklines=true]
+import Imscribing.YangMills.GlobalAxioms
+
+#check YangMills.clay_yang_mills_strict_from_balaban_and_os
+#print axioms YangMills.clay_yang_mills_strict_from_balaban_and_os
+#check YangMills.clay_yang_mills_from_rg_estimates
+#print axioms YangMills.clay_yang_mills_from_rg_estimates
+#check YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence
+#print axioms YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence
+#check YangMills.concreteOS4DContinuumTheory
+#print axioms YangMills.concreteOS4DContinuumTheory
+#check YangMills.concreteUniformRGTrajectory
+#print axioms YangMills.concreteUniformRGTrajectory
+#check YangMills.WightmanQFT4DStrict
+#print axioms YangMills.WightmanQFT4DStrict
+#check YangMills.yangMillsMassGap
+#print axioms YangMills.yangMillsMassGap
+\end{lstlisting}
+
+The two Clay-interface theorems have premises in their types: the strict reduction takes the RG and OS continuation structures, and the RG theorem takes \Lean{SUYangMillsRGConjecture}. The concrete trajectory, OS family, Wightman structure, and existential lattice-gap proposition are checked separately. The kernel axiom report records proof foundations; it does not alter the propositions or inputs displayed by \Lean{\#check}.
+
+\section{Principal declarations}
+
+\begin{longtable}{p{0.55\linewidth}p{0.35\linewidth}}
+\toprule
+Lean declaration & Mathematical role \\
+\midrule
+\endhead
+\url{YangMills.yangMillsMassGap} & Existence of a lattice gauge setup with positive transfer gap. \\
+\url{YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence} & Concrete uniform rescaled-gap and RG trajectory data for each \(N\geq2\). \\
+\url{YangMills.unconditional_non_gaussian_4d_euclidean_os_axioms_verification} & Verified OS, clustering, and non-Gaussian properties of the concrete radial continuum family. \\
+\url{YangMills.unconditional_os_hilbert_completion_and_wightman_reconstruction} & Completion and reconstruction data for the concrete OS structure. \\
+\url{YangMills.unconditional_interacting_yang_mills_hamiltonian_and_phase_space_dynamics} & Packaged Hamiltonian, phase-space, and symmetry data for the concrete setup. \\
+\url{YangMills.stageObservableSchwinger_tendsto_iid} & Full finite-tuple Wilson-stage convergence, with repeated points, under the stated density principle. \\
+\url{YangMills.clay_yang_mills_strict_from_balaban_and_os} & Strict four-dimensional Clay interface from RG and OS continuation structures. \\
+\url{YangMills.clay_yang_mills_from_rg_estimates} & Clay interface from the stated \(\SU(N)\) RG estimate package. \\
+\url{MassGapInstances.clay_yang_mills_strict} & Positive two-level spectral witness. \\
+\bottomrule
+\end{longtable}
+
+\end{document}

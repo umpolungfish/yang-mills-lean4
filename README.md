@@ -1,13 +1,17 @@
-# Unconditional Formal Verification of 4D $SU(N)$ Yang–Mills Theory and the Strict Mass Gap in Lean 4
+# Lean Formalization of Four-Dimensional Yang–Mills Structures and Mass-Gap Interfaces
 
-[![Unconditional](https://img.shields.io/badge/Status-Unconditional-brightgreen.svg)](#key-formal-theorems)
+[![Lean formalization](https://img.shields.io/badge/Status-Formalized-brightgreen.svg)](#key-formal-theorems)
 [![Docs](https://img.shields.io/badge/Documentation-GitHub%20Pages-blue.svg)](https://umpolungfish.github.io/yang-mills-lean4/)
 [![Lean 4](https://img.shields.io/badge/Lean%204-v4.28.0-blue.svg)](https://github.com/leanprover/lean4)
 [![Axioms](https://img.shields.io/badge/Axioms-Standard%20Only-brightgreen.svg)](#axiomatic-audit)
 [![Sorries](https://img.shields.io/badge/Sorries-0-brightgreen.svg)](#axiomatic-audit)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 
-The unconditional 4D Yang–Mills construction is proved in Lean. It includes `YangMills.yangMillsMassGap`, uniform rescaled lattice-gap and RG-convergence data for every `N ≥ 2`, and the full-tuple Wilson stage limit `stageObservableSchwinger_tendsto_iid`, including repeated continuum points. The limit uses spacing `1/(m+2)` and physical side length `m+2`; checked declarations and kernel axiom reports are listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
+**Conventional write-up:** [PDF](./paper/yang-mills-formalization.pdf) · [LaTeX source](./paper/yang-mills-formalization.tex)
+
+This repository formalizes four-dimensional `SU(N)` Wilson lattice theory, transfer operators, strong-coupling clustering, thermodynamic limits, explicit continuum Schwinger families, and Osterwalder–Schrader and Wightman interfaces. Its principal results include the existential transfer-gap proposition `YangMills.yangMillsMassGap`, concrete uniform RG and OS data, and `stageObservableSchwinger_tendsto_iid`, which proves convergence of finite-volume Wilson Schwinger functions for every finite tuple, including repeated points, under the stated one-dimensional submersion-density principle. The stage spacing is `1/(m+2)` and the physical side length is `m+2`.
+
+The strict four-dimensional Clay interface is stated by `ClayYangMillsMassGap4DStrict`. The checked reduction theorem `clay_yang_mills_strict_from_balaban_and_os` takes Balaban RG and OS continuation structures; `clay_yang_mills_from_rg_estimates` takes `SUYangMillsRGConjecture`. The unconditional declarations construct the concrete RG trajectory and continuum structures named in their Lean types. The conventional write-up records these results and their exact relations. Checked declarations and kernel axiom reports are listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
 
 The **Schwinger function with all continuum axioms** is also proved, unconditionally, in [`Imscribing/YangMills/IIDSchwinger.lean`](./Imscribing/YangMills/IIDSchwinger.lean). `iidSchwinger` is built from a non-Gaussian independent field and its value depends only on the equality classes of its argument tuple. Six theorems establish the full set of Euclidean properties directly:
 
@@ -22,7 +26,7 @@ The **Schwinger function with all continuum axioms** is also proved, uncondition
 
 All six depend only on `propext`, `Classical.choice`, `Quot.sound`, with zero sorries.
 
-The Wilson stage limit is proved in [`Imscribing/YangMills/SchwingerConv.lean`](./Imscribing/YangMills/SchwingerConv.lean). `stageObservableSchwinger_tendsto_iid` proves convergence for every finite tuple of continuum points, including repeated points, using spacing `1/(m+2)` and physical side length `m+2`. Its finite-stage frequency selector controls all lattice-site tuples and insertion multiplicities at each stage.
+The Wilson stage limit is proved in [`Imscribing/YangMills/SchwingerConv.lean`](./Imscribing/YangMills/SchwingerConv.lean). `stageObservableSchwinger_tendsto_iid` takes the one-dimensional submersion-density principle as an explicit argument and proves convergence for every finite tuple of continuum points, including repeated points. Its finite-stage frequency selector controls all lattice-site tuples and insertion multiplicities at each stage.
 
 Every theorem, lemma, and construction has been verified by the Lean 4 kernel with **0 `sorry` placeholders** and depends strictly on standard Lean 4 foundations (`propext`, `Classical.choice`, `Quot.sound`).
 
@@ -53,43 +57,18 @@ lake build Imscribing.YangMills.ContinuumClosure
 
 ## 2. Mathematical Overview & Architecture
 
-The formalization rigorously constructs the continuous, non-Gaussian relativistic quantum field theory on 4D Minkowski spacetime from first principles, satisfying the Clay Millennium Prize criteria (`ClayYangMillsMassGap4DStrict`):
+The repository contains four main formal strands. The first develops finite-volume four-dimensional `SU(N)` Wilson theory and its transfer and reflection-positivity structure. The second proves strong-coupling clustering and an infinite-volume subsequential limit. The third constructs explicit continuum Schwinger families and proves a full-tuple Wilson-stage limit to the equality-class iid functional. The fourth defines OS, Wightman, and strict Clay interfaces, with concrete RG and OS data and reduction theorems whose inputs are given by their Lean types.
 
 ```
-                       [ 4D Lattice Gauge Theory & Wilson Action ]
-                                          │  (§§1–11, §§22–26)
-                                          ▼
-                       [ Temporal-Gauge Transfer Kernel T ]
-                                          │  (§§39–40)
-                                          ▼
-                [ Self-Adjointness, Compactness & Perron–Frobenius Gap ]
-                                          │  (§§24, §§32–33, §40)
-                                          ▼
-                 [ 4D Wilson Schwinger Functions & Slice Decomposition ]
-                                          │  (§§25, §36, §§41–42)
-                                          ▼
-                  [ n-Point Euclidean Reflection Positivity ]
-                                          │  (§36)
-                                          ▼
-            [ High-Temperature Polymer & Dobrushin Cluster Expansion ]
-                                          │  (§43)
-              ──> Volume-independent exponential clustering rate m(β) > 0
-                                          │
-                                          ▼
-                    [ Infinite-Volume Thermodynamic Limit ]
-                                          │  (§44)
-              ──> Existence of continuum family S_inf on closed loops
-                                          │
-                                          ▼
-                 [ Osterwalder–Schrader (OS) Hilbert Reconstruction ]
-                                          │  (§§14–17, §§30–31, §38)
-              ──> Euclidean clustering implies spectral gap of OS Hamiltonian
-                                          │
-                                          ▼
-               [ Balaban Multiscale RG Flow & Relativistic Continuation ]
-                                          │  (§45)
-                                          ▼
-          [ ClayYangMillsMassGap4DStrict: Strict Positive Mass Gap Δ_phys > 0 ]
+ [4D Wilson lattice] ──> [transfer / reflection positivity] ──> [Dobrushin clustering]
+          │                                                      │
+          └──────────────────────────────────────────────────────┴──> [thermodynamic limit]
+
+ [Wilson stage observables] ──> [finite-tuple limit, repeated points included]
+                                           └──> [iid Schwinger functional]
+
+ [RG data] ──> [OS continuation data] ──> [strict Clay interface]
+                    concrete instances     reduction theorem
 ```
 
 ---
@@ -138,15 +117,13 @@ The following analytic results and the stage construction are proved in Lean wit
 | Fubini coordinate splitting | `integral_pi_split_at` | `Imscribing/YangMills/PiFubini.lean` |
 | Full-tuple stage convergence, including repeated points | `stageObservableSchwinger_tendsto_iid` | `Imscribing/YangMills/SchwingerConv.lean` |
 
-The Wilson expectation is concrete — Haar measure on the gauge group times the Boltzmann
-weight, normalized by the partition function (`cubic4Schwinger`), with no `wilsonExpect` axiom.
-The bridge theorem `iidSchwinger_from_wilson` and the full-tuple stage theorem
-`stageObservableSchwinger_tendsto_iid` are unconditional. The first gives exact equality for a
-single-site probe at every lattice size and every `β ≥ 0`; the second gives an explicit stage
-sequence with spacing `1/(m+2)`, physical side length `m+2`, and convergence for arbitrary
-finite tuples, including repeated points. `wilson_limit_glut` proves that changing the probe
-anchor leaves the limit unchanged. Together these theorems establish the Wilson-to-iidSchwinger
-limit and transfer all six Euclidean axioms.
+The Wilson expectation is the Haar integral against the Boltzmann weight, normalized by the
+partition function (`cubic4Schwinger`). The bridge theorem `iidSchwinger_from_wilson` proves
+exact equality for a single-site probe at every lattice size and every `β ≥ 0`. The full-tuple
+stage theorem `stageObservableSchwinger_tendsto_iid` takes the one-dimensional
+submersion-density principle as an explicit input and then proves convergence with spacing
+`1/(m+2)` and physical side length `m+2`, for arbitrary finite tuples including repeated points.
+`wilson_limit_glut` proves that changing the probe anchor leaves the limit unchanged.
 
 The formal declaration audit records the strict mass-gap assembly, RG estimates, concrete
 continuum and trajectory declarations, Wightman structure, and `yangMillsMassGap`, with each
