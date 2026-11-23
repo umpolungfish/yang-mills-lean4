@@ -1,3 +1,1 @@
-I repaired the Clay audit layout and refreshed its semantic overview
-
-I fixed responsive table layout and mathematical notation on the 27-component page, joined wrapped Markdown lines into readable paragraphs, rewrote the semantic overview to explain the 4D construction claims, and linked the audit pages together in the site navigation.
+I add screenshots of the Corpus Explorer source reader and four interactive labs to the Pages landing page.
