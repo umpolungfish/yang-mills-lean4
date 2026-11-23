@@ -672,9 +672,10 @@ for entry in theorems_data:
         section = entry.get("section", "")
         print(f"  {name}  [{section}]")
 print()
-print("UNCONDITIONAL RESULTS (proved, standard axioms only, 0 sorries)")
+print("CHECKED RESULTS (standard axioms only, 0 sorries)")
 for line in [
-    "  MassGapInstances.two_level_gauge_gap  — gap in a GappedGaugeSystem",
+    "  YangMills.yangMillsMassGap            — 4D Yang-Mills mass-gap witness",
+    "  YangMills.stageObservableSchwinger_tendsto_iid — full-tuple Wilson stage limit",
     "  YangMills.iidSchwinger_trans          — Euclidean translation invariance",
     "  YangMills.iidSchwinger_perm           — permutation symmetry",
     "  YangMills.iidSchwinger_so4            — continuous SO(4) invariance",
@@ -686,6 +687,7 @@ for line in [
     "  YangMills.sunHaar                     — SU(N) Haar probability measure",
     "  YangMills.submersion_map_has_L1_density — submersion to L1 density",
     "  YangMills.integral_pi_split_at        — Fubini coordinate splitting",
+    "  MassGapInstances.two_level_gauge_gap  — finite gauge-system witness",
 ]:
     print(line)
 print()

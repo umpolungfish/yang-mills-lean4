@@ -2080,7 +2080,7 @@
     "status": "PASS"
   },
   {
-    "section": "\u00a746. Unconditional Mass Gap",
+    "section": "\u00a746. Finite Gauge-System Witness",
     "name": "MassGapInstances.two_level_gauge_gap",
     "axioms": [
       "Classical.choice",

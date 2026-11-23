@@ -561,7 +561,7 @@ export const CORPUS_MODULES: CorpusModule[] = [
   },
   {
     id: 'MassGapInstances',
-    title: 'Unconditional Promoted Two-Level Mass Gap',
+    title: 'Finite Gauge-System Gap Witness',
     fileName: 'MassGapInstances.lean',
     assetPath: 'assets/aistudio/MassGapInstances_rung.txt',
     sections: '§46',
@@ -569,7 +569,7 @@ export const CORPUS_MODULES: CorpusModule[] = [
     layer: 'analytic_rungs',
     status: 'proved',
     summary:
-      'Unconditional existence of a non-vacuous two-level gapped spectrum and gauge system (lattice CCR, reflection, reflection positivity, gap = 2).',
+      'A finite-dimensional gauge-system witness with a two-level spectrum, lattice CCR, reflection positivity, and gap 2. The 4D Wilson construction is indexed separately.',
     imports: ['Mathlib'],
     keyDefinitions: [
       'GappedSpectrum',
@@ -577,7 +577,6 @@ export const CORPUS_MODULES: CorpusModule[] = [
     ],
     keyTheorems: [
       'two_level_gauge_gap',
-      'clay_yang_mills_strict',
     ],
   },
   {
@@ -999,10 +998,10 @@ export const THEOREM_CATALOG: TheoremEntry[] = [
   },
   {
     name: 'two_level_gauge_gap',
-    section: '§46',
+    section: '§46 finite witness',
     moduleId: 'MassGapInstances',
     kind: 'theorem',
     status: 'proved',
-    statement: 'Unconditional promoted two-level spectral gap with nonzero lattice commutator.',
+    statement: 'Finite gauge-system witness with a two-level spectral gap and nonzero lattice commutator.',
   },
 ];
