@@ -61,5 +61,10 @@ globs = [
   "Imscribing.YangMills.IIDContinuation",
   "Imscribing.YangMills.TrivialWightman",
   "Imscribing.YangMills.WilsonObservable",
-  "Imscribing.YangMills.ConstMomSchwinger"
+  "Imscribing.YangMills.LatticeLimitDensity",
+  "Imscribing.YangMills.ConstMomSchwinger",
+  "Imscribing.YangMills.PlaquetteDensity",
+  "Imscribing.YangMills.PlaquetteStep2",
+  "Imscribing.YangMills.PlaquetteStep3",
+  "Imscribing.YangMills.RademacherStep4"
 ]
