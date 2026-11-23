@@ -173,6 +173,11 @@ private lemma integral_rademacher_parent_zero (K K0 : ℕ) (hK : K0 < K) (n : �
     simpa using halt_range k
   rw [halt, zero_div]
 
+/-- Every positive-frequency Rademacher function has mean zero on `[0,1)`. -/
+theorem rademacher_integral_Ico_zero (K : ℕ) (hK : 0 < K) :
+    ∫ u in Set.Ico (0 : ℝ) 1, rademacher K u = 0 := by
+  simpa using integral_rademacher_parent_zero K 0 hK 0
+
 
 end YangMills
 
