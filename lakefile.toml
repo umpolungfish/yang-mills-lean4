@@ -59,5 +59,6 @@ globs = [
   "Imscribing.YangMills.IIDSchwingerFromWilson",
   "Imscribing.YangMills.IIDOS",
   "Imscribing.YangMills.IIDContinuation",
-  "Imscribing.YangMills.TrivialWightman"
+  "Imscribing.YangMills.TrivialWightman",
+  "Imscribing.YangMills.WilsonObservable"
 ]
