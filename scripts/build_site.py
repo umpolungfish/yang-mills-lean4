@@ -95,9 +95,7 @@ html_content = """<!DOCTYPE html>
         <a href="#theorems" class="hover:text-emerald-400 transition">Theorems</a>
         <a href="#audit" class="hover:text-emerald-400 transition">Axiom Audit</a>
         <a href="explorer/index.html" class="hover:text-emerald-400 transition">Corpus Explorer</a>
-        <a href="statement_decomposition.html" class="hover:text-emerald-400 transition">Statement Audit</a>
-        <a href="semantic_decomposition.html" class="hover:text-emerald-400 transition">Semantic Audit</a>
-        <a href="clay_27_components.html" class="hover:text-emerald-400 transition">27-Component Audit</a>
+        <a href="clay_27_components.html" class="hover:text-emerald-400 transition">Clay Audit &amp; Semantics</a>
         <a href="formal_declaration_audit.html" class="hover:text-emerald-400 transition">Declaration Audit</a>
         <a href="#reproduce" class="hover:text-emerald-400 transition">Replication</a>
         <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition">
@@ -541,6 +539,37 @@ def _md_to_html(md_text, title):
     code_buf = []
     table_buf = []
     list_buf = []
+    paragraph_buf = []
+
+    def flush_paragraph():
+        if paragraph_buf:
+            text = " ".join(part.strip() for part in paragraph_buf)
+            out.append(f'<p class="text-slate-300 leading-relaxed my-3">{_inline(text)}</p>')
+            paragraph_buf.clear()
+
+    def split_table_row(row):
+        raw = row.strip()
+        if raw.startswith("|"):
+            raw = raw[1:]
+        if raw.endswith("|"):
+            raw = raw[:-1]
+        cells = []
+        cell = []
+        i = 0
+        while i < len(raw):
+            ch = raw[i]
+            if ch == "\\" and i + 1 < len(raw) and raw[i + 1] == "|":
+                cell.append("|")
+                i += 2
+                continue
+            if ch == "|":
+                cells.append("".join(cell).strip())
+                cell = []
+            else:
+                cell.append(ch)
+            i += 1
+        cells.append("".join(cell).strip())
+        return cells
 
     def flush_list():
         if list_buf:
@@ -552,16 +581,16 @@ def _md_to_html(md_text, title):
         if not table_buf:
             return
         rows = [r for r in table_buf if not _re.match(r"^\s*\|[\s:\-|]+\|\s*$", r)]
-        head = [c.strip() for c in rows[0].strip().strip("|").split("|")]
+        head = split_table_row(rows[0])
         body = rows[1:]
-        t = ['<div class="overflow-x-auto my-5"><table class="w-full text-left border-collapse text-sm">',
+        t = ['<div class="overflow-x-auto my-5 rounded-lg border border-slate-800"><table class="w-full table-fixed text-left border-collapse text-sm">',
              '<thead><tr class="border-b border-slate-700">' +
-             "".join(f'<th class="py-2 pr-4 text-emerald-400 font-semibold">{_inline(h)}</th>' for h in head) +
+             "".join(f'<th class="py-3 px-3 align-top break-words text-emerald-400 font-semibold {"w-12" if h == "#" else "w-20" if h == "Status" else ""}">{_inline(h)}</th>' for h in head) +
              '</tr></thead><tbody>']
         for row in body:
-            cells = [c.strip() for c in row.strip().strip("|").split("|")]
+            cells = split_table_row(row)
             t.append('<tr class="border-b border-slate-800">' +
-                     "".join(f'<td class="py-2 pr-4 text-slate-300">{_inline(c)}</td>' for c in cells) +
+                     "".join(f'<td class="py-3 px-3 align-top break-words text-slate-300">{_inline(c)}</td>' for c in cells) +
                      '</tr>')
         t.append('</tbody></table></div>')
         out.append("".join(t))
@@ -570,7 +599,7 @@ def _md_to_html(md_text, title):
     while i < len(lines):
         line = lines[i]
         if line.startswith("```"):
-            flush_list(); flush_table()
+            flush_paragraph(); flush_list(); flush_table()
             if in_code:
                 out.append('<pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>' +
                            _html.escape("\n".join(code_buf)) + '</code></pre>')
@@ -585,30 +614,31 @@ def _md_to_html(md_text, title):
             i += 1
             continue
         if line.strip().startswith("|") and line.strip().endswith("|"):
-            flush_list()
+            flush_paragraph(); flush_list()
             table_buf.append(line)
             i += 1
             continue
         flush_table()
         if line.startswith("#### "):
-            flush_list(); out.append(f'<h4 class="text-lg font-semibold text-slate-200 mt-6 mb-2">{_inline(line[5:])}</h4>')
+            flush_paragraph(); flush_list(); out.append(f'<h4 class="text-lg font-semibold text-slate-200 mt-6 mb-2">{_inline(line[5:])}</h4>')
         elif line.startswith("### "):
-            flush_list(); out.append(f'<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3">{_inline(line[4:])}</h3>')
+            flush_paragraph(); flush_list(); out.append(f'<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3">{_inline(line[4:])}</h3>')
         elif line.startswith("## "):
-            flush_list(); out.append(f'<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">{_inline(line[3:])}</h2>')
+            flush_paragraph(); flush_list(); out.append(f'<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">{_inline(line[3:])}</h2>')
         elif line.startswith("# "):
-            flush_list()  # title handled in the page header
+            flush_paragraph(); flush_list()  # title handled in the page header
         elif line.strip().startswith("- "):
+            flush_paragraph()
             list_buf.append(line.strip()[2:])
         elif line.strip().startswith("> "):
-            flush_list(); out.append(f'<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">{_inline(line.strip()[2:])}</blockquote>')
+            flush_paragraph(); flush_list(); out.append(f'<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">{_inline(line.strip()[2:])}</blockquote>')
         elif line.strip() == "":
-            flush_list(); out.append('<div class="h-2"></div>')
+            flush_paragraph(); flush_list(); out.append('<div class="h-2"></div>')
         else:
             flush_list()
-            out.append(f'<p class="text-slate-300 leading-relaxed my-2">{_inline(line)}</p>')
+            paragraph_buf.append(line)
         i += 1
-    flush_list(); flush_table()
+    flush_paragraph(); flush_list(); flush_table()
     return "\n".join(out)
 
 

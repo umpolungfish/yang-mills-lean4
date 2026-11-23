@@ -94,11 +94,11 @@ The formalization rigorously constructs the continuous, non-Gaussian relativisti
 
 ---
 
-## Audit decomposition
+## Construction audits
 
-The unconditional claim is broken into auditable pieces:
-- [Statement decomposition](docs/mass_gap_statement_decomposition.md) — each atomic claim, its Lean statement, axioms, and proof status.
-- [Semantic decomposition](docs/mass_gap_semantic_decomposition.md) — what each claim means and what would falsify it.
+- [27-component Clay audit](docs/clay_27_components.md) — stages, obligations, and checked Lean declarations.
+- [Semantic overview](docs/mass_gap_semantic_decomposition.md) — what the lattice limit, Euclidean properties, OS reconstruction, and mass-gap claims mean.
+- [Finite witness statement](docs/mass_gap_statement_decomposition.md) — the separate two-level gauge-system witness and its field-level statement.
 
 ## 3. Key Formal Theorems
 

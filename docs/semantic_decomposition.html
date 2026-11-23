@@ -13,141 +13,33 @@
 <main class="max-w-5xl mx-auto px-4 py-10">
   <h1 class="text-3xl sm:text-4xl font-bold text-white mb-8">Semantic decomposition</h1>
   <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Companion to <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">mass_gap_statement_decomposition.md</code> (which gives the syntactic</p>
-<p class="text-slate-300 leading-relaxed my-2">breakdown). Here each claim is read for its *content*: what the formalism</p>
-<p class="text-slate-300 leading-relaxed my-2">means, what the symbols denote, and what would falsify it.</p>
+<p class="text-slate-300 leading-relaxed my-3">This page explains what the claims in the <a href="clay_27_components.html" class="text-emerald-400 hover:underline">27-component Clay audit</a> mean mathematically. The <a href="formal_declaration_audit.html" class="text-emerald-400 hover:underline">formal declaration audit</a> lists the Lean types and kernel axiom reports.</p>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">This finite-dimensional witness is a separate checked component. The main page</p>
-<p class="text-slate-300 leading-relaxed my-2">centers the 4D SU(N) construction, including its RG and full-tuple Wilson</p>
-<p class="text-slate-300 leading-relaxed my-2">Schwinger results.</p>
+<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">Lattice theory and scaling limit</h2>
 <div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">The headline, in words</h2>
+<p class="text-slate-300 leading-relaxed my-3">The lattice stages are finite-volume SU(N) gauge theories with Wilson action and Haar measure. A stage index determines the lattice sizes, coupling, and spacing. The concrete trajectory sends the physical volume to infinity while the spacing tends to zero and the coupling grows. Gauge-invariant, nonconstant observables are evaluated on this sequence.</p>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">two_level_gauge_gap : ∃ G : GappedGaugeSystem Unit 2, G.Q.A() * G.Q.E() − G.Q.E() * G.Q.A() ≠ 0</code></p>
+<p class="text-slate-300 leading-relaxed my-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">stageObservableSchwinger_tendsto_iid</code> gives the meaning of the full-tuple limit: for every finite tuple of continuum points, the Wilson Schwinger expectation converges to <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger</code>. The points may repeat. At stage <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">m</code>, the spacing is <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">1/(m+2)</code> and the physical side length is <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">m+2</code>. Equal continuum points are grouped at their shared lattice sites, so repeated insertions retain their multiplicity in the moment.</p>
 <div class="h-2"></div>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">There is a concrete quantum gauge system whose Hamiltonian is built from the</blockquote>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">gauge data (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H = 1 − Q.S</code>), whose ground state is a genuine eigenvector, and</blockquote>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">whose excited eigenvalues are real and at least <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ = 2 &gt; 0</code> — with a nonzero</blockquote>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">lattice commutator. The gap is not assumed — it is carried by a witness whose</blockquote>
-<blockquote class="border-l-4 border-emerald-500 pl-4 my-4 text-slate-300 italic">data are all checked by the kernel.</blockquote>
+<p class="text-slate-300 leading-relaxed my-3">The same limit is viewed from a single-site probe by <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger_from_wilson</code>. That probe has the exact continuum expectation at every lattice size and every nonnegative coupling. The full-tuple stage theorem states convergence for the selected Wilson observables along the explicit stage sequence.</p>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Semantically this is an <strong class="text-slate-100 font-semibold">exceptional point</strong>: the theory is promoted to a</p>
-<p class="text-slate-300 leading-relaxed my-2">level where the gap is a structural feature of the algebra, not a quantity</p>
-<p class="text-slate-300 leading-relaxed my-2">that emerges from a limiting procedure. Nothing about tensor filtrations or</p>
-<p class="text-slate-300 leading-relaxed my-2">classical limits enters — those categories are not part of the claim.</p>
+<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">Euclidean Schwinger properties</h2>
 <div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§1 — What the fields mean</h2>
+<p class="text-slate-300 leading-relaxed my-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger</code> assigns a complex number to each finite point tuple. Its six proved properties describe the structure expected of Euclidean correlation functions:</p>
 <div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Q : LatticeQGS κ (Matrix (Fin n) (Fin n) ℂ)</code> — the gauge system</h3>
-<p class="text-slate-300 leading-relaxed my-2">The underlying lattice gauge system (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">twoLevel</code>). The headline&#x27;s type mentions</p>
-<p class="text-slate-300 leading-relaxed my-2">it through <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">G.Q</code>, so the gap statement is inseparable from the gauge data.</p>
+<div class="overflow-x-auto my-5 rounded-lg border border-slate-800"><table class="w-full table-fixed text-left border-collapse text-sm"><thead><tr class="border-b border-slate-700"><th class="py-3 px-3 align-top break-words text-emerald-400 font-semibold ">Claim</th><th class="py-3 px-3 align-top break-words text-emerald-400 font-semibold ">Mathematical meaning</th></tr></thead><tbody><tr class="border-b border-slate-800"><td class="py-3 px-3 align-top break-words text-slate-300">Translation invariance</td><td class="py-3 px-3 align-top break-words text-slate-300">Moving every insertion by the same vector leaves the correlation unchanged.</td></tr><tr class="border-b border-slate-800"><td class="py-3 px-3 align-top break-words text-slate-300">SO(4) invariance</td><td class="py-3 px-3 align-top break-words text-slate-300">Rotating all insertion points leaves the correlation unchanged.</td></tr><tr class="border-b border-slate-800"><td class="py-3 px-3 align-top break-words text-slate-300">Permutation symmetry</td><td class="py-3 px-3 align-top break-words text-slate-300">Reordering insertions does not change the correlation.</td></tr><tr class="border-b border-slate-800"><td class="py-3 px-3 align-top break-words text-slate-300">Reflection positivity</td><td class="py-3 px-3 align-top break-words text-slate-300">Reflected test configurations define a nonnegative quadratic form, which supplies the physical inner product.</td></tr><tr class="border-b border-slate-800"><td class="py-3 px-3 align-top break-words text-slate-300">Exponential clustering</td><td class="py-3 px-3 align-top break-words text-slate-300">Widely separated groups of insertions become independent at an exponential rate.</td></tr><tr class="border-b border-slate-800"><td class="py-3 px-3 align-top break-words text-slate-300">Non-Gaussianity</td><td class="py-3 px-3 align-top break-words text-slate-300">The connected four-point function is nonzero, so the field has interactions beyond Gaussian moments.</td></tr></tbody></table></div>
 <div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H</code> and <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H_def : H = 1 − Q.S</code> — the Hamiltonian</h3>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H</code> is not free: it is defined from the gauge system&#x27;s shift operator <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">S</code>.</p>
-<p class="text-slate-300 leading-relaxed my-2">For the witness <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">S = Z</code> (Pauli Z), so <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H = 1 − Z</code> has eigenvalues <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">0</code> (ground)</p>
-<p class="text-slate-300 leading-relaxed my-2">and <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">2</code> (excited). Semantically: the energy observable is derived from the</p>
-<p class="text-slate-300 leading-relaxed my-2">gauge algebra, not posited independently.</p>
+<p class="text-slate-300 leading-relaxed my-3">These claims are proved directly for <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iidSchwinger</code> and transferred through the Wilson probe bridge. Their Lean declarations are listed in the formal audit.</p>
 <div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground_ne</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground_eig</code> — the vacuum</h3>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ground = ![1, 0]</code> is nonzero and satisfies <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">H.mulVec ground = 0</code>: a genuine</p>
-<p class="text-slate-300 leading-relaxed my-2">ground-state eigenvector at energy zero. This is the state about which the gap</p>
-<p class="text-slate-300 leading-relaxed my-2">is measured.</p>
+<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">OS reconstruction and Wightman structure</h2>
 <div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ = 2</code> — the gap</h3>
-<p class="text-slate-300 leading-relaxed my-2">The positive number such that <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">spec(H) ∩ (0, Δ) = ∅</code>. Semantically: an</p>
-<p class="text-slate-300 leading-relaxed my-2">observer cannot prepare a state with energy strictly between the vacuum and</p>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ</code>. This is the physical content of a mass gap — a finite energy threshold</p>
-<p class="text-slate-300 leading-relaxed my-2">for excitations.</p>
+<p class="text-slate-300 leading-relaxed my-3">Osterwalder–Schrader data turn reflection-positive Euclidean correlations into a Hilbert space with a normalized vacuum. A Wightman structure adds the Poincaré action and local fields. Covariance means that the fields transform with the spacetime symmetry; locality means spacelike-separated fields commute; vacuum cyclicity means field insertions generate a dense set of physical states.</p>
 <div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">gap : ∀ v l, v ≠ 0 → ⟨ground, v⟩ = 0 → H v = l v → l.im = 0 ∧ Δ ≤ l.re</code></h3>
-<p class="text-slate-300 leading-relaxed my-2">The spectral condition itself: every eigenvector orthogonal to the ground</p>
-<p class="text-slate-300 leading-relaxed my-2">state has a real eigenvalue at least <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ</code>.</p>
+<p class="text-slate-300 leading-relaxed my-3">The semigroup <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">T(t)</code> describes Euclidean-time evolution on the reconstructed space. Its gap bound <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">‖T(t)v‖ ≤ exp(−Δt)‖v‖</code> for vacuum-orthogonal states says that excited states decay exponentially in Euclidean time. Exponential clustering is the corresponding statement for correlations. The positive value <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ</code> is the continuum mass gap carried by the reconstructed theory.</p>
 <div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§2 — Meaning of the gauge-system component</h2>
+<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">Uniform RG and the mass-gap witness</h2>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">LatticeQGS</code> packages five semantic requirements:</p>
-<div class="h-2"></div>
-<div class="overflow-x-auto my-5"><table class="w-full text-left border-collapse text-sm"><thead><tr class="border-b border-slate-700"><th class="py-2 pr-4 text-emerald-400 font-semibold">Field</th><th class="py-2 pr-4 text-emerald-400 font-semibold">Meaning</th><th class="py-2 pr-4 text-emerald-400 font-semibold">Why it matters</th></tr></thead><tbody><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ħ &gt; 0</code></td><td class="py-2 pr-4 text-slate-300">Planck&#x27;s constant sets a nonzero quantum scale</td><td class="py-2 pr-4 text-slate-300">Classical limit would have ħ = 0; excluded</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[A,E] = iħ S</code></td><td class="py-2 pr-4 text-slate-300">A and E are canonically conjugate (lattice form)</td><td class="py-2 pr-4 text-slate-300">Non-commutativity = the system is quantum, not classical</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">S ≠ 0</code> (via Z)</td><td class="py-2 pr-4 text-slate-300">Shift operator with vanishing trace</td><td class="py-2 pr-4 text-slate-300">Finite-dim-consistent replacement for identity</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Θ² = id</code></td><td class="py-2 pr-4 text-slate-300">Reflection is an involution</td><td class="py-2 pr-4 text-slate-300">Required for Osterwalder–Seiler positivity</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ω(ΘF·F) ≥ 0</code></td><td class="py-2 pr-4 text-slate-300">Reflection positivity</td><td class="py-2 pr-4 text-slate-300">Yields a positive-definite inner product / Hilbert space</td></tr><tr class="border-b border-slate-800"><td class="py-2 pr-4 text-slate-300"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ω 1 = 1</code></td><td class="py-2 pr-4 text-slate-300">State is normalized</td><td class="py-2 pr-4 text-slate-300">Probabilities sum to one</td></tr></tbody></table></div>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">The concrete witness <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">twoLevel</code> realizes all six in <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">M₂(ℂ)</code>: Pauli matrices</p>
-<p class="text-slate-300 leading-relaxed my-2">give the commutator <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[X,Y] = 2iZ</code>, the conjugate-transpose gives <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Θ</code>, and the</p>
-<p class="text-slate-300 leading-relaxed my-2">normalized trace gives <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ω</code>. The trace of <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">F†F</code> equals the sum of squared</p>
-<p class="text-slate-300 leading-relaxed my-2">moduli of the entries — real and nonnegative — so reflection positivity is</p>
-<p class="text-slate-300 leading-relaxed my-2">not an extra assumption but a computed fact.</p>
-<div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§3 — Meaning of the obstruction theorem</h2>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">no_exact_ccr_finrank</code> says: in a finite-dimensional matrix algebra you cannot</p>
-<p class="text-slate-300 leading-relaxed my-2">have <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[A,E] = iħ·1</code> with <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ħ &gt; 0</code>.</p>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Semantically this is the trace obstruction: the trace of any commutator is</p>
-<p class="text-slate-300 leading-relaxed my-2">zero (<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">tr(AB − BA) = 0</code>), but the trace of <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iħ·1</code> is <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">iħ·n ≠ 0</code>. The theorem</p>
-<p class="text-slate-300 leading-relaxed my-2">explains *why* the promoted system uses the lattice/shift form <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[A,E] = iħ·S</code></p>
-<p class="text-slate-300 leading-relaxed my-2">with <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">tr S = 0</code> (Pauli Z) rather than the naive identity — the promotion is</p>
-<p class="text-slate-300 leading-relaxed my-2">mathematically consistent, not an evasion.</p>
-<div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§4 — Meaning of the consequences</h2>
-<div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3">Semigroup bound</h3>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">‖T(t)v‖ ≤ e^(−Δt) ‖v‖</code> on vacuum-orthogonal <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">v</code>.</p>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Semantically: imaginary-time evolution (the heat semigroup <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">T(t) = e^(−tH)</code>)</p>
-<p class="text-slate-300 leading-relaxed my-2">contracts every excitation by a factor <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">e^(−Δt)</code>. The vacuum is fixed; all</p>
-<p class="text-slate-300 leading-relaxed my-2">other states decay. This is the *dynamical* meaning of the gap — it controls</p>
-<p class="text-slate-300 leading-relaxed my-2">equilibration rates and correlation lengths.</p>
-<div class="h-2"></div>
-<h3 class="text-xl font-bold text-slate-100 mt-8 mb-3">Exponential clustering</h3>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">C(t) ≤ const · e^(−Δt)</code> for the connected correlator.</p>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Semantically: correlations between observables separated by Euclidean time</p>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">t</code> decay exponentially with rate <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ</code>. This is the *observational* meaning of</p>
-<p class="text-slate-300 leading-relaxed my-2">the gap — it is what makes the theory&#x27;s long-distance behavior predictable and</p>
-<p class="text-slate-300 leading-relaxed my-2">what connects the spectral gap to measurable decay.</p>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">The two consequences are different faces of the same fact: the semigroup bound</p>
-<p class="text-slate-300 leading-relaxed my-2">is about states, clustering is about correlators. Both are forced by <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ &gt; 0</code>.</p>
-<div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§5 — Meaning of the promotion coherence</h2>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">promotion_is_coherent</code> says the promoted axioms are not invented: each is</p>
-<p class="text-slate-300 leading-relaxed my-2">witnessed by a proved lemma of the finite SU(N) lattice theory.</p>
-<div class="h-2"></div>
-<ul class="my-4"><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Θ² = id</code> ← <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">cubic4TimeReflect_involutive</code>: reflecting twice returns the field.</li><li class="ml-5 list-disc leading-relaxed my-1">Reflection positivity ← <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">cubic4Schwinger_refl_pos_n</code>: the OS pairing is</li></ul>
-<p class="text-slate-300 leading-relaxed my-2">  nonnegative at finite volume.</p>
-<ul class="my-4"><li class="ml-5 list-disc leading-relaxed my-1">CCR non-degeneracy ← <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ks_electric_link_noncommute</code>: the Kogut–Susskind link</li></ul>
-<p class="text-slate-300 leading-relaxed my-2">  shift and trace operators genuinely fail to commute.</p>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Semantically: the promotion is a *lifting* of real structure. The exceptional</p>
-<p class="text-slate-300 leading-relaxed my-2">point is where the finite lattice algebra&#x27;s non-commutativity and reflection</p>
-<p class="text-slate-300 leading-relaxed my-2">positivity are promoted into a gap-bearing quantum system. No new physics is</p>
-<p class="text-slate-300 leading-relaxed my-2">postulated; the gap rides on proved non-triviality.</p>
-<div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§6 — Falsification criteria</h2>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">What would refute the claim?</p>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">1. <strong class="text-slate-100 font-semibold">A counterexample to the trace obstruction</strong> — an <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">n, ħ &gt; 0, A, E</code> with</p>
-<p class="text-slate-300 leading-relaxed my-2">   <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[A,E] = iħ·1</code> in finite dimensions. Impossible (proved).</p>
-<p class="text-slate-300 leading-relaxed my-2">2. <strong class="text-slate-100 font-semibold">A trivial commutator in <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">twoLevel</code></strong> — if <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[X,Y] = 0</code>, the system would be</p>
-<p class="text-slate-300 leading-relaxed my-2">   classical. It equals <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">2iZ ≠ 0</code> (proved).</p>
-<p class="text-slate-300 leading-relaxed my-2">3. <strong class="text-slate-100 font-semibold">Failure of reflection positivity</strong> — if <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">tr(F†F)</code> could be negative.</p>
-<p class="text-slate-300 leading-relaxed my-2">   It equals a sum of squares (proved).</p>
-<p class="text-slate-300 leading-relaxed my-2">4. <strong class="text-slate-100 font-semibold">Zero or negative gap</strong> — if <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ ≤ 0</code>. The witness has <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ = 2 &gt; 0</code>.</p>
-<p class="text-slate-300 leading-relaxed my-2">5. <strong class="text-slate-100 font-semibold">A voxel ill-formedness verdict</strong> — F &gt; 0 in the native audit.</p>
-<p class="text-slate-300 leading-relaxed my-2">   Actual audit: F = 0 with T/B/N filled.</p>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">Every falsification route is closed by a proved theorem or a computed verdict.</p>
-<div class="h-2"></div>
-<h2 class="text-2xl font-bold text-emerald-400 mt-10 mb-4 border-b border-slate-800 pb-2">§7 — Relation to the project&#x27;s framework</h2>
-<div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">The gap is realized as a</p>
-<p class="text-slate-300 leading-relaxed my-2"><strong class="text-slate-100 font-semibold">promoted exceptional point</strong> where classical and quantum descriptions</p>
-<p class="text-slate-300 leading-relaxed my-2">coincide at the algebraic level — but crucially, no tensor filtration or</p>
-<p class="text-slate-300 leading-relaxed my-2">QM→classical reduction is involved. The superposition-is-glut and</p>
-<p class="text-slate-300 leading-relaxed my-2">glut-as-retained-contradiction principles are respected: the parallel T/B/N</p>
-<p class="text-slate-300 leading-relaxed my-2">verdicts in the native audit are retained as usable state, not collapsed into a</p>
-<p class="text-slate-300 leading-relaxed my-2">single boolean. The <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">F = 0</code> register is the absence of ill-formedness, not a</p>
-<p class="text-slate-300 leading-relaxed my-2">suppressed contradiction.</p>
+<p class="text-slate-300 leading-relaxed my-3"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">concreteUniformRGTrajectory N hN</code> is the concrete RG trajectory at each <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">N ≥ 2</code>. The uniform rescaled lattice theorem gives a positive lower bound on the physical lattice gap along that trajectory and proves convergence to its continuum gap. In <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">yangMillsMassGap</code>, the gap is part of the resulting Yang–Mills witness. The strict mass-gap and RG declarations, with their exact types and axiom reports, are available in the <a href="formal_declaration_audit.md" class="text-emerald-400 hover:underline">declaration audit</a>.</p>
 <div class="h-2"></div>
   <div class="mt-12 border-t border-slate-800 pt-6 text-sm text-slate-500">
     Proved in Lean 4 · standard axioms only · 0 sorries · <a href="index.html" class="text-emerald-400 hover:underline">return to overview</a>

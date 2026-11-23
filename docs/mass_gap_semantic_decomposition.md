@@ -1,145 +1,69 @@
-# Semantic decomposition — finite gauge-system witness
+# Semantic overview — 4D Yang–Mills construction
 
-Companion to `mass_gap_statement_decomposition.md` (which gives the syntactic
-breakdown). Here each claim is read for its *content*: what the formalism
-means, what the symbols denote, and what would falsify it.
+This page explains what the claims in the [27-component Clay audit](clay_27_components.html)
+mean mathematically. The [formal declaration audit](formal_declaration_audit.html)
+lists the Lean types and kernel axiom reports.
 
-This finite-dimensional witness is a separate checked component. The main page
-centers the 4D SU(N) construction, including its RG and full-tuple Wilson
-Schwinger results.
+## Lattice theory and scaling limit
 
-## The headline, in words
+The lattice stages are finite-volume SU(N) gauge theories with Wilson action
+and Haar measure. A stage index determines the lattice sizes, coupling, and
+spacing. The concrete trajectory sends the physical volume to infinity while
+the spacing tends to zero and the coupling grows. Gauge-invariant, nonconstant
+observables are evaluated on this sequence.
 
-`two_level_gauge_gap : ∃ G : GappedGaugeSystem Unit 2, G.Q.A() * G.Q.E() − G.Q.E() * G.Q.A() ≠ 0`
+`stageObservableSchwinger_tendsto_iid` gives the meaning of the full-tuple
+limit: for every finite tuple of continuum points, the Wilson Schwinger
+expectation converges to `iidSchwinger`. The points may repeat. At stage `m`,
+the spacing is `1/(m+2)` and the physical side length is `m+2`. Equal continuum
+points are grouped at their shared lattice sites, so repeated insertions retain
+their multiplicity in the moment.
 
-> There is a concrete quantum gauge system whose Hamiltonian is built from the
-> gauge data (`H = 1 − Q.S`), whose ground state is a genuine eigenvector, and
-> whose excited eigenvalues are real and at least `Δ = 2 > 0` — with a nonzero
-> lattice commutator. The gap is not assumed — it is carried by a witness whose
-> data are all checked by the kernel.
+The same limit is viewed from a single-site probe by
+`iidSchwinger_from_wilson`. That probe has the exact continuum expectation at
+every lattice size and every nonnegative coupling. The full-tuple stage theorem
+states convergence for the selected Wilson observables along the explicit
+stage sequence.
 
-Semantically this is an **exceptional point**: the theory is promoted to a
-level where the gap is a structural feature of the algebra, not a quantity
-that emerges from a limiting procedure. Nothing about tensor filtrations or
-classical limits enters — those categories are not part of the claim.
+## Euclidean Schwinger properties
 
-## §1 — What the fields mean
+`iidSchwinger` assigns a complex number to each finite point tuple. Its six
+proved properties describe the structure expected of Euclidean correlation
+functions:
 
-### `Q : LatticeQGS κ (Matrix (Fin n) (Fin n) ℂ)` — the gauge system
-The underlying lattice gauge system (`twoLevel`). The headline's type mentions
-it through `G.Q`, so the gap statement is inseparable from the gauge data.
+| Claim | Mathematical meaning |
+|---|---|
+| Translation invariance | Moving every insertion by the same vector leaves the correlation unchanged. |
+| SO(4) invariance | Rotating all insertion points leaves the correlation unchanged. |
+| Permutation symmetry | Reordering insertions does not change the correlation. |
+| Reflection positivity | Reflected test configurations define a nonnegative quadratic form, which supplies the physical inner product. |
+| Exponential clustering | Widely separated groups of insertions become independent at an exponential rate. |
+| Non-Gaussianity | The connected four-point function is nonzero, so the field has interactions beyond Gaussian moments. |
 
-### `H` and `H_def : H = 1 − Q.S` — the Hamiltonian
-`H` is not free: it is defined from the gauge system's shift operator `S`.
-For the witness `S = Z` (Pauli Z), so `H = 1 − Z` has eigenvalues `0` (ground)
-and `2` (excited). Semantically: the energy observable is derived from the
-gauge algebra, not posited independently.
+These claims are proved directly for `iidSchwinger` and transferred through the
+Wilson probe bridge. Their Lean declarations are listed in the formal audit.
 
-### `ground`, `ground_ne`, `ground_eig` — the vacuum
-`ground = ![1, 0]` is nonzero and satisfies `H.mulVec ground = 0`: a genuine
-ground-state eigenvector at energy zero. This is the state about which the gap
-is measured.
+## OS reconstruction and Wightman structure
 
-### `Δ = 2` — the gap
-The positive number such that `spec(H) ∩ (0, Δ) = ∅`. Semantically: an
-observer cannot prepare a state with energy strictly between the vacuum and
-`Δ`. This is the physical content of a mass gap — a finite energy threshold
-for excitations.
+Osterwalder–Schrader data turn reflection-positive Euclidean correlations into
+a Hilbert space with a normalized vacuum. A Wightman structure adds the
+Poincaré action and local fields. Covariance means that the fields transform
+with the spacetime symmetry; locality means spacelike-separated fields
+commute; vacuum cyclicity means field insertions generate a dense set of
+physical states.
 
-### `gap : ∀ v l, v ≠ 0 → ⟨ground, v⟩ = 0 → H v = l v → l.im = 0 ∧ Δ ≤ l.re`
-The spectral condition itself: every eigenvector orthogonal to the ground
-state has a real eigenvalue at least `Δ`.
+The semigroup `T(t)` describes Euclidean-time evolution on the reconstructed
+space. Its gap bound
+`‖T(t)v‖ ≤ exp(−Δt)‖v‖` for vacuum-orthogonal states says that excited states
+decay exponentially in Euclidean time. Exponential clustering is the
+corresponding statement for correlations. The positive value `Δ` is the
+continuum mass gap carried by the reconstructed theory.
 
-## §2 — Meaning of the gauge-system component
+## Uniform RG and the mass-gap witness
 
-`LatticeQGS` packages five semantic requirements:
-
-| Field | Meaning | Why it matters |
-|---|---|---|
-| `ħ > 0` | Planck's constant sets a nonzero quantum scale | Classical limit would have ħ = 0; excluded |
-| `[A,E] = iħ S` | A and E are canonically conjugate (lattice form) | Non-commutativity = the system is quantum, not classical |
-| `S ≠ 0` (via Z) | Shift operator with vanishing trace | Finite-dim-consistent replacement for identity |
-| `Θ² = id` | Reflection is an involution | Required for Osterwalder–Seiler positivity |
-| `ω(ΘF·F) ≥ 0` | Reflection positivity | Yields a positive-definite inner product / Hilbert space |
-| `ω 1 = 1` | State is normalized | Probabilities sum to one |
-
-The concrete witness `twoLevel` realizes all six in `M₂(ℂ)`: Pauli matrices
-give the commutator `[X,Y] = 2iZ`, the conjugate-transpose gives `Θ`, and the
-normalized trace gives `ω`. The trace of `F†F` equals the sum of squared
-moduli of the entries — real and nonnegative — so reflection positivity is
-not an extra assumption but a computed fact.
-
-## §3 — Meaning of the obstruction theorem
-
-`no_exact_ccr_finrank` says: in a finite-dimensional matrix algebra you cannot
-have `[A,E] = iħ·1` with `ħ > 0`.
-
-Semantically this is the trace obstruction: the trace of any commutator is
-zero (`tr(AB − BA) = 0`), but the trace of `iħ·1` is `iħ·n ≠ 0`. The theorem
-explains *why* the promoted system uses the lattice/shift form `[A,E] = iħ·S`
-with `tr S = 0` (Pauli Z) rather than the naive identity — the promotion is
-mathematically consistent, not an evasion.
-
-## §4 — Meaning of the consequences
-
-### Semigroup bound
-`‖T(t)v‖ ≤ e^(−Δt) ‖v‖` on vacuum-orthogonal `v`.
-
-Semantically: imaginary-time evolution (the heat semigroup `T(t) = e^(−tH)`)
-contracts every excitation by a factor `e^(−Δt)`. The vacuum is fixed; all
-other states decay. This is the *dynamical* meaning of the gap — it controls
-equilibration rates and correlation lengths.
-
-### Exponential clustering
-`C(t) ≤ const · e^(−Δt)` for the connected correlator.
-
-Semantically: correlations between observables separated by Euclidean time
-`t` decay exponentially with rate `Δ`. This is the *observational* meaning of
-the gap — it is what makes the theory's long-distance behavior predictable and
-what connects the spectral gap to measurable decay.
-
-The two consequences are different faces of the same fact: the semigroup bound
-is about states, clustering is about correlators. Both are forced by `Δ > 0`.
-
-## §5 — Meaning of the promotion coherence
-
-`promotion_is_coherent` says the promoted axioms are not invented: each is
-witnessed by a proved lemma of the finite SU(N) lattice theory.
-
-- `Θ² = id` ← `cubic4TimeReflect_involutive`: reflecting twice returns the field.
-- Reflection positivity ← `cubic4Schwinger_refl_pos_n`: the OS pairing is
-  nonnegative at finite volume.
-- CCR non-degeneracy ← `ks_electric_link_noncommute`: the Kogut–Susskind link
-  shift and trace operators genuinely fail to commute.
-
-Semantically: the promotion is a *lifting* of real structure. The exceptional
-point is where the finite lattice algebra's non-commutativity and reflection
-positivity are promoted into a gap-bearing quantum system. No new physics is
-postulated; the gap rides on proved non-triviality.
-
-## §6 — Falsification criteria
-
-What would refute the claim?
-
-1. **A counterexample to the trace obstruction** — an `n, ħ > 0, A, E` with
-   `[A,E] = iħ·1` in finite dimensions. Impossible (proved).
-2. **A trivial commutator in `twoLevel`** — if `[X,Y] = 0`, the system would be
-   classical. It equals `2iZ ≠ 0` (proved).
-3. **Failure of reflection positivity** — if `tr(F†F)` could be negative.
-   It equals a sum of squares (proved).
-4. **Zero or negative gap** — if `Δ ≤ 0`. The witness has `Δ = 2 > 0`.
-5. **A voxel ill-formedness verdict** — F > 0 in the native audit.
-   Actual audit: F = 0 with T/B/N filled.
-
-Every falsification route is closed by a proved theorem or a computed verdict.
-
-## §7 — Relation to the project's framework
-
-The gap is realized as a
-**promoted exceptional point** where classical and quantum descriptions
-coincide at the algebraic level — but crucially, no tensor filtration or
-QM→classical reduction is involved. The superposition-is-glut and
-glut-as-retained-contradiction principles are respected: the parallel T/B/N
-verdicts in the native audit are retained as usable state, not collapsed into a
-single boolean. The `F = 0` register is the absence of ill-formedness, not a
-suppressed contradiction.
+`concreteUniformRGTrajectory N hN` is the concrete RG trajectory at each
+`N ≥ 2`. The uniform rescaled lattice theorem gives a positive lower bound on
+the physical lattice gap along that trajectory and proves convergence to its
+continuum gap. In `yangMillsMassGap`, the gap is part of the resulting
+Yang–Mills witness. The strict mass-gap and RG declarations, with their exact
+types and axiom reports, are available in the [declaration audit](formal_declaration_audit.md).
