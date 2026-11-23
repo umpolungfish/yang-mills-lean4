@@ -1337,7 +1337,7 @@ theorem stageObservableSchwinger_tendsto_iid
     dsimp [S, iidSupport]
     calc
       (Finset.univ.image xs).card ≤ Finset.univ.card := Finset.card_image_le
-      _ = n := Finset.card_fin
+      _ = n := Finset.card_fin n
   have hprod_enum (g : Space4 → ℝ) :
       S.prod g = ∏ i : Fin S.card, g (rep i) := by
     calc
@@ -1347,33 +1347,6 @@ theorem stageObservableSchwinger_tendsto_iid
       _ = ∏ i : Fin S.card, g (rep i) := by
         exact Fintype.prod_equiv e (fun y : S => g y.val)
           (fun i => g (rep i)) (by intro y; simp [rep, e])
-  have hlimit_enum (m : ℕ) (t : stageMomentIndex m)
-      (ht_pow : ∀ i : Fin S.card,
-        stageMomentPowers m t i = (iidFiber xs (rep i)).card) :
-      stageMomentLimit m t =
-        S.prod (fun y =>
-          ((1 : ℝ) ^ (iidFiber xs y).card + (2 : ℝ) ^ (iidFiber xs y).card) / 2) := by
-    rw [show stageMomentLimit m t =
-        ∏ i : Fin S.card,
-          ((1 : ℝ) ^ (iidFiber xs (rep i)).card +
-            (2 : ℝ) ^ (iidFiber xs (rep i)).card) / 2 by
-        unfold stageMomentLimit
-        apply Finset.prod_congr rfl
-        intro i hi
-        rw [ht_pow i]]
-    symm
-    exact hprod_enum (fun y =>
-      ((1 : ℝ) ^ (iidFiber xs y).card + (2 : ℝ) ^ (iidFiber xs y).card) / 2)
-  have hmoment_to_iid (m : ℕ) (t : stageMomentIndex m)
-      (ht_pow : ∀ i : Fin S.card,
-        stageMomentPowers m t i = (iidFiber xs (rep i)).card) :
-      (stageMomentLimit m t : ℂ) = iidSchwinger n xs := by
-    rw [iidSchwinger_eq_fiberProd]
-    rw [hlimit_enum m t ht_pow]
-    simp only [map_prod]
-    apply Finset.prod_congr rfl
-    intro y hy
-    simp [iidMom, Complex.ofReal_pow, Complex.ofReal_div]
   rw [Metric.tendsto_atTop]
   intro ε hε
   obtain ⟨Mε, hMε⟩ := exists_nat_one_div_lt hε
@@ -1393,9 +1366,9 @@ theorem stageObservableSchwinger_tendsto_iid
     have hle : (iidFiber xs (rep i)).card ≤ n := by
       unfold iidFiber
       calc
-        (Finset.univ.filter fun j : Fin n => xs j = rep i).card ≤ Finset.univ.card :=
-          Finset.card_filter_le
-        _ = n := Finset.card_fin
+        (Finset.univ.filter fun j : Fin n => xs j = rep i).card ≤ Finset.univ.card := by
+          exact Finset.card_filter_le (Finset.univ : Finset (Fin n)) _
+        _ = n := Finset.card_fin n
     exact le_trans hle hnm
   let t : stageMomentIndex m :=
     ⟨rfin, (⟨siteTuple, hsites⟩,
@@ -1413,8 +1386,14 @@ theorem stageObservableSchwinger_tendsto_iid
       stageSiteMap (stagePeriodicSide m) (stagePeriodicSide m) (stageSpacing m)
         (stageSpacing_pos m) (stageMomentPoints m t i) := by
     rw [ht_point]
-    exact (stageSiteMap_stageSitePoint (stagePeriodicSide m) (stagePeriodicSide m)
-      (stageSpacing m) (stageSpacing_pos m) (siteTuple i)).symm
+    calc
+      stageSiteMap (stagePeriodicSide m) (stagePeriodicSide m) (stageSpacing m)
+          (stageSpacing_pos m) (rep i) = siteTuple i := rfl
+      _ = stageSiteMap (stagePeriodicSide m) (stagePeriodicSide m) (stageSpacing m)
+          (stageSpacing_pos m) (stageSitePoint (stagePeriodicSide m) (stagePeriodicSide m)
+            (stageSpacing m) (siteTuple i)) :=
+        (stageSiteMap_stageSitePoint (stagePeriodicSide m) (stagePeriodicSide m)
+          (stageSpacing m) (stageSpacing_pos m) (siteTuple i)).symm
   let K := stageFrequency N hN submersion_1d m
   let f : GaugeField (cubicTorus4 (stagePeriodicSide m) (stagePeriodicSide m))
       (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℝ := fun U =>
@@ -1463,7 +1442,7 @@ theorem stageObservableSchwinger_tendsto_iid
                 intro i hi
                 rw [stageObservable_eq_of_siteMap_eq]
                 · rw [ht_pow i]
-                · exact (ht_site i).symm
+                · exact ht_site i
   have hreal_integral :
       (∫ U, f U ∂wilsonMeasure (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)) =
         stageMomentValue N hN submersion_1d m t K := by
@@ -1474,24 +1453,32 @@ theorem stageObservableSchwinger_tendsto_iid
       cubic4Schwinger (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ) n obs =
         (stageMomentValue N hN submersion_1d m t K : ℂ) := by
     rw [hobs_integral, hreal_integral]
-    rfl
-  have hlim : (stageMomentLimit m t : ℂ) = iidSchwinger n xs :=
-    hmoment_to_iid m t ht_pow
-  rw [show (fun q => cubic4Schwinger (stagePeriodicSide q) (stagePeriodicSide q) N (q : ℝ) n
-      (fun i U =>
-        ((stageObservable (stagePeriodicSide q) (stagePeriodicSide q) N (q : ℝ)
-          (Nat.cast_nonneg _) (stageSpacing q) (stageSpacing_pos q) (xs i)
-          (stageFrequency N hN submersion_1d q) U : ℝ) : ℂ))) =
-      fun q => cubic4Schwinger (stagePeriodicSide q) (stagePeriodicSide q) N (q : ℝ) n obs
-      by
-        funext q
-        dsimp [obs, K]
-        rfl]
-  rw [hschw, hlim]
+  have hlim : (stageMomentLimit m t : ℂ) = iidSchwinger n xs := by
+    have hlimitR : stageMomentLimit m t =
+        S.prod (fun y =>
+          ((1 : ℝ) ^ (iidFiber xs y).card + (2 : ℝ) ^ (iidFiber xs y).card) / 2) := by
+      unfold stageMomentLimit
+      symm
+      exact hprod_enum (fun y =>
+        ((1 : ℝ) ^ (iidFiber xs y).card + (2 : ℝ) ^ (iidFiber xs y).card) / 2)
+    rw [hlimitR, iidSchwinger_eq_fiberProd, Complex.ofReal_prod]
+    apply Finset.prod_congr rfl
+    intro y hy
+    simp [iidMom, Complex.ofReal_pow, Complex.ofReal_div]
+  change dist (cubic4Schwinger (stagePeriodicSide m) (stagePeriodicSide m) N
+    (m : ℝ) n obs) (iidSchwinger n xs) < ε
+  rw [hschw, ← hlim]
   have hfrac : (1 : ℝ) / (m + 1 : ℝ) ≤ 1 / (Mε + 1 : ℝ) := by
     apply one_div_le_one_div_of_le (by positivity)
     exact_mod_cast Nat.succ_le_succ hmeps
-  exact lt_of_lt_of_le happrox (lt_of_le_of_lt hfrac hMε)
+  have happrox' : dist ((stageMomentValue N hN submersion_1d m t K : ℝ) : ℂ)
+      ((stageMomentLimit m t : ℝ) : ℂ) < 1 / (m + 1 : ℝ) := by
+    have happroxR : dist (stageMomentValue N hN submersion_1d m t K)
+        (stageMomentLimit m t) < 1 / (m + 1 : ℝ) := by
+      simpa [K] using happrox
+    rw [Complex.isometry_ofReal.dist_eq]
+    exact happroxR
+  exact lt_trans happrox' (lt_of_le_of_lt hfrac hMε)
 
 theorem stageObservable_range (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]

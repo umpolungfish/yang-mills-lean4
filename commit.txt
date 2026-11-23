@@ -1,5 +1,3 @@
-I unify the corpus explorer with the site theme
+I complete the repeated-point Schwinger convergence proof
 
-I align the explorer's typography, navigation, panels, controls, and diagrams
-with the site's dark slate and emerald palette, then refresh its published
-GitHub Pages assets.
+I finish the finite-stage moment selector argument for tuples with repeated continuum points, including the real-to-complex Wilson expectation bridge and the fiber-product identification with iidSchwinger. I correct the site-map equality orientation and make the finite-cardinality bounds explicit.
