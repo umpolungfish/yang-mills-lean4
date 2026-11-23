@@ -1,0 +1,60 @@
+import Imscribing.YangMills
+import Imscribing.YangMills.Core
+import Imscribing.YangMills.CubicHaar4D
+import Imscribing.YangMills.OSCompletion
+import Imscribing.YangMills.FeynmanKacAndStrongCoupling
+import Imscribing.YangMills.Wilson4DOp
+import Imscribing.YangMills.FeynmanKac
+import Imscribing.YangMills.StrongCouplingDobrushin
+import Imscribing.YangMills.StrongCouplingInfVol
+import Imscribing.YangMills.ContinuumClosure
+import Imscribing.YangMills.CanonicalWitness
+import Imscribing.YangMills.BridgeStatements
+import Imscribing.YangMills.PlaquetteReflection
+import Imscribing.YangMills.Dicke
+import Imscribing.YangMills.UnifiedLattice
+import Imscribing.YangMills.MassGapInstances
+import Imscribing.YangMills.GlobalAxioms
+import Imscribing.YangMills.GappedGaugeSystem
+import Imscribing.YangMills.ContinuumDecomposition
+import Imscribing.YangMills.IIDSchwinger
+import Imscribing.YangMills.IIDWilsonLimit
+import Imscribing.YangMills.IIDScaling
+import Imscribing.YangMills.RademacherL1
+import Imscribing.YangMills.RademacherMulti
+import Imscribing.YangMills.SUNHaar
+import Imscribing.YangMills.ProbIntegralTransform
+import Imscribing.YangMills.PiFubini
+import Imscribing.YangMills.SubmersionDensity
+import Imscribing.YangMills.IIDSchwingerFromWilson
+import Imscribing.YangMills.IIDOS
+import Imscribing.YangMills.IIDContinuation
+import Imscribing.YangMills.TrivialWightman
+import Imscribing.YangMills.WilsonObservable
+import Imscribing.YangMills.LatticeLimitDensity
+import Imscribing.YangMills.ConstMomSchwinger
+import Imscribing.YangMills.PlaquetteDensity
+import Imscribing.YangMills.PlaquetteStep2
+import Imscribing.YangMills.PlaquetteStep3
+import Imscribing.YangMills.RademacherStep4
+import Imscribing.YangMills.SchwingerConv
+import Imscribing.Millennium.ContinuumLatticeBridge
+import Imscribing.Millennium.TorusWraparoundBridge
+
+#check YangMills.clay_yang_mills_strict_from_balaban_and_os
+#print axioms YangMills.clay_yang_mills_strict_from_balaban_and_os
+#check YangMills.clay_yang_mills_from_rg_estimates
+#print axioms YangMills.clay_yang_mills_from_rg_estimates
+#check YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence
+#print axioms YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence
+#check YangMills.concreteOS4DContinuumTheory
+#print axioms YangMills.concreteOS4DContinuumTheory
+#check YangMills.concreteUniformRGTrajectory
+#print axioms YangMills.concreteUniformRGTrajectory
+#check YangMills.WightmanQFT4DStrict
+#print axioms YangMills.WightmanQFT4DStrict
+#check YangMills.yangMillsMassGap
+#print axioms YangMills.yangMillsMassGap
+#check YangMills.stageObservableSchwinger_tendsto_iid
+#check YangMills.iidSchwinger_from_wilson
+

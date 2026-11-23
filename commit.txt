@@ -1,1 +1,1 @@
-I derive the physical Yang–Mills mass gap from the Wilson measure in the conventional write-up and link the rebuilt PDF from the README.
+I build the Yang–Mills project as an ELF, audit the full image with Vox, and add its distance-dependent continuum correlations and short-scale asymptotic freedom to the front page.

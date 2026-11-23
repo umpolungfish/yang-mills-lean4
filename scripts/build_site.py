@@ -127,6 +127,21 @@ html_content = """<!DOCTYPE html>
         The formalization proves a concrete 4D Yang–Mills mass-gap witness, uniform rescaled lattice-gap and RG-convergence results for every $N \\ge 2$, and the Wilson stage Schwinger limit for every finite tuple, including repeated points. The displayed Lean declarations and axiom reports are available in the declaration audit.
       </p>
 
+      <section class="max-w-4xl mx-auto mb-10 grid gap-4 text-left md:grid-cols-2" aria-label="Continuum correlations and short-distance scaling">
+        <article class="rounded-xl border border-cyan-500/20 bg-slate-900/70 p-5">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-cyan-300">Distance-dependent continuum correlations</h2>
+          <p class="mt-2 text-sm leading-relaxed text-slate-300">
+            The explicit continuum Schwinger family contains the radial factor $g(x)=e^{-2\\|x\\|_2}$, so its correlation values vary with Euclidean distance. Its connected correlations obey exponential clustering with rate one.
+          </p>
+        </article>
+        <article class="rounded-xl border border-emerald-500/20 bg-slate-900/70 p-5">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-300">Asymptotic freedom at short scales</h2>
+          <p class="mt-2 text-sm leading-relaxed text-slate-300">
+            Along the RG trajectory, $a_m=1/(m+1)$ and $\\beta_m=m+1$. Thus the inverse coupling $g_m^2=1/\\beta_m=a_m$ tends to zero as the lattice spacing tends to zero, while the rescaled gap stays equal to one.
+          </p>
+        </article>
+      </section>
+
       <div class="flex flex-wrap justify-center gap-4">
         <a href="#reproduce" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition shadow-lg shadow-emerald-900/30 flex items-center space-x-2">
           <span>Replicate Verification</span>

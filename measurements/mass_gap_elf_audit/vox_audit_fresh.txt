@@ -1,0 +1,7 @@
+measurements/mass_gap_elf_audit/yang-mills-full.elf  elf  entry 0xc1abc0  151608850 byte(s) of code
+  178350 function(s), 36863127 instruction(s)
+  claimed 96% of the image (146059805 of 151608850 bytes)
+
+  178350 function(s) by descent, 1137627 more by fallback sweep
+  covered 100% of the image (151608850 of 151608850 bytes)
+  verdicts  T 13206   B 195443   N 1107328   F 0  (F: 0 from descent, 0 from fallback sweep)
