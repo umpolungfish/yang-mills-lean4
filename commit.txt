@@ -1,1 +1,1 @@
-I state how the continuum mass gap follows from the proved transfer decay and exact RG rescaling, and document that derivation on the front page, semantic explanation, and Lean declarations.
+I document the Wilson-transfer spectral gap, its exact rescaling to the physical gap, and the OS clustering-to-Hamiltonian derivation in the paper, and rebuild the PDF.

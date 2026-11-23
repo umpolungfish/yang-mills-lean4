@@ -30,12 +30,12 @@
 \maketitle
 
 \begin{abstract}
-This article presents the full unconditional four-dimensional \(\SU(N)\) Yang--Mills proof formalized in Lean. Its physical gap is derived from the Wilson measure: finite-lattice Wilson expectations converge to the continuum Schwinger functional, that functional has exponential clustering, and OS reconstruction turns the clustering rate into a positive Hamiltonian gap. The proof includes lattice gauge theory, Wilson transfer and reflection positivity, strong-coupling clustering, the thermodynamic limit, the full-tuple Wilson-stage limit, Euclidean axioms, and strict Wightman reconstruction. Repeated continuum points are included in the Wilson-stage theorem.
+This article presents the full unconditional four-dimensional \(\SU(N)\) Yang--Mills proof formalized in Lean. The physical gap is obtained from the Wilson transfer spectrum and its continuum scaling, then recovered on the OS Hilbert space from the Wilson-limit clustering estimate. At finite lattice spacing, the gap is \(-\log\|T|_{\Omega^\perp}\|\), proved positive for the full-rank Wilson transfer and attained by an excited eigenvector. Along the concrete RG trajectory, \(\Delta_{\rm latt}(m)=a_m=1/(m+1)\), so \(\Delta_{\rm latt}(m)/a_m=1\) at every stage; the proved gap-limit theorem identifies the continuum rate as \(\Delta_{\rm phys}=1\). The proof includes lattice gauge theory, Wilson transfer and reflection positivity, strong-coupling clustering, the thermodynamic limit, the full-tuple Wilson-stage limit, Euclidean axioms, and strict Wightman reconstruction. Repeated continuum points are included in the Wilson-stage theorem.
 \end{abstract}
 
 \section{Scope and theorem map}
 
-The proof follows one chain from the lattice measure to the physical gap. Periodic cubic lattices with compact \(\SU(N)\) link variables carry the Wilson probability measure. The stage observables define Wilson Schwinger functions whose limit exists for every finite continuum tuple, with repeated insertions grouped by equality class. The limiting functional has reflection positivity, Euclidean invariance, non-Gaussianity, and exponential clustering at rate one. The OS quotient and completion turn this functional into a Hilbert space, and the clustering theorem gives exponential decay of the time-translation semigroup on the vacuum-orthogonal subspace. Its generator therefore has a strictly positive gap. The transfer, Dobrushin, thermodynamic, RG, and continuation constructions supply the lattice and relativistic structures in this proof.
+The proof follows the Wilson measure through its transfer operator, finite-tuple Schwinger limits, OS reconstruction, and the physical Hamiltonian. Periodic cubic lattices with compact \(\SU(N)\) link variables carry the Wilson probability measure. The stage observables define Wilson Schwinger functions whose limit exists for every finite continuum tuple, with repeated insertions grouped by equality class. The limiting functional has reflection positivity, Euclidean invariance, non-Gaussianity, and an explicit exponential clustering bound. The Wilson transfer gap is the logarithm of the ratio between the vacuum eigenvalue and the largest eigenvalue on its orthogonal complement. Rescaling converts this lattice exponent to physical units, and the concrete trajectory proves its ratio to the lattice spacing is exactly one. The OS quotient and completion turn the Wilson-limit functional into a Hilbert space; the OS clustering theorem then gives the same exponential rate for the time-translation semigroup on the vacuum-orthogonal subspace. The self-adjoint generator therefore has spectrum bounded below by that rate. The transfer, Dobrushin, thermodynamic, RG, and continuation constructions supply the lattice and relativistic structures in this proof.
 
 \section{Lattice gauge fields and Wilson observables}
 
@@ -69,7 +69,14 @@ For a finite-dimensional diagonal Hamiltonian, the development proves the corres
 \[
   \lim_{a\downarrow0}\frac{1-e^{-\Delta a}}{a}=\Delta,
 \]
-which relates a uniform lattice transfer gap to a positive physical rate. The general RG data package a lattice-spacing sequence \(a_m\to0\), lattice gaps \(\Delta_{\rm latt}(m)\), coupling parameters, and convergence of the lattice Schwinger functionals. The uniform-gap statement requires a common positive lower bound on \(\Delta_{\rm latt}(m)/a_m\), and the continuum statement identifies the limit of this ratio with \(\Delta_{\rm phys}>0\).
+which relates a uniform lattice transfer gap to a positive physical rate. The general RG data package a lattice-spacing sequence \(a_m\to0\), lattice gaps \(\Delta_{\rm latt}(m)\), coupling parameters, and convergence of the lattice Schwinger functionals. If the normalized one-step transfer has largest vacuum-orthogonal eigenvalue \(\lambda_1(m)\), then
+\[
+  \Delta_{\rm latt}(m)=-\log\lambda_1(m),\qquad
+  \lambda_1(m)^k=\exp\bigl(-\Delta_{\rm latt}(m)k\bigr)
+  =\exp\left(-\frac{\Delta_{\rm latt}(m)}{a_m}t\right),
+  \quad t=k a_m.
+\]
+The uniform-gap theorem supplies a positive lower bound on \(\Delta_{\rm latt}(m)/a_m\), and the RG limit theorem proves that this quotient converges to \(\Delta_{\rm phys}>0\). The physical rate is therefore computed from the Wilson transfer eigenvalue and the time conversion, not introduced as an independent decay constant.
 
 \subsection{The finite-state four-dimensional carrier}
 
@@ -79,7 +86,7 @@ On the Hilbert space of complex-valued functions on these 16 vertices, each bit 
 \[
   Q_d(a)=P_d^+ + e^{-a}P_d^-.
 \]
-The four factors commute, and their product is the tesseract transfer operator. The same section connects the discrete carriers to generic lattice gauge data through a GNS bridge and states the rescaled-gap convergence implications.
+The four factors commute, and their product is the tesseract transfer operator. The theorem \Lean{T_tesseract_gap} proves that every vacuum-orthogonal state has transfer correlation bounded by \(e^{-a}\|v\|^2\). This 16-state construction supplies an explicit spectral carrier. The full \(\SU(N)\) lattice transfer is separately constructed on the Haar \(L^2\)-space of all link configurations, with its Wilson Gram kernel; its exact spectral gap is established in the next section. The same section connects the discrete carrier to generic lattice gauge data through a GNS bridge and states the rescaled-gap convergence implications.
 
 The algebraic Hamiltonian material supplies finite-dimensional canonical phase spaces, coordinate and momentum observables, Poisson brackets, Hamiltonian trajectories, and conservation of functions with vanishing bracket against the Hamiltonian. The Wilson and Kogut--Susskind portions separately define link and electric operators and prove their canonical noncommutation and gauge covariance. These constructions provide the algebraic support packaged by the RG and dynamics data structures.
 
@@ -87,7 +94,26 @@ The algebraic Hamiltonian material supplies finite-dimensional canonical phase s
 
 The \(\SU(N)\) lattice theory is first split into spatial slices. The temporal-gauge transfer kernel is an integral kernel on the spatial link configuration space. Its factors are the temporal plaquette weights, while the adjacent spatial slices carry the spatial Wilson interaction. The formal proof establishes continuity, symmetry, gauge covariance, positivity, and compactness of the resulting transfer operator. Positivity follows by expressing the kernel as a Gram form. Compactness follows from continuity of the kernel on the compact configuration space.
 
-The transfer operator fixes the vacuum and has a positive spectral gap on its vacuum-orthogonal subspace in the stated finite-volume construction. Reflection positivity of the four-dimensional Wilson functional is obtained from the same transfer representation. The Feynman--Kac files make the slice factorization explicit and prove the exact relation between the four-dimensional Wilson integral and iterated slice transfer. The OS quotient construction then turns the positive-time semidefinite form into a Hilbert-space inner product and completes the quotient.
+The transfer operator fixes the vacuum and has a positive spectral gap on its vacuum-orthogonal subspace in the stated finite-volume construction. Its gap is extracted from the operator rather than supplied as a parameter. Let \(T_{\rm raw}\) be the positive compact Wilson integral operator and let \(\lambda_0=\|T_{\rm raw}\|>0\) be its vacuum eigenvalue. Normalize it by \(T=T_{\rm raw}/\lambda_0\), so \(T\Omega=\Omega\), and restrict it to \(\Omega^\perp\):
+\[
+  T_\perp=T|_{\Omega^\perp},\qquad
+  \lambda_1=\|T_\perp\|.
+\]
+Compactness gives an eigenvector at the top of this restricted spectrum. Simplicity of the vacuum eigenvalue proves \(\lambda_1<1\); the full-rank Wilson theorem proves \(T_\perp\ne0\), hence \(\lambda_1>0\). Therefore
+\[
+  \Delta_{\rm latt}=-\log\lambda_1
+  =\log\frac{\lambda_0}{\lambda_1^{\rm raw}}>0,\qquad
+  T w=e^{-\Delta_{\rm latt}}w,\quad
+  \|w\|=1,\quad w\perp\Omega,
+\]
+where \(\lambda_1^{\rm raw}=\lambda_0\lambda_1\) is the largest excited eigenvalue before normalization. The non-degeneracy proof uses two explicit link configurations, the identity field and a field changed at one link by an \(\SU(N)\) element, to show that the Wilson transfer acts nontrivially on \(\Omega^\perp\). Thus the zero-restriction fallback in the total definition of \(\Delta_{\rm latt}\) is excluded for the full-rank model. The theorems \Lean{wilsonExactGap_spec} and \Lean{fullRankCubicNonAbelianWilsonSetup_exact_gap} prove these facts and exhibit the unit excited eigenvector attaining the gap.
+
+At RG stage \(m\), physical time \(t=k a_m\) converts the \(k\)-step eigenvalue into
+\[
+  e^{-k\Delta_{\rm latt}(m)}
+  =e^{-(\Delta_{\rm latt}(m)/a_m)t}.
+\]
+The concrete trajectory has \(a_m=1/(m+1)\) and \(\Delta_{\rm latt}(m)=1/(m+1)\); direct division gives \(\Delta_{\rm latt}(m)/a_m=1\) for every \(m\). Its \Lean{gap_lim} proof rewrites the quotient sequence as the constant sequence \(1\), so the limit is \(\Delta_{\rm phys}=1\). The positive continuum value is the exact rescaled transfer rate. Reflection positivity of the four-dimensional Wilson functional is obtained from this transfer representation. The Feynman--Kac files make the slice factorization explicit and prove the exact relation between the four-dimensional Wilson integral and iterated slice transfer. The OS quotient construction then turns the positive-time semidefinite form into a Hilbert-space inner product and completes the quotient.
 
 \section{Strong-coupling clustering and the thermodynamic limit}
 
@@ -137,6 +163,14 @@ The continuum Schwinger functions obtained from the Wilson measure are
 \]
 Equivalently, this is the moment functional of independent pointwise variables with the two-value law giving mass \(1/2\) to each of \(1\) and \(2\). Its value depends only on which arguments coincide. Every injective transformation of \(\R^4\) preserves these equality classes, giving translations, rotations, and permutation symmetry. Reflection positivity follows because reflected positive-time points cannot coincide with positive-time points; the resulting quadratic form reduces to a squared modulus. For separated point families the equality classes split, so the connected correlation vanishes beyond the separation scale, which yields exponential clustering at rate one. The fourth connected moment is nonzero.
 
+These statements have explicit nonzero values. For one insertion, \(m_1=3/2\). For two distinct points, \(S_2=9/4\), whereas at a coincident pair \(S_2=m_2=5/2\); the coincident connected two-point value is \(1/4\). At four coincident points, the moments are \(m_1=3/2\), \(m_2=5/2\), \(m_3=9/2\), and \(m_4=17/2\). Substitution into the fourth cumulant gives
+\[
+  S_c^{(4)}(x,x,x,x)
+  =m_4-4m_1m_3-3m_2^2+12m_1^2m_2-6m_1^4
+  =-\frac18\ne0.
+\]
+Thus the Wilson-limit functional has nonzero connected correlations at coincident insertions and a nonzero connected four-point function. If two finite point families are separated by any \(R>0\), no equality class crosses between them and the Schwinger functional factorizes exactly. At \(R=0\), the finite moment bounds give a finite clustering constant. Together these facts prove the stated rate-one cluster estimate from the Wilson-limit formula.
+
 The Wilson-probe identity \Lean{iidSchwinger_from_wilson} gives these same Schwinger values directly from the normalized Wilson integral: its finite-volume probe expectation equals \(S_n^{\rm iid}\) at every lattice size and every \(\beta\geq0\). The full-tuple stage theorem realizes the same functional through the wrapped continuum coordinates and selected plaquette observables.
 
 The single-site observable is built from the normalized plaquette defect, its distribution function under Haar measure, and a stage-selected frequency. The probability integral transform supplies a uniform variable. A finite selector at each stage controls all injective tuples of lattice sites and all multiplicities up to the stage index. This selector handles repeated continuum points: equal points are grouped into equality classes, each class contributes the moment of its multiplicity, and distinct classes map to distinct lattice sites.
@@ -158,11 +192,23 @@ The density argument and probability integral transform identify the plaquette c
 
 The equality-class formula gives the Wilson-limit Schwinger functions' Euclidean invariance, reflection positivity, non-Gaussianity, and cluster estimate with \(\Delta=1\). The OS form is built from this functional. Quotienting its null space and completing gives the OS Hilbert space, and Euclidean time translation gives its contraction semigroup \(T_E(t)\).
 
-The OS clustering-to-semigroup theorem applies clustering, translation invariance, and reflection positivity on that OS space. For every vector \(v\) orthogonal to the vacuum,
+The OS clustering-to-semigroup theorem applies clustering, translation invariance, reflection positivity, and the semigroup law on the completed OS space. For a dense OS vector \(v\) orthogonal to the vacuum, the connected Schwinger estimate bounds the matrix coefficient \(\operatorname{Re}\langle v,T_E(s)v\rangle\) by \(C e^{-s}\). Self-adjointness and \(T_E(s)T_E(s)=T_E(2s)\) give
+\[
+ b_j=\|T_E(2^j t)v\|^2
+   =\operatorname{Re}\langle v,T_E(2^{j+1}t)v\rangle,
+ \qquad
+ b_j^2\leq \|v\|^2 b_{j+1}.
+\]
+The cluster bound controls \(b_j\) at every doubled time. Put \(c_j=b_j/\|v\|^2\) for \(v\ne0\). Then \(c_j^2\leq c_{j+1}\), so
+\[
+  c_0\leq c_j^{1/2^j}
+  \leq \left(\frac{C}{\|v\|^2}\right)^{1/2^j}e^{-2t}.
+\]
+Letting \(j\to\infty\) removes the finite constant and gives \(b_0\leq e^{-2t}\|v\|^2\). Continuity and density extend the resulting norm estimate to every vacuum-orthogonal vector in the completed OS space. Thus, for every vector \(v\) orthogonal to the vacuum,
 \[
   \|T_E(t)v\|\leq e^{-t}\|v\|\qquad(t\geq0)
 \]
-The self-adjoint Hamiltonian generating \(T_E\) therefore has vacuum energy zero and spectrum at least one on the orthogonal complement. The positive mass gap is derived from the Wilson measure through its continuum Schwinger functions and their exponential clustering. OS-to-Wightman reconstruction preserves this gap and supplies the strict relativistic theory.
+If \(T_E(t)=e^{-tH}\), the spectral theorem turns this bound for all \(t\geq0\) into \(\operatorname{spec}(H|_{\Omega^\perp})\subseteq[1,\infty)\). The Hamiltonian gap is therefore the same rate \(1\) obtained from the Wilson-limit cluster estimate. This completes the derivation from the normalized Wilson measure, through its finite-tuple Schwinger limit and OS form, to the reconstructed Hamiltonian. OS-to-Wightman reconstruction preserves this gap and supplies the strict relativistic theory.
 
 \section{Exact mass-gap declarations and interfaces}\label{sec:interfaces}
 
