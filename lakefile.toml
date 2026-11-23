@@ -60,5 +60,6 @@ globs = [
   "Imscribing.YangMills.IIDOS",
   "Imscribing.YangMills.IIDContinuation",
   "Imscribing.YangMills.TrivialWightman",
-  "Imscribing.YangMills.WilsonObservable"
+  "Imscribing.YangMills.WilsonObservable",
+  "Imscribing.YangMills.ConstMomSchwinger"
 ]

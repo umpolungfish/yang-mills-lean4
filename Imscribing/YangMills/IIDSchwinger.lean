@@ -34,7 +34,7 @@ noncomputable def iidSchwinger (n : ℕ) (xs : Fin n → Space4) : ℂ :=
 
 /-! ### Invariance under injective ambient maps -/
 
-private lemma iidClasses_map {n : ℕ} (xs : Fin n → Space4) (g : Space4 → Space4)
+lemma iidClasses_map {n : ℕ} (xs : Fin n → Space4) (g : Space4 → Space4)
     (hg : Function.Injective g) :
     iidClasses (fun i => g (xs i)) = iidClasses xs := by
   unfold iidClasses
@@ -63,7 +63,7 @@ lemma iidSchwinger_trans {n : ℕ} (a : Space4) (xs : Fin n → Space4) :
 
 /-! ### Property 2: continuous SO(4) invariance -/
 
-private lemma so4_mulVec_injective (R : Matrix.specialOrthogonalGroup (Fin 4) ℝ) :
+lemma so4_mulVec_injective (R : Matrix.specialOrthogonalGroup (Fin 4) ℝ) :
     Function.Injective (fun x : Space4 => Matrix.mulVec R.1 x) := by
   intro x y h
   change Matrix.mulVec R.1 x = Matrix.mulVec R.1 y at h
@@ -229,7 +229,7 @@ private lemma class_natAdd_eq {n m : ℕ} (xs : Fin n → Space4) (ys : Fin m �
   · rintro ⟨l, hl, rfl⟩
     simpa using hl
 
-private lemma iidClasses_append_disjoint {n m : ℕ} (xs : Fin n → Space4) (ys : Fin m → Space4)
+lemma iidClasses_append_disjoint {n m : ℕ} (xs : Fin n → Space4) (ys : Fin m → Space4)
     (hdisj : ∀ i j, xs i ≠ ys j) :
     iidClasses (Fin.append xs ys) =
       (iidClasses xs).image (fun C => C.image (Fin.castAdd m)) ∪
@@ -260,27 +260,30 @@ private lemma iidClasses_append_disjoint {n m : ℕ} (xs : Fin n → Space4) (ys
       refine ⟨Fin.natAdd n a, ?_⟩
       exact class_natAdd_eq xs ys hdisj a
 
+lemma iidClasses_append_img_disjoint {n m : ℕ} (xs : Fin n → Space4) (ys : Fin m → Space4)
+    (hdisj : ∀ i j, xs i ≠ ys j) : Disjoint
+      ((iidClasses xs).image (fun C => C.image (Fin.castAdd m)))
+      ((iidClasses ys).image (fun C => C.image (Fin.natAdd n))) := by
+  rw [Finset.disjoint_left]
+  intro C1 hC1 hC2
+  rcases Finset.mem_image.mp hC1 with ⟨A, hA, rfl⟩
+  rcases Finset.mem_image.mp hC2 with ⟨B, hB, hEq⟩
+  rcases Finset.mem_image.mp hA with ⟨i0, hi0, hiEq⟩
+  have hiMem : i0 ∈ A := by rw [← hiEq]; simp
+  have ht1 : Fin.castAdd m i0 ∈ A.image (Fin.castAdd m) := Finset.mem_image.mpr ⟨i0, hiMem, rfl⟩
+  have ht2 : Fin.castAdd m i0 ∈ B.image (Fin.natAdd n) := by rw [hEq]; exact ht1
+  rcases Finset.mem_image.mp ht2 with ⟨j, hj, heq⟩
+  have hfin : (i0.castAdd m : Fin (n+m)) = Fin.natAdd n j := by simpa using heq.symm
+  have happ := congrArg (Fin.append xs ys) hfin
+  have hxy : xs i0 = ys j := by simpa using happ
+  exact hdisj i0 j hxy
+
 lemma iidSchwinger_append {n m : ℕ} (xs : Fin n → Space4) (ys : Fin m → Space4)
     (hdisj : ∀ i j, xs i ≠ ys j) :
     iidSchwinger (n+m) (Fin.append xs ys) = iidSchwinger n xs * iidSchwinger m ys := by
   unfold iidSchwinger
   rw [iidClasses_append_disjoint xs ys hdisj]
-  have hdisjImg : Disjoint
-      ((iidClasses xs).image (fun C => C.image (Fin.castAdd m)))
-      ((iidClasses ys).image (fun C => C.image (Fin.natAdd n))) := by
-    rw [Finset.disjoint_left]
-    intro C1 hC1 hC2
-    rcases Finset.mem_image.mp hC1 with ⟨A, hA, rfl⟩
-    rcases Finset.mem_image.mp hC2 with ⟨B, hB, hEq⟩
-    rcases Finset.mem_image.mp hA with ⟨i0, hi0, hiEq⟩
-    have hiMem : i0 ∈ A := by rw [← hiEq]; simp
-    have ht1 : Fin.castAdd m i0 ∈ A.image (Fin.castAdd m) := Finset.mem_image.mpr ⟨i0, hiMem, rfl⟩
-    have ht2 : Fin.castAdd m i0 ∈ B.image (Fin.natAdd n) := by rw [hEq]; exact ht1
-    rcases Finset.mem_image.mp ht2 with ⟨j, hj, heq⟩
-    have hfin : (i0.castAdd m : Fin (n+m)) = Fin.natAdd n j := by simpa using heq.symm
-    have happ := congrArg (Fin.append xs ys) hfin
-    have hxy : xs i0 = ys j := by simpa using happ
-    exact hdisj i0 j hxy
+  have hdisjImg := iidClasses_append_img_disjoint xs ys hdisj
   rw [Finset.prod_union hdisjImg]
   congr 1
   · rw [Finset.prod_image]
@@ -368,7 +371,7 @@ namespace YangMills
 
 /-! ### Property 6: permutation symmetry (item 8 of the Clay decomposition) -/
 
-private lemma iidClasses_perm {n : ℕ} (σ : Equiv.Perm (Fin n)) (xs : Fin n → Space4) :
+lemma iidClasses_perm {n : ℕ} (σ : Equiv.Perm (Fin n)) (xs : Fin n → Space4) :
     iidClasses (fun i => xs (σ i)) = (iidClasses xs).image (fun C => C.image σ.symm) := by
   unfold iidClasses
   ext C
