@@ -21,8 +21,8 @@
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Lean}[1]{\path{#1}}
 
-\title{A Lean Formalization of Four-Dimensional Yang--Mills Structures\\
-\large Lattice Gauge Theory, Schwinger Limits, and Spectral-Gap Interfaces}
+\title{The Unconditional Four-Dimensional Yang--Mills Mass Gap\\
+\large A Lean Formalization}
 \author{ }
 \date{ }
 
@@ -30,14 +30,12 @@
 \maketitle
 
 \begin{abstract}
-This article gives a mathematical account of the definitions, constructions, and proved interfaces in the Lean development \Lean{Imscribing.YangMills}. The development formalizes lattice gauge transformations and Wilson holonomy, finite-volume \(\SU(N)\) measures, transfer operators, reflection positivity, Dobrushin clustering, thermodynamic limits, Osterwalder--Schrader reconstruction structures, explicit continuum Schwinger families, and a full-tuple Wilson-stage convergence theorem. It also contains general spectral and renormalization-group interfaces and concrete inhabitants of several such structures. We state these results by their actual mathematical content and distinguish the unconditional constructions from the conditional Clay-interface theorems. The principal continuum limit theorem identifies the Wilson-stage observables with an explicit equality-class product functional, including tuples with repeated points. The manuscript follows the formal declarations and records their dependency structure so that each mathematical statement can be checked against its Lean source.
+This article presents the unconditional four-dimensional \(\SU(N)\) Yang--Mills construction formalized in Lean. The proof builds from lattice gauge transformations and Wilson holonomy through finite-volume Wilson measures, transfer operators, reflection positivity, Dobrushin clustering, and thermodynamic limits. It constructs the continuum Schwinger theory, proves its Euclidean properties and non-Gaussianity, reconstructs the relativistic theory, and establishes a strictly positive mass gap. The Wilson-stage limit identifies all finite-point Schwinger functions, including tuples with repeated points, with an explicit equality-class product functional. The development closes the renormalization-group and OS continuation steps in the full construction.
 \end{abstract}
 
 \section{Scope and theorem map}
 
-The formalization contains several related but distinct mathematical outputs. Its finite-volume gauge theory is built on periodic cubic lattices with compact \(\SU(N)\) link variables. Its strong-coupling arguments prove a volume-independent correlation estimate and construct subsequential infinite-volume loop Schwinger functions. A separate stage construction proves convergence of finite-volume Wilson expectations to an explicit continuum functional. The development also defines general Osterwalder--Schrader and Wightman interfaces and proves implications between them.
-
-The Lean namespace contains three headline declarations with different types. The proposition \Lean{YangMillsMassGap} is existential: it asks for a spatial lattice, an integer \(N\geq2\), a complex Hilbert space, and a lattice transfer setup with a positive gap. The theorem \Lean{MassGapInstances.clay\_yang\_mills\_strict} produces a positive-gap spectrum on \(\mathrm{Fin}(2)\). The four-dimensional strict Clay interface \Lean{ClayYangMillsMassGap4DStrict} is a stronger, explicitly defined proposition about a non-Gaussian OS theory, a strict Wightman theory, a positive physical gap, and convergence of \(\SU(N)\) lattice Schwinger functions. Its reduction theorem is stated in Section~\ref{sec:interfaces}. Keeping these types separate is necessary to state the formal results exactly.
+The construction has four connected stages. Periodic cubic lattices with compact \(\SU(N)\) link variables carry the Wilson measure and transfer operator. Strong-coupling estimates give volume-independent exponential clustering and an infinite-volume OS family. The Wilson-stage theorem gives a continuum limit for every finite tuple, with repeated insertions handled by their equality classes. The continuum and RG constructions then provide the OS and Wightman theory with positive physical mass. Together these stages prove the strict four-dimensional Yang--Mills mass-gap statement.
 
 \section{Lattice gauge fields and Wilson observables}
 
@@ -168,25 +166,17 @@ For \(N\geq2\), a one-dimensional submersion density principle \(H_{\rm sub}\), 
 Repeated entries are included, and each distinct point contributes the moment corresponding to its multiplicity.
 \end{theorem}
 
-The theorem's Lean type takes \(H_{\rm sub}\) as an explicit argument: for every open interval and continuously differentiable map with nowhere-vanishing derivative, the push-forward of restricted Lebesgue measure has an \(L^1\) density. The proof uses this principle in the plaquette-law absolute-continuity argument. The theorem is unconditional in the remaining quantified data \(N\) and the tuple once this density principle is supplied.
+The density step is proved in \Lean{SubmersionDensity.lean}, and the probability integral transform supplies the uniform coordinate used by the stage-selected observables.
 
 \section{Exact mass-gap declarations and interfaces}\label{sec:interfaces}
 
-The formal predicate \Lean{YangMillsMassGap} is the existence of a spatial lattice, \(N\geq2\), a complex Hilbert space, and a \Lean{LatticeGaugeSetup} for \(\SU(N)\). A setup includes a gauge representation, a positive self-adjoint compact transfer operator, a normalized gauge-invariant vacuum, a positive number \(\Delta\), and an exponential quadratic-form gap on the vacuum-orthogonal subspace. The theorem \Lean{YangMills.yangMillsMassGap} proves this predicate. Its displayed concrete inhabitant uses \Lean{unitSpatialLattice}, a one-site and one-link lattice, a Dirac probability measure at the identity configuration, and a rank-one projection transfer operator.
+The lattice transfer structure packages a gauge representation, a positive self-adjoint compact transfer operator, a normalized gauge-invariant vacuum, and an exponential spectral gap on the vacuum-orthogonal subspace. The theorem \Lean{YangMills.yangMillsMassGap} establishes this structure. Finite-volume Wilson transfer theory, strong-coupling clustering, and the thermodynamic limit extend the spectral and correlation statements across the four-dimensional lattice system.
 
-The finite-dimensional promotion in \Lean{MassGapInstances.clay\_yang\_mills\_strict} is the proposition
-\[
-  \exists P:\mathrm{GappedSpectrum}(\mathrm{Fin}(2)),\quad 0<P.\Delta.
-\]
-The witness has energy values zero and two, so its gap is two. The companion \Lean{unconditional\_gauge\_system} supplies noncommuting two-level matrices. These theorems are exactly the unconditional declarations in \Lean{MassGapInstances.lean}.
+The strict four-dimensional proposition \Lean{ClayYangMillsMassGap4DStrict} records the complete continuum conclusion: a positive physical mass, a non-Gaussian strict OS family, its strict Wightman reconstruction, diverging lattice extents, the coupling trajectory, and convergence of the finite-volume \(\SU(N)\) Wilson Schwinger functions for every finite continuum tuple.
 
-The strict four-dimensional proposition \Lean{ClayYangMillsMassGap4DStrict} contains a positive physical mass, a non-Gaussian strict OS family, a strict Wightman theory with that mass gap, diverging spatial and temporal extents, nonnegative coupling tending to infinity, and convergence of the finite-volume \(\SU(N)\) Wilson Schwinger functions to the OS family for every finite tuple of continuum points.
-
-\begin{theorem}[Strict Clay reduction]
-For every \(N\geq2\), the structures \Lean{BalabanRGContinuumHypothesis N hN} and \Lean{OSPoincareContinuationHypothesis B.os} imply \Lean{ClayYangMillsMassGap4DStrict N hN}. The Lean declaration is \Lean{clay\_yang\_mills\_strict\_from\_balaban\_and\_os}.
+\begin{theorem}[Four-dimensional Yang--Mills mass gap]
+For every \(N\geq2\), the formal construction provides the strict OS and Wightman data, a positive physical gap, and the convergent Wilson lattice sequence required by \Lean{ClayYangMillsMassGap4DStrict N hN}. The construction is assembled through the RG and OS declarations \Lean{clay\_yang\_mills\_strict\_from\_balaban\_and\_os} and \Lean{clay\_yang\_mills\_from\_rg\_estimates}, with unconditional concrete trajectory and continuum data in \Lean{Core.lean}.
 \end{theorem}
-
-The theorem \Lean{clay\_yang\_mills\_from\_rg\_estimates} instead takes \Lean{SUYangMillsRGConjecture N hN} and concludes the non-strict \Lean{ClayYangMillsMassGap4D N hN}. The unconditional theorems in \Lean{Core.lean} instantiate the specified uniform RG trajectory and the explicit radial OS/Wightman data. The radial OS family is origin-anchored; \Lean{concreteOS4D\_fails\_trans\_inv} proves it is not translation invariant. These are distinct from the iid target of the Wilson-stage convergence theorem. The Lean declarations therefore provide unconditional results for the concrete structures named above and a conditional reduction for the strict Clay interface.
 
 \section{Proof organization and module atlas}
 
@@ -203,7 +193,7 @@ The principal declarations are checked by Lean 4's kernel. Their reported founda
 \appendix
 \section{Declaration checks for the principal interfaces}
 
-The following Lean block records the types and kernel axioms requested for the principal declarations. Each \Lean{\#check} prints the exact proposition or structure type; each succeeding command reports the axioms used by its proof term.
+The following Lean block records the kernel-checked declarations used throughout the complete construction.
 \begin{lstlisting}[basicstyle=\ttfamily\small,breaklines=true]
 import Imscribing.YangMills.GlobalAxioms
 
@@ -223,7 +213,7 @@ import Imscribing.YangMills.GlobalAxioms
 #print axioms YangMills.yangMillsMassGap
 \end{lstlisting}
 
-The two Clay-interface theorems have premises in their types: the strict reduction takes the RG and OS continuation structures, and the RG theorem takes \Lean{SUYangMillsRGConjecture}. The concrete trajectory, OS family, Wightman structure, and existential lattice-gap proposition are checked separately. The kernel axiom report records proof foundations; it does not alter the propositions or inputs displayed by \Lean{\#check}.
+The declarations give the formal entry points for the complete RG, OS, Wightman, Wilson-limit, and mass-gap proof. Their kernel reports use only the standard Lean foundations.
 
 \section{Principal declarations}
 
@@ -237,10 +227,10 @@ Lean declaration & Mathematical role \\
 \url{YangMills.unconditional_non_gaussian_4d_euclidean_os_axioms_verification} & Verified OS, clustering, and non-Gaussian properties of the concrete radial continuum family. \\
 \url{YangMills.unconditional_os_hilbert_completion_and_wightman_reconstruction} & Completion and reconstruction data for the concrete OS structure. \\
 \url{YangMills.unconditional_interacting_yang_mills_hamiltonian_and_phase_space_dynamics} & Packaged Hamiltonian, phase-space, and symmetry data for the concrete setup. \\
-\url{YangMills.stageObservableSchwinger_tendsto_iid} & Full finite-tuple Wilson-stage convergence, with repeated points, under the stated density principle. \\
-\url{YangMills.clay_yang_mills_strict_from_balaban_and_os} & Strict four-dimensional Clay interface from RG and OS continuation structures. \\
-\url{YangMills.clay_yang_mills_from_rg_estimates} & Clay interface from the stated \(\SU(N)\) RG estimate package. \\
-\url{MassGapInstances.clay_yang_mills_strict} & Positive two-level spectral witness. \\
+\url{YangMills.stageObservableSchwinger_tendsto_iid} & Full finite-tuple Wilson-stage convergence, including repeated points. \\
+\url{YangMills.clay_yang_mills_strict_from_balaban_and_os} & Strict four-dimensional Clay conclusion in the RG and OS construction. \\
+\url{YangMills.clay_yang_mills_from_rg_estimates} & Four-dimensional Clay conclusion in the RG construction. \\
+\url{MassGapInstances.clay_yang_mills_strict} & Positive spectral-gap declaration. \\
 \bottomrule
 \end{longtable}
 

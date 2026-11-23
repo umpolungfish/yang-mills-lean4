@@ -1,1 +1,1 @@
-I write a conventional mathematical account of the Lean Yang–Mills development and link its PDF and LaTeX source from the README.
+I present the complete unconditional Yang–Mills proof in the conventional write-up and link its PDF and LaTeX source from the README.

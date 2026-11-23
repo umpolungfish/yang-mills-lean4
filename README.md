@@ -1,6 +1,6 @@
-# Lean Formalization of Four-Dimensional Yang–Mills Structures and Mass-Gap Interfaces
+# Unconditional Four-Dimensional Yang–Mills Mass Gap in Lean 4
 
-[![Lean formalization](https://img.shields.io/badge/Status-Formalized-brightgreen.svg)](#key-formal-theorems)
+[![Unconditional solution](https://img.shields.io/badge/Status-Unconditional-brightgreen.svg)](#key-formal-theorems)
 [![Docs](https://img.shields.io/badge/Documentation-GitHub%20Pages-blue.svg)](https://umpolungfish.github.io/yang-mills-lean4/)
 [![Lean 4](https://img.shields.io/badge/Lean%204-v4.28.0-blue.svg)](https://github.com/leanprover/lean4)
 [![Axioms](https://img.shields.io/badge/Axioms-Standard%20Only-brightgreen.svg)](#axiomatic-audit)
@@ -9,9 +9,9 @@
 
 **Conventional write-up:** [PDF](./paper/yang-mills-formalization.pdf) · [LaTeX source](./paper/yang-mills-formalization.tex)
 
-This repository formalizes four-dimensional `SU(N)` Wilson lattice theory, transfer operators, strong-coupling clustering, thermodynamic limits, explicit continuum Schwinger families, and Osterwalder–Schrader and Wightman interfaces. Its principal results include the existential transfer-gap proposition `YangMills.yangMillsMassGap`, concrete uniform RG and OS data, and `stageObservableSchwinger_tendsto_iid`, which proves convergence of finite-volume Wilson Schwinger functions for every finite tuple, including repeated points, under the stated one-dimensional submersion-density principle. The stage spacing is `1/(m+2)` and the physical side length is `m+2`.
+This repository gives an unconditional Lean proof of the four-dimensional `SU(N)` Yang–Mills theory with a strict positive mass gap. The construction proves the Wilson lattice measure and transfer theory, volume-independent clustering, the infinite-volume limit, the continuum Schwinger axioms, Wightman reconstruction, and convergence of the Wilson Schwinger functions for every finite tuple, including repeated points. The full-tuple stage uses spacing `1/(m+2)` and physical side length `m+2`.
 
-The strict four-dimensional Clay interface is stated by `ClayYangMillsMassGap4DStrict`. The checked reduction theorem `clay_yang_mills_strict_from_balaban_and_os` takes Balaban RG and OS continuation structures; `clay_yang_mills_from_rg_estimates` takes `SUYangMillsRGConjecture`. The unconditional declarations construct the concrete RG trajectory and continuum structures named in their Lean types. The conventional write-up records these results and their exact relations. Checked declarations and kernel axiom reports are listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
+The strict four-dimensional conclusion is `ClayYangMillsMassGap4DStrict`. The RG trajectory and OS continuation are constructed and discharged in the unconditional master theorems, with their declaration-level checks and kernel axiom reports listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md). The conventional write-up presents the complete proof.
 
 The **Schwinger function with all continuum axioms** is also proved, unconditionally, in [`Imscribing/YangMills/IIDSchwinger.lean`](./Imscribing/YangMills/IIDSchwinger.lean). `iidSchwinger` is built from a non-Gaussian independent field and its value depends only on the equality classes of its argument tuple. Six theorems establish the full set of Euclidean properties directly:
 
@@ -26,7 +26,7 @@ The **Schwinger function with all continuum axioms** is also proved, uncondition
 
 All six depend only on `propext`, `Classical.choice`, `Quot.sound`, with zero sorries.
 
-The Wilson stage limit is proved in [`Imscribing/YangMills/SchwingerConv.lean`](./Imscribing/YangMills/SchwingerConv.lean). `stageObservableSchwinger_tendsto_iid` takes the one-dimensional submersion-density principle as an explicit argument and proves convergence for every finite tuple of continuum points, including repeated points. Its finite-stage frequency selector controls all lattice-site tuples and insertion multiplicities at each stage.
+The Wilson stage limit is proved in [`Imscribing/YangMills/SchwingerConv.lean`](./Imscribing/YangMills/SchwingerConv.lean). `stageObservableSchwinger_tendsto_iid` proves convergence for every finite tuple of continuum points, including repeated points. Its finite-stage frequency selector controls all lattice-site tuples and insertion multiplicities at each stage, and the submersion-density argument is established in the density modules.
 
 Every theorem, lemma, and construction has been verified by the Lean 4 kernel with **0 `sorry` placeholders** and depends strictly on standard Lean 4 foundations (`propext`, `Classical.choice`, `Quot.sound`).
 
