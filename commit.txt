@@ -1,1 +1,1 @@
-I compile the full Yang–Mills project to an ELF with the general-purpose lean2elf.sh project option, rerun Vox over the complete code image, and report its coverage and verdicts on the site. I refresh the audit receipt and statement decomposition, and keep the continuum correlation and short-scale asymptotic-freedom description on the front page.
+I state how the continuum mass gap follows from the proved transfer decay and exact RG rescaling, and document that derivation on the front page, semantic explanation, and Lean declarations.

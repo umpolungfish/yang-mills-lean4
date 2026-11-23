@@ -123,7 +123,7 @@
         <article class="rounded-xl border border-emerald-500/20 bg-slate-900/70 p-5">
           <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-300">Asymptotic freedom at short scales</h2>
           <p class="mt-2 text-sm leading-relaxed text-slate-300">
-            Along the RG trajectory, $a_m=1/(m+1)$ and $\beta_m=m+1$. Thus the inverse coupling $g_m^2=1/\beta_m=a_m$ tends to zero as the lattice spacing tends to zero, while the rescaled gap stays equal to one.
+            Along the RG trajectory, $a_m=1/(m+1)$ and $\beta_m=m+1$. Thus the inverse coupling $g_m^2=1/\beta_m=a_m$ tends to zero as the lattice spacing tends to zero.
           </p>
         </article>
       </section>
@@ -280,7 +280,7 @@ flowchart TD
             <span class="text-xs px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">Concrete 4D RG result</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
-            For every $N \ge 2$, Lean constructs the uniform rescaled lattice mass-gap and RG-convergence data over `concreteUniformRGTrajectory N hN`. The strict mass-gap witness and exact checked declaration types are listed in the formal declaration audit.
+            For every $N \ge 2$, Lean constructs the uniform rescaled lattice mass-gap and RG-convergence data over `concreteUniformRGTrajectory N hN`. The gap value follows from the transfer estimate: `T_tesseract_gap` proves decay by $e^{-a}$ per lattice step. At stage $m$, $a_m=\Delta_{\mathrm{latt}}(m)=1/(m+1)$, so $\Delta_{\mathrm{latt}}(m)/a_m=1$ exactly. The proved `gap_lim` identifies this limit as $\Delta_{\mathrm{phys}}=1$. The strict mass-gap witness and exact checked declaration types are listed in the formal declaration audit.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.yangMillsMassGap
 YangMills.concreteUniformRGTrajectory

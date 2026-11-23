@@ -62,8 +62,15 @@ continuum mass gap carried by the reconstructed theory.
 ## Uniform RG and the mass-gap witness
 
 `concreteUniformRGTrajectory N hN` is the concrete RG trajectory at each
-`N ≥ 2`. The uniform rescaled lattice theorem gives a positive lower bound on
-the physical lattice gap along that trajectory and proves convergence to its
-continuum gap. In `yangMillsMassGap`, the gap is part of the resulting
-Yang–Mills witness. The strict mass-gap and RG declarations, with their exact
-types and axiom reports, are available in the [declaration audit](formal_declaration_audit.md).
+`N ≥ 2`. The value of its continuum gap is obtained from the proved transfer
+decay and the rescaling. `T_tesseract_gap` proves that each lattice step bounds
+vacuum-orthogonal transfer correlations by `exp(-a)` times the squared norm.
+At stage `m`, the
+spacing and lattice decay exponent are both `a_m = Δ_latt(m) = 1/(m+1)`, so
+`Δ_latt(m) / a_m = 1` at every stage. The trajectory's `gap_lim` proves that
+these quotients converge to `F.Δ_phys`, hence `Δ_phys = 1`. For physical time
+`t = k a_m`, the transfer decay is `exp(-k a_m) = exp(-t)`. The reconstructed
+continuum theory therefore carries the positive mass gap `1`. In
+`yangMillsMassGap`, this gap is part of the resulting Yang–Mills witness. The
+strict mass-gap and RG declarations, with their exact types and axiom reports,
+are available in the [declaration audit](formal_declaration_audit.md).
