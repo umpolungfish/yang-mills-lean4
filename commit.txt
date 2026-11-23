@@ -1,1 +1,1 @@
-I build the Yang–Mills project as an ELF, audit the full image with Vox, and add its distance-dependent continuum correlations and short-scale asymptotic freedom to the front page.
+I compile the full Yang–Mills project to an ELF with the general-purpose lean2elf.sh project option, rerun Vox over the complete code image, and report its coverage and verdicts on the site. I refresh the audit receipt and statement decomposition, and keep the continuum correlation and short-scale asymptotic-freedom description on the front page.
