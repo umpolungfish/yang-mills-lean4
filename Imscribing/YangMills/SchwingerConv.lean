@@ -149,32 +149,34 @@ theorem plaquetteCDF_bounds (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt] (β : ℝ)
   exact ⟨ProbabilityTheory.cdf_nonneg _ _, ProbabilityTheory.cdf_le_one _ _⟩
 
 /-- Wrap the integer lattice coordinate `⌊x/a⌋` into the periodic direction `Fin L`. -/
-noncomputable def stateWrap (L : ℕ) [NeZero L] (a x : ℝ) : Fin L :=
+noncomputable def stateWrap (L : ℕ) [NeZero L] (a : ℝ) (ha : 0 < a)
+    (x : ℝ) : Fin L :=
   Fin.ofNat L (Int.natMod (⌊x / a⌋) L)
 
 /-- Map four real coordinates to the periodic spacetime lattice at spacing `a`. -/
-noncomputable def stageSiteMap (Ls Lt : ℕ) [NeZero Ls] [NeZero Lt] (a : ℝ) (x : Space4) :
+noncomputable def stageSiteMap (Ls Lt : ℕ) [NeZero Ls] [NeZero Lt]
+    (a : ℝ) (ha : 0 < a) (x : Space4) :
     (cubicTorus4 Ls Lt).Site :=
-  (stateWrap Lt a (x 0), stateWrap Ls a (x 1),
-    stateWrap Ls a (x 2), stateWrap Ls a (x 3))
+  (stateWrap Lt a ha (x 0), stateWrap Ls a ha (x 1),
+    stateWrap Ls a ha (x 2), stateWrap Ls a ha (x 3))
 
 /-- The observable: O_m(x, U) = ψ_{K_m}(F_m(X_{p(v_m(x))}(U))). -/
 noncomputable def stageObservable (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
     [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (x : Space4) (K : ℕ)
+    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (ha : 0 < a) (x : Space4) (K : ℕ)
     (U : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ)) : ℝ := by
-  let v := stageSiteMap Ls Lt a x
+  let v := stageSiteMap Ls Lt a ha x
   exact fourierOrientation K
     (plaquetteCDF Ls Lt N β hβ v (plaquetteDefect Ls Lt N v U))
 
 theorem stageObservable_range (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
     [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (x : Space4) (K : ℕ)
+    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (ha : 0 < a) (x : Space4) (K : ℕ)
     (U : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ)) :
-    stageObservable Ls Lt N β hβ a x K U = 1 ∨
-      stageObservable Ls Lt N β hβ a x K U = 2 := by
+    stageObservable Ls Lt N β hβ a ha x K U = 1 ∨
+      stageObservable Ls Lt N β hβ a ha x K U = 2 := by
   exact fourierOrientation_range K _
 
 theorem measurable_fourierOrientation (K : ℕ) : Measurable (fourierOrientation K) := by
@@ -183,11 +185,11 @@ theorem measurable_fourierOrientation (K : ℕ) : Measurable (fourierOrientation
 theorem measurable_stageObservable (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
     [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (x : Space4) (K : ℕ) :
+    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (ha : 0 < a) (x : Space4) (K : ℕ) :
     Measurable (fun U : GaugeField (cubicTorus4 Ls Lt)
       (Matrix.specialUnitaryGroup (Fin N) ℂ) =>
-        stageObservable Ls Lt N β hβ a x K U) := by
-  let v := stageSiteMap Ls Lt a x
+        stageObservable Ls Lt N β hβ a ha x K U) := by
+  let v := stageSiteMap Ls Lt a ha x
   let ν := (wilsonMeasure Ls Lt N β).map
     (fun U => plaquetteDefect Ls Lt N v U)
   have hcdf : Measurable (ProbabilityTheory.cdf ν) :=
