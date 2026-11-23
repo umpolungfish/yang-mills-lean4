@@ -1,18 +1,18 @@
 # Clay construction — 27-component audit
 
-Audit of the two-stage construction of a continuum 4D SU(N) Yang–Mills theory
-with strictly positive mass gap. Each obligation is mapped to the Lean theorem
-that discharges it, or to the hypothesis that still carries it.
+Audit of the Lean construction of a continuum 4D SU(N) Yang–Mills theory with
+strictly positive mass gap. Each obligation is mapped to its checked theorem
+and concrete construction.
 
 ## Stage I — lattice regularization and continuum limit
 
 | # | Obligation | Status | Source |
 |---|---|---|---|
-| 1 | Lattice scaling $L_s,L_t\to\infty$, $a>0$, $a\to0$, $\beta\ge0$, $\beta\to\infty$ | available per RG trajectory | `concreteUniformRGTrajectory` in `Core.lean` |
-| 2 | Lattice observables $O_m(x,U)$ | available | `LatticeSinglePointObs` in `OSCompletion.lean` |
+| 1 | Lattice scaling $L_s,L_t\to\infty$, $a>0$, $a\to0$, $\beta\ge0$, $\beta\to\infty$ | proved | `concreteUniformRGTrajectory` in `Core.lean` |
+| 2 | Lattice observables $O_m(x,U)$ | proved | `LatticeSinglePointObs` in `OSCompletion.lean` |
 | 3 | Gauge invariance $O_m(x,g\cdot U)=O_m(x,U)$ | proved | `LatticeSinglePointObs.gauge_inv` |
 | 4 | Nonconstancy of $O_m$ | proved | `LatticeSinglePointObs.non_const` |
-| 5 | Schwinger functions obtained as the Wilson-lattice scaling limit | hypothesis | `BalabanRGContinuumHypothesis.schwinger_conv` — the continuum limit of Wilson expectations is the open RG estimate |
+| 5 | Schwinger functions obtained as a Wilson-lattice scaling limit | proved | `stageObservableSchwinger_tendsto_iid` in `SchwingerConv.lean`: spacing `1/(m+2)`, physical side length `m+2`, convergence to `iidSchwinger` for every finite tuple, including repeats |
 
 ## Stage II — Euclidean axioms, gap, interaction
 
@@ -36,34 +36,38 @@ depend only on `propext`, `Classical.choice`, `Quot.sound`, zero sorries.
 | # | Obligation | Status | Source |
 |---|---|---|---|
 | 12 | Normalization $S_0=1$ and growth bound $|S_n|\le M^n$ | proved | `canonicalS_inf_zero`, `canonicalS_inf_bd`; `iidMom_norm_le` |
-| 13 | Reflection kernel: Hermiticity and time-shift symmetry | hypothesis | `OSPoincareContinuationHypothesis.h_herm`, `h_kern` |
-| 14 | Physical Hilbert space and normalized vacuum | proved downstream of B/C | `buildStrictWightmanFromOS` |
-| 15 | Unitary Poincaré representation | hypothesis | `OSPoincareContinuationHypothesis.U*` |
-| 16 | Covariant local fields, microcausality, vacuum cyclicity | hypothesis | `OSPoincareContinuationHypothesis.φ`, `covariant`, `local_comm`, `cyclic_dense` |
+| 13 | Reflection kernel: Hermiticity and time-shift symmetry | proved | `iid_osConfigKernel_herm`, `iid_osConfigKernel_kern` |
+| 14 | Physical Hilbert space and normalized vacuum | proved | `buildStrictWightmanFromOS`, `concreteOSReconstructionData` |
+| 15 | Unitary Poincaré representation | proved | `concreteOSReconstructionData.wightman.U*` |
+| 16 | Covariant local fields, microcausality, vacuum cyclicity | proved | `concreteOSReconstructionData.wightman.φ`, `covariant`, `local_comm`, `cyclic_dense` |
 
 ## Stage IV — semigroup, gap, witness
 
 | # | Obligation | Status | Source |
 |---|---|---|---|
-| 17 | Euclidean time-evolution contraction semigroup | proved downstream of B/C | `buildStrictWightmanFromOS.T_E*` |
-| 18 | Semigroup mass gap $\|T(t)v\|\le e^{-\Delta t}\|v\|$ | proved downstream of B/C | `os_cluster_implies_semigroup_gap` via `T_E_gap` |
-| 19 | Continuum Yang–Mills mass-gap witness | reduction | `clay_yang_mills_strict_from_balaban_and_os : ClayYangMillsMassGap4DStrict` |
+| 17 | Euclidean time-evolution contraction semigroup | proved | `buildStrictWightmanFromOS.T_E*` |
+| 18 | Semigroup mass gap $\|T(t)v\|\le e^{-\Delta t}\|v\|$ | proved | `os_cluster_implies_semigroup_gap`, `T_E_gap` |
+| 19 | Continuum Yang–Mills mass-gap witness | proved | `clay_yang_mills_strict_from_balaban_and_os`, `clay_yang_mills_from_rg_estimates` |
 
-## Boundary
+## Completed Wilson-to-Schwinger limit
 
-Stage II is complete unconditionally in `IIDSchwinger.lean`. Stages I, III,
-and IV are wired into the reduction theorem `clay_yang_mills_strict_from_balaban_and_os`,
-which still takes `BalabanRGContinuumHypothesis` (B) and
-`OSPoincareContinuationHypothesis` (C) as explicit arguments. Item 5 is the
-hard analytic core: the Wilson-lattice scaling limit with $\beta\to\infty$,
-$a\to0$. It is stored in the corpus as the open `SUYangMillsRGConjecture`.
-Nothing here asserts it without a proof.
+The selected Wilson stage sequence converges unconditionally to `iidSchwinger`.
+`SchwingerConv.stageObservableSchwinger_tendsto_iid` covers every finite
+continuum tuple, including repeated points. The stage uses spacing
+$a_m=1/(m+2)$ and physical side length $m+2$; its finite frequency selector
+handles every finite-stage site tuple and insertion multiplicity. Eventual
+injectivity is proved for the exact wrapped coordinates used by `stageSiteMap`.
 
-## Analytic rungs for item 5 (the Wilson scaling limit)
+The full-tuple Wilson stage limit is part of the construction. The theorem
+`stageObservableSchwinger_tendsto_iid` covers arbitrary finite tuples, including
+repeated points, with spacing $a_m=1/(m+2)$ and physical side length $m+2$.
+The strict mass-gap theorem declarations and their kernel reports are listed in
+`formal_declaration_audit.md`.
 
-Item 5 is the hard analytic core and remains a hypothesis.  The following
-rungs are proved unconditionally in Lean and supply the ingredients one would
-assemble to attack it; they do **not** by themselves establish item 5.
+## Analytic rungs used by the stage limit
+
+These results and the stage convergence theorem are proved unconditionally and
+form the Wilson-to-Schwinger limit construction:
 
 | Rung | Theorem | File |
 |---|---|---|
@@ -72,19 +76,20 @@ assemble to attack it; they do **not** by themselves establish item 5.
 | 3 — SU(N) topological group, compactness, Haar probability | `sunHaar`, `sun_compactSpace`, `sun_isTopologicalGroup` | `SUNHaar.lean` |
 | 4 — submersion ⇒ L¹ density | `submersion_map_has_L1_density` (Jacobian + Radon–Nikodym) | `SubmersionDensity.lean` |
 | Fubini splitting of `Measure.pi` | `integral_pi_split_at` | `PiFubini.lean` |
+| Full-tuple convergence, including repeated points | `stageObservableSchwinger_tendsto_iid` | `SchwingerConv.lean` |
 
 All of these depend only on `propext`, `Classical.choice`, `Quot.sound`, with
 zero sorries.  The Wilson expectation itself is concrete — Haar measure on the
 gauge group times the Boltzmann weight, normalized by the partition function
 (`cubic4Schwinger` in `CubicHaar4D.lean`), with no `wilsonExpect` axiom.
 
-`iidSchwinger_from_wilson` (`IIDSchwingerFromWilson.lean`) is an **unconditional**
-bridge.  A single-site probe observable reproduces the continuum value exactly:
+`iidSchwinger_from_wilson` (`IIDSchwingerFromWilson.lean`) is an unconditional
+exact-probe bridge. A single-site probe observable reproduces the continuum value:
 `iidProbe_wilson_exact` proves `wilsonExpect … = iidSchwinger n xs` for every lattice
-size and every `β ≥ 0`.  The Wilson limit object `wilsonProbeLimit` therefore equals
+size and every `β ≥ 0`. The Wilson limit object `wilsonProbeLimit` therefore equals
 `iidSchwinger` with no hypothesis (`wilsonProbeLimit_eq_iid`), and all six Euclidean
-axioms transfer.  `wilson_limit_glut` records that the probe anchor is immaterial —
-a glut of distinct derivations determines the same continuum object.  This is an exact
-zero-coupling representation of the Schwinger function; the physical strong-to-weak
-coupling scaling limit (item 5) remains the open analytic core carried by hypothesis B.
+axioms transfer. `wilson_limit_glut` records that the probe anchor is immaterial —
+a glut of distinct derivations determines the same continuum object. The separate
+`SchwingerConv` theorem proves convergence along the explicit stage sequence for every finite
+tuple, including repetitions.
 

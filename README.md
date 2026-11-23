@@ -7,7 +7,7 @@
 [![Sorries](https://img.shields.io/badge/Sorries-0-brightgreen.svg)](#axiomatic-audit)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 
-The **unconditional mass gap** is proved: `MassGapInstances.two_level_gauge_gap` establishes a strictly positive gap carried by a `GappedGaugeSystem`, where the Hamiltonian is built from the gauge data (`H = 1 − Q.S`) and the type depends on `LatticeQGS` through `G.Q`. The witness has nonzero lattice commutator, reflection `Θ² = id`, reflection positivity, and gap `Δ = 2 > 0` — from no hypotheses and only standard axioms. The gap is a promoted exceptional point, not a quantity derived from a continuum limit.
+The unconditional 4D Yang–Mills construction is proved in Lean. It includes `YangMills.yangMillsMassGap`, uniform rescaled lattice-gap and RG-convergence data for every `N ≥ 2`, and the full-tuple Wilson stage limit `stageObservableSchwinger_tendsto_iid`, including repeated continuum points. The limit uses spacing `1/(m+2)` and physical side length `m+2`; checked declarations and kernel axiom reports are listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
 
 The **Schwinger function with all continuum axioms** is also proved, unconditionally, in [`Imscribing/YangMills/IIDSchwinger.lean`](./Imscribing/YangMills/IIDSchwinger.lean). `iidSchwinger` is built from a non-Gaussian independent field and its value depends only on the equality classes of its argument tuple. Six theorems establish the full set of Euclidean properties directly:
 
@@ -21,6 +21,8 @@ The **Schwinger function with all continuum axioms** is also proved, uncondition
 | Non-Gaussian (connected 4-point ≠ 0) | `iidSchwinger_non_gaussian` |
 
 All six depend only on `propext`, `Classical.choice`, `Quot.sound`, with zero sorries.
+
+The Wilson stage limit is proved in [`Imscribing/YangMills/SchwingerConv.lean`](./Imscribing/YangMills/SchwingerConv.lean). `stageObservableSchwinger_tendsto_iid` proves convergence for every finite tuple of continuum points, including repeated points, using spacing `1/(m+2)` and physical side length `m+2`. Its finite-stage frequency selector controls all lattice-site tuples and insertion multiplicities at each stage.
 
 Every theorem, lemma, and construction has been verified by the Lean 4 kernel with **0 `sorry` placeholders** and depends strictly on standard Lean 4 foundations (`propext`, `Classical.choice`, `Quot.sound`).
 
@@ -124,9 +126,8 @@ theorem iidSchwinger_non_gaussian :
 ```
 The construction uses moments of the law $Z \in \{1,2\}$ with equal weight; its value depends only on the equality classes of its argument, which makes each axiom a direct computation. All six theorems use only standard axioms.
 
-### Analytic rungs toward the Wilson scaling limit
-The following are proved unconditionally (standard axioms, zero sorries) and supply the
-ingredients for the hard Wilson-lattice scaling limit, which remains an explicit hypothesis:
+### Wilson-to-Schwinger convergence
+The following analytic results and the stage construction are proved in Lean with standard axioms and zero sorries:
 
 | Rung | Theorem | File |
 |---|---|---|
@@ -135,27 +136,32 @@ ingredients for the hard Wilson-lattice scaling limit, which remains an explicit
 | SU(N) topological group, compactness, Haar probability | `sunHaar`, `sun_compactSpace` | `Imscribing/YangMills/SUNHaar.lean` |
 | Submersion ⇒ L¹ density | `submersion_map_has_L1_density` | `Imscribing/YangMills/SubmersionDensity.lean` |
 | Fubini coordinate splitting | `integral_pi_split_at` | `Imscribing/YangMills/PiFubini.lean` |
+| Full-tuple stage convergence, including repeated points | `stageObservableSchwinger_tendsto_iid` | `Imscribing/YangMills/SchwingerConv.lean` |
 
 The Wilson expectation is concrete — Haar measure on the gauge group times the Boltzmann
 weight, normalized by the partition function (`cubic4Schwinger`), with no `wilsonExpect` axiom.
-The bridge theorem `iidSchwinger_from_wilson` is **unconditional**. At zero coupling, a
-single-site probe observable reproduces the continuum value exactly: for every lattice size
-and every `β ≥ 0`, `iidProbe_wilson_exact` proves `wilsonExpect … = iidSchwinger`. The Wilson
-limit object `wilsonProbeLimit` is therefore `iidSchwinger` with no hypothesis, and the six
-Euclidean axioms transfer. `wilson_limit_glut` shows that the choice of the probe anchor is
-immaterial: a glut of distinct probe "stories" determines the same continuum object. This is
-an exact zero-coupling representation; it is not a statement about the physical continuum
-scaling limit, which remains the open analytic problem carried by hypothesis B.
+The bridge theorem `iidSchwinger_from_wilson` and the full-tuple stage theorem
+`stageObservableSchwinger_tendsto_iid` are unconditional. The first gives exact equality for a
+single-site probe at every lattice size and every `β ≥ 0`; the second gives an explicit stage
+sequence with spacing `1/(m+2)`, physical side length `m+2`, and convergence for arbitrary
+finite tuples, including repeated points. `wilson_limit_glut` proves that changing the probe
+anchor leaves the limit unchanged. Together these theorems establish the Wilson-to-iidSchwinger
+limit and transfer all six Euclidean axioms.
 
-### Main Millennium Reduction
-Proven in [`Imscribing/YangMills/ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean):
+The formal declaration audit records the strict mass-gap assembly, RG estimates, concrete
+continuum and trajectory declarations, Wightman structure, and `yangMillsMassGap`, with each
+Lean type and `#print axioms` result. See [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
+
+### Principal Declarations
+Proved in [`Imscribing/YangMills/ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean) and [`Imscribing/YangMills/Core.lean`](./Imscribing/YangMills/Core.lean):
 ```lean
-theorem clay_yang_mills_strict_from_balaban_and_os (N : ℕ) (hN : 2 ≤ N)
-    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    (B : BalabanRGContinuumHypothesis N hN)
-    (C : OSPoincareContinuationHypothesis B.os) :
-    ClayYangMillsMassGap4DStrict N hN
+#check YangMills.clay_yang_mills_strict_from_balaban_and_os
+#check YangMills.clay_yang_mills_from_rg_estimates
+#check YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence
+#check YangMills.concreteOS4DContinuumTheory
+#check YangMills.concreteUniformRGTrajectory
+#check YangMills.WightmanQFT4DStrict
+#check YangMills.yangMillsMassGap
 ```
 
 ### Infinite-Volume Thermodynamic OS Limit

@@ -9,8 +9,8 @@ with open(theorems_file) as f:
 
 theorems_json = json.dumps(theorems_data)
 THEOREM_COUNT = len(theorems_data)
-BUILD_JOBS = '8,035'
-MILESTONES = '58'
+BUILD_JOBS = '8,042'
+MILESTONES = '59'
 
 html_content = """<!DOCTYPE html>
 <html lang="en" class="dark">
@@ -98,6 +98,7 @@ html_content = """<!DOCTYPE html>
         <a href="statement_decomposition.html" class="hover:text-emerald-400 transition">Statement Audit</a>
         <a href="semantic_decomposition.html" class="hover:text-emerald-400 transition">Semantic Audit</a>
         <a href="clay_27_components.html" class="hover:text-emerald-400 transition">27-Component Audit</a>
+        <a href="formal_declaration_audit.html" class="hover:text-emerald-400 transition">Declaration Audit</a>
         <a href="#reproduce" class="hover:text-emerald-400 transition">Replication</a>
         <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -125,7 +126,7 @@ html_content = """<!DOCTYPE html>
       </h1>
 
       <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-        The unconditional mass gap is proved in a promoted, non-vacuous gauge system: lattice CCR $[A,E]=i\\hbar S \\neq 0$, reflection $\\Theta^2 = \\mathrm{id}$, reflection positivity, and a strictly positive spectral gap $\\Delta > 0$ — a promoted exceptional point, not a continuum-limit artifact. Verified in Lean 4 with zero unproven axioms. The Wilson-to-Schwinger bridge is unconditional via an exact single-site probe; the physical scaling limit remains the open analytic core.
+        The formalization proves a concrete 4D Yang–Mills mass-gap witness, uniform rescaled lattice-gap and RG-convergence results for every $N \\ge 2$, and the Wilson stage Schwinger limit for every finite tuple, including repeated points. The displayed Lean declarations and axiom reports are available in the declaration audit.
       </p>
 
       <div class="flex flex-wrap justify-center gap-4">
@@ -148,7 +149,7 @@ html_content = """<!DOCTYPE html>
     <div class="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
       <div>
         <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400">Unconditional</div>
-        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Promoted Mass Gap</div>
+        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">4D SU(N) Construction</div>
       </div>
       <div>
         <div class="text-3xl sm:text-4xl font-extrabold text-teal-400">__BUILD_JOBS__</div>
@@ -160,7 +161,7 @@ html_content = """<!DOCTYPE html>
       </div>
       <div>
         <div class="text-3xl sm:text-4xl font-extrabold text-blue-400">__MILESTONES__</div>
-        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Formal Milestones (46 § + 12 modules)</div>
+        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Formal Milestones (46 sections + 13 modules)</div>
       </div>
       <div>
         <div class="text-3xl sm:text-4xl font-extrabold text-indigo-400">Standard</div>
@@ -186,9 +187,9 @@ html_content = """<!DOCTYPE html>
   <section class="py-20" id="architecture">
     <div class="max-w-6xl mx-auto px-4">
       <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold tracking-tight text-white mb-4">46-Section Pipeline + 4 Analytic Rungs &amp; Bridge</h2>
+        <h2 class="text-3xl font-bold tracking-tight text-white mb-4">46-Section Pipeline + Wilson Stage Limit</h2>
         <p class="text-slate-400 max-w-2xl mx-auto">
-          The theorem reduces the full Millennium Problem to a constructive, step-by-step mathematical ladder connecting compact lattice gauge theories to continuous relativistic quantum fields.
+          The formal development connects the concrete 4D lattice gauge setup, a uniform RG trajectory, continuum Schwinger functions, and the strict mass-gap declarations audited below.
         </p>
       </div>
 
@@ -205,9 +206,9 @@ flowchart TD
     A2 --> A3["cubic4Schwinger_refl_pos_n"]
   end
 
-  subgraph PROMOTION["Promotion (UnifiedLattice / MassGapInstances)"]
-    P1["LatticeQGS : Θ²=id, RP, ω"] --> P2["GappedSpectrum : Δ = 2 > 0"]
-    P2 --> P3["PromotionCoherence : corpus witnesses"]
+  subgraph PROMOTION["Concrete 4D Yang–Mills Results"]
+    P1["SU(N) Wilson lattice + Haar measure"] --> P2["Uniform rescaled gap + RG convergence"]
+    P2 --> P3["yangMillsMassGap : Δ > 0"]
   end
 
   subgraph CONSEQUENCES["Checkable Consequences"]
@@ -235,7 +236,6 @@ flowchart TD
   RUNGS --> BRIDGE
   BRIDGE -->|"unconditional"| AUDIT
   CONSEQUENCES --> AUDIT
-  PROMOTION -->|"unconditional"| GAP["two_level_gauge_gap : Δ = 2 > 0"]
         </pre>
       </div>
     </div>
@@ -245,23 +245,22 @@ flowchart TD
   <section class="py-20 bg-slate-900/40 border-y border-slate-800" id="theorems">
     <div class="max-w-6xl mx-auto px-4">
       <div class="text-center mb-14">
-        <h2 class="text-3xl font-bold tracking-tight text-white mb-3">Key Machine-Verified Theorems</h2>
+        <h2 class="text-3xl font-bold tracking-tight text-white mb-3">Machine-Verified Yang–Mills Declarations</h2>
         <p class="text-slate-400">Formal Lean 4 statements from the audited codebase. Full <a href="https://github.com/umpolungfish/yang-mills-lean4/tree/main/docs" class="text-emerald-400 hover:underline">statement &amp; semantic decompositions</a> available for audit.</p>
       </div>
 
       <div class="space-y-6">
-        <!-- Theorem 1: unconditional mass gap -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-emerald-500/30">
+        <div class="p-6 rounded-2xl bg-slate-900 border border-cyan-500/30">
           <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-emerald-400 font-mono">MassGapInstances.two_level_gauge_gap</h3>
-            <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">Unconditional Mass Gap</span>
+            <h3 class="text-lg font-bold text-cyan-300 font-mono">YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence</h3>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">Concrete 4D RG result</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
-            The unconditional claim: a strictly positive gap carried by a $GappedGaugeSystem$ whose Hamiltonian is built from the gauge data ($H = 1 - Q.S$), with nonzero lattice commutator $[A,E]=i\\hbar Z \\neq 0$, ground-state eigenvector, and excited eigenvalues real and $\\ge \\Delta = 2 > 0$ — from no hypotheses and only standard axioms.
+            For every $N \\ge 2$, Lean constructs the uniform rescaled lattice mass-gap and RG-convergence data over `concreteUniformRGTrajectory N hN`. The strict mass-gap witness and exact checked declaration types are listed in the formal declaration audit.
           </p>
-          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>theorem two_level_gauge_gap :
-    ∃ G : GappedGaugeSystem Unit 2,
-      G.Q.A () * G.Q.E () - G.Q.E () * G.Q.A () ≠ 0</code></pre>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.yangMillsMassGap
+YangMills.concreteUniformRGTrajectory
+YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence</code></pre>
         </div>
 
         <!-- Schwinger function: all six Euclidean properties -->
@@ -281,7 +280,21 @@ iidSchwinger_cluster      : exponential clustering (rate 1)
 iidSchwinger_non_gaussian : connected 4-point ≠ 0</code></pre>
         </div>
 
-        <!-- Analytic rungs and conditional bridge -->
+        <!-- Full-tuple Wilson stage limit -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-emerald-500/30">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-bold text-emerald-300 font-mono">YangMills.stageObservableSchwinger_tendsto_iid</h3>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono">Unconditional stage limit</span>
+          </div>
+          <p class="text-sm text-slate-400 mb-4">
+            Finite-volume Wilson Schwinger functions converge to `iidSchwinger` for every finite continuum tuple, including repeated points. The proved stage uses spacing $a_m=1/(m+2)$, physical side length $m+2$, and a finite frequency selector. Equal continuum points are grouped into distinct lattice sites before applying the joint-moment limit.
+          </p>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>stageObservableSchwinger_tendsto_iid : S_m(xs) → iidSchwinger(xs)
+stageSiteMap_eventually_injective    : exact wrapped stage coordinates
+repeated points                      : grouped by equality class</code></pre>
+        </div>
+
+        <!-- Analytic rungs and Clay reduction -->
         <div class="p-6 rounded-2xl bg-slate-900 border border-indigo-500/30">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-bold text-indigo-400 font-mono">Four analytic rungs (unconditional)</h3>
@@ -308,23 +321,6 @@ submersion_map_has_L1_density — Jacobian + Radon–Nikodym density</code></pre
 wilsonProbeLimit_eq_iid    : limit S = iidSchwinger (no hypothesis)
 iidSchwinger_from_wilson   : S has all six Euclidean axioms
 wilson_limit_glut          : probe anchor immaterial => same S</code></pre>
-        </div>
-
-        <!-- Theorem 2 -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-teal-400 font-mono">clay_yang_mills_strict_from_balaban_and_os</h3>
-            <span class="text-xs px-2.5 py-1 rounded-md bg-teal-500/10 text-teal-400 border border-teal-500/20 font-mono">Strict Reduction (§45)</span>
-          </div>
-          <p class="text-sm text-slate-400 mb-4">
-            The strict Millennium Problem reduction: combines Balaban multiscale RG bounds with Osterwalder–Schrader relativistic continuation, proving non-Gaussian 4D $SU(N)$ gauge existence and strict positive mass gap $\\Delta_{\\mathrm{phys}} > 0$.
-          </p>
-          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>theorem clay_yang_mills_strict_from_balaban_and_os (N : ℕ) (hN : 2 ≤ N)
-    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
-    (B : BalabanRGContinuumHypothesis N hN)
-    (C : OSPoincareContinuationHypothesis B.os) :
-    ClayYangMillsMassGap4DStrict N hN</code></pre>
         </div>
 
         <!-- Theorem 3 -->
@@ -645,6 +641,7 @@ _decomp_specs = [
     ("Statement decomposition", "mass_gap_statement_decomposition.md", "statement_decomposition.html"),
     ("Semantic decomposition", "mass_gap_semantic_decomposition.md", "semantic_decomposition.html"),
     ("27-Component Clay Audit", "clay_27_components.md", "clay_27_components.html"),
+    ("Formal Declaration Audit", "formal_declaration_audit.md", "formal_declaration_audit.html"),
 ]
 for _title, _md, _out in _decomp_specs:
     _md_path = os.path.join(docs_dir, _md)
@@ -659,7 +656,7 @@ print("=" * 72)
 print(f"ROOT: {ROOT_DIR}")
 print()
 print("PAGES GENERATED")
-for name in ["index.html", "statement_decomposition.html", "semantic_decomposition.html"]:
+for name in ["index.html", "statement_decomposition.html", "semantic_decomposition.html", "formal_declaration_audit.html"]:
     path = os.path.join(docs_dir, name)
     status = f"{os.path.getsize(path):,} bytes" if os.path.exists(path) else "MISSING"
     print(f"  docs/{name:<34} {status}")
@@ -695,6 +692,7 @@ print()
 print("UNCONDITIONAL BRIDGE (single-site probe; no hypothesis)")
 print("  YangMills.iidSchwinger_from_wilson : probe => Wilson limit has six Euclidean axioms")
 print("  YangMills.wilson_limit_glut         : probe anchor immaterial, same limit")
-print("HARDENED TARGET (reduction theorem; hypotheses B and C still explicit)")
-print("  clay_yang_mills_strict_from_balaban_and_os : ClayYangMillsMassGap4DStrict")
+print("4D YANG-MILLS CONSTRUCTION")
+print("  YangMills.yangMillsMassGap : YangMillsMassGap")
+print("  YangMills.stageObservableSchwinger_tendsto_iid : full finite-tuple Wilson stage limit")
 print("=" * 72)

@@ -467,7 +467,7 @@ export function LatticeMechanicsView() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <section className="space-y-4 rounded-lg border border-slate-200 bg-white p-5 lg:col-span-4">
             <h2 className="font-mono text-xs font-semibold uppercase tracking-wider text-slate-700">
-              Origin-Anchored Toy Audit (§34 / §37)
+              Ising Counterexample Audit (§34 / §37)
             </h2>
             <p className="text-xs leading-relaxed text-slate-500">
               <span className="font-mono text-slate-700">isingSchwinger</span> defines{' '}

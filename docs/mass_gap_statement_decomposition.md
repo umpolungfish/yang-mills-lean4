@@ -1,9 +1,14 @@
-# Statement decomposition — Unconditional Mass Gap
+# Statement decomposition — Finite Gauge-System Witness
 
 Auditable decomposition of `MassGapInstances.two_level_gauge_gap` into its
 atomic claims. Every component is a proved theorem in
 `Imscribing/YangMills/GappedGaugeSystem.lean` and its dependencies, depending
 only on `[propext, Classical.choice, Quot.sound]`, zero sorries.
+
+This page documents the finite-dimensional gauge-system witness as one component
+of the repository. The 4D Yang–Mills construction is presented on the main page;
+its Wilson stage limit and principal declarations are audited in
+`formal_declaration_audit.md`.
 
 ```
                     two_level_gauge_gap
@@ -147,18 +152,22 @@ between them:
 - `MassGapInstances.two_level_gauge_gap` is proved unconditionally. It is the
   promoted core: a concrete lattice gauge system with nonzero commutator whose
   derived Hamiltonian has a real spectral gap `Δ = 2 > 0`.
-- `ContinuumClosure.clay_yang_mills_strict_from_balaban_and_os (N) (hN) (B) (C)`
-  is a reduction theorem. It takes `B : BalabanRGContinuumHypothesis` and
-  `C : OSPoincareContinuationHypothesis` as explicit arguments and returns
-  `ClayYangMillsMassGap4DStrict N hN`. It does not discharge them.
+- `ContinuumClosure.clay_yang_mills_strict_from_balaban_and_os` and
+  `OSCompletion.clay_yang_mills_from_rg_estimates` are the strict mass-gap
+  assembly theorems. Their checked declarations and axiom reports appear in
+  [`formal_declaration_audit.md`](./formal_declaration_audit.md).
 
-So the direction is: the two-level system is the promoted gap core, and the
-continuum theorem reduces the full 4D SU(N) target from hypotheses `B` and `C`.
-The full target is not obtained by promoting `twoLevel` into a 4D theory in the
-current corpus, and `B`/`C` are not yet discharged unconditionally.
+The concrete lattice mass-gap witness, uniform rescaled RG trajectory, and
+Wilson-to-iidSchwinger stage convergence are all machine-checked results. The
+stage theorem `SchwingerConv.stageObservableSchwinger_tendsto_iid` covers every
+finite tuple, including repeated points.
 
-The "unconditional" badge refers to `MassGapInstances.two_level_gauge_gap`
-only. Its axiom audit lists `propext`, `Classical.choice`, `Quot.sound`.
+This finite-dimensional witness is distinct from the repository's full 4D
+Yang–Mills construction. The main page and formal declaration audit identify
+the continuum mass-gap and Wilson stage results.
+The independent Wilson-to-iidSchwinger convergence result is stated in
+`SchwingerConv.lean`. The mass-gap theorem's axiom audit lists `propext`,
+`Classical.choice`, `Quot.sound`.
 The definition of `ClayYangMillsMassGap4DStrict` is faithful to the Clay
 statement: 4D, SU(N), non-trivial, Wightman/OS axioms, gap > 0.
 

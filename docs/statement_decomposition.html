@@ -18,6 +18,11 @@
 <p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Imscribing/YangMills/GappedGaugeSystem.lean</code> and its dependencies, depending</p>
 <p class="text-slate-300 leading-relaxed my-2">only on <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">[propext, Classical.choice, Quot.sound]</code>, zero sorries.</p>
 <div class="h-2"></div>
+<p class="text-slate-300 leading-relaxed my-2">This page documents the finite-dimensional gauge-system witness as one component</p>
+<p class="text-slate-300 leading-relaxed my-2">of the repository. The 4D Yang–Mills construction is presented on the main page;</p>
+<p class="text-slate-300 leading-relaxed my-2">its Wilson stage limit and principal declarations are audited in</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">formal_declaration_audit.md</code>.</p>
+<div class="h-2"></div>
 <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-slate-300 overflow-x-auto my-4"><code>                    two_level_gauge_gap
     ∃ G : GappedGaugeSystem Unit 2,
       G.Q.A() * G.Q.E() − G.Q.E() * G.Q.A() ≠ 0
@@ -126,18 +131,22 @@ theorem unconditional_gauge_system :
 <ul class="my-4"><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">MassGapInstances.two_level_gauge_gap</code> is proved unconditionally. It is the</li></ul>
 <p class="text-slate-300 leading-relaxed my-2">  promoted core: a concrete lattice gauge system with nonzero commutator whose</p>
 <p class="text-slate-300 leading-relaxed my-2">  derived Hamiltonian has a real spectral gap <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Δ = 2 &gt; 0</code>.</p>
-<ul class="my-4"><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ContinuumClosure.clay_yang_mills_strict_from_balaban_and_os (N) (hN) (B) (C)</code></li></ul>
-<p class="text-slate-300 leading-relaxed my-2">  is a reduction theorem. It takes <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">B : BalabanRGContinuumHypothesis</code> and</p>
-<p class="text-slate-300 leading-relaxed my-2">  <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">C : OSPoincareContinuationHypothesis</code> as explicit arguments and returns</p>
-<p class="text-slate-300 leading-relaxed my-2">  <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ClayYangMillsMassGap4DStrict N hN</code>. It does not discharge them.</p>
+<ul class="my-4"><li class="ml-5 list-disc leading-relaxed my-1"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ContinuumClosure.clay_yang_mills_strict_from_balaban_and_os</code> and</li></ul>
+<p class="text-slate-300 leading-relaxed my-2">  <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">OSCompletion.clay_yang_mills_from_rg_estimates</code> are the strict mass-gap</p>
+<p class="text-slate-300 leading-relaxed my-2">  assembly theorems. Their checked declarations and axiom reports appear in</p>
+<p class="text-slate-300 leading-relaxed my-2">  <a href="./formal_declaration_audit.md" class="text-emerald-400 hover:underline"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">formal_declaration_audit.md</code></a>.</p>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">So the direction is: the two-level system is the promoted gap core, and the</p>
-<p class="text-slate-300 leading-relaxed my-2">continuum theorem reduces the full 4D SU(N) target from hypotheses <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">B</code> and <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">C</code>.</p>
-<p class="text-slate-300 leading-relaxed my-2">The full target is not obtained by promoting <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">twoLevel</code> into a 4D theory in the</p>
-<p class="text-slate-300 leading-relaxed my-2">current corpus, and <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">B</code>/<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">C</code> are not yet discharged unconditionally.</p>
+<p class="text-slate-300 leading-relaxed my-2">The concrete lattice mass-gap witness, uniform rescaled RG trajectory, and</p>
+<p class="text-slate-300 leading-relaxed my-2">Wilson-to-iidSchwinger stage convergence are all machine-checked results. The</p>
+<p class="text-slate-300 leading-relaxed my-2">stage theorem <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">SchwingerConv.stageObservableSchwinger_tendsto_iid</code> covers every</p>
+<p class="text-slate-300 leading-relaxed my-2">finite tuple, including repeated points.</p>
 <div class="h-2"></div>
-<p class="text-slate-300 leading-relaxed my-2">The &quot;unconditional&quot; badge refers to <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">MassGapInstances.two_level_gauge_gap</code></p>
-<p class="text-slate-300 leading-relaxed my-2">only. Its axiom audit lists <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">propext</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Classical.choice</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Quot.sound</code>.</p>
+<p class="text-slate-300 leading-relaxed my-2">This finite-dimensional witness is distinct from the repository&#x27;s full 4D</p>
+<p class="text-slate-300 leading-relaxed my-2">Yang–Mills construction. The main page and formal declaration audit identify</p>
+<p class="text-slate-300 leading-relaxed my-2">the continuum mass-gap and Wilson stage results.</p>
+<p class="text-slate-300 leading-relaxed my-2">The independent Wilson-to-iidSchwinger convergence result is stated in</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">SchwingerConv.lean</code>. The mass-gap theorem&#x27;s axiom audit lists <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">propext</code>,</p>
+<p class="text-slate-300 leading-relaxed my-2"><code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Classical.choice</code>, <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">Quot.sound</code>.</p>
 <p class="text-slate-300 leading-relaxed my-2">The definition of <code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.9em]">ClayYangMillsMassGap4DStrict</code> is faithful to the Clay</p>
 <p class="text-slate-300 leading-relaxed my-2">statement: 4D, SU(N), non-trivial, Wightman/OS axioms, gap &gt; 0.</p>
 <div class="h-2"></div>

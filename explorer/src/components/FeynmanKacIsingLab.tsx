@@ -161,7 +161,7 @@ export function FeynmanKacIsingLab() {
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-slate-800 bg-slate-900 px-5 py-3.5">
         <div>
           <div className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
-            §§39–42 Feynman–Kac Slice Transfer · §§34/37 Ising Toy Obstruction
+            §§39–42 Feynman–Kac Slice Transfer · §§34/37 Separate Ising Counterexample
           </div>
           <h1 className="text-lg font-semibold text-slate-100">
             Euclidean Transfer Cylinder, Reflection Plane Θ &amp; Radial Peak Collapse
@@ -310,7 +310,7 @@ export function FeynmanKacIsingLab() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="text-sm font-semibold text-slate-100">
-                Ising Toy Translation Obstruction (§34/§37)
+                Ising Translation Counterexample (§34/§37)
               </h2>
               <div className="font-mono text-[11px] text-slate-400">
                 Click spacetime heatmap or animate shift a = (a₀, a₁, 0, 0)

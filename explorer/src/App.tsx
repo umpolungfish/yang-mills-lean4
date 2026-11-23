@@ -9,8 +9,8 @@ import { BridgeAndSourceView } from './components/BridgeAndSourceView';
 type ActiveLab = 'dobrushin' | 'witness' | 'slices' | 'tesseract' | 'source';
 
 export default function App() {
-  const [activeLab, setActiveLab] = useState<ActiveLab>('dobrushin');
-  const [selectedModuleId, setSelectedModuleId] = useState<string>('StrongCouplingDobrushin');
+  const [activeLab, setActiveLab] = useState<ActiveLab>('source');
+  const [selectedModuleId, setSelectedModuleId] = useState<string>('SchwingerConv');
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200">
@@ -27,7 +27,7 @@ export default function App() {
                 Yang–Mills 4D Formalization
               </div>
               <div className="whitespace-nowrap font-mono text-[10px] uppercase tracking-wider text-slate-400">
-                Corpus Explorer · Lean 4
+                4D Wilson Schwinger Limit · Lean 4
               </div>
             </div>
           </div>

@@ -371,4 +371,82 @@ theorem radI_multidim (r : ℕ) (q : C((Fin r → I01), ℝ))
     _ < eps/2 + eps/2 := add_lt_add_of_le_of_lt hdiff_bound hpK
     _ = eps := by ring
 
+/-- Multi-dimensional annihilation for every L¹ density on the cube. -/
+theorem radI_multidim_integrable (r : ℕ) (q : (Fin r → I01) → ℝ)
+    (hq : Integrable q (I01Pi r)) (S : Finset (Fin r)) (hS : S.Nonempty) :
+    Tendsto (fun K : ℕ =>
+      ∫ u : Fin r → I01, q u * S.prod (fun j => radI K (u j)) ∂(I01Pi r))
+      atTop (𝓝 0) := by
+  rw [Metric.tendsto_atTop]
+  intro eps heps
+  let eps' : ℝ := eps / 3
+  have heps' : 0 < eps' := by dsimp [eps']; linarith
+  obtain ⟨g, hgerr, hgint⟩ := hq.exists_boundedContinuous_integral_sub_le heps'
+  let p : C((Fin r → I01), ℝ) := ⟨g, g.continuous⟩
+  have hpint : Integrable (fun u : Fin r → I01 => p u) (I01Pi r) := by
+    simpa [p] using hgint
+  have happ : ∫ u : Fin r → I01, ‖q u - p u‖ ∂(I01Pi r) ≤ eps' := by
+    simpa [p] using hgerr
+  have hpann := radI_multidim r p S hS
+  rw [Metric.tendsto_atTop] at hpann
+  obtain ⟨K₀, hK₀⟩ := hpann eps' heps'
+  let R : ℕ → (Fin r → I01) → ℝ := fun K u =>
+    S.prod (fun j => radI K (u j))
+  have hRmeas (K : ℕ) : Measurable (R K) := by
+    dsimp [R]
+    exact Finset.measurable_prod S (fun j hj =>
+      (radI_measurable K).comp (measurable_pi_apply j))
+  have hRbound (K : ℕ) (u : Fin r → I01) : ‖R K u‖ ≤ 1 := by
+    dsimp [R]
+    calc
+      ‖S.prod (fun j => radI K (u j))‖ ≤
+          S.prod (fun j => ‖radI K (u j)‖) := Finset.norm_prod_le _ _
+      _ ≤ 1 := by
+          apply Finset.prod_le_one
+          · intro j hj
+            exact norm_nonneg _
+          · intro j hj
+            rw [Real.norm_eq_abs, radI, rademacher_abs]
+  have hRbound_ae (K : ℕ) : ∀ᵐ u ∂(I01Pi r), ‖R K u‖ ≤ 1 :=
+    Filter.Eventually.of_forall (hRbound K)
+  have hdiff_int (K : ℕ) :
+      Integrable (fun u => (q u - p u) * R K u) (I01Pi r) :=
+    (hq.sub hpint).mul_bdd (hRmeas K).aestronglyMeasurable (hRbound_ae K)
+  have hdiff_bound (K : ℕ) :
+      |∫ u, (q u - p u) * R K u ∂(I01Pi r)| ≤ eps' := by
+    rw [← Real.norm_eq_abs]
+    calc
+      ‖∫ u, (q u - p u) * R K u ∂(I01Pi r)‖ ≤
+          ∫ u, ‖(q u - p u) * R K u‖ ∂(I01Pi r) := norm_integral_le_integral_norm _
+      _ ≤ ∫ u, ‖q u - p u‖ ∂(I01Pi r) := by
+          apply integral_mono_ae (hdiff_int K).norm (hq.sub hpint).norm
+          filter_upwards with u
+          rw [norm_mul]
+          exact mul_le_of_le_one_right (norm_nonneg _) (hRbound K u)
+      _ ≤ eps' := happ
+  refine ⟨K₀, ?_⟩
+  intro K hK
+  rw [Real.dist_eq, sub_zero]
+  have hpsmall : |∫ u, p u * R K u ∂(I01Pi r)| < eps' := by
+    have h := hK₀ K hK
+    rw [Real.dist_eq, sub_zero] at h
+    simpa [R] using h
+  have hsplit :
+      (∫ u, q u * R K u ∂(I01Pi r)) =
+        (∫ u, (q u - p u) * R K u ∂(I01Pi r)) +
+          ∫ u, p u * R K u ∂(I01Pi r) := by
+    have hfun : (fun u => q u * R K u) =
+        fun u => (q u - p u) * R K u + p u * R K u := by
+      funext u
+      ring
+    rw [hfun, integral_add (hdiff_int K) (integrable_radProd r S p K)]
+  calc
+    |∫ u, q u * R K u ∂(I01Pi r)| =
+        |(∫ u, (q u - p u) * R K u ∂(I01Pi r)) +
+          ∫ u, p u * R K u ∂(I01Pi r)| := by rw [← hsplit]
+    _ ≤ |∫ u, (q u - p u) * R K u ∂(I01Pi r)| +
+        |∫ u, p u * R K u ∂(I01Pi r)| := abs_add_le _ _
+    _ < eps' + eps' := add_lt_add_of_le_of_lt (hdiff_bound K) hpsmall
+    _ < eps := by dsimp [eps']; linarith
+
 end YangMills

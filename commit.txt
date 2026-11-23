@@ -1,3 +1,3 @@
-I complete the repeated-point Schwinger convergence proof
+I updated the Pages site around the unconditional 4D Wilson construction
 
-I finish the finite-stage moment selector argument for tuples with repeated continuum points, including the real-to-complex Wilson expectation bridge and the fiber-product identification with iidSchwinger. I correct the site-map equality orientation and make the finite-cardinality bounds explicit.
+I made the full-tuple Wilson-to-Schwinger limit the explorer's opening view, replaced stale open-bridge and toy-first labels, refreshed the generated Pages artifacts, and added the seven requested Lean declaration checks and axiom reports.

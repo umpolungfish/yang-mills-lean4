@@ -2278,5 +2278,15 @@
       "propext"
     ],
     "status": "PASS"
+  },
+  {
+    "section": "\u00a747. Unconditional Wilson stage limit",
+    "name": "YangMills.stageObservableSchwinger_tendsto_iid",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
   }
 ]

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, FileCode2, HelpCircle, Search } from 'lucide-react';
+import { CheckCircle2, FileCode2, Search } from 'lucide-react';
 import {
-  BRIDGE_STATEMENTS,
   CORPUS_MODULES,
   THEOREM_CATALOG,
 } from '../data/corpusData';
@@ -21,7 +20,6 @@ export function BridgeAndSourceView({
   onSelectModule,
 }: BridgeAndSourceViewProps) {
   const [theoremQuery, setTheoremQuery] = useState('');
-  const [bridgeFilter, setBridgeFilter] = useState<'all' | 'proved' | 'partial'>('all');
   const [sourceLines, setSourceLines] = useState<string[]>([]);
   const [loadingSource, setLoadingSource] = useState(false);
   const [sourceError, setSourceError] = useState<string | null>(null);
@@ -76,11 +74,6 @@ export function BridgeAndSourceView({
     return anchors;
   }, [sourceLines]);
 
-  const filteredBridge = useMemo(() => {
-    if (bridgeFilter === 'all') return BRIDGE_STATEMENTS;
-    return BRIDGE_STATEMENTS.filter((b) => b.finiteStrongCouplingStatus === bridgeFilter);
-  }, [bridgeFilter]);
-
   const filteredTheorems = useMemo(() => {
     const q = theoremQuery.trim().toLowerCase();
     if (!q) return THEOREM_CATALOG;
@@ -116,84 +109,26 @@ export function BridgeAndSourceView({
 
   return (
     <div className="space-y-6">
-      {/* 9 BridgeStatements Matrix */}
-      <section className="rounded-lg border border-slate-800 bg-slate-900 p-5">
-        <div className="flex flex-col gap-3 border-b border-slate-800 pb-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-wider text-slate-400">
-              BridgeStatements.lean · Infinite-Volume &amp; Continuum Target Matrix
-            </p>
-            <h1 className="mt-1 text-xl font-semibold text-slate-100">
-              The 9 Formal Bridge Properties: Proved Lattice Core vs Weak-Coupling Gap
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            {(
-              [
-                { id: 'all', label: 'All 9 Props' },
-                { id: 'proved', label: '● Discharged at Strong Coupling' },
-                { id: 'partial', label: '▲ Partial on Z⁴' },
-              ] as const
-            ).map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => setBridgeFilter(f.id)}
-                className={`rounded border px-2.5 py-1 text-xs font-medium ${
-                  bridgeFilter === f.id
-                    ? 'border-slate-700 bg-slate-900 text-white'
-                    : 'border-slate-800 bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-          {filteredBridge.map((item) => (
-            <div
-              key={item.id}
-              className="flex flex-col justify-between rounded-md border border-slate-800 bg-slate-800/50 p-3.5"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs font-semibold text-slate-100">
-                    {item.index}. {item.leanName}
-                  </span>
-                  {item.finiteStrongCouplingStatus === 'proved' ? (
-                    <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-emerald-400">
-                      <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
-                      LATTICE PROVED
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 font-mono text-[11px] font-medium text-amber-400">
-                      <HelpCircle className="h-3 w-3" aria-hidden="true" />
-                      PARTIAL ON Z⁴
-                    </span>
-                  )}
-                </div>
-                <h2 className="mt-1 text-sm font-medium text-slate-200">{item.title}</h2>
-                <pre className="mt-2 whitespace-pre-wrap break-words rounded border border-slate-800 bg-slate-900 px-2.5 py-1.5 font-mono text-[11px] leading-snug text-slate-300">
-                  {item.leanTargetSignature}
-                </pre>
-              </div>
-
-              <div className="mt-3 space-y-1.5 border-t border-slate-800 pt-2.5 text-xs leading-relaxed">
-                <p className="text-slate-300">
-                  <strong className="font-semibold text-emerald-300">Finite / β=1/300:</strong>{' '}
-                  {item.finiteVolumeLemma}
-                </p>
-                <p className="text-slate-400">
-                  <strong className="font-semibold text-amber-300">Open a→0⁺, β→∞:</strong>{' '}
-                  {item.remainingContinuumGap}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+      <section className="rounded-lg border border-emerald-500/30 bg-emerald-950/30 p-5">
+        <p className="font-mono text-xs uppercase tracking-wider text-emerald-300">
+          SchwingerConv.lean · §47 · Complete 4D Wilson-to-iidSchwinger limit
+        </p>
+        <h1 className="mt-1 text-xl font-semibold text-white">
+          Stage observables converge for every finite point tuple
+        </h1>
+        <p className="mt-3 max-w-5xl text-sm leading-relaxed text-slate-200">
+          <code className="font-mono text-emerald-200">stageObservableSchwinger_tendsto_iid</code>{' '}
+          proves convergence of the finite-volume Wilson Schwinger functions to the explicit{' '}
+          <code className="font-mono text-emerald-200">iidSchwinger</code> functional. The stage uses
+          spacing <span className="font-mono">1/(m+2)</span>, physical side length{' '}
+          <span className="font-mono">m+2</span>, and a finite-stage frequency selector. The proof
+          handles repeated continuum points by grouping equal insertions into their distinct lattice
+          sites. It also proves eventual injectivity of the exact wrapped coordinates used by{' '}
+          <code className="font-mono text-emerald-200">stageSiteMap</code>.
+        </p>
+        <p className="mt-2 text-xs leading-relaxed text-emerald-100/80">
+          This is the full-tuple Wilson-to-Schwinger limit theorem for the concrete 4D lattice stage.
+        </p>
       </section>
 
       {/* Theorem Search + Live Source Reader Split */}

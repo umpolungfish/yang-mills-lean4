@@ -1226,6 +1226,20 @@ end YangMills
 
 -- §§19–21. Concrete constructions & unconditional master theorems
 #print axioms YangMills.concreteOS4DContinuumTheory
+#check YangMills.clay_yang_mills_strict_from_balaban_and_os
+#print axioms YangMills.clay_yang_mills_strict_from_balaban_and_os
+#check YangMills.clay_yang_mills_from_rg_estimates
+#print axioms YangMills.clay_yang_mills_from_rg_estimates
+#check YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence
+#print axioms YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence
+#check YangMills.concreteOS4DContinuumTheory
+#print axioms YangMills.concreteOS4DContinuumTheory
+#check YangMills.concreteUniformRGTrajectory
+#print axioms YangMills.concreteUniformRGTrajectory
+#check YangMills.WightmanQFT4DStrict
+#print axioms YangMills.WightmanQFT4DStrict
+#check YangMills.yangMillsMassGap
+#print axioms YangMills.yangMillsMassGap
 #print axioms YangMills.concreteOSReconstructionData
 #print axioms YangMills.concreteUniformRGTrajectory
 #print axioms YangMills.concreteNonAbelianWilsonSetup

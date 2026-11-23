@@ -1,8 +1,12 @@
-# Semantic decomposition — what the Unconditional Mass Gap says
+# Semantic decomposition — finite gauge-system witness
 
 Companion to `mass_gap_statement_decomposition.md` (which gives the syntactic
 breakdown). Here each claim is read for its *content*: what the formalism
 means, what the symbols denote, and what would falsify it.
+
+This finite-dimensional witness is a separate checked component. The main page
+centers the 4D SU(N) construction, including its RG and full-tuple Wilson
+Schwinger results.
 
 ## The headline, in words
 
