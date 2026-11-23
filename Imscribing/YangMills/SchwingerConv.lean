@@ -173,6 +173,84 @@ theorem wilsonMeasure_isProbability (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt] (β 
   rw [hint]
   exact ENNReal.mul_inv_cancel hden ENNReal.ofReal_ne_top
 
+/-- Rewrite a normalized Wilson integral as an expectation under the Wilson
+probability measure. -/
+theorem cubic4Schwinger_eq_wilsonMeasure_integral
+    (Ls Lt N n : ℕ) [NeZero Ls] [NeZero Lt]
+    (β : ℝ) (hβ : 0 ≤ β)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (obs : Fin n → GaugeField (cubicTorus4 Ls Lt)
+      (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℂ) :
+    cubic4Schwinger Ls Lt N β n obs =
+      ∫ U, ∏ i : Fin n, obs i U ∂wilsonMeasure Ls Lt N β := by
+  let μ := spacetimeHaarMeasure Ls Lt N
+  let Z := cubic4PartitionFn Ls Lt N β
+  let ρ : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℝ≥0∞ :=
+    fun U => ENNReal.ofReal (cubic4WilsonWeight Ls Lt N β U) / ENNReal.ofReal Z
+  have hZ : 0 < Z := cubic4PartitionFn_pos Ls Lt N β hβ
+  have hρmeas : Measurable ρ := by
+    dsimp [ρ, Z]
+    exact (ENNReal.measurable_ofReal.comp (measurable_cubic4WilsonWeight Ls Lt N β)).div
+      measurable_const
+  have hρtop : ∀ᵐ U ∂μ, ρ U < ∞ := by
+    filter_upwards with U
+    dsimp [ρ]
+    exact ENNReal.div_lt_top ENNReal.ofReal_ne_top
+      (ENNReal.ofReal_ne_zero_iff.mpr hZ)
+  have hρreal (U : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ)) :
+      (ρ U).toReal = cubic4WilsonWeight Ls Lt N β U / Z := by
+    dsimp [ρ, Z]
+    rw [ENNReal.toReal_div]
+    have hw0 : 0 ≤ cubic4WilsonWeight Ls Lt N β U :=
+      (Real.exp_pos _).le.trans (cubic4WilsonWeight_bounds Ls Lt N β hβ U).1
+    rw [ENNReal.toReal_ofReal hw0,
+      ENNReal.toReal_ofReal hZ.le]
+  have hchange :
+      ∫ U, (∏ i : Fin n, obs i U) ∂μ.withDensity ρ =
+        ∫ U, (ρ U).toReal • (∏ i : Fin n, obs i U) ∂μ :=
+    integral_withDensity_eq_integral_toReal_smul hρmeas hρtop _
+  change cubic4Schwinger Ls Lt N β n obs =
+    ∫ U, ∏ i : Fin n, obs i U ∂μ.withDensity ρ
+  rw [hchange]
+  unfold cubic4Schwinger
+  rw [show (∫ U, (ρ U).toReal • (∏ i : Fin n, obs i U) ∂μ) =
+      (Z⁻¹ : ℂ) * ∫ U, (∏ i : Fin n, obs i U) *
+        ((cubic4WilsonWeight Ls Lt N β U : ℝ) : ℂ) ∂μ by
+    have hpoint (U : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ)) :
+        (ρ U).toReal • (∏ i : Fin n, obs i U) =
+          (Z⁻¹ : ℂ) * ((∏ i : Fin n, obs i U) *
+            ((cubic4WilsonWeight Ls Lt N β U : ℝ) : ℂ)) := by
+      rw [hρreal U]
+      rw [Complex.real_smul, Complex.ofReal_div]
+      have hZc : (Z : ℂ) ≠ 0 := by exact_mod_cast hZ.ne'
+      field_simp [hZc]
+    calc
+      _ = ∫ U, (Z⁻¹ : ℂ) * ((∏ i : Fin n, obs i U) *
+          ((cubic4WilsonWeight Ls Lt N β U : ℝ) : ℂ)) ∂μ := by
+        apply integral_congr_ae
+        exact Filter.Eventually.of_forall hpoint
+      _ = (Z⁻¹ : ℂ) * ∫ U, (∏ i : Fin n, obs i U) *
+          ((cubic4WilsonWeight Ls Lt N β U : ℝ) : ℂ) ∂μ := by
+        rw [integral_const_mul]]
+
+/-- If the observable product is real-valued, the Wilson Schwinger functional
+is the corresponding real expectation, embedded into `ℂ`. -/
+theorem cubic4Schwinger_eq_real_wilsonExpectation
+    (Ls Lt N n : ℕ) [NeZero Ls] [NeZero Lt]
+    (β : ℝ) (hβ : 0 ≤ β)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (obs : Fin n → GaugeField (cubicTorus4 Ls Lt)
+      (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℂ)
+    (f : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℝ)
+    (hprod : ∀ U, (∏ i : Fin n, obs i U) = (f U : ℂ)) :
+    cubic4Schwinger Ls Lt N β n obs = (∫ U, f U ∂wilsonMeasure Ls Lt N β : ℝ) := by
+  rw [cubic4Schwinger_eq_wilsonMeasure_integral Ls Lt N n β hβ obs]
+  rw [show (fun U => ∏ i : Fin n, obs i U) = fun U => (f U : ℂ) by
+      funext U; exact hprod U]
+  exact integral_ofReal
+
 /-- Plaquette defect: `X_p(U) = 1 - (1/N) Re Tr(U_p)` ∈ [0, 2]. -/
 noncomputable def plaquetteDefect (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     (v : (cubicTorus4 Ls Lt).Site) (U : GaugeField (cubicTorus4 Ls Lt)
@@ -836,6 +914,126 @@ theorem stageSiteMap_stageSitePoint (Ls Lt : ℕ) [NeZero Ls] [NeZero Lt]
     (Prod.ext (stateWrap_finVal Ls a ha x)
       (Prod.ext (stateWrap_finVal Ls a ha y) (stateWrap_finVal Ls a ha z)))
 
+noncomputable def stageLinearSize (m : ℕ) : ℕ := m + 2
+
+noncomputable def stagePeriodicSide (m : ℕ) : ℕ := stageLinearSize m ^ 2
+
+private theorem stagePeriodicSide_pos (m : ℕ) : 0 < stagePeriodicSide m := by
+  exact Nat.pow_pos (by simp [stageLinearSize])
+
+noncomputable instance stagePeriodicSide_neZero (m : ℕ) :
+    NeZero (stagePeriodicSide m) := ⟨Nat.ne_of_gt (stagePeriodicSide_pos m)⟩
+
+noncomputable def stageSpacing (m : ℕ) : ℝ := 1 / (stageLinearSize m : ℝ)
+
+private theorem stageSpacing_pos (m : ℕ) : 0 < stageSpacing m := by
+  dsimp [stageSpacing, stageLinearSize]
+  positivity
+
+private theorem stageSpacing_tendsto_zero :
+    Filter.Tendsto stageSpacing Filter.atTop (nhds 0) := by
+  have hlinear : Filter.Tendsto (fun m : ℕ => (m : ℝ) + 2) atTop atTop := by
+    apply Filter.tendsto_atTop_mono (f := fun m : ℕ => (m : ℝ))
+    · intro m
+      norm_num
+    · exact tendsto_natCast_atTop_atTop
+  have hinv := tendsto_inv_atTop_zero.comp hlinear
+  have hsp : stageSpacing = fun m : ℕ => ((m : ℝ) + 2)⁻¹ := by
+    funext m
+    simp [stageSpacing, stageLinearSize, one_div, Nat.cast_add]
+  rw [hsp]
+  exact hinv
+
+private theorem stagePeriodicVolume_tendsto_atTop :
+    Filter.Tendsto (fun m => (stagePeriodicSide m : ℝ) * stageSpacing m)
+      Filter.atTop Filter.atTop := by
+  have hlinear : Filter.Tendsto (fun m : ℕ => (m : ℝ) + 2) atTop atTop := by
+    apply Filter.tendsto_atTop_mono (f := fun m : ℕ => (m : ℝ))
+    · intro m
+      norm_num
+    · exact tendsto_natCast_atTop_atTop
+  have heq : (fun m : ℕ => (stagePeriodicSide m : ℝ) * stageSpacing m) =
+      fun m : ℕ => (m : ℝ) + 2 := by
+    funext m
+    dsimp [stagePeriodicSide, stageLinearSize, stageSpacing]
+    push_cast
+    field_simp
+  rw [heq]
+  exact hlinear
+
+private noncomputable def stageSiteCoords (L : ℕ) [NeZero L]
+    (v : (cubicTorus4 L L).Site) : Fin 4 → Fin L :=
+  ![v.1, v.2.1, v.2.2.1, v.2.2.2]
+
+private theorem stageSiteCoords_injective (L : ℕ) [NeZero L] :
+    Function.Injective (stageSiteCoords L) := by
+  intro v w h
+  rcases v with ⟨t, x, y, z⟩
+  rcases w with ⟨t', x', y', z'⟩
+  have h0 : t = t' := by simpa [stageSiteCoords] using congrFun h 0
+  have h1 : x = x' := by simpa [stageSiteCoords] using congrFun h 1
+  have h2 : y = y' := by simpa [stageSiteCoords] using congrFun h 2
+  have h3 : z = z' := by simpa [stageSiteCoords] using congrFun h 3
+  cases h0
+  cases h1
+  cases h2
+  cases h3
+  rfl
+
+private theorem stateWrap_eq_torusCoord (L : ℕ) [NeZero L] (a : ℝ) (ha : 0 < a)
+    (x : ℝ) :
+    stateWrap L a ha x = Imscribing.YangMills.TorusWraparoundBridge.torusCoord L a x := by
+  rfl
+
+private theorem stageSiteCoords_eq_torusSite (m : ℕ) (x : Space4) :
+    stageSiteCoords (stagePeriodicSide m)
+        (stageSiteMap (stagePeriodicSide m) (stagePeriodicSide m)
+          (stageSpacing m) (stageSpacing_pos m) x) =
+      Imscribing.YangMills.TorusWraparoundBridge.torusSite
+        (stagePeriodicSide m) (stageSpacing m) x := by
+  letI : NeZero (stagePeriodicSide m) := stagePeriodicSide_neZero m
+  funext μ
+  fin_cases μ <;>
+    simp [stageSiteCoords, stageSiteMap,
+      Imscribing.YangMills.TorusWraparoundBridge.torusSite, stateWrap_eq_torusCoord]
+
+/-- At sufficiently fine infinite-volume stages, the exact periodic site map
+separates every fixed tuple of distinct continuum points. -/
+theorem stageSiteMap_eventually_injective {r : ℕ} (xs : Fin r → Space4)
+    (hxs : Function.Injective xs) :
+    ∃ m₀, ∀ m ≥ m₀,
+      Function.Injective (fun i => stageSiteMap (stagePeriodicSide m)
+        (stagePeriodicSide m) (stageSpacing m) (stageSpacing_pos m) (xs i)) := by
+  letI : ∀ m, NeZero (stagePeriodicSide m) := fun m => stagePeriodicSide_neZero m
+  obtain ⟨m₀, hm₀⟩ :=
+    Imscribing.YangMills.TorusWraparoundBridge.torus_eventually_injective_infinite_volume
+      (L := stagePeriodicSide) (a := stageSpacing)
+      stageSpacing_pos stageSpacing_tendsto_zero stagePeriodicVolume_tendsto_atTop xs hxs
+  refine ⟨m₀, fun m hm => ?_⟩
+  intro i j hsite
+  have htorus :
+      Imscribing.YangMills.TorusWraparoundBridge.torusSite
+        (stagePeriodicSide m) (stageSpacing m) (xs i) =
+      Imscribing.YangMills.TorusWraparoundBridge.torusSite
+        (stagePeriodicSide m) (stageSpacing m) (xs j) := by
+    have hcoords := congrArg (stageSiteCoords (stagePeriodicSide m)) hsite
+    rw [stageSiteCoords_eq_torusSite, stageSiteCoords_eq_torusSite] at hcoords
+    exact hcoords
+  exact (hm₀ m hm) (by simpa [Function.comp_apply] using htorus)
+
+abbrev stageMomentIndex (m : ℕ) :=
+  Σ r : Fin (m + 1),
+    ({ys : Fin r.val → (cubicTorus4 (stagePeriodicSide m) (stagePeriodicSide m)).Site //
+        Function.Injective ys} × (Fin r.val → Fin (m + 1)))
+
+private noncomputable def stageMomentPoints (m : ℕ) (t : stageMomentIndex m) :
+    Fin t.1.val → Space4 :=
+  fun i => stageSitePoint (stagePeriodicSide m) (stagePeriodicSide m)
+    (stageSpacing m) (t.2.1.1 i)
+
+private noncomputable def stageMomentPowers (m : ℕ) (t : stageMomentIndex m) :
+    Fin t.1.val → ℕ := fun i => (t.2.2 i).val
+
 /-- The observable: O_m(x, U) = ψ_{K_m}(F_m(X_{p(v_m(x))}(U))). -/
 noncomputable def stageObservable (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
@@ -845,6 +1043,16 @@ noncomputable def stageObservable (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
   let v := stageSiteMap Ls Lt a ha x
   exact fourierOrientation K
     (plaquetteCDF Ls Lt N β hβ v (plaquetteDefect Ls Lt N v U))
+
+theorem stageObservable_eq_of_siteMap_eq
+    (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
+    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (ha : 0 < a)
+    (x y : Space4) (K : ℕ)
+    (U : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ))
+    (hsite : stageSiteMap Ls Lt a ha x = stageSiteMap Ls Lt a ha y) :
+    stageObservable Ls Lt N β hβ a ha x K U =
+      stageObservable Ls Lt N β hβ a ha y K U := by
+  simp [stageObservable, hsite]
 
 /-- For a finite family of distinct lattice sites, the stage observable moments
 converge to independent `iidMom` values as the frequency increases. The joint
@@ -993,6 +1201,297 @@ theorem stageObservable_distinctSite_moments_tendsto_of_lattice_maps
     Ls Lt N r β hβ hN hLt2 hr submersion_1d v hsite
   exact stageObservable_distinctSite_moments_tendsto
     Ls Lt N r β hβ a ha xs k hN hLt2 submersion_1d (by simpa [v] using hdom)
+
+private noncomputable def stageMomentValue
+    (N : ℕ)
+    (hN : 2 ≤ N) (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U →
+      ContDiffOn ℝ 1 g U → (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (m : ℕ) (t : stageMomentIndex m) (K : ℕ) : ℝ :=
+  ∫ U, ∏ i : Fin t.1.val,
+    (stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+      (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m)
+      (stageMomentPoints m t i) K U) ^ stageMomentPowers m t i
+    ∂wilsonMeasure (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+
+private noncomputable def stageMomentLimit (m : ℕ) (t : stageMomentIndex m) : ℝ :=
+  ∏ i : Fin t.1.val,
+    ((1 : ℝ) ^ stageMomentPowers m t i + (2 : ℝ) ^ stageMomentPowers m t i) / 2
+
+private noncomputable def stageMomentIndexFintype (m : ℕ) : Fintype (stageMomentIndex m) := by
+  classical
+  letI : ∀ r : Fin (m + 1), Fintype
+      (Fin r.val → (cubicTorus4 (stagePeriodicSide m) (stagePeriodicSide m)).Site) :=
+    fun _ => inferInstance
+  letI : ∀ r : Fin (m + 1),
+      Fintype {ys : Fin r.val → (cubicTorus4 (stagePeriodicSide m)
+        (stagePeriodicSide m)).Site // Function.Injective ys} := fun r =>
+    Fintype.subtype (Finset.univ.filter (fun ys => Function.Injective ys)) (by
+      intro ys
+      simp)
+  letI : ∀ r : Fin (m + 1), Fintype (Fin r.val → Fin (m + 1)) :=
+    fun _ => inferInstance
+  letI : ∀ r : Fin (m + 1), Fintype
+      (({ys : Fin r.val → (cubicTorus4 (stagePeriodicSide m)
+        (stagePeriodicSide m)).Site // Function.Injective ys}) ×
+        (Fin r.val → Fin (m + 1))) := fun _ => inferInstance
+  exact inferInstance
+
+private theorem stageMomentValue_tendsto
+    (N : ℕ)
+    (hN : 2 ≤ N) (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U →
+      ContDiffOn ℝ 1 g U → (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (m : ℕ) (t : stageMomentIndex m) :
+    Filter.Tendsto (stageMomentValue N hN submersion_1d m t) atTop
+      (nhds (stageMomentLimit m t)) := by
+  let ys := stageMomentPoints m t
+  let k := stageMomentPowers m t
+  have hsite : Function.Injective (fun i => stageSiteMap (stagePeriodicSide m)
+      (stagePeriodicSide m) (stageSpacing m) (stageSpacing_pos m) (ys i)) := by
+    intro i j hij
+    apply t.2.1.2
+    simpa [ys, stageMomentPoints, stageSiteMap_stageSitePoint] using hij
+  have hside : m + 1 ≤ stagePeriodicSide m := by
+    change m + 1 ≤ (m + 2) ^ 2
+    have hR : (m : ℝ) + 1 ≤ ((m : ℝ) + 2) ^ 2 := by nlinarith [sq_nonneg (m : ℝ)]
+    exact_mod_cast hR
+  have hr : t.1.val + 1 ≤ stagePeriodicSide m :=
+    le_trans (Nat.succ_le_of_lt t.1.isLt) hside
+  have hLt2 : 2 ≤ stagePeriodicSide m := by
+    change 2 ≤ (m + 2) ^ 2
+    have hm : 0 ≤ (m : ℝ) := Nat.cast_nonneg _
+    have hR : (2 : ℝ) ≤ ((m : ℝ) + 2) ^ 2 := by nlinarith
+    exact_mod_cast hR
+  change Filter.Tendsto
+    (fun K => ∫ U, ∏ i : Fin t.1.val,
+      (stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+        (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m)
+        (stageMomentPoints m t i) K U) ^ stageMomentPowers m t i
+      ∂wilsonMeasure (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)) atTop
+    (nhds (∏ i : Fin t.1.val,
+      ((1 : ℝ) ^ stageMomentPowers m t i + (2 : ℝ) ^ stageMomentPowers m t i) / 2))
+  exact @stageObservable_distinctSite_moments_tendsto_of_lattice_maps
+    (stagePeriodicSide m) (stagePeriodicSide m) N t.1.val
+    (inferInstance : NeZero (stagePeriodicSide m))
+    (inferInstance : NeZero (stagePeriodicSide m))
+    (m : ℝ) (Nat.cast_nonneg _)
+    (stageSpacing m) (stageSpacing_pos m) (stageMomentPoints m t)
+    (stageMomentPowers m t) hN hLt2 hr submersion_1d hsite
+
+/-- One frequency at each finite stage controls all tuples of lattice sites and
+all insertion multiplicities up to that stage. -/
+noncomputable def stageFrequency
+    (N : ℕ)
+    (hN : 2 ≤ N) (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U →
+      ContDiffOn ℝ 1 g U → (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (m : ℕ) : ℕ := by
+  classical
+  letI : Fintype (stageMomentIndex m) := stageMomentIndexFintype m
+  exact Imscribing.Millennium.ContinuumLatticeBridge.uniformFrequency
+    (stageMomentValue N hN submersion_1d m) (stageMomentLimit m)
+    (stageMomentValue_tendsto N hN submersion_1d m)
+    (1 / (m + 1 : ℝ)) (by positivity)
+
+theorem stageFrequency_spec
+    (N : ℕ)
+    (hN : 2 ≤ N) (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U →
+      ContDiffOn ℝ 1 g U → (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (m : ℕ) (t : stageMomentIndex m) :
+    dist (stageMomentValue N hN submersion_1d m t (stageFrequency N hN submersion_1d m))
+      (stageMomentLimit m t) < 1 / (m + 1 : ℝ) := by
+  classical
+  letI : Fintype (stageMomentIndex m) := stageMomentIndexFintype m
+  exact Imscribing.Millennium.ContinuumLatticeBridge.uniformFrequency_spec
+    (stageMomentValue N hN submersion_1d m) (stageMomentLimit m)
+    (stageMomentValue_tendsto N hN submersion_1d m)
+    (1 / (m + 1 : ℝ)) (by positivity) t
+
+/-- The stage-selected Wilson observables converge to the concrete iid
+Schwinger functional, including tuples with repeated continuum points. -/
+theorem stageObservableSchwinger_tendsto_iid
+    (N : ℕ) (hN : 2 ≤ N)
+    (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U → ContDiffOn ℝ 1 g U →
+      (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (n : ℕ) (xs : Fin n → Space4) :
+    Filter.Tendsto
+      (fun m => cubic4Schwinger (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ) n
+        (fun i U =>
+          ((stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+            (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m) (xs i)
+            (stageFrequency N hN submersion_1d m) U : ℝ) : ℂ)))
+      atTop (nhds (iidSchwinger n xs)) := by
+  classical
+  let S := iidSupport xs
+  let e := S.equivFin
+  let rep : Fin S.card → Space4 := fun i => (e.symm i).val
+  have hrep : Function.Injective rep := by
+    intro i j h
+    apply e.symm.injective
+    exact Subtype.ext h
+  obtain ⟨m₀, hm₀⟩ := stageSiteMap_eventually_injective rep hrep
+  have hcard : S.card ≤ n := by
+    dsimp [S, iidSupport]
+    calc
+      (Finset.univ.image xs).card ≤ Finset.univ.card := Finset.card_image_le
+      _ = n := Finset.card_fin
+  have hprod_enum (g : Space4 → ℝ) :
+      S.prod g = ∏ i : Fin S.card, g (rep i) := by
+    calc
+      S.prod g = ∏ y : S, g y.val := by
+        symm
+        simpa using (Finset.prod_attach S g)
+      _ = ∏ i : Fin S.card, g (rep i) := by
+        exact Fintype.prod_equiv e (fun y : S => g y.val)
+          (fun i => g (rep i)) (by intro y; simp [rep, e])
+  have hlimit_enum (m : ℕ) (t : stageMomentIndex m)
+      (ht_pow : ∀ i : Fin S.card,
+        stageMomentPowers m t i = (iidFiber xs (rep i)).card) :
+      stageMomentLimit m t =
+        S.prod (fun y =>
+          ((1 : ℝ) ^ (iidFiber xs y).card + (2 : ℝ) ^ (iidFiber xs y).card) / 2) := by
+    rw [show stageMomentLimit m t =
+        ∏ i : Fin S.card,
+          ((1 : ℝ) ^ (iidFiber xs (rep i)).card +
+            (2 : ℝ) ^ (iidFiber xs (rep i)).card) / 2 by
+        unfold stageMomentLimit
+        apply Finset.prod_congr rfl
+        intro i hi
+        rw [ht_pow i]]
+    symm
+    exact hprod_enum (fun y =>
+      ((1 : ℝ) ^ (iidFiber xs y).card + (2 : ℝ) ^ (iidFiber xs y).card) / 2)
+  have hmoment_to_iid (m : ℕ) (t : stageMomentIndex m)
+      (ht_pow : ∀ i : Fin S.card,
+        stageMomentPowers m t i = (iidFiber xs (rep i)).card) :
+      (stageMomentLimit m t : ℂ) = iidSchwinger n xs := by
+    rw [iidSchwinger_eq_fiberProd]
+    rw [hlimit_enum m t ht_pow]
+    simp only [map_prod]
+    apply Finset.prod_congr rfl
+    intro y hy
+    simp [iidMom, Complex.ofReal_pow, Complex.ofReal_div]
+  rw [Metric.tendsto_atTop]
+  intro ε hε
+  obtain ⟨Mε, hMε⟩ := exists_nat_one_div_lt hε
+  refine ⟨max (max n m₀) Mε, fun m hm => ?_⟩
+  have hnm : n ≤ m := le_trans (le_max_left _ _) (le_trans (le_max_left _ _) hm)
+  have hmgeom : m₀ ≤ m := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hm
+  have hmeps : Mε ≤ m := le_trans (le_max_right _ _) hm
+  let rfin : Fin (m + 1) := ⟨S.card, Nat.lt_succ_of_le (le_trans hcard hnm)⟩
+  let siteTuple : Fin S.card → (cubicTorus4 (stagePeriodicSide m)
+      (stagePeriodicSide m)).Site := fun i =>
+    stageSiteMap (stagePeriodicSide m) (stagePeriodicSide m) (stageSpacing m)
+      (stageSpacing_pos m) (rep i)
+  have hsites : Function.Injective siteTuple := by
+    simpa [siteTuple] using hm₀ m hmgeom
+  have hmult : ∀ i : Fin S.card, (iidFiber xs (rep i)).card ≤ m := by
+    intro i
+    have hle : (iidFiber xs (rep i)).card ≤ n := by
+      unfold iidFiber
+      calc
+        (Finset.univ.filter fun j : Fin n => xs j = rep i).card ≤ Finset.univ.card :=
+          Finset.card_filter_le
+        _ = n := Finset.card_fin
+    exact le_trans hle hnm
+  let t : stageMomentIndex m :=
+    ⟨rfin, (⟨siteTuple, hsites⟩,
+      fun i => ⟨(iidFiber xs (rep i)).card, Nat.lt_succ_of_le (hmult i)⟩)⟩
+  have ht_pow (i : Fin S.card) :
+      stageMomentPowers m t i = (iidFiber xs (rep i)).card := by
+    rfl
+  have ht_point (i : Fin S.card) :
+      stageMomentPoints m t i = stageSitePoint (stagePeriodicSide m) (stagePeriodicSide m)
+        (stageSpacing m) (siteTuple i) := by
+    rfl
+  have ht_site (i : Fin S.card) :
+      stageSiteMap (stagePeriodicSide m) (stagePeriodicSide m) (stageSpacing m)
+        (stageSpacing_pos m) (rep i) =
+      stageSiteMap (stagePeriodicSide m) (stagePeriodicSide m) (stageSpacing m)
+        (stageSpacing_pos m) (stageMomentPoints m t i) := by
+    rw [ht_point]
+    exact (stageSiteMap_stageSitePoint (stagePeriodicSide m) (stagePeriodicSide m)
+      (stageSpacing m) (stageSpacing_pos m) (siteTuple i)).symm
+  let K := stageFrequency N hN submersion_1d m
+  let f : GaugeField (cubicTorus4 (stagePeriodicSide m) (stagePeriodicSide m))
+      (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℝ := fun U =>
+        ∏ i : Fin n, stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N
+          (m : ℝ) (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m)
+          (xs i) K U
+  let obs : Fin n → GaugeField (cubicTorus4 (stagePeriodicSide m) (stagePeriodicSide m))
+      (Matrix.specialUnitaryGroup (Fin N) ℂ) → ℂ := fun i U =>
+        (stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+          (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m) (xs i) K U : ℂ)
+  have hobsprod (U : GaugeField (cubicTorus4 (stagePeriodicSide m) (stagePeriodicSide m))
+      (Matrix.specialUnitaryGroup (Fin N) ℂ)) :
+      (∏ i : Fin n, obs i U) = (f U : ℂ) := by
+    simp [obs, f, map_prod]
+  have hobs_integral := cubic4Schwinger_eq_real_wilsonExpectation
+    (stagePeriodicSide m) (stagePeriodicSide m) N n (m : ℝ) (Nat.cast_nonneg _)
+    obs f hobsprod
+  have hprod_fun : f = fun U =>
+      ∏ i : Fin S.card,
+        (stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+          (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m)
+          (stageMomentPoints m t i) K U) ^ stageMomentPowers m t i := by
+    funext U
+    dsimp [f]
+    calc
+      (∏ i : Fin n, stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N
+          (m : ℝ) (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m) (xs i) K U)
+        = S.prod (fun y =>
+            (stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+              (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m) y K U) ^
+              (iidFiber xs y).card) := by
+                simpa [S, iidSupport, iidFiber] using
+                  (prod_regroup
+                    (fun y => stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N
+                      (m : ℝ) (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m) y K U)
+                    xs)
+      _ = ∏ i : Fin S.card,
+            (stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+              (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m)
+              (rep i) K U) ^ (iidFiber xs (rep i)).card := hprod_enum _
+      _ = ∏ i : Fin S.card,
+            (stageObservable (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)
+              (Nat.cast_nonneg _) (stageSpacing m) (stageSpacing_pos m)
+              (stageMomentPoints m t i) K U) ^ stageMomentPowers m t i := by
+                apply Finset.prod_congr rfl
+                intro i hi
+                rw [stageObservable_eq_of_siteMap_eq]
+                · rw [ht_pow i]
+                · exact (ht_site i).symm
+  have hreal_integral :
+      (∫ U, f U ∂wilsonMeasure (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ)) =
+        stageMomentValue N hN submersion_1d m t K := by
+    rw [hprod_fun]
+    rfl
+  have happrox := stageFrequency_spec N hN submersion_1d m t
+  have hschw :
+      cubic4Schwinger (stagePeriodicSide m) (stagePeriodicSide m) N (m : ℝ) n obs =
+        (stageMomentValue N hN submersion_1d m t K : ℂ) := by
+    rw [hobs_integral, hreal_integral]
+    rfl
+  have hlim : (stageMomentLimit m t : ℂ) = iidSchwinger n xs :=
+    hmoment_to_iid m t ht_pow
+  rw [show (fun q => cubic4Schwinger (stagePeriodicSide q) (stagePeriodicSide q) N (q : ℝ) n
+      (fun i U =>
+        ((stageObservable (stagePeriodicSide q) (stagePeriodicSide q) N (q : ℝ)
+          (Nat.cast_nonneg _) (stageSpacing q) (stageSpacing_pos q) (xs i)
+          (stageFrequency N hN submersion_1d q) U : ℝ) : ℂ))) =
+      fun q => cubic4Schwinger (stagePeriodicSide q) (stagePeriodicSide q) N (q : ℝ) n obs
+      by
+        funext q
+        dsimp [obs, K]
+        rfl]
+  rw [hschw, hlim]
+  have hfrac : (1 : ℝ) / (m + 1 : ℝ) ≤ 1 / (Mε + 1 : ℝ) := by
+    apply one_div_le_one_div_of_le (by positivity)
+    exact_mod_cast Nat.succ_le_succ hmeps
+  exact lt_of_lt_of_le happrox (lt_of_le_of_lt hfrac hMε)
 
 theorem stageObservable_range (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]

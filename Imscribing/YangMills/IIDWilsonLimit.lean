@@ -50,7 +50,8 @@ noncomputable def iidSupport {n : ℕ} (xs : Fin n → Space4) : Finset Space4 :
 noncomputable def iidFiber {n : ℕ} (xs : Fin n → Space4) (y : Space4) : Finset (Fin n) :=
   Finset.univ.filter (fun i => xs i = y)
 
-private lemma prod_regroup {n : ℕ} (f : Space4 → ℂ) (xs : Fin n → Space4) :
+lemma prod_regroup {M : Type*} [CommMonoid M] {n : ℕ} (f : Space4 → M)
+    (xs : Fin n → Space4) :
     (∏ i : Fin n, f (xs i)) =
       (iidSupport xs).prod (fun y => f y ^ (iidFiber xs y).card) := by
   unfold iidSupport iidFiber
@@ -87,7 +88,7 @@ lemma iidFiber_injective {n : ℕ} (xs : Fin n → Space4) :
   have hi_y' : xs i = y' := by simpa [iidFiber] using hi_mem'
   exact hi.symm.trans hi_y'
 
-private lemma iidSchwinger_eq_fiberProd {n : ℕ} (xs : Fin n → Space4) :
+lemma iidSchwinger_eq_fiberProd {n : ℕ} (xs : Fin n → Space4) :
     iidSchwinger n xs = (iidSupport xs).prod (fun y => iidMom (iidFiber xs y).card) := by
   unfold iidSchwinger
   rw [iidClasses_eq_fibers]
