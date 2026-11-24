@@ -94,5 +94,7 @@ globs = [
   "Imscribing.YangMills.BoundaryDistributionLimit",
   "Imscribing.YangMills.BorchersPairingFromSchwinger",
   "Imscribing.YangMills.SchwingerToClayMaster",
-  "Imscribing.YangMills.LatticeChessboardAndTransfer4D"
+  "Imscribing.YangMills.LatticeChessboardAndTransfer4D",
+  "Imscribing.YangMills.DoeblinTransferGap4D",
+  "Imscribing.YangMills.LatticeTransferOperator4D"
 ]
