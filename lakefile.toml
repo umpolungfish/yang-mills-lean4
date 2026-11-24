@@ -100,5 +100,7 @@ globs = [
   "Imscribing.YangMills.WilsonDoeblinGap4D",
   "Imscribing.YangMills.IBPBoundaryToWightman",
   "Imscribing.YangMills.PoincareLieAlgebraAndNelson",
-  "Imscribing.YangMills.MinimalClayReduction"
+  "Imscribing.YangMills.MinimalClayReduction",
+  "Imscribing.YangMills.WilsonBlockSpinRG4D",
+  "Imscribing.YangMills.AnalyticVectorExponential"
 ]
