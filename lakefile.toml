@@ -88,5 +88,11 @@ globs = [
   "Imscribing.YangMills.WickRotationAndForwardTube",
   "Imscribing.YangMills.WickMatrixBridge",
   "Imscribing.YangMills.WilsonHaarCompactness4D",
-  "Imscribing.YangMills.ForwardTubeSpectralDamping"
+  "Imscribing.YangMills.ForwardTubeSpectralDamping",
+  "Imscribing.YangMills.TransferMatrixToSemigroup",
+  "Imscribing.YangMills.DimensionalTransmutationAndBoundary",
+  "Imscribing.YangMills.BoundaryDistributionLimit",
+  "Imscribing.YangMills.BorchersPairingFromSchwinger",
+  "Imscribing.YangMills.SchwingerToClayMaster",
+  "Imscribing.YangMills.LatticeChessboardAndTransfer4D"
 ]
