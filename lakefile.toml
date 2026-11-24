@@ -69,6 +69,15 @@ globs = [
   "Imscribing.YangMills.PlaquetteStep3",
   "Imscribing.YangMills.RademacherStep4",
   "Imscribing.YangMills.SchwingerConv",
-  "Imscribing.Millennium.ContinuumLatticeBridge",
-  "Imscribing.Millennium.TorusWraparoundBridge"
+  "Imscribing.YangMills.ContinuumLatticeBridge",
+  "Imscribing.YangMills.TorusWraparoundBridge",
+  "Imscribing.YangMills.ClayStatement",
+  "Imscribing.YangMills.SemigroupGapBridge",
+  "Imscribing.YangMills.AsymptoticFreedomAndOSClosure",
+  "Imscribing.YangMills.OSContractivityAndGenerator",
+  "Imscribing.YangMills.ClayReductionBridge",
+  "Imscribing.YangMills.OSHilbertCompletion",
+  "Imscribing.YangMills.WilsonLattice4D",
+  "Imscribing.YangMills.WilsonBounds4D",
+  "Imscribing.YangMills.OSBorchers"
 ]

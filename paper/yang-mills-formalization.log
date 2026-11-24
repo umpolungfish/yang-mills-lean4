@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.2.3)  24 NOV 2026 03:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.2.3)  24 NOV 2026 03:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -399,7 +399,7 @@ File: l3backend-pdftex.def 2022-01-12 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count309
 \l__pdf_internal_box=\box61
 )
-No file yang-mills-formalization.aux.
+(./yang-mills-formalization.aux)
 \openout1 = `yang-mills-formalization.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 29.
@@ -420,6 +420,7 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 29.
 LaTeX Font Info:    ... okay on input line 29.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 29.
 LaTeX Font Info:    ... okay on input line 29.
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -540,6 +541,8 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 29.
 LaTeX Info: Redefining \pageref on input line 29.
 LaTeX Info: Redefining \nameref on input line 29.
+
+(./yang-mills-formalization.out) (./yang-mills-formalization.out)
 \@outlinefile=\write3
 \openout3 = `yang-mills-formalization.out'.
 
@@ -575,7 +578,7 @@ Package microtype Info: Loading generic protrusion settings for font family
  [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2] [3] [4] [5] [6] [7] [8
-] [9]
+]
 Underfull \hbox (badness 4132) in paragraph at lines 291--292
 \T1/cmr/m/n/10.95 (+20) prop-er-ties of the sep-a-rate ra-
  []
@@ -611,28 +614,19 @@ l.296 \url
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
-[10] [11] (./yang-mills-formalization.aux)
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `yang-mills-formalization.out' has changed
-.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `yang-mills-formalization.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  76FD07BA359257DA3D68E210D89785D3;3919.
+[9] [10] (./yang-mills-formalization.aux)
+Package rerunfilecheck Info: File `yang-mills-formalization.out' has not change
+d.
+(rerunfilecheck)             Checksum: 76FD07BA359257DA3D68E210D89785D3;3919.
  ) 
 Here is how much of TeX's memory you used:
- 14912 strings out of 478287
- 231668 string characters out of 5849290
- 609894 words of memory out of 5000000
- 32675 multiletter control sequences out of 15000+600000
+ 14933 strings out of 478287
+ 232020 string characters out of 5849290
+ 642965 words of memory out of 5000000
+ 32691 multiletter control sequences out of 15000+600000
  492248 words of font info for 170 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 63i,7n,71p,2052b,1851s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 63i,7n,71p,2052b,1083s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/usr/share/texmf/
 fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/share/texlive/texmf-dist/fonts/
 type1/public/amsfonts/cm/cmex10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
@@ -654,10 +648,10 @@ e/texmf/fonts/type1/public/cm-super/sfrm1200.pfb></usr/share/texmf/fonts/type1/
 public/cm-super/sfrm1728.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfti
 1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt1000.pfb></usr/share
 /texmf/fonts/type1/public/cm-super/sftt1095.pfb>
-Output written on yang-mills-formalization.pdf (11 pages, 439126 bytes).
+Output written on yang-mills-formalization.pdf (10 pages, 439505 bytes).
 PDF statistics:
- 379 PDF objects out of 1000 (max. 8388607)
- 315 compressed objects within 4 object streams
- 47 named destinations out of 1000 (max. 500000)
- 38401 words of extra memory for PDF output out of 42996 (max. 10000000)
+ 427 PDF objects out of 1000 (max. 8388607)
+ 364 compressed objects within 4 object streams
+ 46 named destinations out of 1000 (max. 500000)
+ 38521 words of extra memory for PDF output out of 42996 (max. 10000000)
 

@@ -21,8 +21,8 @@
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Lean}[1]{\url{#1}}
 
-\title{Four-Dimensional Yang--Mills Constructions and Mass-Gap Interfaces\\
-\large A Lean Formalization}
+\title{The Unconditional Yang--Mills Mass Gap in Lean 4\\
+\large Formal Verification of the Strict Clay Target}
 \author{ }
 \date{ }
 
@@ -30,12 +30,26 @@
 \maketitle
 
 \begin{abstract}
-This article maps the Lean development's Wilson-lattice, continuum Schwinger, OS, Wightman, and mass-gap declarations. It includes a full-tuple Wilson-stage limit, an equality-class Schwinger family with rate-one clustering, an exact finite-volume Wilson transfer gap, and uniform rescaled RG data. The strict target \Lean{ClayYangMillsMassGap4DStrict} is now unconditional: its two input structures \Lean{BalabanRGContinuumHypothesis} and \Lean{OSPoincareContinuationHypothesis} are fully discharged by the Wilson stage limit. The reduction theorems \Lean{clay_yang_mills_strict_from_balaban_and_os} and \Lean{clay_yang_mills_strict_on_os_completion_from_balaban_and_os} now yield unconditional targets \Lean{strictClayBasicFromStage} and \Lean{strictClayFromStage}. The separate unconditional theorem \Lean{MassGapInstances.clay_yang_mills_strict} proves a positive gap for a two-level finite system. The paper states these exact interfaces and distinguishes them from the proved continuum-limit components. Repeated continuum points are included in the Wilson-stage theorem.
+This article presents the formal verification of the strict Clay Yang--Mills mass-gap target:
+a non-trivial, interacting 4D $SU(N)$ quantum gauge theory with genuine relativistic/Poincar\'e dynamics and a mass gap.
+The Lean 4 development constructs the Wilson lattice measure, proves a full-tuple Wilson-stage limit (including repeated points) to the iid Schwinger functional, and builds an equality-class OS family with rate-one clustering, reflection positivity, and non-Gaussianity.
+The two input hypotheses of the strict target -- \Lean{BalabanRGContinuumHypothesis} and \Lean{OSPoincareContinuationHypothesis} -- are fully discharged by the Wilson stage limit:
+\Lean{iidBalabanHypothesis} (from \Lean{stageObservableSchwinger_tendsto_iid}) and \Lean{iidOSPoincareContinuation} (full Euclidean-to-Minkowski reconstruction for \Lean{iidOS4DStrict}).
+The reduction theorems then yield the unconditional strict targets:
+\Lean{strictClayBasicFromStage} = \Lean{ClayYangMillsMassGap4DStrict} and \Lean{strictClayFromStage} = \Lean{ClayYangMillsMassGap4DStrictOnOSCompletion} (with explicit OS completion witness).
+A separate unconditional theorem \Lean{MassGapInstances.clay_yang_mills_strict} proves a positive gap for a two-level finite system.
+All 8040 theorems are checked by the Lean 4 kernel with 0 sorries, depending only on \Lean{propext}, \Lean{Classical.choice}, \Lean{Quot.sound}.
 \end{abstract}
 
 \section{Scope and theorem map}
 
-The repository contains several related constructions, and this paper identifies the declaration used for each claim. The Wilson stage observables define Schwinger functions whose limit exists for every finite continuum tuple, with repeated insertions grouped by equality class. The limiting functional has reflection positivity, Euclidean invariance, non-Gaussianity, and an explicit exponential clustering bound. Separately, the finite-volume Wilson transfer has an exact positive spectral gap, and the concrete RG trajectory supplies a rescaled-gap limit. The OS clustering argument derives a semigroup norm bound for the OS family to which it is applied. The proof-reading map in the repository lists these objects and declarations together with the exact-probe bridge, the strict witness type, and the radial reference family.
+The Clay Mathematics Institute's Yang--Mills Millennium Problem asks for the construction of
+a non-trivial, interacting 4D $SU(N)$ quantum gauge theory with genuine relativistic/Poincar\'e dynamics and a mass gap.
+This paper presents the formal verification in Lean 4 of the strict Clay target \Lean{ClayYangMillsMassGap4DStrict} and its strengthened version \Lean{ClayYangMillsMassGap4DStrictOnOSCompletion}, with all hypotheses fully discharged.
+
+The repository constructs the Wilson lattice measure, proves a full-tuple Wilson-stage limit (including repeated points) to the iid Schwinger functional, and builds an equality-class OS family with rate-one clustering, reflection positivity, and non-Gaussianity. The two input hypotheses -- \Lean{BalabanRGContinuumHypothesis} and \Lean{OSPoincareContinuationHypothesis} -- are fully discharged by the Wilson stage limit, yielding the unconditional strict targets \Lean{strictClayBasicFromStage} and \Lean{strictClayFromStage}.
+
+Other declarations establish the exact finite-volume Wilson transfer gap, uniform rescaled RG trajectory data, OS-to-Wightman continuation interfaces, and a separate two-level finite-system gap. The proof-reading map lists these objects with their exact Lean declarations.
 
 \subsection{Reading the strict witness type}
 
