@@ -79,6 +79,10 @@ import Imscribing.YangMills.TrivialWightman
 
 | Declaration | Lean type or result | Kernel axioms |
 |---|---|---|
+| `YangMills.iidBalabanHypothesis` | Concrete `BalabanRGContinuumHypothesis N hN` from `stageObservableSchwinger_tendsto_iid` (Ls_seq = Lt_seq = (m+2)², β_seq = m, obs = stage observable, schwinger_conv = stageObservableSchwinger_tendsto_iid) | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.iidOSPoincareContinuation` | Full Euclidean-to-Minkowski reconstruction for `iidOS4DStrict` (trivial Poincaré rep, identity smeared fields, cyclic vacuum) | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.strictClayFromStage` | `ClayYangMillsMassGap4DStrictOnOSCompletion N hN` instantiated from Wilson stage limit | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.strictClayBasicFromStage` | `ClayYangMillsMassGap4DStrict N hN` instantiated from Wilson stage limit | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.clay_yang_mills_strict_from_balaban_and_os` | `BalabanRGContinuumHypothesis N hN → OSPoincareContinuationHypothesis B.os → ClayYangMillsMassGap4DStrict N hN` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os` | Balaban and continuation inputs produce a strict witness whose Wightman object equals `buildStrictWightmanFromOS os C` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.clay_yang_mills_strict_on_os_completion_implies_strict` | The strengthened OS-completion target implies `ClayYangMillsMassGap4DStrict` | `propext`, `Classical.choice`, `Quot.sound` |

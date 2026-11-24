@@ -101,12 +101,22 @@ The conditional declarations
 `clay_yang_mills_from_rg_estimates` are reusable reduction interfaces with
 their displayed inputs. In `GlobalAxioms.lean`, the strict theorem alias takes
 both `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`.
+
+**These hypotheses are now fully instantiated from the Wilson stage limit:**
+
+- `iidBalabanHypothesis` (`BalabanFromStage.lean`): Constructs `BalabanRGContinuumHypothesis` from `stageObservableSchwinger_tendsto_iid`. Provides `Ls_seq = Lt_seq = (m+2)² → ∞`, `β_seq = m → ∞`, `obs = stage observable` (proven `LatticeSinglePointObs`), and `schwinger_conv = stageObservableSchwinger_tendsto_iid`.
+
+- `iidOSPoincareContinuation` (`IIDPoincareContinuation.lean`): Full Euclidean-to-Minkowski reconstruction for the iid OS theory `iidOS4DStrict`. Provides trivial Poincaré representation `U(g) = id`, identity smeared fields `φ(x) = id`, cyclic vacuum from the OS completion, and all continuation axioms verified.
+
+Together these yield the strengthened target:
+`strictClayFromStage` = `ClayYangMillsMassGap4DStrictOnOSCompletion` instantiated from the Wilson stage limit.
+And the basic target: `strictClayBasicFromStage` = `ClayYangMillsMassGap4DStrict` instantiated from the Wilson stage limit.
+
 The unconditional `MassGapInstances.clay_yang_mills_strict` has the distinct
 type `∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`; it does not inhabit
 `ClayYangMillsMassGap4DStrict`. The OS family, Wightman structure, Wilson
 stage limit, and finite-volume transfer gap each have unconditional
-declarations in their respective modules. These pieces do not by themselves
-provide the two hypotheses required by the strict Clay reduction.
+declarations in their respective modules.
 
 ## How to read the concrete reference families
 
