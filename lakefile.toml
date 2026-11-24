@@ -96,5 +96,9 @@ globs = [
   "Imscribing.YangMills.SchwingerToClayMaster",
   "Imscribing.YangMills.LatticeChessboardAndTransfer4D",
   "Imscribing.YangMills.DoeblinTransferGap4D",
-  "Imscribing.YangMills.LatticeTransferOperator4D"
+  "Imscribing.YangMills.LatticeTransferOperator4D",
+  "Imscribing.YangMills.WilsonDoeblinGap4D",
+  "Imscribing.YangMills.IBPBoundaryToWightman",
+  "Imscribing.YangMills.PoincareLieAlgebraAndNelson",
+  "Imscribing.YangMills.MinimalClayReduction"
 ]
