@@ -19,11 +19,15 @@ the spacing is `1/(m+2)` and the physical side length is `m+2`. Equal continuum
 points are grouped at their shared lattice sites, so repeated insertions retain
 their multiplicity in the moment.
 
-The same limit is viewed from a single-site probe by
-`iidSchwinger_from_wilson`. That probe has the exact continuum expectation at
-every lattice size and every nonnegative coupling. The full-tuple stage theorem
-states convergence for the selected Wilson observables along the explicit
-stage sequence.
+There are two distinct Wilson results. `iidSchwinger_from_wilson` gives an
+exact finite-volume identity for a specially defined probe family. The
+finite-volume-to-continuum result is
+`stageObservableSchwinger_tendsto_iid`: it proves convergence of the selected
+plaquette-CDF observables along the explicit stage sequence for every finite
+tuple, including repeated points. The proof-reading map gives the constructions
+and declarations side by side. The theorem's type takes a generic
+submersion-to-density result as an explicit argument, supplied by
+`submersion_map_has_L1_density` in `SubmersionDensity.lean`.
 
 ## Euclidean Schwinger properties
 
@@ -40,10 +44,22 @@ functions:
 | Exponential clustering | Widely separated groups of insertions become independent at an exponential rate. |
 | Non-Gaussianity | The connected four-point function is nonzero, so the field has interactions beyond Gaussian moments. |
 
-These claims are proved directly for `iidSchwinger` and transferred through the
-Wilson probe bridge. Their Lean declarations are listed in the formal audit.
+These claims are proved directly for `iidSchwinger`. The exact Wilson probe
+bridge transfers them to its probe family, and the full-tuple stage theorem
+identifies the limit of the selected Wilson observables with the same
+`iidSchwinger` functional. Their Lean declarations are listed in the formal
+audit.
 
 ## OS reconstruction and Wightman structure
+
+The target `ClayYangMillsMassGap4DStrict` contains an OS structure and a
+Wightman structure indexed by the same positive `Δ_phys`. Its fields also
+require non-Gaussianity of the OS family and convergence of the Wilson lattice
+Schwinger functions to that family. This proposition does not have a field
+identifying its Wightman witness with an OS reconstruction. The separately
+named `buildStrictWightmanFromOS` interface is the reconstruction route when
+its continuation data are provided. See the proof-reading map for the exact
+declaration locations.
 
 Osterwalder–Schrader data turn reflection-positive Euclidean correlations into
 a Hilbert space with a normalized vacuum. A Wightman structure adds the
@@ -52,25 +68,37 @@ with the spacetime symmetry; locality means spacelike-separated fields
 commute; vacuum cyclicity means field insertions generate a dense set of
 physical states.
 
-The semigroup `T(t)` describes Euclidean-time evolution on the reconstructed
-space. Its gap bound
+When the OS-to-Wightman continuation hypotheses are supplied, the semigroup
+`T(t)` describes Euclidean-time evolution on the reconstructed space. Its gap bound
 `‖T(t)v‖ ≤ exp(−Δt)‖v‖` for vacuum-orthogonal states says that excited states
 decay exponentially in Euclidean time. Exponential clustering is the
 corresponding statement for correlations. The positive value `Δ` is the
-continuum mass gap carried by the reconstructed theory.
+mass gap of that reconstructed theory.
 
 ## Uniform RG and the mass-gap witness
 
-`concreteUniformRGTrajectory N hN` is the concrete RG trajectory at each
-`N ≥ 2`. The value of its continuum gap is obtained from the proved transfer
-decay and the rescaling. `T_tesseract_gap` proves that each lattice step bounds
-vacuum-orthogonal transfer correlations by `exp(-a)` times the squared norm.
-At stage `m`, the
-spacing and lattice decay exponent are both `a_m = Δ_latt(m) = 1/(m+1)`, so
-`Δ_latt(m) / a_m = 1` at every stage. The trajectory's `gap_lim` proves that
-these quotients converge to `F.Δ_phys`, hence `Δ_phys = 1`. For physical time
-`t = k a_m`, the transfer decay is `exp(-k a_m) = exp(-t)`. The reconstructed
-continuum theory therefore carries the positive mass gap `1`. In
-`yangMillsMassGap`, this gap is part of the resulting Yang–Mills witness. The
-strict mass-gap and RG declarations, with their exact types and axiom reports,
-are available in the [declaration audit](formal_declaration_audit.md).
+`concreteUniformRGTrajectory N hN` supplies the generic uniform RG and
+rescaled-gap interface. Separately, the full-rank finite-volume Wilson transfer
+has an exact positive spectral gap, proved by
+`fullRankCubicNonAbelianWilsonSetup_exact_gap`. The Wilson-limit functional
+also has a rate-one cluster estimate, and
+`os_cluster_implies_semigroup_gap` derives the corresponding semigroup bound
+on its OS completion. These are distinct gap arguments carried by different
+objects. The declaration audit and proof-reading map identify their types and
+source files.
+
+The complete target proposition is `ClayYangMillsMassGap4DStrict`. Its current
+strict theorem is a conditional reducer whose inputs are
+`BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`. The
+unconditional theorem named `MassGapInstances.clay_yang_mills_strict` proves a
+separate finite-system gap on `Fin 2`. These types answer the common question
+whether the component witnesses already form an unconditional strict Clay
+witness: the OS, Wightman, stage-limit, and transfer-gap declarations are
+present, while the reducer inputs remain explicit.
+
+The radial `isingSchwinger` family and `concreteOS4DContinuumTheory` are a
+separate distance-dependent Euclidean example. The source also proves the
+translation-invariance counterexample for that origin-anchored family. It is
+not the equality-class Wilson stage limit. `concreteUniformRGTrajectory` is a
+generic trajectory carrier with its own role; the Wilson limit is specified by
+`stageObservableSchwinger_tendsto_iid` in `SchwingerConv.lean`.

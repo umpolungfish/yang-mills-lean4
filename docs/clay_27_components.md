@@ -1,12 +1,16 @@
-# Clay construction — 27-component audit
+# Clay obligations — 27-component formal audit
 
-Audit of the Lean construction of a continuum 4D SU(N) Yang–Mills theory with
-strictly positive mass gap. Each obligation is mapped to its checked theorem
-and concrete construction.
+Audit of the Lean declarations related to the continuum 4D SU(N) Yang–Mills
+mass-gap obligations. Each obligation is mapped to its checked theorem,
+construction, or conditional interface. A `proved` component does not by
+itself mean that the complete strict Clay proposition has an unconditional
+inhabitant.
 
 This page gives the component-by-component proof map. The [semantic overview](semantic_decomposition.html)
 explains what the construction's claims mean; the [declaration audit](formal_declaration_audit.html)
-lists the requested Lean checks and kernel reports.
+lists the requested Lean checks and kernel reports. The [proof-reading map](proof_reading_map.html)
+separates the Wilson stage limit, exact probe bridge, strict witnesses, and
+reference families at their likely points of confusion.
 
 ## Stage I — lattice regularization and continuum limit
 
@@ -37,6 +41,12 @@ depend only on `propext`, `Classical.choice`, `Quot.sound`, zero sorries.
 
 ## Stage III — OS reconstruction and Wightman QFT
 
+The `concreteOSReconstructionData` cited in rows 14–16 belongs to
+`concreteOS4DContinuumTheory`, the separate radial reference family. The source
+also proves `concreteOS4D_fails_trans_inv` for that family. These rows record
+that reconstruction example; they do not identify it with `iidOS4DStrict` or
+with the Wightman witness in the strict Clay proposition.
+
 | # | Obligation | Status | Source |
 |---|---|---|---|
 | 12 | Normalization S₀ = 1 and growth bound ‖Sₙ‖ ≤ Mⁿ | proved | `canonicalS_inf_zero`, `canonicalS_inf_bd`; `iidMom_norm_le` |
@@ -51,7 +61,14 @@ depend only on `propext`, `Classical.choice`, `Quot.sound`, zero sorries.
 |---|---|---|---|
 | 17 | Euclidean time-evolution contraction semigroup | proved | `buildStrictWightmanFromOS.T_E*` |
 | 18 | Semigroup mass gap ‖T(t)v‖ ≤ e^(−Δt)‖v‖ | proved | `os_cluster_implies_semigroup_gap`, `T_E_gap` |
-| 19 | Continuum Yang–Mills mass-gap witness | proved | `clay_yang_mills_strict_from_balaban_and_os`, `clay_yang_mills_from_rg_estimates` |
+| 19 | Strict continuum Clay mass-gap proposition | conditional | `clay_yang_mills_strict_from_balaban_and_os` requires `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`; `clay_yang_mills_from_rg_estimates` requires `SUYangMillsRGConjecture` |
+
+The unconditional `MassGapInstances.clay_yang_mills_strict` proves the separate
+finite-system statement `∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`. The strict
+continuum target has no unconditional inhabitant in the declarations listed
+here. `iidOS4DStrict`, `trivialWightman`, the Wilson stage limit, and the exact
+finite-volume Wilson transfer gap are proved separately; their types do not
+provide the inputs to the strict Clay reduction.
 
 ## Completed Wilson-to-Schwinger limit
 
@@ -62,10 +79,11 @@ aₘ = 1/(m+2) and physical side length m+2; its finite frequency selector
 handles every finite-stage site tuple and insertion multiplicity. Eventual
 injectivity is proved for the exact wrapped coordinates used by `stageSiteMap`.
 
-The full-tuple Wilson stage limit is part of the construction. The theorem
-`stageObservableSchwinger_tendsto_iid` covers arbitrary finite tuples, including
-repeated points, with spacing aₘ = 1/(m+2) and physical side length m+2.
-The strict mass-gap theorem declarations and their kernel reports are listed in
+`iidSchwinger_from_wilson` proves an exact identity for its defined probe
+family. `stageObservableSchwinger_tendsto_iid` separately proves convergence
+along the explicit Wilson stage sequence for every finite tuple, including
+repetitions. The second theorem is the selected-observable stage limit. Strict
+mass-gap theorem declarations and kernel reports are in
 `formal_declaration_audit.md`.
 
 ## Analytic rungs used by the stage limit

@@ -1,75 +1,59 @@
-# Bridge to Unconditional — formal targets
+# Completed bridge to the unconditional constructions
 
-The nine properties required to discharge the §46 unconditional mass-gap claim,
-given as Lean formal statements. These are the targets; the task is to prove
-them from the corpus's finite-volume lemmas and pass them to the infinite-volume
-limit.
+This page records where the continuum properties and mass-gap structures are
+proved in the repository. The abstract nine-property interface in
+`BridgeStatements.lean` remains a reusable statement of obligations; it is not
+a list of outstanding proof tasks. The concrete constructions and exact Lean
+types are summarized in the [proof-reading map](proof_reading_map.html) and
+[formal declaration audit](formal_declaration_audit.html).
 
-```lean
-import Mathlib
-open scoped BigOperators
+## Wilson measure and continuum correlations
 
-variable {ι : Type*} [Fintype ι]
+`CubicHaar4D.lean` defines the finite-volume periodic `SU(N)` Wilson measure,
+including product Haar measure, action, partition function, and normalized
+expectations. `SchwingerConv.lean` defines the stage geometry and selected
+plaquette-CDF observable. Its theorem
+`stageObservableSchwinger_tendsto_iid` proves convergence for every finite
+continuum tuple, including repetitions, to `iidSchwinger`.
 
-abbrev Config (n : ℕ) := Fin n → EuclideanSpace ℝ (Fin 4)
+`IIDSchwinger.lean` proves translation and rotation invariance, permutation
+symmetry, reflection positivity, rate-one clustering, nonvanishing, and
+non-Gaussianity for the equality-class functional. `IIDSchwingerFromWilson.lean`
+proves the separate exact-probe identity. That identity does not replace the
+stage-limit theorem.
 
--- 1. SO(4) rotation invariance
-def SO4RotationInvariance (S : (n : ℕ) → Config n → ℝ) : Prop :=
-  ∀ (n : ℕ) (R : Matrix (Fin 4) (Fin 4) ℝ),
-    R ∈ Matrix.orthogonalGroup (Fin 4) ℝ → R.det = 1 →
-    ∀ x : Config n, S n (R • x) = S n x
+## Euclidean and spectral structures
 
--- 2. Translation invariance
-def TranslationInvariance (S : (n : ℕ) → Config n → ℝ) : Prop :=
-  ∀ (n : ℕ) (a : EuclideanSpace ℝ (Fin 4)) (x : Config n),
-    S n (fun i => x i + a) = S n x
+`IIDOS.lean` constructs `iidOS4DStrict` at rate `1`. `CubicHaar4D.lean`
+proves the exact positive gap for the full-rank Wilson transfer in
+`fullRankCubicNonAbelianWilsonSetup_exact_gap`. `OSCompletion.lean` proves
+`os_cluster_implies_semigroup_gap`, deriving the OS semigroup norm bound from
+clustering, reflection positivity, and semigroup properties.
 
--- 3. Cluster property with exponential decay
-def ClusterProperty (S : (n : ℕ) → Config n → ℝ) (Δ : ℝ) : Prop :=
-  ∀ n m : ℕ, ∃ C : ℝ, 0 < C ∧
-    ∀ (x : Config n) (y : Config m) (R : ℝ), 0 ≤ R →
-      (∀ i j, R ≤ dist (x i) (y j)) →
-      |S (n + m) (Fin.append x y) - S n x * S m y| ≤ C * Real.exp (-Δ * R)
+## Typed strict witness and reconstruction interface
 
--- 4. Osterwalder–Schrader reflection positivity
-opaque Theta : ∀ {n : ℕ}, Config n → Config n
-def OSReflectionPositivity (S : (n : ℕ) → Config n → ℝ) : Prop :=
-  ∀ (k : ℕ) (n : Fin k → ℕ) (x : ∀ i, Config (n i)) (c : Fin k → ℂ),
-    0 ≤ Complex.re (∑ i, ∑ j,
-      c i * starRingEnd ℂ (c j) *
-        (S (n i + n j) (Fin.append (Theta (x i)) (x j)) : ℂ))
+`ClayYangMillsMassGap4DStrict` existentially packages OS and Wightman objects
+with the same `Delta_phys` index, along with the lattice and convergence data
+specified by its fields. In this Lean structure, the shared index is an index
+equality; it does not add a field equating the Wightman object with an OS
+reconstruction. `iidOS4DStrict` and `trivialWightman` provide the respective
+structures at rate `1`. `buildStrictWightmanFromOS` is the reconstruction
+interface when its continuation data are supplied.
 
--- 5. Nonvanishing connected four-point function
-def NonvanishingConnectedFourPoint (Sconn : Config 4 → ℝ) : Prop :=
-  ∃ x : Config 4, Sconn x ≠ 0
+The declaration `clay_yang_mills_strict_from_balaban_and_os` takes explicit
+`BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis` inputs.
+The RG reducer also has an explicit conjecture input. The repository's
+unconditional `MassGapInstances.clay_yang_mills_strict` proves
+`∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`, a separate finite-system proposition.
+The unconditional OS family, Wightman structure, stage limit, and Wilson
+transfer-gap results are proved components. Their separate declarations do
+not construct either input to the strict Clay reduction. The precise types and
+kernel reports are in the [declaration audit](formal_declaration_audit.html).
 
--- 6. Nontriviality of Schwinger functions
-def NontrivialitySchwinger (S : (n : ℕ) → Config n → ℝ) : Prop :=
-  ∀ n : ℕ, 1 ≤ n → ∃ x : Config n, S n x ≠ 0
+## Separate reference families
 
--- 7. Hermitian symmetry of the reflection-positivity kernel
-def reflectionKernel (S : (n : ℕ) → Config n → ℝ) {n m : ℕ}
-    (x : Config n) (y : Config m) : ℂ :=
-  S (n + m) (Fin.append (Theta x) y)
-def KernelHermitian (S : (n : ℕ) → Config n → ℝ) : Prop :=
-  ∀ (n m : ℕ) (x : Config n) (y : Config m),
-    reflectionKernel S x y = starRingEnd ℂ (reflectionKernel S y x)
-
--- 8. Lattice–continuum limit convergence
-opaque Slatt : ℝ → (n : ℕ) → Config n → ℝ
-opaque Sinf : (n : ℕ) → Config n → ℝ
-def LatticeContinuumLimit : Prop :=
-  ∀ n : ℕ, ∀ ε : ℝ, 0 < ε → ∃ M : ℝ, ∀ β : ℝ, M ≤ β →
-    ∀ x : Config n, |Slatt β n x - Sinf n x| < ε
-
--- 9. Vacuum cyclicity and the physical Hilbert space
-variable
-  (Hphys : Type*) [NormedAddCommGroup Hphys] [InnerProductSpace ℂ Hphys] [CompleteSpace Hphys]
-  (U : ∀ g : Unit, Hphys →L[ℂ] Hphys)
-  (phi : ∀ n : ℕ, Config n → Hphys →L[ℂ] Hphys)
-  (Omega : Hphys)
-def VacuumCyclicity : Prop :=
-  Closure (Submodule.span ℂ
-    { v : Hphys | ∃ (g : Unit) (n : ℕ) (x : Config n),
-        v = U g (phi n x Omega) }) = ⊤
-```
+The radial `isingSchwinger` example and `concreteOS4DContinuumTheory` provide
+distance-dependent correlations. The source records that this origin-anchored
+family fails translation invariance. `concreteUniformRGTrajectory` is a
+generic RG carrier. Those declarations have separate roles from the Wilson
+stage limit and from the equality-class `iidOS4DStrict` witness.

@@ -21,7 +21,7 @@
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Lean}[1]{\url{#1}}
 
-\title{The Unconditional Four-Dimensional Yang--Mills Mass Gap\\
+\title{Four-Dimensional Yang--Mills Constructions and Mass-Gap Interfaces\\
 \large A Lean Formalization}
 \author{ }
 \date{ }
@@ -30,12 +30,18 @@
 \maketitle
 
 \begin{abstract}
-This article presents the full unconditional four-dimensional \(\SU(N)\) Yang--Mills proof formalized in Lean. The physical gap is obtained from the Wilson transfer spectrum and its continuum scaling, then recovered on the OS Hilbert space from the Wilson-limit clustering estimate. At finite lattice spacing, the gap is \(-\log\|T|_{\Omega^\perp}\|\), proved positive for the full-rank Wilson transfer and attained by an excited eigenvector. Along the concrete RG trajectory, \(\Delta_{\rm latt}(m)=a_m=1/(m+1)\), so \(\Delta_{\rm latt}(m)/a_m=1\) at every stage; the proved gap-limit theorem identifies the continuum rate as \(\Delta_{\rm phys}=1\). The proof includes lattice gauge theory, Wilson transfer and reflection positivity, strong-coupling clustering, the thermodynamic limit, the full-tuple Wilson-stage limit, Euclidean axioms, and strict Wightman reconstruction. Repeated continuum points are included in the Wilson-stage theorem.
+This article maps the Lean development's Wilson-lattice, continuum Schwinger, OS, Wightman, and mass-gap declarations. It includes a full-tuple Wilson-stage limit, an equality-class Schwinger family with rate-one clustering, an exact finite-volume Wilson transfer gap, and uniform rescaled RG data. The strict target \Lean{ClayYangMillsMassGap4DStrict} is returned by the theorem \Lean{clay_yang_mills_strict_from_balaban_and_os} with explicit Balaban RG and OS continuation inputs. The separate unconditional theorem \Lean{MassGapInstances.clay_yang_mills_strict} proves a positive gap for a two-level finite system. The paper states these exact interfaces and distinguishes them from the proved continuum-limit components. Repeated continuum points are included in the Wilson-stage theorem.
 \end{abstract}
 
 \section{Scope and theorem map}
 
-The proof follows the Wilson measure through its transfer operator, finite-tuple Schwinger limits, OS reconstruction, and the physical Hamiltonian. Periodic cubic lattices with compact \(\SU(N)\) link variables carry the Wilson probability measure. The stage observables define Wilson Schwinger functions whose limit exists for every finite continuum tuple, with repeated insertions grouped by equality class. The limiting functional has reflection positivity, Euclidean invariance, non-Gaussianity, and an explicit exponential clustering bound. The Wilson transfer gap is the logarithm of the ratio between the vacuum eigenvalue and the largest eigenvalue on its orthogonal complement. Rescaling converts this lattice exponent to physical units, and the concrete trajectory proves its ratio to the lattice spacing is exactly one. The OS quotient and completion turn the Wilson-limit functional into a Hilbert space; the OS clustering theorem then gives the same exponential rate for the time-translation semigroup on the vacuum-orthogonal subspace. The self-adjoint generator therefore has spectrum bounded below by that rate. The transfer, Dobrushin, thermodynamic, RG, and continuation constructions supply the lattice and relativistic structures in this proof.
+The repository contains several related constructions, and this paper identifies the declaration used for each claim. The Wilson stage observables define Schwinger functions whose limit exists for every finite continuum tuple, with repeated insertions grouped by equality class. The limiting functional has reflection positivity, Euclidean invariance, non-Gaussianity, and an explicit exponential clustering bound. Separately, the finite-volume Wilson transfer has an exact positive spectral gap, and the concrete RG trajectory supplies a rescaled-gap limit. The OS clustering argument derives a semigroup norm bound for the OS family to which it is applied. The proof-reading map in the repository lists these objects and declarations together with the exact-probe bridge, the strict witness type, and the radial reference family.
+
+\subsection{Reading the strict witness type}
+
+The Lean proposition \Lean{ClayYangMillsMassGap4DStrict} is an existential package. Its fields require a positive \(\Delta_{\rm phys}\), a strict OS structure indexed by that value, a Wightman structure indexed by the same value, non-Gaussianity of the OS Schwinger family, diverging spatial and temporal lattice extents, a nonnegative coupling sequence tending to infinity, a gauge-invariant nonconstant lattice observable, and convergence of the finite-volume Wilson Schwinger functions to the OS Schwinger family. The declaration does not include a field identifying the Wightman structure with the reconstruction of that OS family. The theorem returning this proposition takes \Lean{BalabanRGContinuumHypothesis} and \Lean{OSPoincareContinuationHypothesis} as inputs. The separate \Lean{buildStrictWightmanFromOS} interface constructs reconstruction data when its continuation hypotheses are supplied.
+
+The declarations \Lean{clay_yang_mills_strict_from_balaban_and_os} and \Lean{clay_yang_mills_from_rg_estimates} are reduction interfaces with explicit inputs. Other declarations establish the Wilson limit, the equality-class OS family, the finite-volume transfer gap, and a separate two-level finite-system gap. Their roles and types are listed in \Lean{docs/proof_reading_map.md} and \Lean{docs/formal_declaration_audit.md}.
 
 \section{Lattice gauge fields and Wilson observables}
 
@@ -142,7 +148,7 @@ For \(x=(x_0,x_1,x_2,x_3)\in\R^4\), let \(\theta x=(-x_0,x_1,x_2,x_3)\), and let
 \]
 The Euclidean OS structure consists of Schwinger functions on finite tuples in \(\R^4\), continuous \(SO(4)\) invariance, Euclidean translation invariance, permutation symmetry, reflection positivity for positive-time insertions, and exponential clustering at rate \(\Delta_{\rm phys}\). The Wightman structure carries a Hilbert space, a unitary Poincar\'e representation, a vacuum, fields, covariance, spacelike commutativity, and a spectral condition excluding invariant-mass values in \((0,\Delta_{\rm phys}^2)\).
 
-The OS pre-Hilbert construction identifies null vectors of the reflected positive-time form, quotients by them, and completes the quotient. The Euclidean time-shift semigroup descends to the quotient and extends continuously. Its self-adjoint generator defines the physical Hamiltonian. Reconstruction carries the Wilson-derived Schwinger functional into the Wightman representation, with vacuum cyclicity, covariance, local commutativity, and the same positive spectral gap.
+The OS pre-Hilbert construction identifies null vectors of the reflected positive-time form, quotients by them, and completes the quotient. The Euclidean time-shift semigroup descends to the quotient and extends continuously. Its self-adjoint generator defines the physical Hamiltonian. The interface \Lean{buildStrictWightmanFromOS} constructs Wightman data from OS data when the stated continuation inputs are supplied. The strict witness proposition separately quantifies an OS object and a Wightman object at the same rate index; its fields do not identify those witnesses by reconstruction.
 
 \section{The Wilson measure produces the continuum Schwinger theory}
 
@@ -186,7 +192,7 @@ For every \(N\geq2\) and every finite tuple \((x_i)_{i=1}^n\) in \(\R^4\), the W
 Repeated entries are included, and each distinct point contributes the moment corresponding to its multiplicity. This is the continuum Schwinger theory used in the gap derivation below.
 \end{theorem}
 
-The density argument and probability integral transform identify the plaquette coordinate used by the stage-selected observables. The resulting continuum functional is the Wilson measure's limit and supplies the Schwinger functions for OS reconstruction.
+The density argument and probability integral transform identify the plaquette coordinate used by the stage-selected observables. The Lean theorem takes a generic one-dimensional submersion-to-density result as an explicit input, supplied by \Lean{submersion_map_has_L1_density}. The resulting continuum functional is the Wilson measure's limit and supplies the Schwinger functions for the OS construction.
 
 \subsection{From Wilson clustering to the Hamiltonian gap}
 
@@ -208,16 +214,16 @@ Letting \(j\to\infty\) removes the finite constant and gives \(b_0\leq e^{-2t}\|
 \[
   \|T_E(t)v\|\leq e^{-t}\|v\|\qquad(t\geq0)
 \]
-If \(T_E(t)=e^{-tH}\), the spectral theorem turns this bound for all \(t\geq0\) into \(\operatorname{spec}(H|_{\Omega^\perp})\subseteq[1,\infty)\). The Hamiltonian gap is therefore the same rate \(1\) obtained from the Wilson-limit cluster estimate. This completes the derivation from the normalized Wilson measure, through its finite-tuple Schwinger limit and OS form, to the reconstructed Hamiltonian. OS-to-Wightman reconstruction preserves this gap and supplies the strict relativistic theory.
+If \(T_E(t)=e^{-tH}\), the spectral theorem turns this bound for all \(t\geq0\) into \(\operatorname{spec}(H|_{\Omega^\perp})\subseteq[1,\infty)\). The Hamiltonian gap is therefore the same rate \(1\) obtained from the Wilson-limit cluster estimate. This completes the derivation from the normalized Wilson measure, through its finite-tuple Schwinger limit and OS form, to the reconstructed Hamiltonian. The OS-to-Wightman interface preserves this gap when its continuation hypotheses are supplied.
 
 \section{Exact mass-gap declarations and interfaces}\label{sec:interfaces}
 
-The lattice transfer structure packages a gauge representation, a positive self-adjoint compact transfer operator, a normalized gauge-invariant vacuum, and an exponential spectral gap on the vacuum-orthogonal subspace. The theorem \Lean{YangMills.yangMillsMassGap} establishes this structure. The Wilson-stage limit carries the Wilson expectation into the continuum, where its OS cluster estimate gives the physical gap on the reconstructed Hamiltonian.
+The tesseract lattice transfer structure packages a gauge representation, a positive self-adjoint compact transfer operator, a normalized gauge-invariant vacuum, and an exponential spectral gap on the vacuum-orthogonal subspace. The theorem \Lean{YangMills.yangMillsMassGap} establishes this finite-system structure. Separately, the Wilson-stage limit carries the Wilson expectation to the equality-class Schwinger family, whose OS cluster estimate gives a rate-one semigroup bound on its OS completion.
 
-The strict four-dimensional proposition \Lean{ClayYangMillsMassGap4DStrict} records the complete continuum conclusion: a positive physical mass, a non-Gaussian strict OS family, its strict Wightman reconstruction, diverging lattice extents, the coupling trajectory, and convergence of the finite-volume \(\SU(N)\) Wilson Schwinger functions for every finite continuum tuple.
+The strict four-dimensional proposition \Lean{ClayYangMillsMassGap4DStrict} records the fields shown in the preceding type guide: positive physical rate, non-Gaussian strict OS family, a Wightman structure with the same rate index, diverging lattice extents, the coupling trajectory, and convergence of finite-volume \(\SU(N)\) Wilson Schwinger functions to the OS family.
 
 \begin{theorem}[Four-dimensional Yang--Mills mass gap]
-For every \(N\geq2\), the formal construction provides strict OS and Wightman data, a positive physical gap derived from the Wilson measure, and the convergent Wilson lattice sequence. The unconditional RG trajectory and OS continuation supply the strict four-dimensional theorem.
+For every \(N\geq2\), \Lean{clay_yang_mills_strict_from_balaban_and_os} returns the proposition \Lean{ClayYangMillsMassGap4DStrict} from its two displayed input structures. The repository also contains unconditional Wilson-limit, OS, Wightman, and transfer-gap components. The declaration audit records their exact types and does not identify the separate finite-system gap theorem with the strict continuum proposition.
 \end{theorem}
 
 \section{Proof organization and module atlas}
@@ -264,15 +270,15 @@ The declarations give the formal entry points for the complete RG, OS, Wightman,
 Lean declaration & Mathematical role \\
 \midrule
 \endhead
-\url{YangMills.yangMillsMassGap} & Existence of a lattice gauge setup with positive transfer gap. \\
+\url{YangMills.yangMillsMassGap} & Tesseract lattice gauge setup with positive transfer gap. \\
 \url{YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence} & Concrete uniform rescaled-gap and RG trajectory data for each \(N\geq2\). \\
-\url{YangMills.unconditional_non_gaussian_4d_euclidean_os_axioms_verification} & Verified OS, clustering, and non-Gaussian properties of the concrete radial continuum family. \\
-\url{YangMills.unconditional_os_hilbert_completion_and_wightman_reconstruction} & Completion and reconstruction data for the concrete OS structure. \\
+\url{YangMills.unconditional_non_gaussian_4d_euclidean_os_axioms_verification} & OS, clustering, and non-Gaussian properties of the separate radial family, whose translation-invariance failure is also proved. \\
+\url{YangMills.unconditional_os_hilbert_completion_and_wightman_reconstruction} & Completion and reconstruction data for that separate radial OS structure. \\
 \url{YangMills.unconditional_interacting_yang_mills_hamiltonian_and_phase_space_dynamics} & Packaged Hamiltonian, phase-space, and symmetry data for the concrete setup. \\
 \url{YangMills.stageObservableSchwinger_tendsto_iid} & Full finite-tuple Wilson-stage convergence, including repeated points. \\
-\url{YangMills.clay_yang_mills_strict_from_balaban_and_os} & Strict four-dimensional Clay conclusion in the RG and OS construction. \\
-\url{YangMills.clay_yang_mills_from_rg_estimates} & Four-dimensional Clay conclusion in the RG construction. \\
-\url{MassGapInstances.clay_yang_mills_strict} & Positive spectral-gap declaration. \\
+\url{YangMills.clay_yang_mills_strict_from_balaban_and_os} & Conditional strict Clay conclusion from Balaban RG and OS continuation inputs. \\
+\url{YangMills.clay_yang_mills_from_rg_estimates} & Conditional Clay conclusion from an RG conjecture input. \\
+\url{MassGapInstances.clay_yang_mills_strict} & Positive spectral gap for the separate two-level finite system. \\
 \bottomrule
 \end{longtable}
 

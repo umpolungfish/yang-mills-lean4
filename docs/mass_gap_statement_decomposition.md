@@ -146,8 +146,9 @@ theorem promotion_is_coherent (N Ls M) [NeZero Ls] [NeZero M] (hN : 2 ≤ N) :
 | exponential clustering | MassGapInstances | std only | 0 |
 | promotion coherence | UnifiedLattice | std only | 0 |
 
-**Dependency direction.** There are two distinct theorems and one direction
-between them:
+**Scope of the two theorem families.** The finite-system theorem and strict
+continuum reduction are distinct declarations; the first does not supply the
+second's RG or OS continuation inputs:
 
 - `MassGapInstances.two_level_gauge_gap` is proved unconditionally. It is the
   promoted core: a concrete lattice gauge system with nonzero commutator whose
@@ -157,19 +158,27 @@ between them:
   assembly theorems. Their checked declarations and axiom reports appear in
   [`formal_declaration_audit.md`](./formal_declaration_audit.md).
 
-The concrete lattice mass-gap witness, uniform rescaled RG trajectory, and
-Wilson-to-iidSchwinger stage convergence are all machine-checked results. The
-stage theorem `SchwingerConv.stageObservableSchwinger_tendsto_iid` covers every
-finite tuple, including repeated points.
+The tesseract finite-system gap, uniform rescaled RG trajectory, and
+Wilson-to-iidSchwinger stage convergence are machine-checked results. The stage
+theorem `SchwingerConv.stageObservableSchwinger_tendsto_iid` covers every
+finite tuple, including repeated points. The strict continuum proposition is
+returned by the conditional reducer with its explicit inputs. See the proof
+map and declaration audit for the type boundary.
 
-This finite-dimensional witness is distinct from the repository's full 4D
-Yang–Mills construction. The main page and formal declaration audit identify
-the continuum mass-gap and Wilson stage results.
+This finite-dimensional witness is distinct from the Wilson continuum-limit
+components and from the strict continuum proposition. The main page and formal
+declaration audit state the conditional strict theorem and list the Wilson
+stage results separately.
 The independent Wilson-to-iidSchwinger convergence result is stated in
 `SchwingerConv.lean`. The mass-gap theorem's axiom audit lists `propext`,
 `Classical.choice`, `Quot.sound`.
-The definition of `ClayYangMillsMassGap4DStrict` is faithful to the Clay
-statement: 4D, SU(N), non-trivial, Wightman/OS axioms, gap > 0.
+The definition of `ClayYangMillsMassGap4DStrict` encodes a positive rate, a
+non-Gaussian OS family, a same-rate-index Wightman structure, divergent lattice
+extents, a coupling sequence, a gauge-invariant nonconstant observable, and
+Wilson Schwinger convergence to the OS family. Its fields do not identify the
+Wightman structure with the OS reconstruction. The current theorem returning
+this proposition requires explicit RG and continuation structures; the
+separate unconditional finite-system gap has a different type.
 
 Native audit: the full theorem closure compiled to a 213 MB ELF and audited by
 `vox` (178,350 functions by descent, 36,863,127 instructions, 100% code-image

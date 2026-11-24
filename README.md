@@ -1,6 +1,6 @@
-# Unconditional Four-Dimensional Yang–Mills Mass Gap in Lean 4
+# Four-Dimensional Yang–Mills Formalization in Lean 4
 
-[![Unconditional solution](https://img.shields.io/badge/Status-Unconditional-brightgreen.svg)](#key-formal-theorems)
+[![Formalized components](https://img.shields.io/badge/Status-Lean%20verified-brightgreen.svg)](#key-formal-theorems)
 [![Docs](https://img.shields.io/badge/Documentation-GitHub%20Pages-blue.svg)](https://umpolungfish.github.io/yang-mills-lean4/)
 [![Lean 4](https://img.shields.io/badge/Lean%204-v4.28.0-blue.svg)](https://github.com/leanprover/lean4)
 [![Axioms](https://img.shields.io/badge/Axioms-Standard%20Only-brightgreen.svg)](#axiomatic-audit)
@@ -9,9 +9,9 @@
 
 **Conventional write-up:** [PDF](./paper/yang-mills.pdf) · [LaTeX source](./paper/yang-mills-formalization.tex)
 
-This repository gives the full unconditional Lean proof of four-dimensional `SU(N)` Yang–Mills theory with a strict positive mass gap. The gap is derived from the Wilson measure: the finite-lattice Wilson expectations converge to continuum Schwinger functions, their exponential clustering gives a gapped OS time-translation semigroup, and the reconstructed Hamiltonian inherits that positive gap. The construction proves Wilson lattice measure and transfer theory, volume-independent clustering, the infinite-volume limit, Euclidean Schwinger axioms, strict Wightman reconstruction, and convergence for every finite tuple, including repeated points. The full-tuple stage uses spacing `1/(m+2)` and physical side length `m+2`.
+The repository contains a proved full-tuple Wilson stage limit for every finite continuum tuple, including repeated points, an equality-class OS family with rate-one clustering, exact finite-volume Wilson transfer-gap results, and uniform RG data. The strict proposition `ClayYangMillsMassGap4DStrict` is established by the current theorem only when explicit Balaban RG and OS continuation structures are supplied. The unconditional finite gauge-system theorem proves a separate `GappedSpectrum (Fin 2)` witness. The stage theorem `stageObservableSchwinger_tendsto_iid` identifies its limit with `iidSchwinger`; its type takes a submersion-to-density result supplied by `submersion_map_has_L1_density`. At stage `m`, the spacing is `1/(m+2)` and physical side length is `m+2`. The exact single-site probe identity `iidSchwinger_from_wilson` is a separate theorem from this finite-volume-to-continuum limit.
 
-The strict four-dimensional conclusion is `ClayYangMillsMassGap4DStrict`. The RG trajectory and OS continuation are constructed and discharged in the unconditional master theorems, with their declaration-level checks and kernel axiom reports listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md). The conventional write-up presents the complete proof.
+The type of `ClayYangMillsMassGap4DStrict` packages a strict OS family and a Wightman structure with the same positive rate index, non-Gaussianity of the OS family, and convergence of the Wilson lattice Schwinger functions to that family. It does not have a field identifying the Wightman witness with an OS reconstruction. `buildStrictWightmanFromOS` is a separate reconstruction interface with continuation inputs. The theorem returning the strict proposition takes `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`; the exact types and the separate unconditional constructions are listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
 
 The **Schwinger function with all continuum axioms** is also proved, unconditionally, in [`Imscribing/YangMills/IIDSchwinger.lean`](./Imscribing/YangMills/IIDSchwinger.lean). `iidSchwinger` is built from a non-Gaussian independent field and its value depends only on the equality classes of its argument tuple. Six theorems establish the full set of Euclidean properties directly:
 
@@ -26,7 +26,7 @@ The **Schwinger function with all continuum axioms** is also proved, uncondition
 
 All six depend only on `propext`, `Classical.choice`, `Quot.sound`, with zero sorries.
 
-The Wilson stage limit is proved in [`Imscribing/YangMills/SchwingerConv.lean`](./Imscribing/YangMills/SchwingerConv.lean). `stageObservableSchwinger_tendsto_iid` proves convergence for every finite tuple of continuum points, including repeated points. Its finite-stage frequency selector controls all lattice-site tuples and insertion multiplicities at each stage, and the submersion-density argument is established in the density modules.
+The Wilson stage limit is proved in [`Imscribing/YangMills/SchwingerConv.lean`](./Imscribing/YangMills/SchwingerConv.lean). `stageObservableSchwinger_tendsto_iid` proves convergence for every finite tuple of continuum points, including repeated points. Its finite-stage frequency selector controls lattice-site tuples and insertion multiplicities at each stage. The theorem takes the generic density result as an explicit argument; [`SubmersionDensity.lean`](./Imscribing/YangMills/SubmersionDensity.lean) supplies it.
 
 Every theorem, lemma, and construction has been verified by the Lean 4 kernel with **0 `sorry` placeholders** and depends strictly on standard Lean 4 foundations (`propext`, `Classical.choice`, `Quot.sound`).
 
@@ -46,7 +46,7 @@ curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh 
 git clone https://github.com/umpolungfish/yang-mills-lean4.git
 cd yang-mills-lean4
 
-# 2. Compile the complete Yang–Mills library (8,035 targets)
+# 2. Compile the Yang–Mills library
 lake build Imscribing.YangMills
 
 # 3. Run the kernel axiom audit across all 46 development sections
@@ -67,8 +67,10 @@ The repository contains four main formal strands. The first develops finite-volu
  [Wilson stage observables] ──> [finite-tuple limit, repeated points included]
                                            └──> [iid Schwinger functional]
 
- [RG data] ──> [OS continuation data] ──> [strict Clay interface]
-                    concrete instances     reduction theorem
+ [Balaban RG hypothesis] + [OS continuation hypothesis]
+                    └──────────────> [conditional strict Clay interface]
+
+ [Unconditional two-level gap] ──> [GappedSpectrum (Fin 2)]
 ```
 
 ---
@@ -77,6 +79,7 @@ The repository contains four main formal strands. The first develops finite-volu
 
 - [27-component Clay audit](docs/clay_27_components.md) — stages, obligations, and checked Lean declarations.
 - [Semantic overview](docs/mass_gap_semantic_decomposition.md) — what the lattice limit, Euclidean properties, OS reconstruction, and mass-gap claims mean.
+- [Proof-reading map](docs/proof_reading_map.md) — separates the Wilson stage limit, exact probe bridge, strict witness type, spectral-gap arguments, and radial reference family.
 - [Finite witness statement](docs/mass_gap_statement_decomposition.md) — the separate two-level gauge-system witness and its field-level statement.
 
 ## 3. Key Formal Theorems
@@ -122,11 +125,13 @@ partition function (`cubic4Schwinger`). The bridge theorem `iidSchwinger_from_wi
 exact equality for a single-site probe at every lattice size and every `β ≥ 0`. The full-tuple
 stage theorem `stageObservableSchwinger_tendsto_iid` proves convergence with spacing
 `1/(m+2)` and physical side length `m+2`, for arbitrary finite tuples including repeated points.
-Its equality-class limit supplies the translation-invariant, reflection-positive,
-non-Gaussian Schwinger functions with exponential clustering. The OS cluster-to-semigroup
-theorem gives decay `‖T_E(t)v‖ ≤ exp(-t)‖v‖` for vacuum-orthogonal vectors, so the Wilson-limit
-theory has physical mass gap one. `wilson_limit_glut` proves that changing the probe anchor
-leaves the limit unchanged.
+Its equality-class limit has translation invariance, reflection positivity,
+non-Gaussianity, and rate-one exponential clustering. `iidOS4DStrict` packages
+that Schwinger family as strict OS data, and `os_cluster_implies_semigroup_gap`
+derives the rate-one semigroup bound on its OS completion. The finite-volume
+Wilson transfer gap, the RG rescaled-gap interface, and this OS clustering
+argument are separate declarations. `wilson_limit_glut` concerns the probe
+family's anchor independence.
 
 The formal declaration audit records the strict mass-gap assembly, RG estimates, concrete
 continuum and trajectory declarations, Wightman structure, and `yangMillsMassGap`, with each

@@ -9,7 +9,7 @@ with open(theorems_file) as f:
 
 theorems_json = json.dumps(theorems_data)
 THEOREM_COUNT = len(theorems_data)
-BUILD_JOBS = '8,042'
+BUILD_JOBS = '16,125'
 MILESTONES = '59'
 
 html_content = """<!DOCTYPE html>
@@ -17,7 +17,7 @@ html_content = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formal Verification of 4D SU(N) Yang–Mills Theory & Mass Gap in Lean 4</title>
+  <title>Formal Verification of 4D SU(N) Yang–Mills & Mass-Gap Interfaces in Lean 4</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -97,6 +97,7 @@ html_content = """<!DOCTYPE html>
         <a href="explorer/index.html" class="hover:text-emerald-400 transition">Corpus Explorer</a>
         <a href="clay_27_components.html" class="hover:text-emerald-400 transition">Clay Audit &amp; Semantics</a>
         <a href="formal_declaration_audit.html" class="hover:text-emerald-400 transition">Declaration Audit</a>
+        <a href="proof_reading_map.html" class="hover:text-emerald-400 transition">Proof-reading Map</a>
         <a href="#reproduce" class="hover:text-emerald-400 transition">Replication</a>
         <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
@@ -120,18 +121,18 @@ html_content = """<!DOCTYPE html>
         <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
           4D $SU(N)$ Yang–Mills Theory
         </span> <br>
-        and the Strict Mass Gap
+        and the Mass-Gap Interfaces
       </h1>
 
       <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-        The formalization proves a concrete 4D Yang–Mills mass-gap witness, uniform rescaled lattice-gap and RG-convergence results for every $N \\ge 2$, and the Wilson stage Schwinger limit for every finite tuple, including repeated points. The displayed Lean declarations and axiom reports are available in the declaration audit.
+            The formalization proves the full-tuple Wilson stage limit, an equality-class OS family, exact finite-volume Wilson transfer-gap results, and uniform RG data. The strict Clay proposition is reached by a theorem with explicit Balaban RG and OS continuation inputs. The proof-reading map records the exact type boundary and separates these constructions from the finite-system witness.
       </p>
 
       <section class="max-w-4xl mx-auto mb-10 grid gap-4 text-left md:grid-cols-2" aria-label="Continuum correlations and short-distance scaling">
         <article class="rounded-xl border border-cyan-500/20 bg-slate-900/70 p-5">
           <h2 class="text-sm font-semibold uppercase tracking-wider text-cyan-300">Distance-dependent continuum correlations</h2>
           <p class="mt-2 text-sm leading-relaxed text-slate-300">
-            The explicit continuum Schwinger family contains the radial factor $g(x)=e^{-2\\|x\\|_2}$, so its correlation values vary with Euclidean distance. Its connected correlations obey exponential clustering with rate one.
+            The separate radial $isingSchwinger$ reference family contains $g(x)=e^{-2\\|x\\|_2}$ and has distance-dependent correlations. Its source records a translation-invariance counterexample. The equality-class Wilson stage limit is a distinct construction; see the proof-reading map.
           </p>
         </article>
         <article class="rounded-xl border border-emerald-500/20 bg-slate-900/70 p-5">
@@ -161,8 +162,8 @@ html_content = """<!DOCTYPE html>
   <section class="border-y border-slate-800 bg-slate-900/50 py-10">
     <div class="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
       <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400">Unconditional</div>
-        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">4D SU(N) Construction</div>
+        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400">Lean Verified</div>
+        <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">4D SU(N) Components</div>
       </div>
       <div>
         <div class="text-3xl sm:text-4xl font-extrabold text-teal-400">__BUILD_JOBS__</div>
@@ -227,7 +228,7 @@ html_content = """<!DOCTYPE html>
       <div class="text-center mb-16">
         <h2 class="text-3xl font-bold tracking-tight text-white mb-4">46-Section Pipeline + Wilson Stage Limit</h2>
         <p class="text-slate-400 max-w-2xl mx-auto">
-          The formal development connects the concrete 4D lattice gauge setup, a uniform RG trajectory, continuum Schwinger functions, and the strict mass-gap declarations audited below.
+          The development proves the Wilson stage limit and its Euclidean properties, finite-volume transfer gaps, and uniform RG data. The strict Clay proposition is returned by a theorem with explicit RG and OS continuation inputs.
         </p>
       </div>
 
@@ -244,9 +245,10 @@ flowchart TD
     A2 --> A3["cubic4Schwinger_refl_pos_n"]
   end
 
-  subgraph PROMOTION["Concrete 4D Yang–Mills Results"]
-    P1["SU(N) Wilson lattice + Haar measure"] --> P2["Uniform rescaled gap + RG convergence"]
-    P2 --> P3["yangMillsMassGap : Δ > 0"]
+  subgraph PROMOTION["Proved Components and Strict Target Interface"]
+    P1["SU(N) Wilson lattice + Haar measure"] --> P2["Uniform rescaled gap + RG data"]
+    P2 --> P3["yangMillsMassGap : tesseract lattice gap"]
+    P4["Balaban RG hypothesis + OS continuation"] --> P5["conditional Clay strict target"]
   end
 
   subgraph CONSEQUENCES["Checkable Consequences"]
@@ -274,6 +276,7 @@ flowchart TD
   RUNGS --> BRIDGE
   BRIDGE -->|"unconditional"| AUDIT
   CONSEQUENCES --> AUDIT
+  P5 -->|"requires both inputs"| AUDIT
         </pre>
       </div>
     </div>
@@ -294,7 +297,7 @@ flowchart TD
             <span class="text-xs px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">Concrete 4D RG result</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
-            For every $N \\ge 2$, Lean constructs the uniform rescaled lattice mass-gap and RG-convergence data over `concreteUniformRGTrajectory N hN`. The gap value follows from the transfer estimate: `T_tesseract_gap` proves decay by $e^{-a}$ per lattice step. At stage $m$, $a_m=\\Delta_{\\mathrm{latt}}(m)=1/(m+1)$, so $\\Delta_{\\mathrm{latt}}(m)/a_m=1$ exactly. The proved `gap_lim` identifies this limit as $\\Delta_{\\mathrm{phys}}=1$. The strict mass-gap witness and exact checked declaration types are listed in the formal declaration audit.
+            For every $N \\ge 2$, Lean constructs uniform rescaled-gap and RG data over `concreteUniformRGTrajectory N hN`. The `yangMillsMassGap` declaration supplies a finite gauge-setup gap, and the full-rank Wilson transfer has its own exact gap theorem. The strict Clay proposition is provided through `clay_yang_mills_strict_from_balaban_and_os`, which takes explicit Balaban RG and OS continuation structures. The declaration audit lists each exact type.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.yangMillsMassGap
 YangMills.concreteUniformRGTrajectory
@@ -353,7 +356,7 @@ submersion_map_has_L1_density — Jacobian + Radon–Nikodym density</code></pre
             <span class="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">Unconditional bridge · single-site probe</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
-            A single-site probe observable reproduces the continuum value exactly at every lattice size and every coupling (`iidProbe_wilson_exact`). The Wilson limit object `wilsonProbeLimit` therefore equals `iidSchwinger` with no hypothesis and carries all six Euclidean axioms. `wilson_limit_glut` shows the probe anchor is immaterial — a glut of equivalent derivations of one continuum object.
+            This exact identity concerns the defined single-site probe family. The finite-volume-to-continuum result is the separate `stageObservableSchwinger_tendsto_iid` theorem for the selected plaquette-CDF observables and every finite tuple, including repeats.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>iidProbe_wilson_exact      : probe expectation = iidSchwinger (exact)
 wilsonProbeLimit_eq_iid    : limit S = iidSchwinger (no hypothesis)
@@ -719,6 +722,7 @@ _decomp_specs = [
     ("Semantic decomposition", "mass_gap_semantic_decomposition.md", "semantic_decomposition.html"),
     ("27-Component Clay Audit", "clay_27_components.md", "clay_27_components.html"),
     ("Formal Declaration Audit", "formal_declaration_audit.md", "formal_declaration_audit.html"),
+    ("Proof-reading Map", "proof_reading_map.md", "proof_reading_map.html"),
 ]
 for _title, _md, _out in _decomp_specs:
     _md_path = os.path.join(docs_dir, _md)
@@ -751,7 +755,7 @@ for entry in theorems_data:
 print()
 print("CHECKED RESULTS (standard axioms only, 0 sorries)")
 for line in [
-    "  YangMills.yangMillsMassGap            — 4D Yang-Mills mass-gap witness",
+    "  YangMills.yangMillsMassGap            — gauge-setup mass-gap structure",
     "  YangMills.stageObservableSchwinger_tendsto_iid — full-tuple Wilson stage limit",
     "  YangMills.iidSchwinger_trans          — Euclidean translation invariance",
     "  YangMills.iidSchwinger_perm           — permutation symmetry",
@@ -771,7 +775,9 @@ print()
 print("UNCONDITIONAL BRIDGE (single-site probe; no hypothesis)")
 print("  YangMills.iidSchwinger_from_wilson : probe => Wilson limit has six Euclidean axioms")
 print("  YangMills.wilson_limit_glut         : probe anchor immaterial, same limit")
-print("4D YANG-MILLS CONSTRUCTION")
-print("  YangMills.yangMillsMassGap : YangMillsMassGap")
+print("WILSON CONTINUUM CONSTRUCTION")
+print("  YangMills.yangMillsMassGap : gauge-setup mass-gap structure")
 print("  YangMills.stageObservableSchwinger_tendsto_iid : full finite-tuple Wilson stage limit")
+print("STRICT CLAY TARGET")
+print("  conditional on BalabanRGContinuumHypothesis and OSPoincareContinuationHypothesis")
 print("=" * 72)
