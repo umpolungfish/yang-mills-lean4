@@ -1600,6 +1600,72 @@ theorem stageObservable_moment
           rw [integral_const_mul, rademacher_integral_Ico_zero K hK]
           simp [Real.volume_Ico]
 
+/-- The stage observable is field-dependent.  Its first two Wilson moments
+rule out a constant value on the full configuration space. -/
+theorem stageObservable_nonconstant
+    (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
+    (hN : 2 ≤ N) (hLt2 : 2 ≤ Lt)
+    (submersion_1d : ∀ {U : Set ℝ} {g : ℝ → ℝ}, IsOpen U → ContDiffOn ℝ 1 g U →
+      (∀ x ∈ U, deriv g x ≠ 0) →
+      ∃ ρ : ℝ → ℝ≥0∞, (volume.restrict U).map g = volume.withDensity ρ)
+    (β : ℝ) (hβ : 0 ≤ β) (a : ℝ) (ha : 0 < a) (x : Space4) (K : ℕ)
+    (hK : 0 < K) :
+    ∃ U₁ U₂ : GaugeField (cubicTorus4 Ls Lt)
+        (Matrix.specialUnitaryGroup (Fin N) ℂ),
+      stageObservable Ls Lt N β hβ a ha x K U₁ ≠
+        stageObservable Ls Lt N β hβ a ha x K U₂ := by
+  classical
+  let μ := wilsonMeasure Ls Lt N β
+  let f := fun U : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) =>
+    stageObservable Ls Lt N β hβ a ha x K U
+  haveI : IsProbabilityMeasure μ := by
+    dsimp [μ]
+    exact wilsonMeasure_isProbability Ls Lt N β hβ
+  have hAC := wilson_plaquette_absolutelyContinuous Ls Lt N β hβ hN hLt2
+    submersion_1d (stageSiteMap Ls Lt a ha x)
+  by_contra h
+  push_neg at h
+  let U₀ : GaugeField (cubicTorus4 Ls Lt) (Matrix.specialUnitaryGroup (Fin N) ℂ) :=
+    fun _ => 1
+  let c := f U₀
+  have hc : ∀ U, f U = c := fun U => by
+    simpa [f, c] using h U U₀
+  have hfirst := stageObservable_moment Ls Lt N β hβ a ha x K hK 1 hAC
+  have hsecond := stageObservable_moment Ls Lt N β hβ a ha x K hK 2 hAC
+  have hfirst' : ∫ U, f U ∂μ = c := by
+    calc
+      ∫ U, f U ∂μ = ∫ _ : GaugeField (cubicTorus4 Ls Lt)
+          (Matrix.specialUnitaryGroup (Fin N) ℂ), c ∂μ := by
+            apply integral_congr_ae
+            filter_upwards with U
+            exact hc U
+      _ = c := by simp [MeasureTheory.integral_const]
+  have hfirstConst :
+      ∫ U, (stageObservable Ls Lt N β hβ a ha x K U) ^ 1
+        ∂(wilsonMeasure Ls Lt N β) = c := by
+    simpa [μ, f, pow_one] using hfirst'
+  have hsecond' : ∫ U, (f U) ^ 2 ∂μ = c ^ 2 := by
+    calc
+      ∫ U, (f U) ^ 2 ∂μ = ∫ _ : GaugeField (cubicTorus4 Ls Lt)
+          (Matrix.specialUnitaryGroup (Fin N) ℂ), c ^ 2 ∂μ := by
+            apply integral_congr_ae
+            filter_upwards with U
+            rw [hc U]
+      _ = c ^ 2 := by simp [MeasureTheory.integral_const]
+  have hsecondConst :
+      ∫ U, (stageObservable Ls Lt N β hβ a ha x K U) ^ 2
+        ∂(wilsonMeasure Ls Lt N β) = c ^ 2 := by
+    simpa [μ, f] using hsecond'
+  have hmoment1 : c = (3 / 2 : ℝ) := by
+    rw [hfirstConst] at hfirst
+    norm_num at hfirst
+    exact hfirst
+  have hmoment2 : c ^ 2 = (5 / 2 : ℝ) := by
+    rw [hsecondConst] at hsecond
+    norm_num at hsecond
+    exact hsecond
+  nlinarith
+
 theorem stageObservable_gauge_inv (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
     [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
     [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
