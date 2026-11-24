@@ -122,5 +122,11 @@ globs = [
   "Imscribing.YangMills.CanonicalWilsonHaar4D",
   "Imscribing.YangMills.ConcreteSchwartzShiftAndReflect",
   "Imscribing.YangMills.CanonicalWilsonMeasureBridge",
-  "Imscribing.YangMills.CanonicalWilsonHalfMeasureRP4D"
+  "Imscribing.YangMills.CanonicalWilsonHalfMeasureRP4D",
+  "Imscribing.YangMills.AllDegreesSchwingerLimit",
+  "Imscribing.YangMills.ConcreteSchwartzReflectOps",
+  "Imscribing.YangMills.SpatialISO3UnitariesOnOS",
+  "Imscribing.YangMills.ConcreteMinimalClayReduction",
+  "Imscribing.YangMills.CanonicalBalabanSubsequentialBridge",
+  "Imscribing.YangMills.EuclideanFieldOperatorOnOS"
 ]
