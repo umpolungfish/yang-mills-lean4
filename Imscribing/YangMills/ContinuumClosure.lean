@@ -147,6 +147,42 @@ noncomputable def buildStrictWightmanFromOS {Δ_phys : ℝ}
     cyclic_dense := C.cyclic_dense }
 
 /--
+The Wightman object assembled from OS data uses the same completed configuration
+vectors, whose inner products recover the reflected Schwinger kernel.
+-/
+theorem buildStrictWightmanFromOS_config_inner {Δ_phys : ℝ}
+    (os : OsterwalderSchrader4DStrict Δ_phys)
+    (C : OSPoincareContinuationHypothesis os)
+    (x y : PosTimeConfig) :
+    let W := buildStrictWightmanFromOS os C
+    let F := osConfigForm os.toOS4DContinuumTheory C.h_herm
+    letI : InnerProductSpace ℂ W.H := W.hInner
+    ⟪(osCompletionMap F (osPreMk F (osConfigSingle x)) : W.H),
+      (osCompletionMap F (osPreMk F (osConfigSingle y)) : W.H)⟫_ℂ =
+        osConfigKernel os.toOS4DContinuumTheory x y := by
+  let F := osConfigForm os.toOS4DContinuumTheory C.h_herm
+  let W := buildStrictWightmanFromOS os C
+  letI : InnerProductSpace ℂ W.H := W.hInner
+  exact osConfigKernel_eq_completion_inner os.toOS4DContinuumTheory C.h_herm x y
+
+/-- The assembled Wightman Hilbert space retains the OS time-shift kernel matrix coefficients. -/
+theorem buildStrictWightmanFromOS_time_shift_kernel {Δ_phys : ℝ}
+    (os : OsterwalderSchrader4DStrict Δ_phys)
+    (C : OSPoincareContinuationHypothesis os)
+    (t : ℝ) (ht : 0 ≤ t) (x y : PosTimeConfig) :
+    let W := buildStrictWightmanFromOS os C
+    let F := osConfigForm os.toOS4DContinuumTheory C.h_herm
+    letI : InnerProductSpace ℂ W.H := W.hInner
+    ⟪W.T_E t (osCompletionMap F (osPreMk F (osConfigSingle x))),
+      osCompletionMap F (osPreMk F (osConfigSingle y))⟫_ℂ =
+        osConfigKernel os.toOS4DContinuumTheory (posTimeShiftConfig t ht x) y := by
+  let W := buildStrictWightmanFromOS os C
+  let F := osConfigForm os.toOS4DContinuumTheory C.h_herm
+  letI : InnerProductSpace ℂ W.H := W.hInner
+  exact osTimeShiftConfig_eq_completion_inner os.toOS4DContinuumTheory C.h_herm
+    C.h_kern C.M_bd C.hM_nn C.h_bd t ht x y
+
+/--
 **Strict Reduction Theorem**:
 combining `BalabanRGContinuumHypothesis N hN` and `OSPoincareContinuationHypothesis`
 establishes `ClayYangMillsMassGap4DStrict N hN` with zero unproven placeholders.
@@ -1376,6 +1412,8 @@ end YangMills
 
 -- §30. OS pre-Hilbert GNS construction, Glimm–Jaffe contraction & joint thermodynamic limit
 #print axioms YangMills.osConfigInner_single
+#print axioms YangMills.osConfigKernel_eq_completion_inner
+#print axioms YangMills.osTimeShiftConfig_eq_completion_inner
 #print axioms YangMills.osConfigForm
 #print axioms YangMills.osTimeShiftPre_zero
 #print axioms YangMills.osTimeShiftPre_add
@@ -1479,6 +1517,8 @@ end YangMills
 
 -- §45. Balaban multiscale RG & OS analytic continuation into ClayYangMillsMassGap4DStrict
 #print axioms YangMills.buildStrictWightmanFromOS
+#print axioms YangMills.buildStrictWightmanFromOS_config_inner
+#print axioms YangMills.buildStrictWightmanFromOS_time_shift_kernel
 #print axioms YangMills.clay_yang_mills_strict_from_balaban_and_os
 #print axioms YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os
 #print axioms YangMills.clay_yang_mills_strict_on_os_completion_implies_strict

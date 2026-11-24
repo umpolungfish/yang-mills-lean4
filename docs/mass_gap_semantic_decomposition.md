@@ -76,6 +76,18 @@ decay exponentially in Euclidean time. Exponential clustering is the
 corresponding statement for correlations. The positive value `Δ` is the
 mass gap of that reconstructed theory.
 
+At the kernel level, `osConfigKernel_eq_completion_inner` identifies the
+reflected Schwinger value for any two positive-time configurations with the
+inner product of their canonical vectors in the OS Hilbert completion.
+`osTimeShiftConfig_eq_completion_inner` identifies the matrix coefficient of
+the lifted Euclidean time semigroup with the kernel after shifting the first
+configuration in Euclidean time.
+`buildStrictWightmanFromOS_config_inner` gives the same identity using the
+Hilbert space field of the assembled Wightman object, while
+`buildStrictWightmanFromOS_time_shift_kernel` gives the semigroup matrix
+coefficient there. This makes both the OS kernel and its Euclidean transfer
+evolution explicit inside the reconstructed state space.
+
 ## Uniform RG and the mass-gap witness
 
 `concreteUniformRGTrajectory N hN` supplies the generic uniform RG and

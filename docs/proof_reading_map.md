@@ -80,6 +80,13 @@ witness and requires its Wightman object to equal
 `clay_yang_mills_strict_on_os_completion_from_balaban_and_os` constructs this
 stronger target from `BalabanRGContinuumHypothesis` and
 `OSPoincareContinuationHypothesis`. The continuation data remain explicit.
+For positive-time configurations, `osConfigKernel_eq_completion_inner`
+proves that the reflected Schwinger kernel is the inner product of the canonical
+OS completion vectors. `osTimeShiftConfig_eq_completion_inner` proves that
+the lifted Euclidean time semigroup has the time-shifted kernel as its matrix
+coefficient. `buildStrictWightmanFromOS_config_inner` and
+`buildStrictWightmanFromOS_time_shift_kernel` state these identities in the
+Hilbert space used by the assembled Wightman object.
 `iidOS4DStrict` and `trivialWightman` remain separate examples; they do not by
 themselves supply this reconstruction identity.
 

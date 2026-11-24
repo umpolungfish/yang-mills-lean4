@@ -2338,5 +2338,45 @@
       "propext"
     ],
     "status": "PASS"
+  },
+  {
+    "section": "\u00a730. OS pre-Hilbert GNS construction",
+    "name": "YangMills.osConfigKernel_eq_completion_inner",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a745. Balaban multiscale RG & OS analytic continuation into ClayYangMillsMassGap4DStrict",
+    "name": "YangMills.buildStrictWightmanFromOS_config_inner",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a730. OS pre-Hilbert GNS construction",
+    "name": "YangMills.osTimeShiftConfig_eq_completion_inner",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a745. Balaban multiscale RG & OS analytic continuation into ClayYangMillsMassGap4DStrict",
+    "name": "YangMills.buildStrictWightmanFromOS_time_shift_kernel",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
   }
 ]
