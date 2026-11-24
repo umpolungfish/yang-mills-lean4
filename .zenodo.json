@@ -5,7 +5,7 @@
   "creators": [
     {
       "name": "Yang-Mills Lean 4 Formalization Team",
-      "affiliation": "Independent researchers"
+      "affiliation": { "name": "Independent researchers" }
     }
   ],
   "keywords": [
@@ -31,7 +31,7 @@
     {
       "identifier": "https://umpolungfish.github.io/yang-mills-lean4/",
       "relation": "isDocumentedBy",
-      "resource_type": "documentation"
+      "resource_type": "website"
     }
   ],
   "references": [
