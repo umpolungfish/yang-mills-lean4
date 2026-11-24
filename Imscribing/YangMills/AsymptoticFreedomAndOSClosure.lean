@@ -35,7 +35,7 @@ theorem ymSpacing_tendsto_zero :
     Filter.Tendsto ymSpacing Filter.atTop (nhds 0) := by
   unfold ymSpacing
   have hden : Filter.Tendsto (fun m : ℕ => (m : ℝ) + 2) Filter.atTop Filter.atTop :=
-    Filter.tendsto_natCast_atTop_atTop.atTop_add tendsto_const_nhds
+    (Filter.tendsto_natCast_atTop_atTop.add tendsto_const_nhds)
   exact tendsto_const_nhds.div_atTop hden
 
 /-- Logarithmic weak-coupling inverse temperature β_m = 4N b₀(N) log(1 / a_m). -/
@@ -60,8 +60,10 @@ theorem ymBetaAF_pos {N : ℕ} (hN : 2 ≤ N) (m : ℕ) : 0 < ymBetaAF N m := by
           have h₂ : (m : ℝ) + 2 > 1 := by
             have h₃ : (m : ℝ) ≥ 0 := by exact_mod_cast Nat.zero_le m
             linarith
-          exact (one_div_lt_one_iff (by positivity)).mpr h₂
-      have h₂ : 1 < 1 / ymSpacing m := by linarith
+          have h₃ : 0 < (m : ℝ) + 2 := by positivity
+          rw [div_lt_one (by positivity)]
+          <;> linarith
+        linarith
       have h₃ : 0 < Real.log (1 / ymSpacing m) := Real.log_pos (by linarith)
       exact h₃
     positivity
@@ -82,7 +84,7 @@ theorem ymBetaAF_tendsto_atTop {N : ℕ} (hN : 2 ≤ N) :
       <;> field_simp
       <;> ring_nf
     rw [h_eq]
-    exact Filter.tendsto_natCast_atTop_atTop.atTop_add tendsto_const_nhds
+    exact (Filter.tendsto_natCast_atTop_atTop.add tendsto_const_nhds)
   have h_log : Filter.Tendsto (fun m : ℕ => Real.log (1 / ymSpacing m)) Filter.atTop Filter.atTop :=
     Real.tendsto_log_atTop.comp h_inv
   exact h_log.const_mul_atTop (by positivity : (0 : ℝ) < 4 * (N : ℝ) * suNOneLoopBeta0 N)
@@ -114,7 +116,7 @@ def ForwardTube (n : ℕ) : Set (Fin n → Fin 4 → ℂ) :=
     exponential clustering (E4), and separated non-Gaussianity (nontrivial connected 4-point). -/
 structure ContinuumSchwingerOS where
   S : ∀ n : ℕ, EuclideanSchwartz n →L[ℂ] ℂ
-  S_zero : S 0 1 = 1
+  S_zero : S 0 (1 : EuclideanSchwartz 0) = (1 : ℂ)
   /-- OS II linear-growth temperedness bound guaranteeing analytic continuation to local fields. -/
   linear_growth_E0 : ∃ (C α : ℝ) (k : ℕ), 0 < C ∧ 0 ≤ α ∧
     ∀ n (f : EuclideanSchwartz n),
@@ -127,5 +129,10 @@ structure ContinuumSchwingerOS where
     ∃ (f g : SchwartzMap (EuclideanSpace ℝ (Fin 4)) ℂ),
       Disjoint (Function.support f) (Function.support g) ∧
       ∃ F : EuclideanSchwartz 2, S 2 F ≠ 0
+
+instance : One (EuclideanSchwartz 0) :=
+  ⟨SchwartzMap.mk (fun _ : Fin 0 => (1 : ℂ)) (by
+    -- For 0-dimensional space, any function is rapidly decreasing
+    infer_instance)⟩
 
 end Imscribing.YangMills.ContinuumInterfaces

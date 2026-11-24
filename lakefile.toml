@@ -84,5 +84,7 @@ globs = [
   "Imscribing.YangMills.BorchersContinuumReconstruction",
   "Imscribing.YangMills.PositiveDefiniteKernels",
   "Imscribing.YangMills.LatticeOSCutSplitting4D",
-  "Imscribing.YangMills.LatticeOSReflectionPositivity4D"
+  "Imscribing.YangMills.LatticeOSReflectionPositivity4D",
+  "Imscribing.YangMills.WickRotationAndForwardTube",
+  "Imscribing.YangMills.WickMatrixBridge"
 ]
