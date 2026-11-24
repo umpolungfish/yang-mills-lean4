@@ -279,6 +279,37 @@ import Imscribing.YangMills.ClayReductionBridge
 #print axioms YangMills.LatticeCutSplit4D.posAction_linkReflect_eq_negAction
 #check YangMills.LatticeCutSplit4D.wilsonAction_temporal_split
 #print axioms YangMills.LatticeCutSplit4D.wilsonAction_temporal_split
+
+#check YangMills.LatticeOSRP4D.IsPosLink
+#print axioms YangMills.LatticeOSRP4D.IsPosLink
+#check YangMills.LatticeOSRP4D.IsNegLink
+#print axioms YangMills.LatticeOSRP4D.IsNegLink
+#check YangMills.LatticeOSRP4D.IsCutLinkMid
+#print axioms YangMills.LatticeOSRP4D.IsCutLinkMid
+#check YangMills.LatticeOSRP4D.IsCutLinkTop
+#print axioms YangMills.LatticeOSRP4D.IsCutLinkTop
+#check YangMills.LatticeOSRP4D.HalfVar
+#print axioms YangMills.LatticeOSRP4D.HalfVar
+#check YangMills.LatticeOSRP4D.glueConfig
+#print axioms YangMills.LatticeOSRP4D.glueConfig
+#check YangMills.LatticeOSRP4D.plaquette_pos_eq
+#print axioms YangMills.LatticeOSRP4D.plaquette_pos_eq
+#check YangMills.LatticeOSRP4D.posAction_glueConfig
+#print axioms YangMills.LatticeOSRP4D.posAction_glueConfig
+#check YangMills.LatticeOSRP4D.linkReflect_glueConfig_posLink
+#print axioms YangMills.LatticeOSRP4D.linkReflect_glueConfig_posLink
+#check YangMills.LatticeOSRP4D.negAction_glueConfig
+#print axioms YangMills.LatticeOSRP4D.negAction_glueConfig
+#check YangMills.LatticeOSRP4D.cutAnchor
+#print axioms YangMills.LatticeOSRP4D.cutAnchor
+#check YangMills.LatticeOSRP4D.cutMatrix
+#print axioms YangMills.LatticeOSRP4D.cutMatrix
+#check YangMills.LatticeOSRP4D.cut_plaq_realTrace_eq
+#print axioms YangMills.LatticeOSRP4D.cut_plaq_realTrace_eq
+#check YangMills.LatticeOSRP4D.wilsonAction_glueConfig
+#print axioms YangMills.LatticeOSRP4D.wilsonAction_glueConfig
+#check YangMills.LatticeOSRP4D.wilson4D_reflection_positivity
+#print axioms YangMills.LatticeOSRP4D.wilson4D_reflection_positivity
 ```
 
 ## Checked types
@@ -413,6 +444,21 @@ import Imscribing.YangMills.ClayReductionBridge
 | `YangMills.LatticeCutSplit4D.cutAction` | Cut-plaquette Wilson action `S_cut(U)` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.LatticeCutSplit4D.posAction_linkReflect_eq_negAction` | `posAction N M β (linkReflect U)` equals sum over `IsNegPlaq M` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.LatticeCutSplit4D.wilsonAction_temporal_split` | `S_W(U) = S₊(U) + S₊(Θ U) + S_cut(U)` exact 3-way action split | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.IsPosLink` | Positive-half link definition on `Lat4 (2 * M)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.IsNegLink` | Negative-half link definition on `Lat4 (2 * M)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.IsCutLinkMid` | Cut link at temporal mid-plane `t = M - 1` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.IsCutLinkTop` | Cut link at temporal top `t = 2*M - 1` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.HalfVar` | Half-lattice configuration `(U_half, W_cut)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.glueConfig` | Glue positive/negative half configs with cut-link auxiliaries | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.plaquette_pos_eq` | Plaquette equality for positive-time sites | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.posAction_glueConfig` | Positive action unchanged under glue | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.linkReflect_glueConfig_posLink` | Link reflection of glue equals positive link of second config | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.negAction_glueConfig` | Negative action of glue equals positive action of second config | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.cutAnchor` | Spatial anchor site of cut plaquette | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.cutMatrix` | Cut-plaquette matrix factor `A_{x,ρ}(r)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.cut_plaq_realTrace_eq` | Cut plaquette trace equals `realTrace(A₊ * A₋⁻¹)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.wilsonAction_glueConfig` | Full action split `S_W = S₊(p) + S₊(q) + cutConst - cutKernel` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeOSRP4D.wilson4D_reflection_positivity` | **Main Theorem:** Unconditional finite-volume OS reflection positivity | `propext`, `Classical.choice`, `Quot.sound` |
 
 The exact probe bridge and full-tuple stage limit are separate declarations.
 The first proves an exact identity for its probe family. The second proves the
