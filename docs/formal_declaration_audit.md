@@ -237,6 +237,48 @@ import Imscribing.YangMills.ClayReductionBridge
 #print axioms YangMills.BorchersReconstruction.toEuclideanPreData
 #check YangMills.BorchersReconstruction.borchers_to_clay_target
 #print axioms YangMills.BorchersReconstruction.borchers_to_clay_target
+
+#check YangMills.PosDefKernels.IsBoundedPosDefKernel
+#print axioms YangMills.PosDefKernels.IsBoundedPosDefKernel
+#check YangMills.PosDefKernels.isBoundedPosDefKernel_zero
+#print axioms YangMills.PosDefKernels.isBoundedPosDefKernel_zero
+#check YangMills.PosDefKernels.isBoundedPosDefKernel_one
+#print axioms YangMills.PosDefKernels.isBoundedPosDefKernel_one
+#check YangMills.PosDefKernels.isBoundedPosDefKernel_smul_nonneg
+#print axioms YangMills.PosDefKernels.isBoundedPosDefKernel_smul_nonneg
+#check YangMills.PosDefKernels.isBoundedPosDefKernel_add
+#print axioms YangMills.PosDefKernels.isBoundedPosDefKernel_add
+#check YangMills.PosDefKernels.isBoundedPosDefKernel_mul
+#print axioms YangMills.PosDefKernels.isBoundedPosDefKernel_mul
+#check YangMills.PosDefKernels.isBoundedPosDefKernel_pow
+#print axioms YangMills.PosDefKernels.isBoundedPosDefKernel_pow
+#check YangMills.PosDefKernels.isBoundedPosDefKernel_sum
+#print axioms YangMills.PosDefKernels.isBoundedPosDefKernel_sum
+#check YangMills.PosDefKernels.posDefKernel_double_integral_nonneg
+#print axioms YangMills.PosDefKernels.posDefKernel_double_integral_nonneg
+#check YangMills.PosDefKernels.exp_real_posDefKernel_double_integral_nonneg
+#print axioms YangMills.PosDefKernels.exp_real_posDefKernel_double_integral_nonneg
+#check YangMills.PosDefKernels.realTrace_unitary_kernel_isPosDef
+#print axioms YangMills.PosDefKernels.realTrace_unitary_kernel_isPosDef
+
+#check YangMills.LatticeCutSplit4D.cutPlaquette_split_trace
+#print axioms YangMills.LatticeCutSplit4D.cutPlaquette_split_trace
+#check YangMills.LatticeCutSplit4D.IsPosPlaq
+#print axioms YangMills.LatticeCutSplit4D.IsPosPlaq
+#check YangMills.LatticeCutSplit4D.IsNegPlaq
+#print axioms YangMills.LatticeCutSplit4D.IsNegPlaq
+#check YangMills.LatticeCutSplit4D.IsCutPlaq
+#print axioms YangMills.LatticeCutSplit4D.IsCutPlaq
+#check YangMills.LatticeCutSplit4D.plaq_partition_disjoint_and_exhaustive
+#print axioms YangMills.LatticeCutSplit4D.plaq_partition_disjoint_and_exhaustive
+#check YangMills.LatticeCutSplit4D.posAction
+#print axioms YangMills.LatticeCutSplit4D.posAction
+#check YangMills.LatticeCutSplit4D.cutAction
+#print axioms YangMills.LatticeCutSplit4D.cutAction
+#check YangMills.LatticeCutSplit4D.posAction_linkReflect_eq_negAction
+#print axioms YangMills.LatticeCutSplit4D.posAction_linkReflect_eq_negAction
+#check YangMills.LatticeCutSplit4D.wilsonAction_temporal_split
+#print axioms YangMills.LatticeCutSplit4D.wilsonAction_temporal_split
 ```
 
 ## Checked types
@@ -333,6 +375,44 @@ import Imscribing.YangMills.ClayReductionBridge
 | `YangMills.BorchersReconstruction.BorchersOSData` | Concrete Borchers OS data package | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.BorchersReconstruction.toEuclideanPreData` | Embedding `BorchersOSData N → EuclideanPreData BorchersPos` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.BorchersReconstruction.borchers_to_clay_target` | Unconditional Borchers-to-Clay Yang-Mills reduction | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.reflectSite` | Temporal site reflection `t ↦ -(t+1)` on 4D periodic lattice | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.reflectSite_involutive` | `reflectSite ∘ reflectSite = id` on `Lat4 L` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.reflectSite_bijective` | `reflectSite` is bijective on `Lat4 L` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.reflectSite_ne_self` | No fixed points on even torus `Lat4 (2*M)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.linkReflect` | Osterwalder–Seiler link reflection involution Θ | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.linkReflect_involutive` | `Θ² = id` on `LinkConfig N L` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.realTrace_inv` | `Re Tr(A⁻¹) = Re Tr(A)` for `A ∈ SU(N)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.plaquetteHolonomy_diag` | Diagonal plaquette holonomy is identity | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.plaquetteHolonomy_swap` | `plaquetteHolonomy U x ν μ = (plaquetteHolonomy U x μ ν)⁻¹` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.realTrace_plaquette_linkReflect_spatial` | Spatial plaquette density under site reflection | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.realTrace_plaquette_linkReflect_time_first` | Temporal plaquette density under `x ↦ reflectSite x - e₀` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeRP4D.wilsonAction_linkReflect` | Exact time-reflection invariance of 4D SU(N) Wilson action | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.BorchersReconstruction.PosSchwartzSubmodule` | Positive-time Schwartz subspace `𝓢₊((ℝ⁴)ⁿ)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.BorchersReconstruction.BorchersPos` | Borchers algebra `⨁ₙ 𝓢₊((ℝ⁴)ⁿ, ℂ)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.BorchersReconstruction.borchersVac` | Vacuum unit in degree 0 of `BorchersPos` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.BorchersReconstruction.BorchersOSData` | Concrete Borchers OS data package | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.BorchersReconstruction.toEuclideanPreData` | Embedding `BorchersOSData N → EuclideanPreData BorchersPos` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.BorchersReconstruction.borchers_to_clay_target` | Unconditional Borchers-to-Clay Yang-Mills reduction | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.IsBoundedPosDefKernel` | Bounded positive-definite kernel definition | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.isBoundedPosDefKernel_zero` | Zero kernel is positive-definite | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.isBoundedPosDefKernel_one` | Constant-1 kernel is positive-definite | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.isBoundedPosDefKernel_smul_nonneg` | Nonnegative scalar multiplication closure | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.isBoundedPosDefKernel_add` | Addition closure of positive-definite kernels | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.isBoundedPosDefKernel_mul` | Schur product closure of positive-definite kernels | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.isBoundedPosDefKernel_pow` | Powers closure of positive-definite kernels | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.isBoundedPosDefKernel_sum` | Finite sum closure of positive-definite kernels | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.posDefKernel_double_integral_nonneg` | Double-integral positivity of bounded pos-def kernels | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.exp_real_posDefKernel_double_integral_nonneg` | Exponential Boltzmann positivity for real pos-def kernels | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.PosDefKernels.realTrace_unitary_kernel_isPosDef` | `Re Tr(A x * (A y)⁻¹)` is bounded pos-def kernel for A : α → SU(N) | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.cutPlaquette_split_trace` | Exact SU(N) matrix factorization under Haar cut-link split | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.IsPosPlaq` | Positive-time half plaquettes on `Lat4 (2 * M)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.IsNegPlaq` | Negative-time half plaquettes on `Lat4 (2 * M)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.IsCutPlaq` | Cut plaquettes crossing reflection planes | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.plaq_partition_disjoint_and_exhaustive` | Disjoint exhaustive partition of all plaquettes | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.posAction` | Positive-half Wilson action `S₊(U)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.cutAction` | Cut-plaquette Wilson action `S_cut(U)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.posAction_linkReflect_eq_negAction` | `posAction N M β (linkReflect U)` equals sum over `IsNegPlaq M` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.LatticeCutSplit4D.wilsonAction_temporal_split` | `S_W(U) = S₊(U) + S₊(Θ U) + S_cut(U)` exact 3-way action split | `propext`, `Classical.choice`, `Quot.sound` |
 
 The exact probe bridge and full-tuple stage limit are separate declarations.
 The first proves an exact identity for its probe family. The second proves the
