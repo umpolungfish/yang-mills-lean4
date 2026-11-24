@@ -4,8 +4,8 @@ authors:
   - family-names: "Yang-Mills Lean 4 Formalization Team"
     affiliation: "Independent researchers"
 title: "Four-Dimensional Yang–Mills Constructions and Mass-Gap Interfaces: A Lean 4 Formalization"
-version: 1.0.0
-doi: "10.5281/zenodo.XXXXXXX"  # Will be filled after Zenodo deposit
+version: v1.0.0
+doi: "10.5281/zenodo.XXXXXXX"
 date-released: 2026-11-24
 url: "https://github.com/umpolungfish/yang-mills-lean4"
 license: "Apache-2.0"
