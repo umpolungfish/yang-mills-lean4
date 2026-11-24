@@ -1,4 +1,5 @@
 import Imscribing.YangMills.ContinuumClosure
+import Imscribing.YangMills.IIDPoincareContinuation
 
 /-!
 YangMills — a thin shim over the five cached modules:

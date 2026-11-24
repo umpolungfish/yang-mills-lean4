@@ -31,6 +31,8 @@ import Imscribing.YangMills.TrivialWightman
 #print axioms YangMills.buildStrictWightmanFromOS_time_shift_kernel
 #check YangMills.buildStrictWightmanFromOS_schwinger_vacuum_coefficient
 #print axioms YangMills.buildStrictWightmanFromOS_schwinger_vacuum_coefficient
+#check YangMills.buildStrictWightmanFromOS_schwinger_field_word_approx
+#print axioms YangMills.buildStrictWightmanFromOS_schwinger_field_word_approx
 
 #check YangMills.clay_yang_mills_from_rg_estimates
 #print axioms YangMills.clay_yang_mills_from_rg_estimates
@@ -85,6 +87,7 @@ import Imscribing.YangMills.TrivialWightman
 | `YangMills.buildStrictWightmanFromOS_config_inner` | The same kernel identity in the Hilbert space of the assembled Wightman object | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.buildStrictWightmanFromOS_time_shift_kernel` | The time-shifted kernel matrix coefficient in the assembled Wightman Hilbert space | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.buildStrictWightmanFromOS_schwinger_vacuum_coefficient` | Positive-time Schwinger value as the vacuum matrix coefficient of its canonical configuration state | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.buildStrictWightmanFromOS_schwinger_field_word_approx` | Positive-time Schwinger vacuum coefficient approximated by vacuum coefficients of finite linear combinations of Wightman field words | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.clay_yang_mills_from_rg_estimates` | `SUYangMillsRGConjecture N hN → ClayYangMillsMassGap4D N hN` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence` | Concrete uniform rescaled lattice gap and RG convergence data for every `N ≥ 2` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.concreteOS4DContinuumTheory` | `OS4DContinuumTheory 1`; the source separately proves `concreteOS4D_fails_trans_inv` | `propext`, `Classical.choice`, `Quot.sound` |

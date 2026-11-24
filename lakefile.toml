@@ -59,6 +59,7 @@ globs = [
   "Imscribing.YangMills.IIDSchwingerFromWilson",
   "Imscribing.YangMills.IIDOS",
   "Imscribing.YangMills.IIDContinuation",
+  "Imscribing.YangMills.IIDPoincareContinuation",
   "Imscribing.YangMills.TrivialWightman",
   "Imscribing.YangMills.WilsonObservable",
   "Imscribing.YangMills.LatticeLimitDensity",

@@ -202,6 +202,53 @@ theorem buildStrictWightmanFromOS_schwinger_vacuum_coefficient {Δ_phys : ℝ}
   exact osConfigKernel_empty_left os.os.Δ_pos os.toOS4DContinuumTheory C.h_S0 y
 
 /--
+Positive-time Schwinger vacuum coefficients are limits of finite linear
+combinations of vacuum coefficients of Wightman field words.
+-/
+theorem buildStrictWightmanFromOS_schwinger_field_word_approx {Δ_phys : ℝ}
+    (os : OsterwalderSchrader4DStrict Δ_phys)
+    (C : OSPoincareContinuationHypothesis os)
+    (y : PosTimeConfig) :
+    let W := buildStrictWightmanFromOS os C
+    let F := osConfigForm os.toOS4DContinuumTheory C.h_herm
+    letI : InnerProductSpace ℂ W.H := W.hInner
+    ∀ ε > 0, ∃ v : W.H,
+      v ∈ Submodule.span ℂ
+        {w : W.H | ∃ (k : ℕ) (xs : Fin k → Space4),
+          w = (List.ofFn (fun i : Fin k => W.φ (xs i))).foldr
+            (fun A acc => A acc) W.Ω_phys} ∧
+      ‖os.os.Schwinger y.n_pts y.pts - ⟪W.Ω_phys, v⟫_ℂ‖ < ε := by
+  let W := buildStrictWightmanFromOS os C
+  let F := osConfigForm os.toOS4DContinuumTheory C.h_herm
+  letI : InnerProductSpace ℂ W.H := W.hInner
+  let ψ : W.H := osCompletionMap F (osPreMk F (osConfigSingle y))
+  let fieldWords : Set W.H := {w | ∃ (k : ℕ) (xs : Fin k → Space4),
+    w = (List.ofFn (fun i : Fin k => W.φ (xs i))).foldr
+      (fun A acc => A acc) W.Ω_phys}
+  let fieldSpan : Submodule ℂ W.H := Submodule.span ℂ fieldWords
+  have h_dense : fieldSpan.topologicalClosure = ⊤ := by
+    simpa [fieldSpan, fieldWords] using W.cyclic_dense
+  have h_mem : ψ ∈ (fieldSpan.topologicalClosure : Set W.H) := by
+    rw [h_dense]
+    exact Set.mem_univ ψ
+  change ψ ∈ closure (fieldSpan : Set W.H) at h_mem
+  intro W' F' ε hε
+  have h_mem' : ψ ∈ closure (fieldSpan : Set W.H) := h_mem
+  rw [Metric.mem_closure_iff] at h_mem'
+  obtain ⟨v, hv_span, hv_dist⟩ := h_mem' (ε / 2) (by linarith)
+  refine ⟨v, hv_span, ?_⟩
+  have h_coeff : os.os.Schwinger y.n_pts y.pts = ⟪W.Ω_phys, ψ⟫_ℂ :=
+    (buildStrictWightmanFromOS_schwinger_vacuum_coefficient os C y).symm
+  calc
+    ‖os.os.Schwinger y.n_pts y.pts - ⟪W.Ω_phys, v⟫_ℂ‖ =
+        ‖⟪W.Ω_phys, ψ - v⟫_ℂ‖ := by rw [h_coeff, ← inner_sub_right]
+    _ ≤ ‖W.Ω_phys‖ * ‖ψ - v‖ := norm_inner_le_norm _ _
+    _ < ε := by
+      rw [W.Ω_unit]
+      have hnorm : ‖ψ - v‖ < ε / 2 := by simpa [dist_eq_norm] using hv_dist
+      linarith
+
+/--
 **Strict Reduction Theorem**:
 combining `BalabanRGContinuumHypothesis N hN` and `OSPoincareContinuationHypothesis`
 establishes `ClayYangMillsMassGap4DStrict N hN` with zero unproven placeholders.
@@ -1539,6 +1586,7 @@ end YangMills
 #print axioms YangMills.buildStrictWightmanFromOS_config_inner
 #print axioms YangMills.buildStrictWightmanFromOS_time_shift_kernel
 #print axioms YangMills.buildStrictWightmanFromOS_schwinger_vacuum_coefficient
+#print axioms YangMills.buildStrictWightmanFromOS_schwinger_field_word_approx
 #print axioms YangMills.clay_yang_mills_strict_from_balaban_and_os
 #print axioms YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os
 #print axioms YangMills.clay_yang_mills_strict_on_os_completion_implies_strict

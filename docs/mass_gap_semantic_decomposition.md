@@ -90,6 +90,9 @@ then identifies every positive-time Schwinger value with the vacuum matrix
 coefficient of its canonical configuration state in that same space. This
 makes the OS kernel, its Euclidean transfer evolution, and its vacuum
 coefficients explicit inside the reconstructed state space.
+`buildStrictWightmanFromOS_schwinger_field_word_approx` uses cyclic density to
+approximate each such coefficient arbitrarily closely by vacuum coefficients
+of finite linear combinations of Wightman field words.
 
 ## Uniform RG and the mass-gap witness
 

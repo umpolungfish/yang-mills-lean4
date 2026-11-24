@@ -89,7 +89,9 @@ coefficient. `buildStrictWightmanFromOS_config_inner` and
 Hilbert space used by the assembled Wightman object.
 `buildStrictWightmanFromOS_schwinger_vacuum_coefficient` writes every
 positive-time Schwinger value as the vacuum matrix coefficient of its canonical
-configuration state there.
+configuration state there. `buildStrictWightmanFromOS_schwinger_field_word_approx`
+uses cyclic density to approximate that coefficient arbitrarily closely by
+vacuum coefficients of finite linear combinations of Wightman field words.
 `iidOS4DStrict` and `trivialWightman` remain separate examples; they do not by
 themselves supply this reconstruction identity.
 
