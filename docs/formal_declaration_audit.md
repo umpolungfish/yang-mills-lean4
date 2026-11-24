@@ -14,6 +14,12 @@ import Imscribing.YangMills.TrivialWightman
 #check YangMills.clay_yang_mills_strict_from_balaban_and_os
 #print axioms YangMills.clay_yang_mills_strict_from_balaban_and_os
 
+#check YangMills.ClayYangMillsMassGap4DStrictOnOSCompletion
+#check YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os
+#print axioms YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os
+#check YangMills.clay_yang_mills_strict_on_os_completion_implies_strict
+#print axioms YangMills.clay_yang_mills_strict_on_os_completion_implies_strict
+
 #check YangMills.clay_yang_mills_from_rg_estimates
 #print axioms YangMills.clay_yang_mills_from_rg_estimates
 
@@ -34,6 +40,10 @@ import Imscribing.YangMills.TrivialWightman
 
 #check YangMills.stageObservableSchwinger_tendsto_iid
 #print axioms YangMills.stageObservableSchwinger_tendsto_iid
+
+#check YangMills.stageObservable_not_ae_constant
+#print axioms YangMills.stageObservable_not_ae_constant
+#check YangMills.stageObservable_latticeSinglePointObs
 
 #check YangMills.iidSchwinger_from_wilson
 #print axioms YangMills.iidSchwinger_from_wilson
@@ -56,6 +66,8 @@ import Imscribing.YangMills.TrivialWightman
 | Declaration | Lean type or result | Kernel axioms |
 |---|---|---|
 | `YangMills.clay_yang_mills_strict_from_balaban_and_os` | `BalabanRGContinuumHypothesis N hN → OSPoincareContinuationHypothesis B.os → ClayYangMillsMassGap4DStrict N hN` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os` | Balaban and continuation inputs produce a strict witness whose Wightman object equals `buildStrictWightmanFromOS os C` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.clay_yang_mills_strict_on_os_completion_implies_strict` | The strengthened OS-completion target implies `ClayYangMillsMassGap4DStrict` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.clay_yang_mills_from_rg_estimates` | `SUYangMillsRGConjecture N hN → ClayYangMillsMassGap4D N hN` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence` | Concrete uniform rescaled lattice gap and RG convergence data for every `N ≥ 2` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.concreteOS4DContinuumTheory` | `OS4DContinuumTheory 1`; the source separately proves `concreteOS4D_fails_trans_inv` | `propext`, `Classical.choice`, `Quot.sound` |
@@ -63,6 +75,8 @@ import Imscribing.YangMills.TrivialWightman
 | `YangMills.WightmanQFT4DStrict` | `Type 1` structure indexed by `Δ_phys` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.yangMillsMassGap` | `YangMillsMassGap` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.stageObservableSchwinger_tendsto_iid` | Full finite-tuple limit of selected Wilson stage observables, including repeated points | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.stageObservable_not_ae_constant` | The stage observable is not almost surely constant under the Wilson measure | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.stageObservable_latticeSinglePointObs` | Packages Wilson stage observables as gauge-invariant, nonconstant `LatticeSinglePointObs` data | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.iidSchwinger_from_wilson` | Exact Wilson-probe bridge to `iidSchwinger` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.iidOS4DStrict` | Strict OS family with rate `1` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.trivialWightman` | `WightmanQFT4DStrict 1` | `propext`, `Classical.choice`, `Quot.sound` |
@@ -81,6 +95,11 @@ unconditional finite-system mass-gap theorem proves a `GappedSpectrum (Fin 2)`
 existence statement. The unconditional OS, Wightman, Wilson-limit, and
 finite-volume transfer declarations listed here do not instantiate the strict
 Clay theorem's inputs.
+
+The original strict proposition leaves the Wightman witness independent of the
+OS reconstruction. `ClayYangMillsMassGap4DStrictOnOSCompletion` adds the
+object-level reconstruction equality, and its reduction theorem retains the
+Balaban and continuation records as explicit inputs.
 
 `concreteOS4DContinuumTheory` is a separate checked OS declaration. The
 translation-invariance counterexample is recorded by

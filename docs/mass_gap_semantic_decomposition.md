@@ -55,11 +55,12 @@ audit.
 The target `ClayYangMillsMassGap4DStrict` contains an OS structure and a
 Wightman structure indexed by the same positive `Δ_phys`. Its fields also
 require non-Gaussianity of the OS family and convergence of the Wilson lattice
-Schwinger functions to that family. This proposition does not have a field
-identifying its Wightman witness with an OS reconstruction. The separately
-named `buildStrictWightmanFromOS` interface is the reconstruction route when
-its continuation data are provided. See the proof-reading map for the exact
-declaration locations.
+Schwinger functions to that family. `ClayYangMillsMassGap4DStrictOnOSCompletion`
+strengthens this interface with an explicit OS continuation witness and an
+equality requiring the Wightman witness to be the result of
+`buildStrictWightmanFromOS`. The corresponding reduction theorem constructs
+that stronger target from the Balaban and continuation hypotheses. See the
+proof-reading map for the exact declaration locations.
 
 Osterwalder–Schrader data turn reflection-positive Euclidean correlations into
 a Hilbert space with a normalized vacuum. A Wightman structure adds the

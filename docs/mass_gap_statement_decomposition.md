@@ -175,10 +175,13 @@ The independent Wilson-to-iidSchwinger convergence result is stated in
 The definition of `ClayYangMillsMassGap4DStrict` encodes a positive rate, a
 non-Gaussian OS family, a same-rate-index Wightman structure, divergent lattice
 extents, a coupling sequence, a gauge-invariant nonconstant observable, and
-Wilson Schwinger convergence to the OS family. Its fields do not identify the
-Wightman structure with the OS reconstruction. The current theorem returning
-this proposition requires explicit RG and continuation structures; the
-separate unconditional finite-system gap has a different type.
+Wilson Schwinger convergence to the OS family. This original declaration does
+not identify the Wightman structure with the OS reconstruction.
+`ClayYangMillsMassGap4DStrictOnOSCompletion` adds that identity by requiring the
+Wightman witness to equal the output of `buildStrictWightmanFromOS` for explicit
+continuation data. Its reduction theorem still takes the RG and continuation
+structures as inputs. The separate unconditional finite-system gap has a
+different type.
 
 Native audit: the full theorem closure compiled to a 213 MB ELF and audited by
 `vox` (178,350 functions by descent, 36,863,127 instructions, 100% code-image

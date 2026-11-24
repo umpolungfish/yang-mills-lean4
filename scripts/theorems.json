@@ -2288,5 +2288,55 @@
       "propext"
     ],
     "status": "PASS"
+  },
+  {
+    "section": "\u00a747. Unconditional Wilson stage limit",
+    "name": "YangMills.stageObservable_not_ae_constant",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a747. Unconditional Wilson stage limit",
+    "name": "YangMills.stageObservable_latticeSinglePointObs",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a745. Balaban multiscale RG & OS analytic continuation into ClayYangMillsMassGap4DStrict",
+    "name": "YangMills.ClayYangMillsMassGap4DStrictOnOSCompletion",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a745. Balaban multiscale RG & OS analytic continuation into ClayYangMillsMassGap4DStrict",
+    "name": "YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "\u00a745. Balaban multiscale RG & OS analytic continuation into ClayYangMillsMassGap4DStrict",
+    "name": "YangMills.clay_yang_mills_strict_on_os_completion_implies_strict",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
   }
 ]

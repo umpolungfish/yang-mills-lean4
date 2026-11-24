@@ -18,6 +18,11 @@ under the Wilson measure. Its probability-integral-transform output is then
 sent through the frequency-selected two-value map. `stageObservable_moment`
 computes every positive integer moment as
 `((1 : ℝ)^k + (2 : ℝ)^k) / 2`.
+The unequal first and second moments prove `stageObservable_not_ae_constant`,
+so nonconstancy holds under the Wilson measure up to null sets. The
+`stageObservable_latticeSinglePointObs` constructor packages this gauge-
+invariant, nonconstant family into the observable interface used by the strict
+target.
 
 `stageObservableSchwinger_tendsto_iid` proves convergence of the actual
 stage-indexed Wilson expectations for every finite point tuple. Its tuple
@@ -67,14 +72,20 @@ under discussion.
 
 `ClayYangMillsMassGap4DStrict` is an existential proposition over an OS family,
 a Wightman structure, a lattice sequence, and lattice observables. The OS and
-Wightman witnesses carry the same `Δ_phys` index. The declared fields do not
-require a constructor equating the Wightman object with an OS reconstruction.
-`iidOS4DStrict` supplies the strict OS family at rate `1`; `trivialWightman`
-supplies a `WightmanQFT4DStrict 1`. `buildStrictWightmanFromOS` is the separate
-reconstruction route when the Poincaré continuation data are supplied.
+Wightman witnesses carry the same `Δ_phys` index, while this target does not
+require the Wightman object to be reconstructed from the OS family.
+`ClayYangMillsMassGap4DStrictOnOSCompletion` adds an explicit continuation
+witness and requires its Wightman object to equal
+`buildStrictWightmanFromOS os C`. The theorem
+`clay_yang_mills_strict_on_os_completion_from_balaban_and_os` constructs this
+stronger target from `BalabanRGContinuumHypothesis` and
+`OSPoincareContinuationHypothesis`. The continuation data remain explicit.
+`iidOS4DStrict` and `trivialWightman` remain separate examples; they do not by
+themselves supply this reconstruction identity.
 
 The conditional declarations
-`clay_yang_mills_strict_from_balaban_and_os` and
+`clay_yang_mills_strict_from_balaban_and_os`,
+`clay_yang_mills_strict_on_os_completion_from_balaban_and_os`, and
 `clay_yang_mills_from_rg_estimates` are reusable reduction interfaces with
 their displayed inputs. In `GlobalAxioms.lean`, the strict theorem alias takes
 both `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`.

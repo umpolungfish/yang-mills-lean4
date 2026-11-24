@@ -55,6 +55,12 @@ with the Wightman witness in the strict Clay proposition.
 | 15 | Unitary Poincaré representation | proved | `concreteOSReconstructionData.wightman.U*` |
 | 16 | Covariant local fields, microcausality, vacuum cyclicity | proved | `concreteOSReconstructionData.wightman.φ`, `covariant`, `local_comm`, `cyclic_dense` |
 
+`ClayYangMillsMassGap4DStrictOnOSCompletion` strengthens the target by carrying
+the continuation witness and requiring the Wightman object to equal
+`buildStrictWightmanFromOS os C`. The reduction theorem constructs this target
+from explicit Balaban and continuation hypotheses. The original strict target
+remains available with its less restrictive Wightman field.
+
 ## Stage IV — semigroup, gap, witness
 
 | # | Obligation | Status | Source |
@@ -62,6 +68,10 @@ with the Wightman witness in the strict Clay proposition.
 | 17 | Euclidean time-evolution contraction semigroup | proved | `buildStrictWightmanFromOS.T_E*` |
 | 18 | Semigroup mass gap ‖T(t)v‖ ≤ e^(−Δt)‖v‖ | proved | `os_cluster_implies_semigroup_gap`, `T_E_gap` |
 | 19 | Strict continuum Clay mass-gap proposition | conditional | `clay_yang_mills_strict_from_balaban_and_os` requires `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`; `clay_yang_mills_from_rg_estimates` requires `SUYangMillsRGConjecture` |
+
+The OS-linked version is `ClayYangMillsMassGap4DStrictOnOSCompletion`, returned
+by `clay_yang_mills_strict_on_os_completion_from_balaban_and_os` from the same
+explicit continuum and continuation inputs.
 
 The unconditional `MassGapInstances.clay_yang_mills_strict` proves the separate
 finite-system statement `∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`. The strict

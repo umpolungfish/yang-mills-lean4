@@ -125,7 +125,7 @@ html_content = """<!DOCTYPE html>
       </h1>
 
       <p class="text-lg sm:text-xl text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-            The formalization proves the full-tuple Wilson stage limit, an equality-class OS family, exact finite-volume Wilson transfer-gap results, and uniform RG data. The strict Clay proposition is reached by a theorem with explicit Balaban RG and OS continuation inputs. The proof-reading map records the exact type boundary and separates these constructions from the finite-system witness.
+            The formalization proves the full-tuple Wilson stage limit, an equality-class OS family, exact finite-volume Wilson transfer-gap results, and uniform RG data. The strict Clay targets have reduction theorems with explicit Balaban RG and OS continuation inputs; the strengthened target fixes the Wightman witness to the OS-completion construction. The proof-reading map records the exact type boundary and separates these constructions from the finite-system witness.
       </p>
 
       <section class="max-w-4xl mx-auto mb-10 grid gap-4 text-left md:grid-cols-2" aria-label="Continuum correlations and short-distance scaling">
@@ -228,7 +228,7 @@ html_content = """<!DOCTYPE html>
       <div class="text-center mb-16">
         <h2 class="text-3xl font-bold tracking-tight text-white mb-4">46-Section Pipeline + Wilson Stage Limit</h2>
         <p class="text-slate-400 max-w-2xl mx-auto">
-          The development proves the Wilson stage limit and its Euclidean properties, finite-volume transfer gaps, and uniform RG data. The strict Clay proposition is returned by a theorem with explicit RG and OS continuation inputs.
+          The development proves the Wilson stage limit and its Euclidean properties, finite-volume transfer gaps, and uniform RG data. The strict Clay targets are returned by theorems with explicit RG and OS continuation inputs, including an OS-completion-linked Wightman witness.
         </p>
       </div>
 
@@ -297,7 +297,7 @@ flowchart TD
             <span class="text-xs px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">Concrete 4D RG result</span>
           </div>
           <p class="text-sm text-slate-400 mb-4">
-            For every $N \\ge 2$, Lean constructs uniform rescaled-gap and RG data over `concreteUniformRGTrajectory N hN`. The `yangMillsMassGap` declaration supplies a finite gauge-setup gap, and the full-rank Wilson transfer has its own exact gap theorem. The strict Clay proposition is provided through `clay_yang_mills_strict_from_balaban_and_os`, which takes explicit Balaban RG and OS continuation structures. The declaration audit lists each exact type.
+            For every $N \\ge 2$, Lean constructs uniform rescaled-gap and RG data over `concreteUniformRGTrajectory N hN`. The `yangMillsMassGap` declaration supplies a finite gauge-setup gap, and the full-rank Wilson transfer has its own exact gap theorem. The strict Clay proposition and its OS-completion-linked strengthening are provided by reduction theorems with explicit Balaban RG and OS continuation structures. The declaration audit lists each exact type.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.yangMillsMassGap
 YangMills.concreteUniformRGTrajectory
