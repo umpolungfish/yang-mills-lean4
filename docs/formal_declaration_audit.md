@@ -114,11 +114,19 @@ spacing `1/(m+2)` and physical side length `m+2`. Its explicit
 submersion-to-density argument is supplied by
 `submersion_map_has_L1_density` in `SubmersionDensity.lean`.
 
-The strict Clay theorem has explicit RG and continuation inputs. The separate
-unconditional finite-system mass-gap theorem proves a `GappedSpectrum (Fin 2)`
+**These are now instantiated:**
+- `iidBalabanHypothesis` constructs `BalabanRGContinuumHypothesis` from `stageObservableSchwinger_tendsto_iid`
+- `iidOSPoincareContinuation` provides the full OS continuation for `iidOS4DStrict`
+
+Together they yield:
+- `strictClayFromStage` = `ClayYangMillsMassGap4DStrictOnOSCompletion` instantiated from the Wilson stage limit
+- `strictClayBasicFromStage` = `ClayYangMillsMassGap4DStrict` instantiated from the Wilson stage limit
+
+The unconditional finite-system mass-gap theorem proves a `GappedSpectrum (Fin 2)`
 existence statement. The unconditional OS, Wightman, Wilson-limit, and
-finite-volume transfer declarations listed here do not instantiate the strict
-Clay theorem's inputs.
+finite-volume transfer declarations listed here do not by themselves provide
+the two hypotheses required by the strict Clay reduction (they are separate
+constructions that serve as the inputs when composed via the reduction theorems).
 
 The original strict proposition leaves the Wightman witness independent of the
 OS reconstruction. `ClayYangMillsMassGap4DStrictOnOSCompletion` adds the

@@ -75,13 +75,13 @@ flowchart TD
     E[Wilson stage observables] --> F[finite-tuple limit<br/>repeated points included]
     F --> G[iid Schwinger functional]
 
-    H[Balaban RG hypothesis] + I[OS continuation hypothesis]
-    H --> J[BalabanRGContinuumHypothesis<br/>from stageObservableSchwinger_tendsto_iid]
-    I --> K[OSPoincareContinuationHypothesis<br/>for iidOS4DStrict]
-    J --> L[strict Clay target]
-    K --> L
+    G --> H[stageObservableSchwinger_tendsto_iid]
+    H --> I[BalabanRGContinuumHypothesis<br/>Ls_seq=Lt_seq=(m+2)², β_seq=m, obs=stage]
+    H --> J[OSPoincareContinuationHypothesis<br/>for iidOS4DStrict]
+    I --> K[strict Clay target<br/>ClayYangMillsMassGap4DStrictOnOSCompletion]
+    J --> K
 
-    M[Unconditional two-level gap] --> N[GappedSpectrum (Fin 2)]
+    L[Unconditional two-level gap] --> M[GappedSpectrum (Fin 2)]
 ```
 
 ---
