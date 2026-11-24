@@ -87,6 +87,9 @@ the lifted Euclidean time semigroup has the time-shifted kernel as its matrix
 coefficient. `buildStrictWightmanFromOS_config_inner` and
 `buildStrictWightmanFromOS_time_shift_kernel` state these identities in the
 Hilbert space used by the assembled Wightman object.
+`buildStrictWightmanFromOS_schwinger_vacuum_coefficient` writes every
+positive-time Schwinger value as the vacuum matrix coefficient of its canonical
+configuration state there.
 `iidOS4DStrict` and `trivialWightman` remain separate examples; they do not by
 themselves supply this reconstruction identity.
 

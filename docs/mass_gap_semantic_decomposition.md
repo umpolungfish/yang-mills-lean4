@@ -85,8 +85,11 @@ configuration in Euclidean time.
 `buildStrictWightmanFromOS_config_inner` gives the same identity using the
 Hilbert space field of the assembled Wightman object, while
 `buildStrictWightmanFromOS_time_shift_kernel` gives the semigroup matrix
-coefficient there. This makes both the OS kernel and its Euclidean transfer
-evolution explicit inside the reconstructed state space.
+coefficient there. `buildStrictWightmanFromOS_schwinger_vacuum_coefficient`
+then identifies every positive-time Schwinger value with the vacuum matrix
+coefficient of its canonical configuration state in that same space. This
+makes the OS kernel, its Euclidean transfer evolution, and its vacuum
+coefficients explicit inside the reconstructed state space.
 
 ## Uniform RG and the mass-gap witness
 

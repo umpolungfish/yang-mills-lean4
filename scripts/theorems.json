@@ -2378,5 +2378,15 @@
       "propext"
     ],
     "status": "PASS"
+  },
+  {
+    "section": "\u00a745. Balaban multiscale RG & OS analytic continuation into ClayYangMillsMassGap4DStrict",
+    "name": "YangMills.buildStrictWightmanFromOS_schwinger_vacuum_coefficient",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
   }
 ]

@@ -182,6 +182,25 @@ theorem buildStrictWightmanFromOS_time_shift_kernel {Δ_phys : ℝ}
   exact osTimeShiftConfig_eq_completion_inner os.toOS4DContinuumTheory C.h_herm
     C.h_kern C.M_bd C.hM_nn C.h_bd t ht x y
 
+/-- Positive-time Schwinger values are vacuum coefficients of canonical states in the built space. -/
+theorem buildStrictWightmanFromOS_schwinger_vacuum_coefficient {Δ_phys : ℝ}
+    (os : OsterwalderSchrader4DStrict Δ_phys)
+    (C : OSPoincareContinuationHypothesis os)
+    (y : PosTimeConfig) :
+    let W := buildStrictWightmanFromOS os C
+    let F := osConfigForm os.toOS4DContinuumTheory C.h_herm
+    letI : InnerProductSpace ℂ W.H := W.hInner
+    ⟪W.Ω_phys,
+      (osCompletionMap F (osPreMk F (osConfigSingle y)) : W.H)⟫_ℂ =
+        os.os.Schwinger y.n_pts y.pts := by
+  let W := buildStrictWightmanFromOS os C
+  let F := osConfigForm os.toOS4DContinuumTheory C.h_herm
+  letI : InnerProductSpace ℂ W.H := W.hInner
+  change ⟪osCompletionMap F (osPreMk F (osConfigSingle emptyPosConfig)),
+      osCompletionMap F (osPreMk F (osConfigSingle y))⟫_ℂ = _
+  rw [osConfigKernel_eq_completion_inner]
+  exact osConfigKernel_empty_left os.os.Δ_pos os.toOS4DContinuumTheory C.h_S0 y
+
 /--
 **Strict Reduction Theorem**:
 combining `BalabanRGContinuumHypothesis N hN` and `OSPoincareContinuationHypothesis`
@@ -1519,6 +1538,7 @@ end YangMills
 #print axioms YangMills.buildStrictWightmanFromOS
 #print axioms YangMills.buildStrictWightmanFromOS_config_inner
 #print axioms YangMills.buildStrictWightmanFromOS_time_shift_kernel
+#print axioms YangMills.buildStrictWightmanFromOS_schwinger_vacuum_coefficient
 #print axioms YangMills.clay_yang_mills_strict_from_balaban_and_os
 #print axioms YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os
 #print axioms YangMills.clay_yang_mills_strict_on_os_completion_implies_strict

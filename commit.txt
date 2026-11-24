@@ -1,1 +1,1 @@
-I prove the OS kernel and Euclidean semigroup matrix coefficients in the completed Hilbert space and carry those identities into the assembled Wightman object. I update the paper, repository audit, and site to document the reconstructed-state-space link.
+I prove that every positive-time Schwinger value is the vacuum matrix coefficient of its canonical configuration state in the OS-completion Wightman Hilbert space. I add the theorem to the kernel audit, repository guide, site, and paper.
