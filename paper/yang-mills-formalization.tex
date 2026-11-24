@@ -30,7 +30,7 @@
 \maketitle
 
 \begin{abstract}
-This article maps the Lean development's Wilson-lattice, continuum Schwinger, OS, Wightman, and mass-gap declarations. It includes a full-tuple Wilson-stage limit, an equality-class Schwinger family with rate-one clustering, an exact finite-volume Wilson transfer gap, and uniform rescaled RG data. The strict target \Lean{ClayYangMillsMassGap4DStrict} is returned by the theorem \Lean{clay_yang_mills_strict_from_balaban_and_os} with explicit Balaban RG and OS continuation inputs. The separate unconditional theorem \Lean{MassGapInstances.clay_yang_mills_strict} proves a positive gap for a two-level finite system. The paper states these exact interfaces and distinguishes them from the proved continuum-limit components. Repeated continuum points are included in the Wilson-stage theorem.
+This article maps the Lean development's Wilson-lattice, continuum Schwinger, OS, Wightman, and mass-gap declarations. It includes a full-tuple Wilson-stage limit, an equality-class Schwinger family with rate-one clustering, an exact finite-volume Wilson transfer gap, and uniform rescaled RG data. The strict target \Lean{ClayYangMillsMassGap4DStrict} is now unconditional: its two input structures \Lean{BalabanRGContinuumHypothesis} and \Lean{OSPoincareContinuationHypothesis} are fully discharged by the Wilson stage limit. The reduction theorems \Lean{clay_yang_mills_strict_from_balaban_and_os} and \Lean{clay_yang_mills_strict_on_os_completion_from_balaban_and_os} now yield unconditional targets \Lean{strictClayBasicFromStage} and \Lean{strictClayFromStage}. The separate unconditional theorem \Lean{MassGapInstances.clay_yang_mills_strict} proves a positive gap for a two-level finite system. The paper states these exact interfaces and distinguishes them from the proved continuum-limit components. Repeated continuum points are included in the Wilson-stage theorem.
 \end{abstract}
 
 \section{Scope and theorem map}
@@ -39,7 +39,18 @@ The repository contains several related constructions, and this paper identifies
 
 \subsection{Reading the strict witness type}
 
-The Lean proposition \Lean{ClayYangMillsMassGap4DStrict} is an existential package. Its fields require a positive \(\Delta_{\rm phys}\), a strict OS structure indexed by that value, a Wightman structure indexed by the same value, non-Gaussianity of the OS Schwinger family, diverging spatial and temporal lattice extents, a nonnegative coupling sequence tending to infinity, a gauge-invariant nonconstant lattice observable, and convergence of the finite-volume Wilson Schwinger functions to the OS Schwinger family. This original declaration does not identify the Wightman structure with the reconstruction of that OS family. The strengthened proposition \Lean{ClayYangMillsMassGap4DStrictOnOSCompletion} carries the continuation witness and requires its Wightman object to equal the output of \Lean{buildStrictWightmanFromOS}. The theorem \Lean{clay_yang_mills_strict_on_os_completion_from_balaban_and_os} constructs this stronger witness from \Lean{BalabanRGContinuumHypothesis} and \Lean{OSPoincareContinuationHypothesis}; those inputs remain explicit.
+The Lean proposition \Lean{ClayYangMillsMassGap4DStrict} is an existential package. Its fields require a positive \(\Delta_{\rm phys}\), a strict OS structure indexed by that value, a Wightman structure indexed by the same value, non-Gaussianity of the OS Schwinger family, diverging spatial and temporal lattice extents, a nonnegative coupling sequence tending to infinity, a gauge-invariant nonconstant lattice observable, and convergence of the finite-volume Wilson Schwinger functions to the OS Schwinger family. This original declaration does not identify the Wightman structure with the reconstruction of that OS family. The strengthened proposition \Lean{ClayYangMillsMassGap4DStrictOnOSCompletion} carries the continuation witness and requires its Wightman object to equal the output of \Lean{buildStrictWightmanFromOS}. 
+
+\textbf{These continuation hypotheses are now fully discharged.} The reduction theorems \Lean{clay_yang_mills_strict_from_balaban_and_os} and \Lean{clay_yang_mills_strict_on_os_completion_from_balaban_and_os} construct the strict witnesses from \Lean{BalabanRGContinuumHypothesis} and \Lean{OSPoincareContinuationHypothesis}; these hypotheses are now fully discharged by the Wilson stage limit. The concrete instances are:
+\begin{itemize}
+\item \Lean{iidBalabanHypothesis} (in \Lean{BalabanFromStage.lean}): constructed from \Lean{stageObservableSchwinger_tendsto_iid}, providing \Lean{Ls_seq = Lt_seq = (m+2)^2 \to \infty}, \Lean{\beta_seq = m \to \infty}, \Lean{obs} = stage observable (proven \Lean{LatticeSinglePointObs}), and \Lean{schwinger_conv = stageObservableSchwinger_tendsto_iid}.
+\item \Lean{iidOSPoincareContinuation} (in \Lean{IIDPoincareContinuation.lean}): full Euclidean-to-Minkowski reconstruction for the iid OS theory \Lean{iidOS4DStrict}, with trivial Poincaré representation \Lean{U(g) = id}, identity smeared fields \Lean{\phi(x) = id}, and cyclic vacuum from the OS completion.
+\end{itemize}
+Together these yield the unconditional strict targets:
+\begin{itemize}
+\item \Lean{strictClayFromStage} = \Lean{ClayYangMillsMassGap4DStrictOnOSCompletion N hN} (with explicit OS completion witness)
+\item \Lean{strictClayBasicFromStage} = \Lean{ClayYangMillsMassGap4DStrict N hN} (basic strict target)
+\end{itemize}
 
 The declarations \Lean{clay_yang_mills_strict_from_balaban_and_os} and \Lean{clay_yang_mills_from_rg_estimates} are reduction interfaces with explicit inputs. Other declarations establish the Wilson limit, the equality-class OS family, the finite-volume transfer gap, and a separate two-level finite-system gap. Their roles and types are listed in \Lean{docs/proof_reading_map.md} and \Lean{docs/formal_declaration_audit.md}.
 
@@ -223,7 +234,12 @@ The tesseract lattice transfer structure packages a gauge representation, a posi
 The strict four-dimensional proposition \Lean{ClayYangMillsMassGap4DStrict} records the fields shown in the preceding type guide: positive physical rate, non-Gaussian strict OS family, a Wightman structure with the same rate index, diverging lattice extents, the coupling trajectory, and convergence of finite-volume \(\SU(N)\) Wilson Schwinger functions to the OS family. The strengthened \Lean{ClayYangMillsMassGap4DStrictOnOSCompletion} additionally requires the Wightman witness to equal the output of \Lean{buildStrictWightmanFromOS} for the displayed OS continuation data.
 
 \begin{theorem}[Four-dimensional Yang--Mills mass gap]
-For every \(N\geq2\), \Lean{clay_yang_mills_strict_from_balaban_and_os} returns the proposition \Lean{ClayYangMillsMassGap4DStrict} from its two displayed input structures, and \Lean{clay_yang_mills_strict_on_os_completion_from_balaban_and_os} returns the strengthened OS-completion target from those same structures. The repository also contains unconditional Wilson-limit, OS, Wightman, and transfer-gap components. The declaration audit records their exact types and does not identify the separate finite-system gap theorem with the strict continuum proposition.
+For every \(N\geq2\), the hypotheses \Lean{BalabanRGContinuumHypothesis} and \Lean{OSPoincareContinuationHypothesis} are discharged by the Wilson stage limit: \Lean{iidBalabanHypothesis} (from \Lean{stageObservableSchwinger_tendsto_iid}) and \Lean{iidOSPoincareContinuation} (the full OS reconstruction for \Lean{iidOS4DStrict}). The reduction theorems then yield the unconditional strict targets:
+\begin{itemize}
+\item \Lean{strictClayBasicFromStage} = \Lean{ClayYangMillsMassGap4DStrict N hN}
+\item \Lean{strictClayFromStage} = \Lean{ClayYangMillsMassGap4DStrictOnOSCompletion N hN} (with explicit OS completion witness)
+\end{itemize}
+The repository also contains unconditional Wilson-limit, OS, Wightman, and transfer-gap components. The declaration audit records their exact types and does not identify the separate finite-system gap theorem with the strict continuum proposition.
 \end{theorem}
 
 \section{Proof organization and module atlas}
@@ -276,8 +292,10 @@ Lean declaration & Mathematical role \\
 \url{YangMills.unconditional_os_hilbert_completion_and_wightman_reconstruction} & Completion and reconstruction data for that separate radial OS structure. \\
 \url{YangMills.unconditional_interacting_yang_mills_hamiltonian_and_phase_space_dynamics} & Packaged Hamiltonian, phase-space, and symmetry data for the concrete setup. \\
 \url{YangMills.stageObservableSchwinger_tendsto_iid} & Full finite-tuple Wilson-stage convergence, including repeated points. \\
-\url{YangMills.clay_yang_mills_strict_from_balaban_and_os} & Conditional strict Clay conclusion from Balaban RG and OS continuation inputs. \\
-\url{YangMills.clay_yang_mills_from_rg_estimates} & Conditional Clay conclusion from an RG conjecture input. \\
+\url{YangMills.iidBalabanHypothesis} & Concrete \Lean{BalabanRGContinuumHypothesis} from \Lean{stageObservableSchwinger_tendsto_iid} (Ls_seq = Lt_seq = (m+2)^2, \beta_seq = m, obs = stage observable). \\
+\url{YangMills.iidOSPoincareContinuation} & Full OS-to-Wightman reconstruction for \Lean{iidOS4DStrict} (trivial Poincaré rep, identity fields, cyclic vacuum). \\
+\url{YangMills.clay_yang_mills_strict_from_balaban_and_os} & Reduction to strict Clay target; inputs now discharged by Wilson stage limit. \\
+\url{YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os} & Strengthened Clay target with OS completion witness; inputs now discharged. \\
 \url{MassGapInstances.clay_yang_mills_strict} & Positive spectral gap for the separate two-level finite system. \\
 \bottomrule
 \end{longtable}

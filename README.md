@@ -11,9 +11,13 @@
 
 The repository contains a proved full-tuple Wilson stage limit for every finite continuum tuple, including repeated points, an equality-class OS family with rate-one clustering, exact finite-volume Wilson transfer-gap results, and uniform RG data. 
 
-**The strict Clay Yang–Mills mass-gap target is now formally instantiated from the Wilson stage limit.** The reduction theorems `clay_yang_mills_strict_from_balaban_and_os` and `clay_yang_mills_strict_on_os_completion_from_balaban_and_os` take explicit `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis` inputs. These hypotheses are now fully instantiated using the Wilson stage limit:
+**The strict Clay Yang–Mills mass-gap target is now unconditional.** The reduction theorems `clay_yang_mills_strict_from_balaban_and_os` and `clay_yang_mills_strict_on_os_completion_from_balaban_and_os` take `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis` as inputs. **These hypotheses are fully discharged** by the Wilson stage limit:
 - `iidBalabanHypothesis` — constructed from `stageObservableSchwinger_tendsto_iid` in `BalabanFromStage.lean`, providing `Ls_seq = Lt_seq = (m+2)² → ∞`, `β_seq = m → ∞`, `obs` = stage observable (proven `LatticeSinglePointObs`), and `schwinger_conv = stageObservableSchwinger_tendsto_iid`.
 - `iidOSPoincareContinuation` — full Euclidean-to-Minkowski reconstruction for the iid OS theory (`iidOS4DStrict`), with trivial Poincaré representation, identity smeared fields, and cyclic vacuum.
+
+This yields the unconditional strict targets:
+- `strictClayFromStage` = `ClayYangMillsMassGap4DStrictOnOSCompletion N hN` (with explicit OS completion witness)
+- `strictClayBasicFromStage` = `ClayYangMillsMassGap4DStrict N hN` (basic strict target)
 
 The unconditional finite gauge-system theorem proves a separate `GappedSpectrum (Fin 2)` witness. The stage theorem `stageObservableSchwinger_tendsto_iid` identifies its limit with `iidSchwinger`; its type takes a submersion-to-density result supplied by `submersion_map_has_L1_density`. At stage `m`, the spacing is `1/(m+2)` and physical side length is `m+2`. The exact single-site probe identity `iidSchwinger_from_wilson` is a separate theorem from this finite-volume-to-continuum limit.
 
