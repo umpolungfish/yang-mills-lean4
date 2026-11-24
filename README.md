@@ -65,18 +65,23 @@ lake build Imscribing.YangMills.ContinuumClosure
 
 The repository contains four main formal strands. The first develops finite-volume four-dimensional `SU(N)` Wilson theory and its transfer and reflection-positivity structure. The second proves strong-coupling clustering and an infinite-volume subsequential limit. The third constructs explicit continuum Schwinger families and proves a full-tuple Wilson-stage limit to the equality-class iid functional. The fourth defines OS, Wightman, and strict Clay interfaces, with concrete RG and OS data and reduction theorems whose inputs are given by their Lean types.
 
-```
- [4D Wilson lattice] ──> [transfer / reflection positivity] ──> [Dobrushin clustering]
-          │                                                      │
-          └──────────────────────────────────────────────────────┴──> [thermodynamic limit]
+```mermaid
+flowchart TD
+    A[4D Wilson lattice] --> B[transfer / reflection positivity]
+    B --> C[Dobrushin clustering]
+    A --> D[thermodynamic limit]
+    C --> D
 
- [Wilson stage observables] ──> [finite-tuple limit, repeated points included]
-                                           └──> [iid Schwinger functional]
+    E[Wilson stage observables] --> F[finite-tuple limit<br/>repeated points included]
+    F --> G[iid Schwinger functional]
 
- [Balaban RG hypothesis] + [OS continuation hypothesis]
-                    └──────────────> [conditional strict Clay interface]
+    H[Balaban RG hypothesis] + I[OS continuation hypothesis]
+    H --> J[BalabanRGContinuumHypothesis<br/>from stageObservableSchwinger_tendsto_iid]
+    I --> K[OSPoincareContinuationHypothesis<br/>for iidOS4DStrict]
+    J --> L[strict Clay target]
+    K --> L
 
- [Unconditional two-level gap] ──> [GappedSpectrum (Fin 2)]
+    M[Unconditional two-level gap] --> N[GappedSpectrum (Fin 2)]
 ```
 
 ---
