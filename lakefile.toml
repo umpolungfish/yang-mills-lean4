@@ -86,5 +86,7 @@ globs = [
   "Imscribing.YangMills.LatticeOSCutSplitting4D",
   "Imscribing.YangMills.LatticeOSReflectionPositivity4D",
   "Imscribing.YangMills.WickRotationAndForwardTube",
-  "Imscribing.YangMills.WickMatrixBridge"
+  "Imscribing.YangMills.WickMatrixBridge",
+  "Imscribing.YangMills.WilsonHaarCompactness4D",
+  "Imscribing.YangMills.ForwardTubeSpectralDamping"
 ]
