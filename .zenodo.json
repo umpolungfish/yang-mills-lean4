@@ -21,7 +21,7 @@
     "Millennium Prize Problems"
   ],
   "license": "Apache-2.0",
-  "version": "1.0.0",
+  "version": "v1.0.0",
   "related_identifiers": [
     {
       "identifier": "https://github.com/umpolungfish/yang-mills-lean4",
