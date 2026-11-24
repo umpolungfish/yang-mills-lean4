@@ -161,6 +161,55 @@ theorem clay_yang_mills_strict_from_balaban_and_os (N : ℕ) (hN : 2 ≤ N)
     B.Ls_nz, B.Lt_nz, B.β_seq, B.obs, B.os.os.Δ_pos, B.non_gaussian,
     B.Ls_lim, B.Lt_lim, B.hβ_nn, B.hβ_lim, B.schwinger_conv⟩
 
+/-- The strengthened target records the actual OS continuation witness and
+requires its Wightman theory to be the object built on the OS Hilbert completion. -/
+def ClayYangMillsMassGap4DStrictOnOSCompletion (N : ℕ) (hN : 2 ≤ N)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)] : Prop :=
+  ∃ (Δ_phys : ℝ) (os : OsterwalderSchrader4DStrict Δ_phys)
+    (C : OSPoincareContinuationHypothesis os)
+    (Ls_seq Lt_seq : ℕ → ℕ) (hLs : ∀ m, NeZero (Ls_seq m))
+    (hLt : ∀ m, NeZero (Lt_seq m)) (β_seq : ℕ → ℝ)
+    (O : LatticeSinglePointObs N Ls_seq Lt_seq)
+    (W : WightmanQFT4DStrict Δ_phys),
+    0 < Δ_phys ∧
+    ¬ IsGaussian4 os.os.Schwinger ∧
+    Filter.Tendsto Ls_seq Filter.atTop Filter.atTop ∧
+    Filter.Tendsto Lt_seq Filter.atTop Filter.atTop ∧
+    (∀ m, 0 ≤ β_seq m) ∧
+    Filter.Tendsto β_seq Filter.atTop Filter.atTop ∧
+    (∀ (n : ℕ) (xs : Fin n → Space4),
+      Filter.Tendsto
+        (fun m => cubic4Schwinger (Ls_seq m) (Lt_seq m) N (β_seq m) n
+          (fun i => O.obs m (xs i)))
+        Filter.atTop (nhds (os.os.Schwinger n xs))) ∧
+    W = buildStrictWightmanFromOS os C
+
+/-- Balaban continuum data and its continuation witness inhabit the strengthened
+target with the Wightman theory fixed to the OS completion construction. -/
+theorem clay_yang_mills_strict_on_os_completion_from_balaban_and_os
+    (N : ℕ) (hN : 2 ≤ N)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (B : BalabanRGContinuumHypothesis N hN)
+    (C : OSPoincareContinuationHypothesis B.os) :
+    ClayYangMillsMassGap4DStrictOnOSCompletion N hN :=
+  ⟨B.Δ_phys, B.os, C, B.Ls_seq, B.Lt_seq, B.Ls_nz, B.Lt_nz, B.β_seq,
+    B.obs, buildStrictWightmanFromOS B.os C, B.os.os.Δ_pos, B.non_gaussian,
+    B.Ls_lim, B.Lt_lim, B.hβ_nn, B.hβ_lim, B.schwinger_conv, rfl⟩
+
+/-- Forgetting the reconstruction identity recovers the existing strict target. -/
+theorem clay_yang_mills_strict_on_os_completion_implies_strict
+    (N : ℕ) (hN : 2 ≤ N)
+    [MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    [BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ)]
+    (h : ClayYangMillsMassGap4DStrictOnOSCompletion N hN) :
+    ClayYangMillsMassGap4DStrict N hN := by
+  rcases h with ⟨Δ_phys, os, C, Ls_seq, Lt_seq, hLs, hLt, β_seq, O, W,
+    hΔ, hnonG, hLs_lim, hLt_lim, hβ_nn, hβ_lim, hconv, hW⟩
+  exact ⟨Δ_phys, os, W, Ls_seq, Lt_seq, hLs, hLt, β_seq, O,
+    hΔ, hnonG, hLs_lim, hLt_lim, hβ_nn, hβ_lim, hconv⟩
+
 end BalabanRGAndContinuationBridge
 
 /-! ## Canonical thermodynamic limit data (proved from §44) -/
@@ -1431,3 +1480,5 @@ end YangMills
 -- §45. Balaban multiscale RG & OS analytic continuation into ClayYangMillsMassGap4DStrict
 #print axioms YangMills.buildStrictWightmanFromOS
 #print axioms YangMills.clay_yang_mills_strict_from_balaban_and_os
+#print axioms YangMills.clay_yang_mills_strict_on_os_completion_from_balaban_and_os
+#print axioms YangMills.clay_yang_mills_strict_on_os_completion_implies_strict
