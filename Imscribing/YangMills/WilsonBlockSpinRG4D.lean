@@ -39,7 +39,7 @@ private lemma blockOrigin_add_stepDir (k L : ℕ) [NeZero L] (x : Lat4 L) (μ : 
         k * ((x ν).val + 1) = k * (L * (((x ν).val + 1) / L) + ((x ν).val + 1) % L) := by
             rw [hdiv]
         _ = (k * L) * (((x ν).val + 1) / L) + k * (((x ν).val + 1) % L) := by
-            simp [stepDir]; ring
+            ring
     have h_eqZ : ((k * ((x ν).val + 1) : ℕ) : ZMod (k * L)) =
         ((k * (((x ν).val + 1) % L) : ℕ) : ZMod (k * L)) := by
       calc ((k * ((x ν).val + 1) : ℕ) : ZMod (k * L))

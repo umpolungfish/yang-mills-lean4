@@ -139,16 +139,14 @@ theorem expSeries_group_law_small
         (|s| ^ j / (j.factorial : ℝ)) * (|t| ^ k / (k.factorial : ℝ)) *
         (M * r ^ (j + k) * (2 ^ (j + k) * (j.factorial : ℝ) * (k.factorial : ℝ))) := by
       gcongr
-      calc
-        M * r ^ (j + k) * (((j + k).choose j : ℝ) * (j.factorial : ℝ) * (k.factorial : ℝ))
-            ≤ M * r ^ (j + k) * ((2 ^ (j + k) : ℝ) * (j.factorial : ℝ) * (k.factorial : ℝ)) := by
-                gcongr
+      exact le_trans h_iter (by gcongr)
     have h_eq_rhs :
         (|s| ^ j / (j.factorial : ℝ)) * (|t| ^ k / (k.factorial : ℝ)) *
           (M * r ^ (j + k) * (2 ^ (j + k) * (j.factorial : ℝ) * (k.factorial : ℝ))) =
           M * (2 * r * |s|) ^ j * (2 * r * |t|) ^ k := by
       rw [pow_add, pow_add, mul_pow, mul_pow, mul_pow, mul_pow]
       field_simp [hjf.ne', hkf.ne']
+      push_cast
       ring
     exact le_trans h_num (le_of_eq h_eq_rhs)
   have h_Us_tsum :
@@ -162,7 +160,8 @@ theorem expSeries_group_law_small
           ∑' k : ℕ, ((Complex.I * (t : ℂ)) ^ k / (k.factorial : ℂ)) •
             U_s (iterA D A hA k ψ : H) := by
         unfold expSeries
-        rw [U_s.toContinuousLinearMap.map_tsum (expSeries_summable D A hA (h_unif ψ) ht1)]
+        change (U_s.toContinuousLinearMap : H →L[ℂ] H) (∑' k : ℕ, ((Complex.I * (t : ℂ)) ^ k / (k.factorial : ℂ)) • (iterA D A hA k ψ : H)) = _
+        rw [ContinuousLinearMap.map_tsum (expSeries_summable D A hA (h_unif ψ) ht1)]
         refine tsum_congr fun k => ?_
         simp
       rw [h_lin]
@@ -303,10 +302,11 @@ theorem expSeries_group_law_small
         have hnjf : ((n - j).factorial : ℂ) ≠ 0 :=
           Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero (n - j))
         have hnf : (n.factorial : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero n)
+        have hch : (n.choose j : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.ne_of_gt (Nat.choose_pos hj_le))
         rw [h_ch]
-        field_simp [hjf, hnjf, hnf]
+        field_simp [hjf, hnjf, hnf, hch]
         ring
-      rw [Finset.sum_congr rfl h_eq, ← Finset.sum_mul, ← Finset.sum_div]
+      rw [Finset.sum_congr rfl h_eq, ← Finset.sum_smul, ← Finset.sum_div]
       congr 1
       have h_bin : (∑ j ∈ Finset.range (n + 1),
           (n.choose j : ℂ) * (Complex.I * (s : ℂ)) ^ j * (Complex.I * (t : ℂ)) ^ (n - j)) =
@@ -332,7 +332,7 @@ theorem expSeries_group_law_small
       have h_sigma :
           (∑ n ∈ Finset.range N, ∑ j ∈ Finset.range (n + 1), w j (n - j)) =
           ∑ p ∈ (Finset.range N).sigma (fun n => Finset.range (n + 1)),
-            w p.2 (p.1 - p.2) := (Finset.sum_sigma _ _ _).symm
+            w p.2 (p.1 - p.2) := by rw [Finset.sum_sigma]
       rw [h_sigma]
       refine Finset.sum_bij (fun p _ => (p.2, p.1 - p.2)) ?_ ?_ ?_ ?_
       · rintro ⟨n, j⟩ hp
@@ -360,7 +360,7 @@ theorem expSeries_group_law_small
           (∑ n ∈ Finset.range N, ∑ j ∈ Finset.range (n + 1), w j (n - j))) - 0‖ ≤
           M * ((∑ j ∈ Finset.Ico (N / 2) N, b_s j) * (∑' k, b_t k) +
                (∑' j, b_s j) * (∑ k ∈ Finset.Ico (N / 2) N, b_t k)) := by
-    intro N
+      intro N
     rw [sub_zero, h_sq_eq N, h_tri_eq N, ← Finset.sum_sdiff_eq_sub (Finset.filter_subset _ _)]
     have h_sub :
         (Finset.range N ×ˢ Finset.range N \
@@ -445,20 +445,9 @@ theorem expSeries_group_law_small
            (∑' j, b_s j) * (∑ k ∈ Finset.Ico (N / 2) N, b_t k))) Filter.atTop (𝓝 0) := by
     simpa using ((h_ico_s.mul_const _).add (h_ico_t.const_mul _)).const_mul M
   exact squeeze_zero (fun _ => norm_nonneg _) h_bound h_rhs0
-  have h_tri_const : Filter.Tendsto
-      (fun N : ℕ => ∑ n ∈ Finset.range N, ∑ j ∈ Finset.range (n + 1), w j (n - j))
-      Filter.atTop (𝓝 (expSeries D A hA (s + t) ψ)) := by
-    have h_ev : ∀ᶠ N : ℕ in Filter.atTop,
-        (∑ n ∈ Finset.range N, ∑ j ∈ Finset.range (n + 1), w j (n - j)) =
-          expSeries D A hA (s + t) ψ := by
-      rw [Filter.eventually_atTop]
-      refine ⟨1, fun N hN => ?_⟩
-      have h1 := inner_expSeries_partial_eq D A hA h_symm t ψ φ N
-      have hne : N ≠ 0 := by omega
-      simpa [hne] using h1
-    exact tendsto_const_nhds.congr' (h_ev.mono fun _ h => h.symm)
-  have h_diff2 := h_partial_tend.sub h_tri_const
-  exact sub_eq_zero.mp (tendsto_nhds_unique h_diff2 h_tri_diff) |>.symm
+  have h_sub := h_Us_tsum.sub h_tri_tend
+  have h_lim := tendsto_nhds_unique h_sub h_sq_tri_diff
+  exact sub_eq_zero.mp h_lim
 
 /-- **Full Nelson Unitary Group Theorem:**
     Every symmetric operator `A : D →ₗ[ℂ] H` preserving a dense uniform analytic-vector
@@ -509,24 +498,20 @@ noncomputable def nelson_global_unitary_group
       rw [hU_loc_eq (by simpa using hδ) ψ, expSeries_zero]
     ext x
     have hc : Continuous (U_loc 0) := (U_loc 0).continuous
-    exact h_dense.equalizer hc continuous_id (fun y hy => h_dense_eq ⟨y, hy⟩) x
+    exact congrFun (hc.ext_on h_dense continuous_id fun y hy => h_dense_eq ⟨y, hy⟩) x
   have hU_loc_add : ∀ s t : ℝ, |s| < δ → |t| < δ → |s + t| < δ →
       ∀ x : H, U_loc (s + t) x = U_loc s (U_loc t x) := by
     intro s t hs ht hst x
     have h_dense_eq : ∀ ψ : D, U_loc (s + t) (ψ : H) = U_loc s (U_loc t (ψ : H)) := by
       intro ψ
-      have hs2 : 2 * r * |s| < 1 := by
-        have := (lt_div_iff₀' (by positivity : 0 < 2 * r)).mpr (by simpa [δ, one_div] using hs)
-        linarith
-      have ht2 : 2 * r * |t| < 1 := by
-        have := (lt_div_iff₀' (by positivity : 0 < 2 * r)).mpr (by simpa [δ, one_div] using ht)
-        linarith
+      have hs2 : 2 * r * |s| < 1 := by calc 2 * r * |s| < 2 * r * (2 * r)⁻¹ := mul_lt_mul_of_pos_left hs (by positivity)
+        _ = 1 := mul_inv_cancel₀ (by positivity)
+      have ht2 : 2 * r * |t| < 1 := by calc 2 * r * |t| < 2 * r * (2 * r)⁻¹ := mul_lt_mul_of_pos_left ht (by positivity)
+        _ = 1 := mul_inv_cancel₀ (by positivity)
       rw [hU_loc_eq hst ψ, hU_loc_eq ht ψ]
       exact (expSeries_group_law_small D A hA hr h_unif (U_loc s) hs2 ht2
         (fun φ => hU_loc_eq hs φ) ψ).symm
-    exact h_dense.equalizer (U_loc (s + t)).continuous
-      ((U_loc s).continuous.comp (U_loc t).continuous)
-      (fun y hy => h_dense_eq ⟨y, hy⟩) x
+    exact congrFun ((U_loc (s + t)).continuous.ext_on h_dense ((U_loc s).continuous.comp (U_loc t).continuous) fun y hy => h_dense_eq ⟨y, hy⟩) x
   obtain ⟨U, hU0, hUadd, hUsmall⟩ :=
     globalUnitaryGroupFromLocal U_loc δ hδ hU_loc_zero hU_loc_add
   refine ⟨U, hU0, hUadd, fun t ht ψ => ?_⟩

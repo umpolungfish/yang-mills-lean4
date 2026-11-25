@@ -8,6 +8,9 @@ import Imscribing.YangMills.OSBorchersBridge
 
 namespace Imscribing.YangMills.EuclideanFieldOnOS
 
+set_option maxSynthPendingDepth 1
+set_option maxHeartbeats 800000
+
 open scoped InnerProductSpace
 open Imscribing.YangMills.ClaySpec
 open Imscribing.YangMills.ContinuumInterfaces
@@ -23,47 +26,43 @@ theorem tensorSchwartz_mem_pos {m n : ℕ}
   · rcases g.2 with rfl | hg
     · exact Or.inl rfl
     · right
-      intro z hz i
-      simp only [Nat.zero_add] at i hz ⊢
-      have hg' := hg (projRight 0 n z) hz i
-      simpa [projRight] using hg'
+      intro z hz i; let j : Fin n := ⟨i.1, by omega⟩; have hj : projRight 0 n z j = z i := congrArg z (Fin.ext (by simp [j])); rw [← hj]; exact hg (projRight 0 n z) (right_ne_zero_of_mul (by change f.1 (projLeft _ _ z) * g.1 (projRight _ _ z) ≠ 0; exact hz)) j
   · rcases g.2 with rfl | hg
     · right
-      intro z hz i
-      simp only [Nat.add_zero] at i hz ⊢
-      have hf' := hf (projLeft m 0 z) hz i
-      simpa [projLeft] using hf'
+      intro z hz i; let j : Fin m := ⟨i.1, by omega⟩; have hj : projLeft m 0 z j = z i := congrArg z (Fin.ext rfl); rw [← hj]; exact hf (projLeft m 0 z) (left_ne_zero_of_mul (by change f.1 (projLeft _ _ z) * g.1 (projRight _ _ z) ≠ 0; exact hz)) j
     · right
       intro z hz i
       refine Fin.addCases (fun i₁ => ?_) (fun i₂ => ?_) i
-      · exact hf (projLeft m n z) hz i₁
-      · exact hg (projRight m n z) hz i₂
+      · exact hf (projLeft m n z) (left_ne_zero_of_mul (by change f.1 (projLeft _ _ z) * g.1 (projRight _ _ z) ≠ 0; exact hz)) i₁
+      · exact hg (projRight m n z) (right_ne_zero_of_mul (by change f.1 (projLeft _ _ z) * g.1 (projRight _ _ z) ≠ 0; exact hz)) i₂
 
 /-- Multiplication of a degree-`n` positive-time Schwartz element by `f : PosSchwartzSubmodule 1`. -/
 noncomputable def euclidFieldMul (f : PosSchwartzSubmodule 1) (n : ℕ) :
     PosSchwartzSubmodule n →ₗ[ℂ] PosSchwartzSubmodule (1 + n) where
   toFun g := ⟨tensorSchwartz f.1 g.1, tensorSchwartz_mem_pos f g⟩
-  map_add' g₁ g₂ := by ext z; simp [tensorSchwartz, mul_add]
-  map_smul' c g := by ext z; simp [tensorSchwartz, smul_eq_mul]; ring
+  map_add' g₁ g₂ := by ext z; change f.1 (projLeft 1 n z) * (g₁.1 + g₂.1) (projRight 1 n z) = f.1 (projLeft 1 n z) * g₁.1 (projRight 1 n z) + f.1 (projLeft 1 n z) * g₂.1 (projRight 1 n z); simp [mul_add]
+  map_smul' c g := by ext z; change f.1 (projLeft 1 n z) * (c • g.1) (projRight 1 n z) = c * (f.1 (projLeft 1 n z) * g.1 (projRight 1 n z)); simp [smul_eq_mul]; ring
 
 /-- Global Euclidean field creation operator on `BorchersPos := Π₀ n, PosSchwartzSubmodule n`. -/
 noncomputable def borchersFieldMul (f : PosSchwartzSubmodule 1) :
     BorchersPos →ₗ[ℂ] BorchersPos where
   toFun F := F.sum fun n gn => DFinsupp.single (1 + n) (euclidFieldMul f n gn)
   map_add' F G := by
-    rw [DFinsupp.sum_add_index']
-    · intro n; simp
-    · intro n a b; rw [map_add, DFinsupp.single_add]
+    classical
+    let φ : ∀ n, PosSchwartzSubmodule n →+ BorchersPos := fun n => (DFinsupp.singleAddHom (β := fun k => PosSchwartzSubmodule k) (1 + n)).comp (euclidFieldMul f n).toAddMonoidHom
+    change (DFinsupp.sum (F + G) fun n => ⇑(φ n).toZeroHom) = (DFinsupp.sum F fun n => ⇑(φ n).toZeroHom) + (DFinsupp.sum G fun n => ⇑(φ n).toZeroHom)
+    rw [← DFinsupp.sumZeroHom_apply (fun n => (φ n).toZeroHom) (F + G), ← DFinsupp.sumZeroHom_apply (fun n => (φ n).toZeroHom) F, ← DFinsupp.sumZeroHom_apply (fun n => (φ n).toZeroHom) G]; exact (DFinsupp.sumAddHom φ).map_add F G
   map_smul' c F := by
     simp only [DFinsupp.sum, smul_eq_mul]
     rw [Finset.smul_sum]
-    have h_sub : (c • F).support ⊆ F.support := DFinsupp.support_smul
+    have h_sub : (c • F).support ⊆ F.support := DFinsupp.support_smul c F
     rw [← Finset.sum_subset h_sub]
     · refine Finset.sum_congr rfl fun n _ => ?_
       simp [map_smul, DFinsupp.single_smul]
     · intro n _ hn
-      have hn0 : (c • F) n = 0 := DFinsupp.not_mem_support_iff.mp hn
-      simp [hn0]
+      by_cases hc : c = 0
+      · simp [hc]
+      · have h0 : F n = 0 := (show c ≠ 0 → F n = 0 by simpa [DFinsupp.mem_support_iff] using hn) hc; simp [h0]
 
 /-- Null-space invariance of `borchersFieldMul f` via `sesquilinear_cauchy_schwarz`. -/
 theorem borchersFieldMul_preserves_null
@@ -103,126 +102,29 @@ theorem coeLin_injective (H₀ : Type*) [NormedAddCommGroup H₀] [InnerProductS
   exact sub_eq_zero.mp (norm_eq_zero.mp hn)
 
 /-- Dense invariant Euclidean field domain `LinearMap.range (coeLin H₀)` inside `OSHilbert`. -/
-def osFieldDomain (pre : EuclideanPreData BorchersPos) :
-    let core := quotInnerCore pre
-    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-    Submodule ℂ (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) := by
-  intro core
-  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-  exact LinearMap.range (coeLin (BorchersPos ⧸ nullSubmodule pre))
-
-theorem osFieldDomain_dense (pre : EuclideanPreData BorchersPos) :
-    let core := quotInnerCore pre
-    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-    Dense ((osFieldDomain pre : Submodule ℂ _) : Set (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) := by
-  intro core
-  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-  exact UniformSpace.Completion.denseRange_coe
-
-theorem vac_mem_osFieldDomain (pre : EuclideanPreData BorchersPos) :
-    let core := quotInnerCore pre
-    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-    ((Submodule.Quotient.mk pre.e₀ : BorchersPos ⧸ nullSubmodule pre) :
-      UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) ∈ osFieldDomain pre :=
-  ⟨Submodule.Quotient.mk pre.e₀, rfl⟩
-
-/-- Lifted Euclidean field operator `φ(f) : osFieldDomain pre →ₗ[ℂ] OSHilbert`. -/
-noncomputable def euclidFieldOp (pre : EuclideanPreData BorchersPos)
-    (f : PosSchwartzSubmodule 1)
-    (h_adj : ∃ f_adj : PosSchwartzSubmodule 1, ∀ F G : BorchersPos,
-      pre.B F (borchersFieldMul f G) = pre.B (borchersFieldMul f_adj F) G) :
-    let core := quotInnerCore pre
-    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-    let D := osFieldDomain pre
-    { op : D →ₗ[ℂ] UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre) //
-      (∀ ψ : D, op ψ ∈ D) ∧
-      (∀ F : BorchersPos,
-        op ⟨((Submodule.Quotient.mk F : BorchersPos ⧸ nullSubmodule pre) : _),
-            ⟨Submodule.Quotient.mk F, rfl⟩⟩ =
-          ((Submodule.Quotient.mk (borchersFieldMul f F) : BorchersPos ⧸ nullSubmodule pre) : _)) } := by
-  intro core
-  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-  set H₀ := BorchersPos ⧸ nullSubmodule pre
-  let op₀ : H₀ →ₗ[ℂ] H₀ :=
-    (nullSubmodule pre).liftQ ((Submodule.mkQ (nullSubmodule pre)).comp (borchersFieldMul f))
-      (fun F hF => by
-        simp only [LinearMap.mem_ker, LinearMap.comp_apply, Submodule.mkQ_apply,
-          Submodule.Quotient.mk_eq_zero]
-        exact borchersFieldMul_preserves_null pre f h_adj hF)
-  let equivD : osFieldDomain pre ≃ₗ[ℂ] H₀ :=
-    (LinearEquiv.ofInjective (coeLin H₀) (coeLin_injective H₀)).symm
-  let op : osFieldDomain pre →ₗ[ℂ] UniformSpace.Completion H₀ :=
-    (coeLin H₀).comp (op₀.comp equivD.toLinearMap)
-  refine ⟨op, fun ψ => ⟨op₀ (equivD ψ), rfl⟩, fun F => ?_⟩
-  have heq : equivD ⟨coeLin H₀ (Submodule.Quotient.mk F), ⟨Submodule.Quotient.mk F, rfl⟩⟩ =
-      Submodule.Quotient.mk F := by
-    apply (LinearEquiv.ofInjective (coeLin H₀) (coeLin_injective H₀)).injective
-    simp [equivD]
-  change coeLin H₀ (op₀ (equivD _)) = _
-  rw [heq]
-  rfl
-
-/-- **Euclidean Field Commutativity on `osFieldDomain` from OS-E3 Symmetry.** -/
-theorem euclidFieldOp_commute (pre : EuclideanPreData BorchersPos)
-    (f g : PosSchwartzSubmodule 1)
-    (hf_adj : ∃ f_adj : PosSchwartzSubmodule 1, ∀ F G : BorchersPos,
-      pre.B F (borchersFieldMul f G) = pre.B (borchersFieldMul f_adj F) G)
-    (hg_adj : ∃ g_adj : PosSchwartzSubmodule 1, ∀ F G : BorchersPos,
-      pre.B F (borchersFieldMul g G) = pre.B (borchersFieldMul g_adj F) G)
-    (h_e3_fg : ∀ F G : BorchersPos,
-      pre.B (borchersFieldMul f (borchersFieldMul g F)) G =
-      pre.B (borchersFieldMul g (borchersFieldMul f F)) G) :
-    let core := quotInnerCore pre
-    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-    let opF := euclidFieldOp pre f hf_adj
-    let opG := euclidFieldOp pre g hg_adj
-    ∀ ψ : osFieldDomain pre,
-      opF.1 ⟨opG.1 ψ, opG.2.1 ψ⟩ =
-      opG.1 ⟨opF.1 ψ, opF.2.1 ψ⟩ := by
-  intro core
-  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-  set H₀ := BorchersPos ⧸ nullSubmodule pre
-  let opF := euclidFieldOp pre f hf_adj
-  let opG := euclidFieldOp pre g hg_adj
-  rintro ⟨x, ⟨x₀, rfl⟩⟩
-  induction x₀ using Submodule.Quotient.induction_on with
-  | _ F =>
-    have h1 : (⟨opG.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), ⟨Submodule.Quotient.mk F, rfl⟩⟩,
-        opG.2.1 _⟩ : osFieldDomain pre) =
-        ⟨coeLin H₀ (Submodule.Quotient.mk (borchersFieldMul g F)),
-          ⟨Submodule.Quotient.mk (borchersFieldMul g F), rfl⟩⟩ := by
-      apply Subtype.ext; exact opG.2.2 F
-    have h2 : (⟨opF.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), ⟨Submodule.Quotient.mk F, rfl⟩⟩,
-        opF.2.1 _⟩ : osFieldDomain pre) =
-        ⟨coeLin H₀ (Submodule.Quotient.mk (borchersFieldMul f F)),
-          ⟨Submodule.Quotient.mk (borchersFieldMul f F), rfl⟩⟩ := by
-      apply Subtype.ext; exact opF.2.2 F
-    change opF.1 ⟨opG.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), _⟩, _⟩ =
-      opG.1 ⟨opF.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), _⟩, _⟩
-    rw [h1, h2, opF.2.2 (borchersFieldMul g F), opG.2.2 (borchersFieldMul f F)]
-    congr 1
-    apply Submodule.Quotient.eq.mpr
-    change (pre.B (borchersFieldMul f (borchersFieldMul g F) -
-        borchersFieldMul g (borchersFieldMul f F))
-      (borchersFieldMul f (borchersFieldMul g F) -
-        borchersFieldMul g (borchersFieldMul f F))).re = 0
-    set X := borchersFieldMul f (borchersFieldMul g F) - borchersFieldMul g (borchersFieldMul f F)
-    have hX : ∀ G : BorchersPos, pre.B X G = 0 := by
-      intro G
-      have hs : X = borchersFieldMul f (borchersFieldMul g F) +
-          (-1 : ℂ) • borchersFieldMul g (borchersFieldMul f F) := by
-        dsimp [X]; rw [sub_eq_add_neg]; simp
-      rw [hs, pre.B_add_left, pre.B_smul_left, h_e3_fg F G]
-      simp
-    rw [hX X, Complex.zero_re]
-
+section
+private noncomputable local instance (pre : EuclideanPreData BorchersPos) : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := (quotInnerCore pre).toNormedAddCommGroup
+private noncomputable local instance (pre : EuclideanPreData BorchersPos) : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := @InnerProductSpace.ofCore ℂ (BorchersPos ⧸ nullSubmodule pre) _ (Submodule.Quotient.addCommGroup _) (Submodule.Quotient.module _) (quotInnerCore pre).toCore
+noncomputable def osFieldDomain (pre : EuclideanPreData BorchersPos) : Submodule ℂ (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) := LinearMap.range (coeLin (BorchersPos ⧸ nullSubmodule pre))
+theorem osFieldDomain_dense (pre : EuclideanPreData BorchersPos) : Dense ((osFieldDomain pre : Submodule ℂ _) : Set (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) := UniformSpace.Completion.denseRange_coe
+theorem vac_mem_osFieldDomain (pre : EuclideanPreData BorchersPos) : ((Submodule.Quotient.mk pre.e₀ : (BorchersPos ⧸ nullSubmodule pre)) : UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) ∈ osFieldDomain pre := ⟨Submodule.Quotient.mk pre.e₀, rfl⟩
+noncomputable def euclidFieldOp (pre : EuclideanPreData BorchersPos) (f : PosSchwartzSubmodule 1) (h_adj : ∃ f_adj : PosSchwartzSubmodule 1, ∀ F G, pre.B F (borchersFieldMul f G) = pre.B (borchersFieldMul f_adj F) G) : { op : osFieldDomain pre →ₗ[ℂ] UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre) // (∀ ψ : osFieldDomain pre, op ψ ∈ osFieldDomain pre) ∧ (∀ F : BorchersPos, op ⟨((Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre)) : _), ⟨_, rfl⟩⟩ = ((Submodule.Quotient.mk (borchersFieldMul f F) : (BorchersPos ⧸ nullSubmodule pre)) : _)) } := by
+  let mf := borchersFieldMul f
+  let op₀ : (BorchersPos ⧸ nullSubmodule pre) →ₗ[ℂ] (BorchersPos ⧸ nullSubmodule pre) := { toFun := fun x => Quotient.liftOn' x (fun F => (Submodule.Quotient.mk (mf F) : (BorchersPos ⧸ nullSubmodule pre))) fun a b hab => (Submodule.Quotient.eq (nullSubmodule pre)).mpr <| by have hs : a - b ∈ nullSubmodule pre := (Submodule.Quotient.eq (nullSubmodule pre)).mp (Quotient.sound hab); change mf a - mf b ∈ nullSubmodule pre; rw [← map_sub mf]; exact borchersFieldMul_preserves_null pre f h_adj hs, map_add' := fun x y => by induction x using Submodule.Quotient.induction_on with | _ a => induction y using Submodule.Quotient.induction_on with | _ b => exact congrArg Submodule.Quotient.mk (map_add mf a b), map_smul' := fun c x => by induction x using Submodule.Quotient.induction_on with | _ a => exact congrArg Submodule.Quotient.mk (map_smul mf c a) }
+  let equivD : osFieldDomain pre ≃ₗ[ℂ] (BorchersPos ⧸ nullSubmodule pre) := (LinearEquiv.ofInjective (coeLin (BorchersPos ⧸ nullSubmodule pre)) (coeLin_injective (BorchersPos ⧸ nullSubmodule pre))).symm
+  refine ⟨(coeLin (BorchersPos ⧸ nullSubmodule pre)).comp (op₀.comp equivD.toLinearMap), fun ψ => ⟨op₀ (equivD ψ), rfl⟩, fun F => ?_⟩
+  have heq : equivD ⟨coeLin (BorchersPos ⧸ nullSubmodule pre) (Submodule.Quotient.mk F), ⟨_, rfl⟩⟩ = Submodule.Quotient.mk F := (LinearEquiv.ofInjective (coeLin (BorchersPos ⧸ nullSubmodule pre)) (coeLin_injective (BorchersPos ⧸ nullSubmodule pre))).symm_apply_apply _
+  change coeLin (BorchersPos ⧸ nullSubmodule pre) (op₀ (equivD ⟨coeLin (BorchersPos ⧸ nullSubmodule pre) (Submodule.Quotient.mk F), ⟨_, rfl⟩⟩)) = _; rw [heq]; rfl
+theorem euclidFieldOp_commute (pre : EuclideanPreData BorchersPos) (f g : PosSchwartzSubmodule 1) (hf_adj : ∃ f_adj : PosSchwartzSubmodule 1, ∀ F G, pre.B F (borchersFieldMul f G) = pre.B (borchersFieldMul f_adj F) G) (hg_adj : ∃ g_adj : PosSchwartzSubmodule 1, ∀ F G, pre.B F (borchersFieldMul g G) = pre.B (borchersFieldMul g_adj F) G) (h_e3_fg : ∀ F G : BorchersPos, pre.B (borchersFieldMul f (borchersFieldMul g F)) G = pre.B (borchersFieldMul g (borchersFieldMul f F)) G) : ∀ ψ : osFieldDomain pre, (euclidFieldOp pre f hf_adj).1 ⟨(euclidFieldOp pre g hg_adj).1 ψ, (euclidFieldOp pre g hg_adj).2.1 ψ⟩ = (euclidFieldOp pre g hg_adj).1 ⟨(euclidFieldOp pre f hf_adj).1 ψ, (euclidFieldOp pre f hf_adj).2.1 ψ⟩ := by
+  let opF := euclidFieldOp pre f hf_adj; let opG := euclidFieldOp pre g hg_adj; rintro ⟨x, ⟨x₀, rfl⟩⟩
+  induction x₀ using Submodule.Quotient.induction_on with | _ F =>
+  have h1 : (⟨opG.1 ⟨coeLin _ (Submodule.Quotient.mk F), ⟨_, rfl⟩⟩, opG.2.1 _⟩ : osFieldDomain pre) = ⟨coeLin _ (Submodule.Quotient.mk (borchersFieldMul g F)), ⟨_, rfl⟩⟩ := Subtype.ext (opG.2.2 F)
+  have h2 : (⟨opF.1 ⟨coeLin _ (Submodule.Quotient.mk F), ⟨_, rfl⟩⟩, opF.2.1 _⟩ : osFieldDomain pre) = ⟨coeLin _ (Submodule.Quotient.mk (borchersFieldMul f F)), ⟨_, rfl⟩⟩ := Subtype.ext (opF.2.2 F)
+  change opF.1 ⟨opG.1 ⟨coeLin _ (Submodule.Quotient.mk F), _⟩, _⟩ = opG.1 ⟨opF.1 ⟨coeLin _ (Submodule.Quotient.mk F), _⟩, _⟩; rw [h1, h2, opF.2.2 (borchersFieldMul g F), opG.2.2 (borchersFieldMul f F)]; congr 1; apply (Submodule.Quotient.eq (nullSubmodule pre)).mpr
+  set X := borchersFieldMul f (borchersFieldMul g F) - borchersFieldMul g (borchersFieldMul f F)
+  have hX : ∀ G : BorchersPos, pre.B X G = 0 := fun G => by
+    have hs : X = borchersFieldMul f (borchersFieldMul g F) + (-1 : ℂ) • borchersFieldMul g (borchersFieldMul f F) := by dsimp [X]; rw [sub_eq_add_neg]; simp
+    rw [hs, pre.B_add_left, pre.B_smul_left, h_e3_fg F G]; simp
+  rw [hX X, Complex.zero_re]
+end
 end Imscribing.YangMills.EuclideanFieldOnOS

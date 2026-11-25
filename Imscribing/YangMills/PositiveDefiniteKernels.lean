@@ -1,3 +1,4 @@
+import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.Matrix.PosDef
 import Mathlib.MeasureTheory.Integral.Pi
 import Mathlib.MeasureTheory.Integral.Bochner.Basic
@@ -39,8 +40,8 @@ theorem isBoundedPosDefKernel_sum {α ι : Type*} [MeasurableSpace α]
         (∑ a : Fin n, ∑ b : Fin n, star (c a) * c b * ∑ i ∈ s, K i (x a) (x b)) =
           ∑ i ∈ s, ∑ a : Fin n, ∑ b : Fin n, star (c a) * c b * K i (x a) (x b) := by
       simp_rw [Finset.mul_sum]
+      conv_lhs => arg 2; ext a; rw [Finset.sum_comm]
       rw [Finset.sum_comm]
-      exact Finset.sum_congr rfl fun a _ => Finset.sum_comm
     rw [h_swap, Complex.re_sum]
     exact Finset.sum_nonneg fun i hi => (hK i hi).2.2.2 n c x
 
@@ -82,11 +83,7 @@ private lemma realTrace_inv_eq_self {N : ℕ} (X : GaugeGroup N) :
     _ = (X⁻¹ : GaugeGroup N).val * ((X : Matrix (Fin N) (Fin N) ℂ) * star (X : Matrix (Fin N) (Fin N) ℂ)) := by rw [hR]
     _ = ((X⁻¹ : GaugeGroup N).val * (X : Matrix (Fin N) (Fin N) ℂ)) * star (X : Matrix (Fin N) (Fin N) ℂ) := by rw [Matrix.mul_assoc]
     _ = star (X : Matrix (Fin N) (Fin N) ℂ) := by rw [hL, Matrix.one_mul]
-  unfold realTrace
-  rw [hX, Matrix.trace]
-  simp_rw [Matrix.diag_apply]
-  simp only [Matrix.star_apply, Complex.re_sum]
-  exact Finset.sum_congr rfl fun i _ => Complex.conj_re _
+  unfold realTrace; rw [hX]; simp [Matrix.trace, Matrix.star_apply, Complex.re_sum, Complex.star_def]
 
 private lemma complex_re_rank1_psd {n : ℕ} (c z : Fin n → ℂ) :
     0 ≤ (∑ i : Fin n, ∑ j : Fin n, star (c i) * c j * ((z i * star (z j)).re : ℂ)).re := by
@@ -145,11 +142,7 @@ theorem realTrace_unitary_kernel_isPosDef {α : Type*} [MeasurableSpace α] {N :
     refine Finset.sum_congr rfl fun b _ => ?_
     simp [Matrix.star_apply]
   refine ⟨?_, ?_, ⟨(N : ℝ), Nat.cast_nonneg N, fun p q => ?_⟩, ?_⟩
-  · have h_eq : (fun p : α × α => (realTrace (A p.1 * (A p.2)⁻¹) : ℂ)) =
-        fun p : α × α => (∑ a : Fin N, ∑ b : Fin N,
-          ((A p.1 : Matrix (Fin N) (Fin N) ℂ) a b *
-            star ((A p.2 : Matrix (Fin N) (Fin N) ℂ) a b)).re : ℂ) := by
-      ext p; rw [h_re p.1 p.2]
+  · have h_eq : (fun p : α × α => (realTrace (A p.1 * (A p.2)⁻¹) : ℂ)) = fun p => Complex.ofReal (∑ a : Fin N, ∑ b : Fin N, ((A p.1 : Matrix _ _ ℂ) a b * star ((A p.2 : Matrix _ _ ℂ) a b)).re) := by ext p; rw [h_re p.1 p.2]
     rw [h_eq]
     refine Complex.continuous_ofReal.measurable.comp ?_
     refine Finset.measurable_sum _ fun a _ => Finset.measurable_sum _ fun b _ => ?_
@@ -158,7 +151,7 @@ theorem realTrace_unitary_kernel_isPosDef {α : Type*} [MeasurableSpace α] {N :
       (continuous_star.measurable.comp ((hA_meas a b).comp measurable_snd))
   · intro p q
     rw [Complex.star_def, Complex.conj_ofReal]
-    congr 1
+    apply congrArg Complex.ofReal
     have h1 : A q * (A p)⁻¹ = (A p * (A q)⁻¹)⁻¹ := by group
     rw [h1]
     exact realTrace_inv_eq_self _
@@ -195,7 +188,7 @@ private lemma real_psd_of_complex_psd {n : ℕ}
     (hsym : ∀ i j, M j i = M i j)
     (hpsd : ∀ c : Fin n → ℂ, 0 ≤ (∑ i : Fin n, ∑ j : Fin n, star (c i) * c j * (M i j : ℂ)).re) :
     M.PosSemidef := by
-  refine ⟨by ext i j; simp [hsym i j], fun x => ?_⟩
+  refine .of_dotProduct_mulVec_nonneg (by ext i j; simp [hsym i j]) fun x => ?_
   have h := hpsd (fun i => (x i : ℂ))
   have heq : (∑ i : Fin n, ∑ j : Fin n,
       star (x i : ℂ) * (x j : ℂ) * (M i j : ℂ)).re =
@@ -204,8 +197,8 @@ private lemma real_psd_of_complex_psd {n : ℕ}
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Complex.re_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
-    simp [Complex.conj_ofReal, mul_comm, mul_assoc]
-  simpa [dotProduct, Matrix.mulVec, heq] using h
+    simp [Complex.conj_ofReal]; ring
+  rw [heq] at h; simpa [dotProduct, Matrix.mulVec] using h
 
 private lemma complex_psd_of_real_psd {n : ℕ}
     {M : Matrix (Fin n) (Fin n) ℝ} (hM : M.PosSemidef)
@@ -220,10 +213,30 @@ private lemma complex_psd_of_real_psd {n : ℕ}
     refine Finset.sum_congr rfl fun j _ => ?_
     simp [Complex.star_def]; ring
   have h1 : 0 ≤ ∑ i : Fin n, ∑ j : Fin n, (c i).re * M i j * (c j).re := by
-    simpa [dotProduct, Matrix.mulVec, Finset.mul_sum, mul_assoc] using hM.2 (fun i => (c i).re)
+    simpa [dotProduct, Matrix.mulVec, Finset.mul_sum, mul_assoc] using hM.dotProduct_mulVec_nonneg (fun i => (c i).re)
   have h2 : 0 ≤ ∑ i : Fin n, ∑ j : Fin n, (c i).im * M i j * (c j).im := by
-    simpa [dotProduct, Matrix.mulVec, Finset.mul_sum, mul_assoc] using hM.2 (fun i => (c i).im)
+    simpa [dotProduct, Matrix.mulVec, Finset.mul_sum, mul_assoc] using hM.dotProduct_mulVec_nonneg (fun i => (c i).im)
   rw [hre]; exact add_nonneg h1 h2
+
+open Matrix Finset in
+private lemma real_hadamard_psd {n : ℕ} {A B : Matrix (Fin n) (Fin n) ℝ}
+    (hA : A.PosSemidef) (hB : B.PosSemidef) : (of fun i j => A i j * B i j).PosSemidef := by
+  refine .of_dotProduct_mulVec_nonneg (by ext i j; simp; rw [show A j i = A i j by simpa using congr_fun (congr_fun hA.1 i) j, show B j i = B i j by simpa using congr_fun (congr_fun hB.1 i) j]) fun x => ?_
+  let U : Matrix (Fin n) (Fin n) ℝ := hB.1.eigenvectorUnitary.1
+  let D : Matrix (Fin n) (Fin n) ℝ := diagonal hB.1.eigenvalues
+  have hsp : B = U * D * star U := by simpa [U, D, Unitary.conjStarAlgAut_apply] using hB.1.spectral_theorem
+  have hBe : ∀ i j, B i j = ∑ r, hB.1.eigenvalues r * (U i r * U j r) := fun i j => by
+    conv_lhs => rw [hsp, mul_apply]
+    congr 1; ext r
+    have hr : (U * D) i r = U i r * hB.1.eigenvalues r := by
+      rw [mul_apply]; exact (sum_eq_single r (fun k _ hk => by simp [D, hk]) (fun h => absurd (mem_univ r) h)).trans (by simp [D])
+    rw [hr]; simp [star_apply]; ring
+  let y r i := x i * U i r
+  have hid : star x ⬝ᵥ ((of fun i j => A i j * B i j) *ᵥ x) = ∑ r, hB.1.eigenvalues r * (star (y r) ⬝ᵥ (A *ᵥ y r)) := by
+    simp only [dotProduct, mulVec, of_apply, star_trivial, hBe, y]; simp_rw [mul_sum, sum_mul]; simp_rw [mul_sum]
+    conv_lhs => arg 2; ext i; rw [sum_comm]
+    rw [sum_comm]; congr 1; ext r; congr 1; ext i; congr 1; ext j; ring
+  rw [hid]; exact sum_nonneg fun r _ => mul_nonneg (hB.eigenvalues_nonneg r) (hA.dotProduct_mulVec_nonneg (y r))
 
 private lemma exp_real_kernel_finite_psd {α : Type*} [MeasurableSpace α]
     (K : α → α → ℝ) (hK : IsBoundedPosDefKernel (fun p q => (K p q : ℂ)))
@@ -239,20 +252,20 @@ private lemma exp_real_kernel_finite_psd {α : Type*} [MeasurableSpace α]
     intro k
     induction k with
     | zero =>
-        refine ⟨by ext i j; simp, fun v => ?_⟩
-        have heq : dotProduct v ((Matrix.of fun (_ _ : Fin n) => (1 : ℝ)) *ᵥ v) =
+        refine .of_dotProduct_mulVec_nonneg (by ext i j; simp) fun v => ?_
+        have heq : dotProduct (star v) ((Matrix.of fun (_ _ : Fin n) => (1 : ℝ)).mulVec v) =
             (∑ i : Fin n, v i) ^ 2 := by
-          simp [dotProduct, Matrix.mulVec, sq, Finset.sum_mul, Finset.mul_sum]
-        rw [heq]; exact sq_nonneg _
+          simp [dotProduct, Matrix.mulVec, sq, Finset.sum_mul, Finset.mul_sum]; rw [Finset.sum_comm]
+        simp only [pow_zero]; rw [heq]; exact sq_nonneg _
     | succ k ih =>
-        simpa [pow_succ'] using hM_psd.hadamard ih
+        simpa [pow_succ'] using real_hadamard_psd hM_psd ih
   have h_partial : ∀ N : ℕ,
       0 ≤ (∑ i : Fin n, ∑ j : Fin n, star (c i) * c j *
-        ((∑ k ∈ Finset.range N, (M i j) ^ k / (Nat.factorial k : ℝ)) : ℂ)).re := by
+        Complex.ofReal (∑ k ∈ Finset.range N, (M i j) ^ k / (Nat.factorial k : ℝ))).re := by
     intro N
     have h_swap :
         (∑ i : Fin n, ∑ j : Fin n, star (c i) * c j *
-          ((∑ k ∈ Finset.range N, (M i j) ^ k / (Nat.factorial k : ℝ)) : ℂ)) =
+          Complex.ofReal (∑ k ∈ Finset.range N, (M i j) ^ k / (Nat.factorial k : ℝ))) =
         ∑ k ∈ Finset.range N, ((Nat.factorial k : ℝ)⁻¹ : ℂ) *
           ∑ i : Fin n, ∑ j : Fin n, star (c i) * c j * (((M i j) ^ k : ℝ) : ℂ) := by
       push_cast
@@ -260,18 +273,15 @@ private lemma exp_real_kernel_finite_psd {α : Type*} [MeasurableSpace α]
       rw [Finset.sum_comm]
       conv_lhs => arg 2; ext i; rw [Finset.sum_comm]
       rw [Finset.sum_comm]
-      refine Finset.sum_congr rfl fun k _ => ?_
-      rw [Finset.mul_sum]
-      refine Finset.sum_congr rfl fun i _ => ?_
-      rw [Finset.mul_sum]
-      refine Finset.sum_congr rfl fun j _ => by ring
+      conv_lhs => arg 2; ext k; rw [Finset.sum_comm]
+      exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by rw [div_eq_mul_inv]; ring
     rw [h_swap, Complex.re_sum]
     refine Finset.sum_nonneg fun k _ => ?_
-    rw [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+    rw [← Complex.ofReal_inv, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
     exact mul_nonneg (inv_nonneg.mpr (Nat.cast_nonneg _)) (complex_psd_of_real_psd (hM_pow k) c)
   have h_tend : Filter.Tendsto (fun N : ℕ =>
       (∑ i : Fin n, ∑ j : Fin n, star (c i) * c j *
-        ((∑ k ∈ Finset.range N, (M i j) ^ k / (Nat.factorial k : ℝ)) : ℂ)).re)
+        Complex.ofReal (∑ k ∈ Finset.range N, (M i j) ^ k / (Nat.factorial k : ℝ))).re)
       Filter.atTop
       (𝓝 (∑ i : Fin n, ∑ j : Fin n, star (c i) * c j * (Real.exp (M i j) : ℂ)).re) := by
     refine Complex.continuous_re.tendsto _ |>.comp ?_
@@ -279,7 +289,8 @@ private lemma exp_real_kernel_finite_psd {α : Type*} [MeasurableSpace α]
     refine tendsto_const_nhds.mul ?_
     refine Complex.continuous_ofReal.tendsto _ |>.comp ?_
     have hsum : HasSum (fun k : ℕ => (M i j) ^ k / (Nat.factorial k : ℝ)) (Real.exp (M i j)) := by
-      simpa [div_eq_mul_inv] using Real.hasSum_exp (M i j)
+      rw [Real.exp_eq_exp_ℝ]
+      exact NormedSpace.expSeries_div_hasSum_exp (M i j)
     exact hsum.tendsto_sum_nat
   exact ge_of_tendsto h_tend (Filter.Eventually.of_forall h_partial)
 
@@ -322,7 +333,7 @@ theorem exp_real_posDefKernel_double_integral_nonneg
     haveI : IsFiniteMeasure μn := inferInstance
     have h_pair_meas : ∀ i j : Fin n,
         Measurable (fun ω : Fin n → α => star (g (ω i)) * g (ω j) * (Real.exp (K (ω i) (ω j)) : ℂ)) :=
-      fun i j => hF_meas.comp ((measurable_pi_apply i).prodMk (measurable_pi_apply j))
+      fun i j => by have hm : Measurable (fun ω : Fin n → α => (ω i, ω j)) := (measurable_pi_apply i).prodMk (measurable_pi_apply j); exact hF_meas.comp hm
     have h_pair_int : ∀ i j : Fin n,
         Integrable (fun ω : Fin n → α => star (g (ω i)) * g (ω j) * (Real.exp (K (ω i) (ω j)) : ℂ)) μn :=
       fun i j => Integrable.of_bound (h_pair_meas i j).aestronglyMeasurable (Bf ^ 2 * Real.exp B)
@@ -343,7 +354,7 @@ theorem exp_real_posDefKernel_double_integral_nonneg
       rw [integral_finset_sum _ fun i _ => integrable_finset_sum _ fun j _ => h_re_int i j]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [integral_finset_sum _ fun j _ => h_re_int i j]
-      exact Finset.sum_congr rfl fun j _ => (integral_re (h_pair_int i j)).symm
+      exact Finset.sum_congr rfl fun j _ => by simpa using integral_re (h_pair_int i j)
     have h_diag : ∀ i : Fin n,
         (∫ ω : Fin n → α, star (g (ω i)) * g (ω i) * (Real.exp (K (ω i) (ω i)) : ℂ) ∂μn).re =
           (μ Set.univ).toReal ^ (m + 1) * D := by
@@ -361,12 +372,11 @@ theorem exp_real_posDefKernel_double_integral_nonneg
       rw [heq, integral_prod _ h_int_prod]
       have h_inner : ∀ p : α, (∫ _ : Fin (m + 1) → α,
           star (g p) * g p * (Real.exp (K p p) : ℂ) ∂(Measure.pi fun _ => μ)) =
-          ((μ Set.univ).toReal ^ (m + 1) : ℂ) * (star (g p) * g p * (Real.exp (K p p) : ℂ)) := by
+          Complex.ofReal ((μ Set.univ).toReal ^ (m + 1)) * (star (g p) * g p * (Real.exp (K p p) : ℂ)) := by
         intro p
-        simp [integral_const, Measure.pi_univ, Finset.prod_const, Finset.card_univ, ENNReal.toReal_pow]
-        ring
+        simp [integral_const, Measure.real_def, Measure.pi_univ, Finset.prod_const, Finset.card_univ, ENNReal.toReal_pow]
       simp_rw [h_inner, integral_const_mul, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im,
-        zero_mul, sub_zero]
+        zero_mul, sub_zero]; rfl
     have h_off : ∀ i j : Fin n, i ≠ j →
         (∫ ω : Fin n → α, star (g (ω i)) * g (ω j) * (Real.exp (K (ω i) (ω j)) : ℂ) ∂μn).re =
           (μ Set.univ).toReal ^ m * I := by
@@ -387,11 +397,11 @@ theorem exp_real_posDefKernel_double_integral_nonneg
               ∂(μ.prod (Measure.pi fun _ => μ)) := by
         rw [← hmp1.integral_comp']
         refine integral_congr_ae (Filter.Eventually.of_forall fun ω => ?_)
-        simp [hj']
+        rw [← hj']; rfl
       rw [heq1, integral_prod _ h_int1]
       have h_inner1 : ∀ a : α, (∫ q : Fin (m + 1) → α,
           star (g a) * g (q j') * (Real.exp (K a (q j')) : ℂ) ∂(Measure.pi fun _ => μ)) =
-          ((μ Set.univ).toReal ^ m : ℂ) * ∫ b : α, star (g a) * g b * (Real.exp (K a b) : ℂ) ∂μ := by
+          Complex.ofReal ((μ Set.univ).toReal ^ m) * ∫ b : α, star (g a) * g b * (Real.exp (K a b) : ℂ) ∂μ := by
         intro a
         have h_int2 : Integrable (fun r : α × (Fin m → α) =>
             star (g a) * g r.1 * (Real.exp (K a r.1) : ℂ))
@@ -407,13 +417,12 @@ theorem exp_real_posDefKernel_double_integral_nonneg
         rw [heq2, integral_prod _ h_int2]
         have h_const : ∀ b : α, (∫ _ : Fin m → α,
             star (g a) * g b * (Real.exp (K a b) : ℂ) ∂(Measure.pi fun _ => μ)) =
-            ((μ Set.univ).toReal ^ m : ℂ) * (star (g a) * g b * (Real.exp (K a b) : ℂ)) := by
+            Complex.ofReal ((μ Set.univ).toReal ^ m) * (star (g a) * g b * (Real.exp (K a b) : ℂ)) := by
           intro b
-          simp [integral_const, Measure.pi_univ, Finset.prod_const, Finset.card_univ, ENNReal.toReal_pow]
-          ring
+          simp [integral_const, Measure.real_def, Measure.pi_univ, Finset.prod_const, Finset.card_univ, ENNReal.toReal_pow]
         simp_rw [h_const, integral_const_mul]
       simp_rw [h_inner1, integral_const_mul, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im,
-        zero_mul, sub_zero]
+        zero_mul, sub_zero]; rfl
     rw [h_sum_eq] at h_int_nn
     have h_split :
         (∑ i : Fin n, ∑ j : Fin n,
@@ -439,13 +448,15 @@ theorem exp_real_posDefKernel_double_integral_nonneg
             (μ Set.univ).toReal ^ m * I := fun j hj => h_off i j (Finset.ne_of_mem_erase hj).symm
         rw [Finset.sum_congr rfl h_const, Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ i),
           Finset.card_univ, Fintype.card_fin]
-        simp [n]; ring
+        simp [n]
       rw [h_off_sum]
     simp_rw [h_eval, Finset.sum_const, Finset.card_univ, Fintype.card_fin] at h_int_nn
     have h_alg : ((n : ℕ) : ℝ) • ((μ Set.univ).toReal ^ (m + 1) * D + (m + 1 : ℝ) * ((μ Set.univ).toReal ^ m * I)) =
         ((m + 2 : ℝ) * (m + 1 : ℝ)) * (μ Set.univ).toReal ^ m * I +
         (m + 2 : ℝ) * (μ Set.univ).toReal ^ (m + 1) * D := by
-      simp [n, nsmul_eq_mul]; ring
+      simp [n, smul_eq_mul]; ring
+    simp only [nsmul_eq_mul] at h_int_nn
+    simp only [smul_eq_mul] at h_alg
     linarith [h_int_nn, h_alg]
   by_contra hI_neg
   push_neg at hI_neg

@@ -19,9 +19,6 @@ open Imscribing.YangMills.WickTube
 open Imscribing.YangMills.SpectralDamping
 open Imscribing.YangMills.ForwardTubeFL
 
-private def toS4 (v : Fin 4 → ℝ) : Spacetime4 :=
-  (WithLp.equiv 2 (Fin 4 → ℝ)).symm v
-
 /-- Wightman 2-point bilinear pairing `W₂(f, g) = ∫ p, star(f̂(p)) * ĝ(p) dμ(p)`
     from a finite spectral measure `μ` on energy-momentum space. -/
 noncomputable def wightman2FromSpectral (μ : Measure (Fin 4 → ℝ))
@@ -91,15 +88,16 @@ theorem wightman2Spectral_euclid_decay
     fin_cases ν <;> simp [wickMap, xE]
   have hy : (fun ν : Fin 4 => (wickMap xE ν).im) ∈ Vplus := by
     rw [him_eq]
-    exact ⟨ht, by norm_num; exact sq_pos_of_pos ht⟩
+    refine ⟨ht, ?_⟩
+    dsimp
+    have ht2 : 0 < t ^ 2 := sq_pos_of_pos ht
+    linarith
   have hbd := tubeFourierLaplace_massive_bound μ hΔ h_supp (wickMap xE) hy
-  have hmink : minkowskiInner ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (fun ν => (wickMap xE ν).im))
-      ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (fun ν => (wickMap xE ν).im)) = t ^ 2 := by
+  have hmink : minkowskiInner (toS4 (fun ν => (wickMap xE ν).im))
+      (toS4 (fun ν => (wickMap xE ν).im)) = t ^ 2 := by
     rw [him_eq]
-    simp [minkowskiInner]
+    dsimp [minkowskiInner, toS4]
     ring
-  change ‖tubeFourierLaplace μ (wickMap xE)‖ ≤
-    (μ Set.univ).toReal * Real.exp (-Δ * Real.sqrt (minkowskiInner _ _)) at hbd
   rw [hmink, Real.sqrt_sq ht.le] at hbd
   exact hbd
 
