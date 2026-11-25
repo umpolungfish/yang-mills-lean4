@@ -22,11 +22,34 @@ open Imscribing.YangMills.CanonicalHaar4D
 open Imscribing.YangMills.CanonicalWilsonBridge
 open Imscribing.YangMills.CanonicalHalfRP4D
 
+private lemma clb_gaugeGroup_coe_inv_star {N : ℕ} (A : GaugeGroup N) :
+    ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ) = star (A : Matrix (Fin N) (Fin N) ℂ) := by
+  have h1 : (A : Matrix (Fin N) (Fin N) ℂ) * ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ) = 1 :=
+    congrArg Subtype.val (mul_inv_cancel A)
+  have h2 : star (A : Matrix (Fin N) (Fin N) ℂ) * (A : Matrix (Fin N) (Fin N) ℂ) = 1 :=
+    Matrix.mem_unitaryGroup_iff'.mp A.2.1
+  calc ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)
+      = (star (A : Matrix (Fin N) (Fin N) ℂ) * (A : Matrix (Fin N) (Fin N) ℂ)) *
+          ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ) := by rw [h2, Matrix.one_mul]
+    _ = star (A : Matrix (Fin N) (Fin N) ℂ) *
+          ((A : Matrix (Fin N) (Fin N) ℂ) * ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)) := by
+          rw [Matrix.mul_assoc]
+    _ = star (A : Matrix (Fin N) (Fin N) ℂ) := by rw [h1, Matrix.mul_one]
+
 private lemma canonicalPlaqHolonomyMeasurable (N L : ℕ) [NeZero N] (x : Lat4 L) (μ ν : Fin 4) :
     letI := borel (GaugeGroup N)
     Measurable (fun U : LinkConfig N L => plaquetteHolonomy U x μ ν) := by
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) :=
+    inferInstanceAs (SecondCountableTopology (Fin N → Fin N → ℂ))
+  haveI : SecondCountableTopology (GaugeGroup N) :=
+    Topology.IsInducing.secondCountableTopology
+      (⟨rfl⟩ : Topology.IsInducing (Subtype.val : GaugeGroup N → Matrix (Fin N) (Fin N) ℂ))
+  haveI : ContinuousInv (GaugeGroup N) :=
+    ⟨continuous_induced_rng.mpr (by
+      simpa only [Function.comp_def, clb_gaugeGroup_coe_inv_star] using
+        continuous_star.comp continuous_subtype_val)⟩
   haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
   haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
   unfold plaquetteHolonomy
@@ -34,10 +57,12 @@ private lemma canonicalPlaqHolonomyMeasurable (N L : ℕ) [NeZero N] (x : Lat4 L
     (measurable_pi_apply _).comp (measurable_pi_apply _)
   have m2 : Measurable (fun U : LinkConfig N L => U (x + stepDir L μ) ν) :=
     (measurable_pi_apply _).comp (measurable_pi_apply _)
-  have m3 : Measurable (fun U : LinkConfig N L => (U (x + stepDir L ν) μ)⁻¹) :=
-    ((measurable_pi_apply _).comp (measurable_pi_apply _)).inv
-  have m4 : Measurable (fun U : LinkConfig N L => (U x ν)⁻¹) :=
-    ((measurable_pi_apply _).comp (measurable_pi_apply _)).inv
+  have m3' : Measurable (fun U : LinkConfig N L => U (x + stepDir L ν) μ) :=
+    (measurable_pi_apply _).comp (measurable_pi_apply _)
+  have m3 : Measurable (fun U : LinkConfig N L => (U (x + stepDir L ν) μ)⁻¹) := m3'.inv
+  have m4' : Measurable (fun U : LinkConfig N L => U x ν) :=
+    (measurable_pi_apply _).comp (measurable_pi_apply _)
+  have m4 : Measurable (fun U : LinkConfig N L => (U x ν)⁻¹) := m4'.inv
   exact ((m1.mul m2).mul m3).mul m4
 
 private lemma canonicalSpatialPlaqMeasurable (N L : ℕ) [NeZero N] (x : Lat4 L) :
@@ -54,7 +79,7 @@ private lemma canonicalSpatialPlaqMeasurable (N L : ℕ) [NeZero N] (x : Lat4 L)
   exact Finset.measurable_sum _ fun k _ =>
     (hEntry k k).comp (canonicalPlaqHolonomyMeasurable N L x i.succ j.succ)
 
-private lemma canonicalWilsonActionMeasurable (N L : ℕ) [NeZero N] (β : ℝ) :
+private lemma canonicalWilsonActionMeasurable (N L : ℕ) [NeZero N] [NeZero L] (β : ℝ) :
     letI := borel (GaugeGroup N)
     Measurable (fun U : LinkConfig N L => wilsonAction N L β U) := by
   letI := borel (GaugeGroup N)
@@ -74,8 +99,8 @@ theorem canonicalSpatialPlaqProdMeasurable (N L n : ℕ) [NeZero N] (xs : Fin n 
     letI := borel (GaugeGroup N)
     Measurable (fun U : LinkConfig N L => (∏ k : Fin n, spatialPlaqDensity N L U (xs k) : ℂ)) := by
   letI := borel (GaugeGroup N)
-  exact Complex.continuous_ofReal.measurable.comp
-    (Finset.measurable_prod _ fun k _ => canonicalSpatialPlaqMeasurable N L (xs k))
+  exact Finset.measurable_prod Finset.univ fun k _ =>
+    Complex.continuous_ofReal.measurable.comp (canonicalSpatialPlaqMeasurable N L (xs k))
 
 /-- Centered smeared `n`-point 4D SU(N) magnetic plaquette Schwinger functional. -/
 noncomputable def canonicalMagneticSchwinger (N L n : ℕ) [NeZero N] [NeZero L]
@@ -107,13 +132,13 @@ theorem canonicalMagneticSchwinger_zero (N L : ℕ) [NeZero N] [NeZero L]
   dsimp [canonicalMagneticSchwinger]
   simp only [pow_zero, mul_zero, mul_one, one_mul, Finset.univ_unique, Finset.sum_singleton,
     Finset.univ_eq_empty, Finset.prod_empty, Complex.ofReal_one]
-  have h1 : (1 : EuclideanSchwartz 0) (fun k => centeredLatSite L a (Fin.elim0 k)) = 1 := by
-    simp
-  rw [h1, one_mul]
   unfold wilsonExpectation
-  simp only [one_mul, integral_ofReal]
-  change ((wilsonPartitionFn N L β (wilsonHaarLinkMeasure N L))⁻¹ : ℂ) *
-      (wilsonPartitionFn N L β (wilsonHaarLinkMeasure N L) : ℂ) = 1
+  simp only [one_mul]
+  have h_int : (∫ (U : LinkConfig N L), (Real.exp (-wilsonAction N L β U) : ℂ) ∂wilsonHaarLinkMeasure N L) =
+      (wilsonPartitionFn N L β (wilsonHaarLinkMeasure N L) : ℂ) := by
+    unfold wilsonPartitionFn
+    exact (integral_ofReal : (∫ U : LinkConfig N L, ((Real.exp (-wilsonAction N L β U) : ℝ) : ℂ) ∂wilsonHaarLinkMeasure N L) = _)
+  rw [h_int]
   exact_mod_cast inv_mul_cancel₀ hZ_pos.ne'
 
 /-- **Uniform Schwartz Bound on Centered Magnetic Schwinger Functionals.** -/
@@ -134,7 +159,7 @@ theorem canonicalMagneticSchwinger_uniform_schwartz_bound
     intro xs
     refine wilsonExpectation_norm_le hβ _ h_act_meas _
       (canonicalSpatialPlaqProdMeasurable N L n xs) ((18 : ℝ) ^ n) (by positivity) fun U => ?_
-    rw [Complex.norm_real, Real.norm_of_nonneg (Finset.prod_nonneg fun k _ =>
+    rw [← Complex.ofReal_prod, Complex.norm_real, Real.norm_of_nonneg (Finset.prod_nonneg fun k _ =>
       (spatialPlaqDensity_bounds N L U (xs k)).1)]
     calc (∏ k : Fin n, spatialPlaqDensity N L U (xs k))
         ≤ ∏ _k : Fin n, (18 : ℝ) :=
@@ -177,13 +202,13 @@ theorem canonicalMagneticSchwinger_uniform_schwartz_bound
       a ^ (4 * n) * ‖f (fun k => centeredLatSite L a (xs k))‖ ≤
         S_semi * (∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) := by
     intro xs
-    let x_phys : Fin n → Spacetime4 := fun k => centeredLatSite L a (xs k)
+    let x_phys := fun k : Fin n => centeredLatSite L a (xs k)
     have h_coord_le : ∀ k : Fin n, ∀ μ : Fin 4,
         1 + a * |(centeredCoord L (xs k μ) : ℝ)| ≤ 1 + ‖x_phys‖ := by
       intro k μ
       have h1 : a * |(centeredCoord L (xs k μ) : ℝ)| = ‖(x_phys k) μ‖ := by
         dsimp [x_phys, centeredLatSite]
-        rw [WithLp.equiv_symm_pi_apply, Real.norm_eq_abs, abs_mul, abs_of_pos ha0]
+        rw [abs_mul, abs_of_pos ha0]
       have h2 : ‖(x_phys k) μ‖ ≤ ‖x_phys k‖ := PiLp.norm_apply_le (x_phys k) μ
       have h3 : ‖x_phys k‖ ≤ ‖x_phys‖ := norm_le_pi_norm x_phys k
       linarith
@@ -196,7 +221,7 @@ theorem canonicalMagneticSchwinger_uniform_schwartz_bound
               fun k _ => Finset.prod_le_prod (fun _ _ => by positivity) fun μ _ =>
                 pow_le_pow_left₀ (by positivity) (h_coord_le k μ) 2
         _ = (1 + ‖x_phys‖) ^ (8 * n) := by
-            simp [Finset.prod_const, ← pow_mul]; ring
+            simp [Finset.prod_const, ← pow_mul]
     have h_f_bound : (1 + ‖x_phys‖) ^ (8 * n) * ‖f x_phys‖ ≤ S_semi := by
       rw [add_comm, add_pow, Finset.sum_mul]
       dsimp [S_semi]
@@ -227,7 +252,8 @@ theorem canonicalMagneticSchwinger_uniform_schwartz_bound
           mul_le_mul_of_nonneg_right (le_trans (mul_le_mul_of_nonneg_right h_prod_den (norm_nonneg _)) h_f_bound)
             (Finset.prod_nonneg fun _ _ => Finset.prod_nonneg fun _ _ => by positivity)
   dsimp [canonicalMagneticSchwinger]
-  rw [norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_mul, abs_pow, abs_pow, abs_of_pos ha0]
+  rw [norm_mul, norm_mul, norm_pow, norm_pow, Complex.norm_real, Complex.norm_real,
+      Real.norm_eq_abs, Real.norm_eq_abs, abs_of_pos ha0]
   calc (|Z_ren| ^ n * a ^ (4 * n)) *
         ‖∑ xs : Fin n → Lat4 L, f (fun k => centeredLatSite L a (xs k)) *
           wilsonExpectation N L β (wilsonHaarLinkMeasure N L)
@@ -241,7 +267,7 @@ theorem canonicalMagneticSchwinger_uniform_schwartz_bound
         exact mul_le_mul_of_nonneg_left (h_exp_bd xs) (norm_nonneg _)
     _ = |Z_ren| ^ n * (18 : ℝ) ^ n *
           ∑ xs : Fin n → Lat4 L, a ^ (4 * n) * ‖f (fun k => centeredLatSite L a (xs k))‖ := by
-        rw [Finset.mul_sum, Finset.mul_sum]
+        rw [Finset.mul_sum, Finset.mul_sum, Finset.mul_sum]
         refine Finset.sum_congr rfl fun xs _ => ?_
         ring
     _ ≤ |Z_ren| ^ n * (18 : ℝ) ^ n *
@@ -250,7 +276,7 @@ theorem canonicalMagneticSchwinger_uniform_schwartz_bound
         mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun xs _ => h_pt xs) (by positivity)
     _ = |Z_ren| ^ n * (18 : ℝ) ^ n * (S_semi * ∑ xs : Fin n → Lat4 L,
           ∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) := by
-        rw [Finset.mul_sum]
+        simp only [Finset.mul_sum]
     _ ≤ |Z_ren| ^ n * (18 : ℝ) ^ n * (S_semi * (4096 : ℝ) ^ n) :=
         mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h_nd hS_nn) (by positivity)
     _ = (|Z_ren| * 73728) ^ n * S_semi := by
@@ -261,27 +287,24 @@ theorem canonicalMagneticSchwinger_uniform_schwartz_bound
 /-- **OS Axiom E3 Permutation Symmetry on `canonicalMagneticSchwinger`.** -/
 theorem canonicalMagneticSchwinger_perm_symm (N L n : ℕ) [NeZero N] [NeZero L]
     (a β Z_ren : ℝ) (π : Equiv.Perm (Fin n)) (f f_π : EuclideanSchwartz n)
-    (hf : ∀ y : Fin n → Spacetime4, f_π y = f (fun k => y (π k))) :
+    (hf : ∀ y, f_π y = f (fun k => y (π k))) :
     canonicalMagneticSchwinger N L n a β Z_ren f_π =
       canonicalMagneticSchwinger N L n a β Z_ren f := by
   dsimp [canonicalMagneticSchwinger]
   congr 1
   let e : (Fin n → Lat4 L) ≃ (Fin n → Lat4 L) :=
-    { toFun := fun xs k => xs (π.symm k)
-      invFun := fun xs k => xs (π k)
+    { toFun := fun xs k => xs (π k)
+      invFun := fun xs k => xs (π.symm k)
       left_inv := fun xs => by funext k; simp
       right_inv := fun xs => by funext k; simp }
   refine Fintype.sum_equiv e _ _ fun xs => ?_
   have hf_eq : f_π (fun k => centeredLatSite L a (xs k)) =
       f (fun k => centeredLatSite L a (e xs k)) := by
-    rw [hf]
-    congr 1
-    funext k
-    simp [e]
+    rw [hf]; rfl
   have hprod_eq : (fun U : LinkConfig N L => (∏ k : Fin n, spatialPlaqDensity N L U (xs k) : ℂ)) =
       (fun U : LinkConfig N L => (∏ k : Fin n, spatialPlaqDensity N L U (e xs k) : ℂ)) := by
     funext U
-    exact (Fintype.prod_equiv π.symm _ _ fun k => by simp [e]).symm
+    exact (Fintype.prod_equiv π _ _ fun k => by simp [e]).symm
   rw [hf_eq, hprod_eq]
 
 /-- **Unconditional Finite-Volume Osterwalder–Seiler Reflection Positivity.** -/

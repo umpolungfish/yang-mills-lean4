@@ -9,7 +9,7 @@ import Imscribing.YangMills.ConcreteMinimalClayReduction
    `EuclideanSchwartz n` bounded by a finite sum of `SchwartzMap.seminorm`s
    to a genuine `EuclideanSchwartz n →L[ℂ] ℂ`.
 2. `canonical_schwinger_clm_subseq`: extracts `CanonicalSchwingerLimitWitness`
-   with continuous `S_∞ n : EuclideanSchwartz n →L[ℂ] ℂ` and E3 symmetry.
+   with continuous `S_inf n : EuclideanSchwartz n →L[ℂ] ℂ` and E3 symmetry.
 3. `concrete_balaban_target_from_canonical_lattice`: constructs `ConcreteBalabanTarget N hN`
    from `CanonicalBalabanEstimates` via `borchers_axioms_of_lattice_limit` (`0 sorry`).
 -/
@@ -39,7 +39,7 @@ theorem continuous_of_schwartz_seminorm_bound {n : ℕ}
     Continuous L := by
   have h_semi_cont : ∀ j : ℕ, Continuous (fun f : EuclideanSchwartz n =>
       SchwartzMap.seminorm ℂ j 0 f) := fun j =>
-    (schwartz_withSeminorms ℂ (Fin n → Spacetime4) ℂ).continuous_seminorm (j, 0)
+    (schwartz_withSeminorms ℂ (Fin n → ContinuumInterfaces.Spacetime4) ℂ).continuous_seminorm (j, 0)
   have h_sum_cont : Continuous (fun f : EuclideanSchwartz n =>
       ∑ j ∈ Finset.range (M + 1), c j * SchwartzMap.seminorm ℂ j 0 f) :=
     continuous_finset_sum _ fun j _ => continuous_const.mul (h_semi_cont j)
@@ -58,14 +58,14 @@ structure CanonicalSchwingerLimitWitness (N : ℕ) [NeZero N]
     (L : ℕ → ℕ) [∀ m, NeZero (L m)] (a β Z_ren : ℕ → ℝ) where
   φ : ℕ → ℕ
   hφ : StrictMono φ
-  S_∞ : ∀ n : ℕ, EuclideanSchwartz n →L[ℂ] ℂ
+  S_inf : ∀ n : ℕ, EuclideanSchwartz n →L[ℂ] ℂ
   h_lim : ∀ (n : ℕ) (f : EuclideanSchwartz n),
     Filter.Tendsto (fun m =>
       canonicalSmearedPlaqSchwinger N (L (φ m)) n (a (φ m)) (β (φ m)) (Z_ren (φ m)) f)
-      Filter.atTop (𝓝 (S_∞ n f))
+      Filter.atTop (𝓝 (S_inf n f))
   h_e3 : ∀ (n : ℕ) (π : Equiv.Perm (Fin n)) (f f_π : EuclideanSchwartz n),
-    (∀ y : Fin n → Spacetime4, f_π y = f (fun k => y (π k))) →
-    S_∞ n f_π = S_∞ n f
+    (∀ y : Fin n → ContinuumInterfaces.Spacetime4, f_π y = f (fun k => y (π k))) →
+    S_inf n f_π = S_inf n f
 
 /-- Extract `CanonicalSchwingerLimitWitness` unconditionally from `all_degrees_subsequential_schwinger_limit`. -/
 noncomputable def canonical_schwinger_clm_subseq
@@ -97,7 +97,7 @@ noncomputable def canonical_schwinger_clm_subseq
   exact ⟨{
     φ := φ
     hφ := h_spec.1
-    S_∞ := S_clm
+    S_inf := S_clm
     h_lim := h_spec.2.1
     h_e3 := h_spec.2.2.2 }⟩
 
@@ -106,21 +106,21 @@ noncomputable def canonical_schwinger_clm_subseq
 structure CanonicalBalabanEstimates {N : ℕ} [NeZero N]
     {L : ℕ → ℕ} [∀ m, NeZero (L m)] {a β Z_ren : ℕ → ℝ}
     (W : CanonicalSchwingerLimitWitness N L a β Z_ren) where
-  S_zero : W.S_∞ 0 1 = 1
+  S_zero : W.S_inf 0 1 = 1
   linear_growth_E0 : ∃ (C α : ℝ) (k : ℕ), 0 < C ∧ 0 ≤ α ∧
     ∀ n (f : EuclideanSchwartz n),
-      ‖W.S_∞ n f‖ ≤ C ^ n * ((Nat.factorial n : ℝ) ^ α) * (SchwartzMap.seminorm ℂ k 0 f)
+      ‖W.S_inf n f‖ ≤ C ^ n * ((Nat.factorial n : ℝ) ^ α) * (SchwartzMap.seminorm ℂ k 0 f)
   Δ : ℝ
   Δ_pos : 0 < Δ
   nontrivial_separated_2pt :
-    ∃ (f g : SchwartzMap Spacetime4 ℂ),
+    ∃ (f g : SchwartzMap ContinuumInterfaces.Spacetime4 ℂ),
       Disjoint (Function.support f) (Function.support g) ∧
-      ∃ F : EuclideanSchwartz 2, W.S_∞ 2 F ≠ 0
+      ∃ F : EuclideanSchwartz 2, W.S_inf 2 F ≠ 0
   B_m : ℕ → BorchersPos → BorchersPos → ℂ
   h_conv : ∀ F G : BorchersPos,
     Filter.Tendsto (fun m => B_m m F G) Filter.atTop
       (𝓝 (borchersForm
-        { S := W.S_∞
+        { S := W.S_inf
           S_zero := S_zero
           linear_growth_E0 := linear_growth_E0
           cluster_rate := Δ
@@ -150,11 +150,12 @@ structure CanonicalBalabanEstimates {N : ℕ} [NeZero N]
 noncomputable def concrete_balaban_target_from_canonical_lattice
     (N : ℕ) (hN : 2 ≤ N)
     {L : ℕ → ℕ} [∀ m, NeZero (L m)] {a β Z_ren : ℕ → ℝ}
-    (W : CanonicalSchwingerLimitWitness N L a β Z_ren)
-    (E : CanonicalBalabanEstimates W) :
+    (W : @CanonicalSchwingerLimitWitness N ⟨Nat.ne_of_gt (lt_of_lt_of_le Nat.zero_lt_two hN)⟩ L _ a β Z_ren)
+    (E : @CanonicalBalabanEstimates N ⟨Nat.ne_of_gt (lt_of_lt_of_le Nat.zero_lt_two hN)⟩ L _ a β Z_ren W) :
     ConcreteBalabanTarget N hN :=
+  letI : NeZero N := ⟨Nat.ne_of_gt (lt_of_lt_of_le Nat.zero_lt_two hN)⟩
   let C_os : ContinuumSchwingerOS :=
-    { S := W.S_∞
+    { S := W.S_inf
       S_zero := E.S_zero
       linear_growth_E0 := E.linear_growth_E0
       cluster_rate := E.Δ

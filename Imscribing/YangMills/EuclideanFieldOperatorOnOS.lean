@@ -106,27 +106,27 @@ theorem coeLin_injective (H₀ : Type*) [NormedAddCommGroup H₀] [InnerProductS
 def osFieldDomain (pre : EuclideanPreData BorchersPos) :
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     Submodule ℂ (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) := by
   intro core
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
   exact LinearMap.range (coeLin (BorchersPos ⧸ nullSubmodule pre))
 
 theorem osFieldDomain_dense (pre : EuclideanPreData BorchersPos) :
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     Dense ((osFieldDomain pre : Submodule ℂ _) : Set (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) := by
   intro core
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
   exact UniformSpace.Completion.denseRange_coe
 
 theorem vac_mem_osFieldDomain (pre : EuclideanPreData BorchersPos) :
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     ((Submodule.Quotient.mk pre.e₀ : BorchersPos ⧸ nullSubmodule pre) :
       UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) ∈ osFieldDomain pre :=
   ⟨Submodule.Quotient.mk pre.e₀, rfl⟩
@@ -138,7 +138,7 @@ noncomputable def euclidFieldOp (pre : EuclideanPreData BorchersPos)
       pre.B F (borchersFieldMul f G) = pre.B (borchersFieldMul f_adj F) G) :
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let D := osFieldDomain pre
     { op : D →ₗ[ℂ] UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre) //
       (∀ ψ : D, op ψ ∈ D) ∧
@@ -148,7 +148,7 @@ noncomputable def euclidFieldOp (pre : EuclideanPreData BorchersPos)
           ((Submodule.Quotient.mk (borchersFieldMul f F) : BorchersPos ⧸ nullSubmodule pre) : _)) } := by
   intro core
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
   set H₀ := BorchersPos ⧸ nullSubmodule pre
   let op₀ : H₀ →ₗ[ℂ] H₀ :=
     (nullSubmodule pre).liftQ ((Submodule.mkQ (nullSubmodule pre)).comp (borchersFieldMul f))
@@ -181,7 +181,7 @@ theorem euclidFieldOp_commute (pre : EuclideanPreData BorchersPos)
       pre.B (borchersFieldMul g (borchersFieldMul f F)) G) :
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let opF := euclidFieldOp pre f hf_adj
     let opG := euclidFieldOp pre g hg_adj
     ∀ ψ : osFieldDomain pre,
@@ -189,7 +189,7 @@ theorem euclidFieldOp_commute (pre : EuclideanPreData BorchersPos)
       opG.1 ⟨opF.1 ψ, opF.2.1 ψ⟩ := by
   intro core
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
   set H₀ := BorchersPos ⧸ nullSubmodule pre
   let opF := euclidFieldOp pre f hf_adj
   let opG := euclidFieldOp pre g hg_adj

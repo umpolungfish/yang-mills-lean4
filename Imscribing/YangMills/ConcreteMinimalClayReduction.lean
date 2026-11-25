@@ -11,6 +11,9 @@ and proves `clay_yang_mills_from_concrete_targets` (`0 sorry`).
 
 namespace Imscribing.YangMills.ConcreteMinimalReduction
 
+set_option maxSynthPendingDepth 1
+set_option maxHeartbeats 800000
+
 open scoped InnerProductSpace
 open Imscribing.YangMills.ClaySpec
 open Imscribing.YangMills.ContinuumInterfaces
@@ -54,12 +57,12 @@ structure ConcreteOSTarget {N : ℕ} {hN : 2 ≤ N} (B : ConcreteBalabanTarget N
       B.h_herm B.h_rp B.h_symm B.h_cluster
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
     let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ nullSubmodule pre) : H)
     ∃ (U : Poincare4 → H →ₗᵢ[ℂ] H)
       (fieldDomain : Submodule ℂ H)
-      (field : TestFn4 → fieldDomain →ₗ[ℂ] H),
+      (field : TestFn4 → ↥fieldDomain →ₗ[ℂ] H),
       (∀ g : Poincare4, U g Ω = Ω) ∧
       U (poincareTimeTrans 0) = LinearIsometry.id ∧
       (∀ s t : ℝ,
@@ -67,9 +70,9 @@ structure ConcreteOSTarget {N : ℕ} {hN : 2 ≤ N} (B : ConcreteBalabanTarget N
           fun ψ => U (poincareTimeTrans s) (U (poincareTimeTrans t) ψ)) ∧
       Dense (fieldDomain : Set H) ∧
       Ω ∈ fieldDomain ∧
-      (∀ f (ψ : fieldDomain), field f ψ ∈ fieldDomain) ∧
+      (∀ f (ψ : ↥fieldDomain), field f ψ ∈ fieldDomain) ∧
       (∀ f g : TestFn4, SpacelikeDisjoint f g →
-        ∀ (ψ₁ ψ₂ : fieldDomain) hfg hgf,
+        ∀ (ψ₁ ψ₂ : ↥fieldDomain) (hfg : field g ψ₂ ∈ fieldDomain) (hgf : field f ψ₂ ∈ fieldDomain),
           ⟪(ψ₁ : H), field f ⟨field g ψ₂, hfg⟩⟫_ℂ =
           ⟪(ψ₁ : H), field g ⟨field f ψ₂, hgf⟩⟫_ℂ) ∧
       (∃ (f₀ g₀ : TestFn4)

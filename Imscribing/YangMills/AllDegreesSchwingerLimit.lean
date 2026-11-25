@@ -33,7 +33,7 @@ open Imscribing.YangMills.MinimalReduction
 
 /-- **Simultaneous All-n Subsequential Continuum Schwinger Limit:**
     Extracts ONE strictly monotone subsequence `φ : ℕ → ℕ` converging simultaneously
-    for every `n : ℕ` and every `f : EuclideanSchwartz n` to a linear distribution `S_∞ n`,
+    for every `n : ℕ` and every `f : EuclideanSchwartz n` to a linear distribution `S_inf n`,
     preserving Schwartz bounds and OS Axiom E3 permutation symmetry for all `n`. -/
 theorem all_degrees_subsequential_schwinger_limit
     (N : ℕ) [NeZero N]
@@ -49,16 +49,16 @@ theorem all_degrees_subsequential_schwinger_limit
     let p : ∀ n : ℕ, EuclideanSchwartz n → ℝ := fun n f =>
       (Z_max * 8192) ^ n * ∑ j ∈ Finset.range (8 * n + 1),
         ((8 * n).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 f
-    ∃ (φ : ℕ → ℕ) (S_∞ : ∀ n : ℕ, EuclideanSchwartz n →ₗ[ℂ] ℂ),
+    ∃ (φ : ℕ → ℕ) (S_inf : ∀ n : ℕ, EuclideanSchwartz n →ₗ[ℂ] ℂ),
       StrictMono φ ∧
       (∀ (n : ℕ) (f : EuclideanSchwartz n),
         Filter.Tendsto (fun m =>
           canonicalSmearedPlaqSchwinger N (L (φ m)) n (a (φ m)) (β (φ m)) (Z_ren (φ m)) f)
-          Filter.atTop (𝓝 (S_∞ n f))) ∧
-      (∀ (n : ℕ) (f : EuclideanSchwartz n), ‖S_∞ n f‖ ≤ p n f) ∧
+          Filter.atTop (𝓝 (S_inf n f))) ∧
+      (∀ (n : ℕ) (f : EuclideanSchwartz n), ‖S_inf n f‖ ≤ p n f) ∧
       (∀ (n : ℕ) (π : Equiv.Perm (Fin n)) (f f_π : EuclideanSchwartz n),
-        (∀ y : Fin n → Spacetime4, f_π y = f (fun k => y (π k))) →
-        S_∞ n f_π = S_∞ n f) := by
+        (∀ y : Fin n → ContinuumInterfaces.Spacetime4, f_π y = f (fun k => y (π k))) →
+        S_inf n f_π = S_inf n f) := by
   intro p
   let F_diag : ℕ → ℕ → ℂ := fun m idx =>
     let nk := Nat.unpair idx
@@ -74,8 +74,7 @@ theorem all_degrees_subsequential_schwinger_limit
     refine le_trans h1 ?_
     dsimp [p]
     gcongr
-    · exact hZ m
-    · exact Finset.sum_nonneg fun j _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
+    exact hZ m
   obtain ⟨φ, hφ_mono, h_diag_lim⟩ := cantor_diagonal_subseq F_diag h_bd
   have h_all_cauchy : ∀ (n : ℕ) (f : EuclideanSchwartz n),
       CauchySeq (fun m =>
@@ -101,8 +100,7 @@ theorem all_degrees_subsequential_schwinger_limit
         (ha (φ m)).1 (ha (φ m)).2 (hβ (φ m)) (Z_ren (φ m)) g
       refine le_trans h1 ?_
       dsimp [p]; gcongr
-      · exact hZ (φ m)
-      · exact Finset.sum_nonneg fun j _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
+      exact hZ (φ m)
     have h1 : ‖S_fn m₁ f - S_fn m₁ (D n k)‖ < ε / 3 := by
       have h_sub : S_fn m₁ f - S_fn m₁ (D n k) = S_fn m₁ (f - D n k) :=
         (map_sub (canonicalSmearedPlaqSchwinger N (L (φ m₁)) n (a (φ m₁)) (β (φ m₁)) (Z_ren (φ m₁))) f (D n k)).symm
@@ -123,7 +121,7 @@ theorem all_degrees_subsequential_schwinger_limit
     calc
       ‖_ + _ + _‖ ≤ ‖S_fn m₁ f - S_fn m₁ (D n k)‖ + ‖S_fn m₁ (D n k) - S_fn m₂ (D n k)‖ +
           ‖S_fn m₂ (D n k) - S_fn m₂ f‖ :=
-          le_trans (norm_add_le _ _) (add_le_add_right (norm_add_le _ _) _)
+          le_trans (norm_add_le _ _) (add_le_add (norm_add_le _ _) le_rfl)
       _ < ε / 3 + ε / 3 + ε / 3 := add_lt_add (add_lt_add h1 h2) h3
       _ = ε := by ring
   have h_lim_ex : ∀ (n : ℕ) (f : EuclideanSchwartz n), ∃ z : ℂ,
@@ -131,7 +129,7 @@ theorem all_degrees_subsequential_schwinger_limit
         canonicalSmearedPlaqSchwinger N (L (φ m)) n (a (φ m)) (β (φ m)) (Z_ren (φ m)) f)
         Filter.atTop (𝓝 z) :=
     fun n f => cauchySeq_tendsto_of_complete (h_all_cauchy n f)
-  let S_∞ : ∀ n : ℕ, EuclideanSchwartz n →ₗ[ℂ] ℂ := fun n =>
+  let S_inf : ∀ n : ℕ, EuclideanSchwartz n →ₗ[ℂ] ℂ := fun n =>
     { toFun := fun f => Classical.choose (h_lim_ex n f)
       map_add' := fun f g => by
         have hf := Classical.choose_spec (h_lim_ex n f)
@@ -153,23 +151,25 @@ theorem all_degrees_subsequential_schwinger_limit
   have h_spec : ∀ (n : ℕ) (f : EuclideanSchwartz n),
       Filter.Tendsto (fun m =>
         canonicalSmearedPlaqSchwinger N (L (φ m)) n (a (φ m)) (β (φ m)) (Z_ren (φ m)) f)
-        Filter.atTop (𝓝 (S_∞ n f)) :=
+        Filter.atTop (𝓝 (S_inf n f)) :=
     fun n f => Classical.choose_spec (h_lim_ex n f)
-  refine ⟨φ, S_∞, hφ_mono, h_spec, fun n f => ?_, fun n π f f_π hf => ?_⟩
+  refine ⟨φ, S_inf, hφ_mono, h_spec, fun n f => ?_, fun n π f f_π hf => ?_⟩
   · have h_norm : Filter.Tendsto (fun m =>
         ‖canonicalSmearedPlaqSchwinger N (L (φ m)) n (a (φ m)) (β (φ m)) (Z_ren (φ m)) f‖)
-        Filter.atTop (𝓝 ‖S_∞ n f‖) :=
+        Filter.atTop (𝓝 ‖S_inf n f‖) :=
       (continuous_norm.tendsto _).comp (h_spec n f)
     refine le_of_tendsto h_norm (Filter.Eventually.of_forall fun m => ?_)
     have h1 := canonicalWilsonSchwinger_uniform_schwartz_bound N (L (φ m)) n
       (ha (φ m)).1 (ha (φ m)).2 (hβ (φ m)) (Z_ren (φ m)) f
     refine le_trans h1 ?_
     dsimp [p]; gcongr
-    · exact hZ (φ m)
-    · exact Finset.sum_nonneg fun j _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
-  · exact continuum_schwinger_perm_symm N n (fun m => L (φ m)) (fun m => a (φ m))
+    exact hZ (φ m)
+  · letI := borel (GaugeGroup N)
+    have h_lim_n := h_spec n
+    dsimp only [canonicalSmearedPlaqSchwinger] at h_lim_n
+    exact continuum_schwinger_perm_symm N n (fun m => L (φ m)) (fun m => a (φ m))
       (fun m => β (φ m)) (fun m => Z_ren (φ m))
       (fun _ => inferInstance) (fun m => wilsonHaarLinkMeasure N (L (φ m)))
-      (S_∞ n) (h_spec n) π f f_π hf
+      (S_inf n) h_lim_n π f f_π hf
 
 end Imscribing.YangMills.AllDegreesLimit

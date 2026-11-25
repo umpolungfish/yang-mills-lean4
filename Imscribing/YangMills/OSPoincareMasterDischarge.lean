@@ -1,3 +1,4 @@
+import Imscribing.YangMills.SpatialISO3UnitariesOnOS
 import Imscribing.YangMills.SemigroupToUnitaryGroupCFC
 import Imscribing.YangMills.ConcreteMinimalClayReduction
 import Imscribing.YangMills.IBPBoundaryToWightman
@@ -13,6 +14,9 @@ core `OSAnalyticCore B`, synthesizes `ConcreteOSTarget B` and proves
 -/
 
 namespace Imscribing.YangMills.OSMasterDischarge
+
+set_option maxSynthPendingDepth 1
+set_option maxHeartbeats 800000
 
 open scoped InnerProductSpace Topology
 open Imscribing.YangMills.ClaySpec
@@ -40,7 +44,7 @@ structure OSAnalyticCore {N : ℕ} {hN : 2 ≤ N} (B : ConcreteBalabanTarget N h
       B.h_herm B.h_rp B.h_symm B.h_cluster
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
     let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ nullSubmodule pre) : H)
     ∃ (T : ℝ → H →L[ℂ] H),
@@ -52,14 +56,14 @@ structure OSAnalyticCore {N : ℕ} {hN : 2 ≤ N} (B : ConcreteBalabanTarget N h
       (∀ t : ℝ, 0 ≤ t → T t Ω = Ω) ∧
     ∃ (U_lor : Lorentz4 → H →ₗᵢ[ℂ] H)
       (fieldDomain : Submodule ℂ H)
-      (field : TestFn4 → fieldDomain →ₗ[ℂ] H),
+      (field : TestFn4 → ↥fieldDomain →ₗ[ℂ] H),
       (∀ Λ : Lorentz4, Λ.mat = 1 → U_lor Λ = LinearIsometry.id) ∧
       (∀ Λ : Lorentz4, U_lor Λ Ω = Ω) ∧
       Dense (fieldDomain : Set H) ∧
       Ω ∈ fieldDomain ∧
-      (∀ f (ψ : fieldDomain), field f ψ ∈ fieldDomain) ∧
+      (∀ f (ψ : ↥fieldDomain), field f ψ ∈ fieldDomain) ∧
       (∀ f g : TestFn4, SpacelikeDisjoint f g →
-        ∀ (ψ₁ ψ₂ : fieldDomain) hfg hgf,
+        ∀ (ψ₁ ψ₂ : ↥fieldDomain) (hfg : field g ψ₂ ∈ fieldDomain) (hgf : field f ψ₂ ∈ fieldDomain),
           ⟪(ψ₁ : H), field f ⟨field g ψ₂, hfg⟩⟫_ℂ =
           ⟪(ψ₁ : H), field g ⟨field f ψ₂, hgf⟩⟫_ℂ) ∧
       (∃ (f₀ g₀ : TestFn4)
@@ -91,7 +95,7 @@ theorem os_continuation_master_discharge
     B.h_herm B.h_rp B.h_symm B.h_cluster
   let core := quotInnerCore pre
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
   obtain ⟨T, hT_zero, hT_add, hT_symm, hT_contr, hT_cont, hT_vac,
     U_lor, fieldDomain, field, hU_lor_one, hU_lor_vac, h_dense, hΩ_dom,
     h_maps, h_weak_loc, f₀, g₀, W_reg, D_ibp, M, p, hp_nn, h_deriv, h_cont,

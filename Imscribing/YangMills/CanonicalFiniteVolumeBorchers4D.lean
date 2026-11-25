@@ -24,6 +24,25 @@ open Imscribing.YangMills.CanonicalHalfRP4D
 open Imscribing.YangMills.BorchersReconstruction
 open Imscribing.YangMills.LatticeChessboardTransfer
 
+
+
+private instance instNeZeroTwoMul (M : ℕ) [NeZero M] : NeZero (2 * M) :=
+  ⟨Nat.mul_ne_zero two_ne_zero (NeZero.ne M)⟩
+
+private lemma fvb_gaugeGroup_coe_inv_star {N : ℕ} (A : GaugeGroup N) :
+    ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ) = star (A : Matrix (Fin N) (Fin N) ℂ) := by
+  have h1 : (A : Matrix (Fin N) (Fin N) ℂ) * ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ) = 1 :=
+    congrArg Subtype.val (mul_inv_cancel A)
+  have h2 : star (A : Matrix (Fin N) (Fin N) ℂ) * (A : Matrix (Fin N) (Fin N) ℂ) = 1 :=
+    Matrix.mem_unitaryGroup_iff'.mp A.2.1
+  calc ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)
+      = (star (A : Matrix (Fin N) (Fin N) ℂ) * (A : Matrix (Fin N) (Fin N) ℂ)) *
+          ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ) := by rw [h2, Matrix.one_mul]
+    _ = star (A : Matrix (Fin N) (Fin N) ℂ) *
+          ((A : Matrix (Fin N) (Fin N) ℂ) * ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)) := by
+          rw [Matrix.mul_assoc]
+    _ = star (A : Matrix (Fin N) (Fin N) ℂ) := by rw [h1, Matrix.mul_one]
+
 private lemma reflectSite_sub_step0_cutMid (M : ℕ) [NeZero M] (x : Lat4 (2 * M))
     (hx : (x 0).val = M - 1) :
     reflectSite (2 * M) x - stepDir (2 * M) 0 = x := by
@@ -35,9 +54,10 @@ private lemma reflectSite_sub_step0_cutMid (M : ℕ) [NeZero M] (x : Lat4 (2 * M
     have h2 : 2 * (x 0 + 1) = 0 := by
       have hsub : 2 * ((x 0).val + 1) = 2 * M := by omega
       have hcast := congrArg (Nat.cast (R := ZMod (2 * M))) hsub
+      rw [ZMod.natCast_self] at hcast
       push_cast at hcast
-      rw [ZMod.natCast_zmod_val, ZMod.natCast_self] at hcast
-      linear_combination hcast
+      rw [ZMod.natCast_zmod_val] at hcast
+      exact hcast
     linear_combination -h2
   · simp [reflectSite, stepDir, hν]
 
@@ -52,8 +72,9 @@ private lemma reflectSite_sub_step0_cutTop (M : ℕ) [NeZero M] (x : Lat4 (2 * M
     have h1 : x 0 + 1 = 0 := by
       have hsub : (x 0).val + 1 = 2 * M := by omega
       have hcast := congrArg (Nat.cast (R := ZMod (2 * M))) hsub
+      rw [ZMod.natCast_self] at hcast
       push_cast at hcast
-      rw [ZMod.natCast_zmod_val, ZMod.natCast_self] at hcast
+      rw [ZMod.natCast_zmod_val] at hcast
       exact hcast
     linear_combination -2 * h1
   · simp [reflectSite, stepDir, hν]
@@ -66,22 +87,24 @@ private lemma reflectSite_sub_step0_val {M : ℕ} [NeZero M] (x : Lat4 (2 * M))
   have heq : -(x 0 + 1) - 1 = (((2 * M - 2 - (x 0).val : ℕ) : ZMod (2 * M))) := by
     have hsub : ((x 0).val + (2 * M - 2 - (x 0).val) + 2 : ℕ) = 2 * M := by omega
     have hz := congrArg (Nat.cast (R := ZMod (2 * M))) hsub
+    rw [ZMod.natCast_self] at hz
     push_cast at hz
-    rw [ZMod.natCast_zmod_val, ZMod.natCast_self] at hz
-    linear_combination hz
+    rw [ZMod.natCast_zmod_val] at hz
+    linear_combination -hz
   rw [heq, ZMod.val_natCast_of_lt (by omega)]
 
 private lemma reflectSite_zero_val' {M : ℕ} [NeZero M] (x : Lat4 (2 * M)) :
     ((reflectSite (2 * M) x) 0).val = 2 * M - 1 - (x 0).val := by
   have hM : 0 < M := NeZero.pos M
-  have hx_lt : (x 0).val < 2 * M := (x 0).isLt
+  have hx_lt : (x 0).val < 2 * M := ZMod.val_lt (x 0)
   simp only [reflectSite, ↓reduceIte]
   have heq : -(x 0 + 1) = (((2 * M - 1 - (x 0).val : ℕ) : ZMod (2 * M))) := by
     have hsub : ((x 0).val + (2 * M - 1 - (x 0).val) + 1 : ℕ) = 2 * M := by omega
     have hz := congrArg (Nat.cast (R := ZMod (2 * M))) hsub
+    rw [ZMod.natCast_self] at hz
     push_cast at hz
-    rw [ZMod.natCast_zmod_val, ZMod.natCast_self] at hz
-    linear_combination hz
+    rw [ZMod.natCast_zmod_val] at hz
+    linear_combination -hz
   rw [heq, ZMod.val_natCast_of_lt (by omega)]
 
 /-- **Exact Swapping-Reflection Symmetry of `glueConfig`:**
@@ -91,7 +114,7 @@ theorem glueConfig_swap {N M : ℕ} [NeZero M] (p q : HalfVar N M) :
   classical
   have hM : 0 < M := NeZero.pos M
   funext x μ
-  have hx_lt : (x 0).val < 2 * M := (x 0).isLt
+  have hx_lt : (x 0).val < 2 * M := ZMod.val_lt (x 0)
   by_cases hp : IsPosLink M x μ
   · have h_lhs : glueConfig q p x μ = q.1 x μ := by simp [glueConfig, hp]
     rw [h_lhs]
@@ -188,22 +211,33 @@ private lemma glueConfig_measurable (N M : ℕ) [NeZero M] :
     Measurable (fun pq : HalfVar N M × HalfVar N M => glueConfig pq.1 pq.2) := by
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) :=
+    inferInstanceAs (SecondCountableTopology (Fin N → Fin N → ℂ))
+  haveI : SecondCountableTopology (GaugeGroup N) :=
+    Topology.IsInducing.secondCountableTopology
+      (⟨rfl⟩ : Topology.IsInducing (Subtype.val : GaugeGroup N → Matrix (Fin N) (Fin N) ℂ))
+  haveI : ContinuousInv (GaugeGroup N) :=
+    ⟨continuous_induced_rng.mpr (by
+      simpa only [Function.comp_def, fvb_gaugeGroup_coe_inv_star] using
+        continuous_star.comp continuous_subtype_val)⟩
   haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
   haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
+  have mp1 : ∀ y ν, Measurable (fun pq : HalfVar N M × HalfVar N M => pq.1.1 y ν) :=
+    fun y ν => (measurable_pi_apply ν).comp ((measurable_pi_apply y).comp (measurable_fst.comp measurable_fst))
+  have mp2 : ∀ y ν, Measurable (fun pq : HalfVar N M × HalfVar N M => pq.2.1 y ν) :=
+    fun y ν => (measurable_pi_apply ν).comp ((measurable_pi_apply y).comp (measurable_fst.comp measurable_snd))
   refine measurable_pi_iff.mpr fun x => measurable_pi_iff.mpr fun μ => ?_
   dsimp [glueConfig]
   split_ifs
-  · exact ((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst
+  · exact mp1 x μ
   · exact (((measurable_pi_apply _).comp measurable_snd).comp measurable_fst).inv.mul
       (((measurable_pi_apply _).comp measurable_snd).comp measurable_snd)
   · exact (((measurable_pi_apply _).comp measurable_snd).comp measurable_snd).inv.mul
       (((measurable_pi_apply _).comp measurable_snd).comp measurable_fst)
   · dsimp [linkReflect]
     split_ifs
-    · exact (((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst).comp
-        measurable_snd |>.inv
-    · exact (((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst).comp
-        measurable_snd
+    · exact (mp2 _ _).inv
+    · exact mp2 _ _
 
 private lemma glueConfig_action_measurable (N M : ℕ) [NeZero N] [NeZero M] (β : ℝ) :
     letI := borel (GaugeGroup N)
@@ -211,6 +245,15 @@ private lemma glueConfig_action_measurable (N M : ℕ) [NeZero N] [NeZero M] (β
       wilsonAction N (2 * M) β (glueConfig pq.1 pq.2)) := by
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) :=
+    inferInstanceAs (SecondCountableTopology (Fin N → Fin N → ℂ))
+  haveI : SecondCountableTopology (GaugeGroup N) :=
+    Topology.IsInducing.secondCountableTopology
+      (⟨rfl⟩ : Topology.IsInducing (Subtype.val : GaugeGroup N → Matrix (Fin N) (Fin N) ℂ))
+  haveI : ContinuousInv (GaugeGroup N) :=
+    ⟨continuous_induced_rng.mpr (by
+      simpa only [Function.comp_def, fvb_gaugeGroup_coe_inv_star] using
+        continuous_star.comp continuous_subtype_val)⟩
   haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
   haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
   have hEntry := canonicalGaugeEntryMeasurable N
@@ -224,10 +267,12 @@ private lemma glueConfig_action_measurable (N M : ℕ) [NeZero N] [NeZero M] (β
       (measurable_pi_apply _).comp (measurable_pi_apply _)
     have m2 : Measurable (fun U : LinkConfig N (2 * M) => U (x + stepDir (2 * M) μ) ν) :=
       (measurable_pi_apply _).comp (measurable_pi_apply _)
-    have m3 : Measurable (fun U : LinkConfig N (2 * M) => (U (x + stepDir (2 * M) ν) μ)⁻¹) :=
-      ((measurable_pi_apply _).comp (measurable_pi_apply _)).inv
-    have m4 : Measurable (fun U : LinkConfig N (2 * M) => (U x ν)⁻¹) :=
-      ((measurable_pi_apply _).comp (measurable_pi_apply _)).inv
+    have m3' : Measurable (fun U : LinkConfig N (2 * M) => U (x + stepDir (2 * M) ν) μ) :=
+      (measurable_pi_apply μ).comp (measurable_pi_apply (x + stepDir (2 * M) ν))
+    have m3 : Measurable (fun U : LinkConfig N (2 * M) => (U (x + stepDir (2 * M) ν) μ)⁻¹) := m3'.inv
+    have m4' : Measurable (fun U : LinkConfig N (2 * M) => U x ν) :=
+      (measurable_pi_apply ν).comp (measurable_pi_apply x)
+    have m4 : Measurable (fun U : LinkConfig N (2 * M) => (U x ν)⁻¹) := m4'.inv
     have mprod := ((m1.mul m2).mul m3).mul m4
     change Measurable (fun U : LinkConfig N (2 * M) =>
       Matrix.trace ((plaquetteHolonomy U x μ ν : GaugeGroup N) :
@@ -262,7 +307,7 @@ theorem gluePartitionFn_pos (N M : ℕ) [NeZero N] [NeZero M] {β : ℝ} (hβ : 
   have h_int_outer : Integrable (fun p : HalfVar N M =>
       ∫ q, Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) ∂μ) μ := by
     refine Integrable.of_bound ?_ 1 (Filter.Eventually.of_forall fun p => ?_)
-    · exact (h_meas.integral_prod_right').aestronglyMeasurable
+    · exact h_meas.stronglyMeasurable.integral_prod_right'.aestronglyMeasurable
     · rw [Real.norm_of_nonneg (integral_nonneg fun _ => (Real.exp_pos _).le)]
       have h1 : (1 : ℝ) = ∫ _q : HalfVar N M, (1 : ℝ) ∂μ := by simp [integral_const]
       rw [h1]
@@ -275,13 +320,13 @@ theorem gluePartitionFn_pos (N M : ℕ) [NeZero N] [NeZero M] {β : ℝ} (hβ : 
   exact integral_mono (integrable_const _) h_int_outer h_inner_lb
 
 /-- Positive half-torus physical coordinate `(a * ((x 0).val + 1), a * centeredCoord ...)`. -/
-def posHalfLatSite (M : ℕ) (a : ℝ) (x : Lat4 (2 * M)) : Spacetime4 :=
+def posHalfLatSite (M : ℕ) [NeZero M] (a : ℝ) (x : Lat4 (2 * M)) : ContinuumInterfaces.Spacetime4 :=
   (WithLp.equiv 2 (Fin 4 → ℝ)).symm
     (Fin.cons (a * (((x 0).val : ℝ) + 1))
       (fun j : Fin 3 => a * (centeredCoord (2 * M) (x j.succ) : ℝ)))
 
 /-- Evaluation of a positive-time `PosSchwartzSubmodule n` element on `p : HalfVar N M`. -/
-noncomputable def evalPosLat (N M : ℕ) [NeZero N] (a Z_ren : ℝ) :
+noncomputable def evalPosLat (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ) :
     ∀ n : ℕ, PosSchwartzSubmodule n → HalfVar N M → ℂ :=
   fun n fn p =>
     letI := Classical.propDecidable
@@ -292,75 +337,78 @@ noncomputable def evalPosLat (N M : ℕ) [NeZero N] (a Z_ren : ℝ) :
             (∏ k : Fin n, (spatialPlaqDensity N (2 * M) p.1 (xs k) : ℂ))
         else 0
 
-theorem evalPosLat_vac (N M : ℕ) [NeZero N] (a Z_ren : ℝ) (p : HalfVar N M) :
+theorem evalPosLat_vac (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ) (p : HalfVar N M) :
     evalPosLat N M a Z_ren 0 ⟨1, Or.inl rfl⟩ p = 1 := by
   unfold evalPosLat
   simp [Finset.univ_unique]
 
 /-- Evaluation of any `F : BorchersPos` on `HalfVar N M`. -/
-noncomputable def evalPosBorchers (N M : ℕ) [NeZero N] (a Z_ren : ℝ)
+noncomputable def evalPosBorchers (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ)
     (F : BorchersPos) (p : HalfVar N M) : ℂ :=
   F.sum fun n fn => evalPosLat N M a Z_ren n fn p
 
-theorem evalPosBorchers_vac (N M : ℕ) [NeZero N] (a Z_ren : ℝ) (p : HalfVar N M) :
+theorem evalPosBorchers_vac (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ) (p : HalfVar N M) :
     evalPosBorchers N M a Z_ren borchersVac p = 1 := by
   unfold evalPosBorchers borchersVac
   rw [DFinsupp.sum_single_index]
   · exact evalPosLat_vac N M a Z_ren p
   · simp [evalPosLat]
 
-theorem evalPosBorchers_add (N M : ℕ) [NeZero N] (a Z_ren : ℝ)
+theorem evalPosBorchers_add (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ)
     (F G : BorchersPos) (p : HalfVar N M) :
     evalPosBorchers N M a Z_ren (F + G) p =
       evalPosBorchers N M a Z_ren F p + evalPosBorchers N M a Z_ren G p := by
   unfold evalPosBorchers
-  rw [DFinsupp.sum_add_index']
+  rw [DFinsupp.sum_add_index]
   · intro n; simp [evalPosLat]
   · intro n a₁ b₁
     unfold evalPosLat
-    simp only [AddSubmonoidClass.coe_add, SchwartzMap.add_apply, add_mul]
+    simp only [Submodule.coe_add, SchwartzMap.add_apply, add_mul]
     rw [← mul_add, ← Finset.sum_add_distrib]
     congr 1
     refine Finset.sum_congr rfl fun xs _ => ?_
     split_ifs <;> simp
 
-theorem evalPosBorchers_smul (N M : ℕ) [NeZero N] (a Z_ren : ℝ)
+theorem evalPosBorchers_smul (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ)
     (c : ℂ) (F : BorchersPos) (p : HalfVar N M) :
     evalPosBorchers N M a Z_ren (c • F) p = c * evalPosBorchers N M a Z_ren F p := by
   unfold evalPosBorchers
   simp only [DFinsupp.sum]
   rw [Finset.mul_sum]
-  have h_sub : (c • F).support ⊆ F.support := DFinsupp.support_smul
+  have h_sub : (c • F).support ⊆ F.support := DFinsupp.support_smul c F
   rw [← Finset.sum_subset h_sub]
   · refine Finset.sum_congr rfl fun n _ => ?_
     simp only [DFinsupp.coe_smul, Pi.smul_apply]
     unfold evalPosLat
     simp only [SetLike.val_smul, SchwartzMap.smul_apply, smul_eq_mul]
-    have h_eq :
-        (∑ xs : Fin n → Lat4 (2 * M),
-          if (∀ k : Fin n, ((xs k) 0).val < M) then
-            (c * (F n).1 (fun k => posHalfLatSite M a (xs k))) *
-              (∏ k : Fin n, (spatialPlaqDensity N (2 * M) p.1 (xs k) : ℂ))
-          else 0) =
-        c * ∑ xs : Fin n → Lat4 (2 * M),
-          if (∀ k : Fin n, ((xs k) 0).val < M) then
-            (F n).1 (fun k => posHalfLatSite M a (xs k)) *
-              (∏ k : Fin n, (spatialPlaqDensity N (2 * M) p.1 (xs k) : ℂ))
-          else 0 := by
-      rw [Finset.mul_sum]
-      refine Finset.sum_congr rfl fun xs _ => ?_
-      split_ifs <;> ring
-    rw [h_eq]; ring
+    rw [Finset.mul_sum, ← mul_assoc, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun xs _ => ?_
+    by_cases h_cond : (∀ k : Fin n, ((xs k) 0).val < M)
+    · simp [h_cond]; ring
+    · simp [h_cond]
   · intro n _ hn
-    have hn0 : (c • F) n = 0 := DFinsupp.not_mem_support_iff.mp hn
-    simp [hn0, evalPosLat]
+    have hn0 : c • F n = 0 := by
+      by_contra h_ne
+      exact hn (DFinsupp.mem_support_iff.mpr (by simpa [DFinsupp.coe_smul, Pi.smul_apply] using h_ne))
+    rcases smul_eq_zero.mp hn0 with hc | hFn
+    · simp [hc, evalPosLat]
+    · simp [hFn, evalPosLat]
 
-private lemma evalPosBorchers_measurable (N M : ℕ) [NeZero N] (a Z_ren : ℝ) (F : BorchersPos) :
+private lemma evalPosBorchers_measurable (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ) (F : BorchersPos) :
     letI := borel (GaugeGroup N)
     Measurable (evalPosBorchers N M a Z_ren F) := by
   classical
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) :=
+    inferInstanceAs (SecondCountableTopology (Fin N → Fin N → ℂ))
+  haveI : SecondCountableTopology (GaugeGroup N) :=
+    Topology.IsInducing.secondCountableTopology
+      (⟨rfl⟩ : Topology.IsInducing (Subtype.val : GaugeGroup N → Matrix (Fin N) (Fin N) ℂ))
+  haveI : ContinuousInv (GaugeGroup N) :=
+    ⟨continuous_induced_rng.mpr (by
+      simpa only [Function.comp_def, fvb_gaugeGroup_coe_inv_star] using
+        continuous_star.comp continuous_subtype_val)⟩
   haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
   haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
   have hEntry := canonicalGaugeEntryMeasurable N
@@ -373,13 +421,15 @@ private lemma evalPosBorchers_measurable (N M : ℕ) [NeZero N] (a Z_ren : ℝ) 
     refine measurable_const.sub ((Complex.continuous_re.measurable.comp ?_).div_const _)
     unfold plaquetteHolonomy
     have ml1 : Measurable (fun p : HalfVar N M => p.1 x i.succ) :=
-      ((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst
+      (measurable_pi_apply i.succ).comp ((measurable_pi_apply x).comp measurable_fst)
     have ml2 : Measurable (fun p : HalfVar N M => p.1 (x + stepDir (2 * M) i.succ) j.succ) :=
-      ((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst
-    have ml3 : Measurable (fun p : HalfVar N M => (p.1 (x + stepDir (2 * M) j.succ) i.succ)⁻¹) :=
-      (((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst).inv
-    have ml4 : Measurable (fun p : HalfVar N M => (p.1 x j.succ)⁻¹) :=
-      (((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst).inv
+      (measurable_pi_apply j.succ).comp ((measurable_pi_apply (x + stepDir (2 * M) i.succ)).comp measurable_fst)
+    have ml3' : Measurable (fun p : HalfVar N M => p.1 (x + stepDir (2 * M) j.succ) i.succ) :=
+      (measurable_pi_apply i.succ).comp ((measurable_pi_apply (x + stepDir (2 * M) j.succ)).comp measurable_fst)
+    have ml3 : Measurable (fun p : HalfVar N M => (p.1 (x + stepDir (2 * M) j.succ) i.succ)⁻¹) := ml3'.inv
+    have ml4' : Measurable (fun p : HalfVar N M => p.1 x j.succ) :=
+      (measurable_pi_apply j.succ).comp ((measurable_pi_apply x).comp measurable_fst)
+    have ml4 : Measurable (fun p : HalfVar N M => (p.1 x j.succ)⁻¹) := ml4'.inv
     have mprod := ((ml1.mul ml2).mul ml3).mul ml4
     change Measurable (fun p : HalfVar N M =>
       Matrix.trace ((plaquetteHolonomy p.1 x i.succ j.succ : GaugeGroup N) :
@@ -394,19 +444,19 @@ private lemma evalPosBorchers_measurable (N M : ℕ) [NeZero N] (a Z_ren : ℝ) 
   · exact measurable_const.mul (Finset.measurable_prod _ fun k _ => h_site (xs k))
   · exact measurable_const
 
-private lemma evalPosBorchers_bounded (N M : ℕ) [NeZero N] (a Z_ren : ℝ) (F : BorchersPos) :
-    ∃ BF : ℝ, 0 ≤ BF ∧ ∀ p : HalfVar N M, ‖evalPosBorchers N M a Z_ren F p‖ ≤ BF := by
-  classical
-  let BF : ℝ := ∑ n ∈ F.support, ‖(Z_ren ^ n * a ^ (4 * n) : ℂ)‖ *
+private noncomputable def evalPosLatBound (M : ℕ) [NeZero M] (a Z_ren : ℝ)
+    (n : ℕ) (fn : PosSchwartzSubmodule n) : ℝ :=
+  letI := Classical.propDecidable
+  ‖(Z_ren ^ n * a ^ (4 * n) : ℂ)‖ *
     ∑ xs : Fin n → Lat4 (2 * M),
       if (∀ k : Fin n, ((xs k) 0).val < M) then
-        ‖(F n).1 (fun k => posHalfLatSite M a (xs k))‖ * (18 : ℝ) ^ n
+        ‖fn.1 (fun k => posHalfLatSite M a (xs k))‖ * (18 : ℝ) ^ n
       else 0
-  refine ⟨BF, Finset.sum_nonneg fun n _ => mul_nonneg (norm_nonneg _)
-    (Finset.sum_nonneg fun xs _ => by split_ifs <;> positivity), fun p => ?_⟩
-  dsimp [evalPosBorchers, DFinsupp.sum, BF]
-  refine le_trans (norm_sum_le _ _) (Finset.sum_le_sum fun n _ => ?_)
-  dsimp [evalPosLat]
+
+private lemma evalPosLat_norm_le (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ)
+    (n : ℕ) (fn : PosSchwartzSubmodule n) (p : HalfVar N M) :
+    ‖evalPosLat N M a Z_ren n fn p‖ ≤ evalPosLatBound M a Z_ren n fn := by
+  unfold evalPosLat evalPosLatBound
   rw [norm_mul]
   refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
   refine le_trans (norm_sum_le _ _) (Finset.sum_le_sum fun xs _ => ?_)
@@ -418,8 +468,17 @@ private lemma evalPosBorchers_bounded (N M : ℕ) [NeZero N] (a Z_ren : ℝ) (F 
           Finset.prod_le_prod (fun _ _ => norm_nonneg _) fun k _ => by
             rw [Complex.norm_real, Real.norm_of_nonneg (spatialPlaqDensity_bounds N (2 * M) p.1 _).1]
             exact (spatialPlaqDensity_bounds N (2 * M) p.1 _).2
-      _ = (18 : ℝ) ^ n := by simp [Finset.prod_const]
-  · simp
+      _ = (18 : ℝ) ^ n := by simp only [Finset.prod_const, Finset.card_fin]
+  · simp only [norm_zero, le_refl]
+
+private lemma evalPosBorchers_bounded (N M : ℕ) [NeZero N] [NeZero M] (a Z_ren : ℝ) (F : BorchersPos) :
+    ∃ BF : ℝ, 0 ≤ BF ∧ ∀ p : HalfVar N M, ‖evalPosBorchers N M a Z_ren F p‖ ≤ BF := by
+  refine ⟨∑ n ∈ F.support, evalPosLatBound M a Z_ren n (F n),
+    Finset.sum_nonneg fun n _ => ?_, fun p => ?_⟩
+  · unfold evalPosLatBound
+    exact mul_nonneg (norm_nonneg _) (Finset.sum_nonneg fun xs _ => by split_ifs <;> positivity)
+  · unfold evalPosBorchers DFinsupp.sum
+    exact le_trans (norm_sum_le _ _) (Finset.sum_le_sum fun n _ => evalPosLat_norm_le N M a Z_ren n (F n) p)
 
 private lemma latticeBorchers_integrable (N M : ℕ) [NeZero N] [NeZero M]
     (a : ℝ) {β : ℝ} (hβ : 0 ≤ β) (Z_ren : ℝ) (F G : BorchersPos) :
@@ -464,6 +523,15 @@ theorem latticeBorchersForm_nonneg (N M : ℕ) [NeZero N] [NeZero M]
     0 ≤ (latticeBorchersForm N M a β Z_ren F F).re := by
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) :=
+    inferInstanceAs (SecondCountableTopology (Fin N → Fin N → ℂ))
+  haveI : SecondCountableTopology (GaugeGroup N) :=
+    Topology.IsInducing.secondCountableTopology
+      (⟨rfl⟩ : Topology.IsInducing (Subtype.val : GaugeGroup N → Matrix (Fin N) (Fin N) ℂ))
+  haveI : ContinuousInv (GaugeGroup N) :=
+    ⟨continuous_induced_rng.mpr (by
+      simpa only [Function.comp_def, fvb_gaugeGroup_coe_inv_star] using
+        continuous_star.comp continuous_subtype_val)⟩
   haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
   haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
   haveI := halfVarHaarMeasure_isProbability N M
@@ -487,8 +555,20 @@ theorem latticeBorchersForm_vac (N M : ℕ) [NeZero N] [NeZero M]
       (∫ q : HalfVar N M, (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂(halfVarHaarMeasure N M)) =
       ((∫ q : HalfVar N M, Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) ∂(halfVarHaarMeasure N M) : ℝ) : ℂ) :=
     fun p => integral_ofReal
-  simp_rw [h_in]
-  rw [integral_ofReal]
+  have h_in_fn : (fun p : HalfVar N M =>
+      ∫ q : HalfVar N M, (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂(halfVarHaarMeasure N M)) =
+      fun p : HalfVar N M =>
+        ((∫ q : HalfVar N M, Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) ∂(halfVarHaarMeasure N M) : ℝ) : ℂ) :=
+    funext h_in
+  rw [h_in_fn]
+  have h_out : (∫ p : HalfVar N M,
+      ((∫ q : HalfVar N M, Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) ∂(halfVarHaarMeasure N M) : ℝ) : ℂ)
+      ∂(halfVarHaarMeasure N M)) =
+      ((∫ p : HalfVar N M,
+        ∫ q : HalfVar N M, Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) ∂(halfVarHaarMeasure N M)
+        ∂(halfVarHaarMeasure N M) : ℝ) : ℂ) :=
+    integral_ofReal
+  rw [h_out]
   change ((gluePartitionFn N M β)⁻¹ : ℂ) * (gluePartitionFn N M β : ℂ) = 1
   exact_mod_cast inv_mul_cancel₀ hZ.ne'
 
@@ -556,7 +636,7 @@ theorem latticeBorchersForm_sesquilinear (N M : ℕ) [NeZero N] [NeZero M]
         funext q; rw [evalPosBorchers_add, star_add]; ring
       rw [h_eq]
       exact integral_add (h_int_p F₁ G p) (h_int_p F₂ G p)
-    simp_rw [h_in]
+    rw [show (fun p => _) = _ from funext h_in]
     rw [integral_add (h_int_outer F₁ G) (h_int_outer F₂ G), mul_add]
   · intro c F G
     unfold latticeBorchersForm wilsonGlueRPForm
@@ -574,7 +654,7 @@ theorem latticeBorchersForm_sesquilinear (N M : ℕ) [NeZero N] [NeZero M]
             (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ)) := by
         funext q; rw [evalPosBorchers_smul, star_mul]; ring
       rw [h_eq, integral_const_mul]
-    simp_rw [h_in]
+    rw [show (fun p => _) = _ from funext h_in]
     rw [integral_const_mul]
     ring
   · intro F G₁ G₂
@@ -597,7 +677,7 @@ theorem latticeBorchersForm_sesquilinear (N M : ℕ) [NeZero N] [NeZero M]
         funext q; rw [evalPosBorchers_add]; ring
       rw [h_eq]
       exact integral_add (h_int_p F G₁ p) (h_int_p F G₂ p)
-    simp_rw [h_in]
+    rw [show (fun p => _) = _ from funext h_in]
     rw [integral_add (h_int_outer F G₁) (h_int_outer F G₂), mul_add]
   · intro c F G
     unfold latticeBorchersForm wilsonGlueRPForm
@@ -615,7 +695,7 @@ theorem latticeBorchersForm_sesquilinear (N M : ℕ) [NeZero N] [NeZero M]
             (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ)) := by
         funext q; rw [evalPosBorchers_smul]; ring
       rw [h_eq, integral_const_mul]
-    simp_rw [h_in]
+    rw [show (fun p => _) = _ from funext h_in]
     rw [integral_const_mul]
     ring
 
@@ -627,14 +707,25 @@ theorem latticeBorchersForm_herm (N M : ℕ) [NeZero N] [NeZero M]
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
   haveI := halfVarHaarMeasure_isProbability N M
   unfold latticeBorchersForm wilsonGlueRPForm
-  rw [star_mul, Complex.star_def, Complex.conj_ofReal]
+  rw [star_mul, Complex.star_def, map_inv₀, Complex.conj_ofReal, mul_comm _ ((gluePartitionFn N M β : ℂ)⁻¹)]
   congr 1
-  rw [integral_integral_swap (latticeBorchers_integrable N M a hβ Z_ren G F)]
+  have h_sw :
+      (∫ p : HalfVar N M, ∫ q : HalfVar N M,
+          (starRingEnd ℂ) (evalPosBorchers N M a Z_ren G p) * evalPosBorchers N M a Z_ren F q *
+            (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂(halfVarHaarMeasure N M) ∂(halfVarHaarMeasure N M)) =
+        (∫ q : HalfVar N M, ∫ p : HalfVar N M,
+          (starRingEnd ℂ) (evalPosBorchers N M a Z_ren G p) * evalPosBorchers N M a Z_ren F q *
+            (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂(halfVarHaarMeasure N M) ∂(halfVarHaarMeasure N M)) := by
+    simpa only [Complex.star_def] using
+      integral_integral_swap (latticeBorchers_integrable N M a hβ Z_ren G F)
+  rw [h_sw]
   rw [← integral_conj]
   refine integral_congr_ae (Filter.Eventually.of_forall fun p => ?_)
+  dsimp only
   rw [← integral_conj]
   refine integral_congr_ae (Filter.Eventually.of_forall fun q => ?_)
-  rw [wilsonAction_glueConfig_symm N M β p q, star_mul, star_mul, star_star, Complex.conj_ofReal]
+  dsimp only
+  rw [wilsonAction_glueConfig_symm N M β p q, map_mul, map_mul, Complex.conj_conj, Complex.conj_ofReal]
   ring
 
 /-- **Unconditional Finite-Volume Cauchy–Schwarz Inequality** on `BorchersPos`. -/
@@ -650,9 +741,10 @@ theorem latticeBorchersForm_cauchy_schwarz (N M : ℕ) [NeZero N] [NeZero M]
            star v * u * star (B F G) + star v * v * B G G).re := by
     intro u v
     have h_nn := latticeBorchersForm_nonneg N M a hβ Z_ren (u • F + v • G)
-    change 0 ≤ (B (u • F + v • G) (u • F + v • G)).re at h_nn
-    rw [h_add1, h_add2, h_add2, h_smul1, h_smul1, h_smul2, h_smul2, h_smul2, h_smul2,
+    simp only [h_add1, h_add2, h_smul1, h_smul2,
       latticeBorchersForm_herm N M a hβ Z_ren F G] at h_nn
+    change 0 ≤ (star u * u * B F F + star u * v * B F G +
+         star v * u * star (B F G) + star v * v * B G G).re at *
     convert h_nn using 2
     ring
   have hFF_nn : 0 ≤ (B F F).re := latticeBorchersForm_nonneg N M a hβ Z_ren F
@@ -673,14 +765,15 @@ theorem latticeBorchersForm_cauchy_schwarz (N M : ℕ) [NeZero N] [NeZero M]
       have h1 : star ((r : ℂ) * B F G) * ((r : ℂ) * B F G) =
           (((r * ‖B F G‖) ^ 2 : ℝ) : ℂ) := by
         rw [star_mul, Complex.star_def, Complex.conj_ofReal]
-        calc ((r : ℂ) * star (B F G)) * ((r : ℂ) * B F G)
+        calc (star (B F G) * (r : ℂ)) * ((r : ℂ) * B F G)
             = ((r : ℂ) * (r : ℂ)) * (star (B F G) * B F G) := by ring
           _ = ((r ^ 2 : ℝ) : ℂ) * ((‖B F G‖ ^ 2 : ℝ) : ℂ) := by
               rw [h_nsq_self]; push_cast; ring
           _ = (((r * ‖B F G‖) ^ 2 : ℝ) : ℂ) := by push_cast; ring
       have h2 : star ((r : ℂ) * B F G) * 1 * B F G = ((r * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by
-        rw [star_mul, Complex.star_def, Complex.conj_ofReal, mul_one, mul_assoc, h_nsq_self]
-        push_cast; rfl
+        rw [star_mul, Complex.star_def, Complex.conj_ofReal, mul_one]
+        calc (star (B F G) * (r : ℂ)) * B F G = (r : ℂ) * (star (B F G) * B F G) := by ring
+          _ = ((r * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by rw [h_nsq_self]; push_cast; rfl
       have h3 : star (1 : ℂ) * ((r : ℂ) * B F G) * star (B F G) =
           ((r * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by
         rw [star_one, one_mul, mul_assoc, mul_comm (B F G), h_nsq_self]
@@ -690,7 +783,7 @@ theorem latticeBorchersForm_cauchy_schwarz (N M : ℕ) [NeZero N] [NeZero M]
         Complex.ofReal_re] at hq
       have hFG2 : 0 < 2 * ‖B F G‖ ^ 2 := by positivity
       have hr : 2 * (r * ‖B F G‖ ^ 2) = -((B G G).re + 1) := by
-        dsimp [r]; field_simp [hFG2.ne']; ring
+        dsimp [r]; field_simp [hFG2.ne']
       linarith
   · have hFF_pos : 0 < (B F F).re := lt_of_le_of_ne hFF_nn (Ne.symm hFF0)
     have hq := h_quad (B F G) (-((B F F).re : ℂ))
