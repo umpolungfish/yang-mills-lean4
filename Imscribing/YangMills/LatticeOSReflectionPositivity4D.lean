@@ -120,7 +120,7 @@ private lemma reflectSite_zero_val {M : ℕ} [NeZero M] (x : Lat4 (2 * M)) :
     zmod_2m_self _ hsub
   simp only [Nat.cast_add, Nat.cast_one, ZMod.natCast_zmod_val] at hz
   have heq : -(x 0 + 1) = (((2 * M - 1 - (x 0).val : ℕ) : ZMod (2 * M))) := by
-    linear_combination hz
+    linear_combination -hz
   rw [heq, ZMod.val_natCast_of_lt (by omega)]
 
 private lemma reflectSite_sub_step0_zero_val {M : ℕ} [NeZero M] (x : Lat4 (2 * M))
@@ -134,7 +134,7 @@ private lemma reflectSite_sub_step0_zero_val {M : ℕ} [NeZero M] (x : Lat4 (2 *
     zmod_2m_self _ hsub
   simp only [Nat.cast_add, Nat.cast_ofNat, ZMod.natCast_zmod_val] at hz
   have heq : -(x 0 + 1) - 1 = (((2 * M - 2 - (x 0).val : ℕ) : ZMod (2 * M))) := by
-    linear_combination hz
+    linear_combination -hz
   rw [heq, ZMod.val_natCast_of_lt (by omega)]
 
 private lemma spatial_step_zero_eq {M : ℕ} (x : Lat4 (2 * M)) {ν : Fin 4} (hν : ν ≠ 0) :
@@ -181,7 +181,7 @@ private lemma reflectSite_sub_step0_invol {M : ℕ} (x : Lat4 (2 * M)) :
     reflectSite (2 * M) (reflectSite (2 * M) x - stepDir (2 * M) 0) - stepDir (2 * M) 0 = x := by
   ext ν
   by_cases hν : ν = 0
-  · subst hν; simp [reflectSite, stepDir]; ring
+  · subst hν; simp [reflectSite, stepDir]
   · simp [reflectSite, stepDir, hν]
 
 private lemma reflectSite_add_step_spatial {M : ℕ} (x : Lat4 (2 * M)) {ν : Fin 4} (hν : ν ≠ 0) :
@@ -240,7 +240,7 @@ private lemma reflectSite_sub_step0_cutTop_val {M : ℕ} [NeZero M] (x : Lat4 (2
   have hz2 : (((2 * M - 1 + 1 : ℕ)) : ZMod (2 * M)) = 0 := zmod_2m_self _ hsub2
   simp only [Nat.cast_add, Nat.cast_one] at hz2
   have heq : -(x 0 + 1) - 1 = (((2 * M - 1 : ℕ) : ZMod (2 * M))) := by
-    linear_combination hz2 - h1
+    linear_combination -hz2 - h1
   rw [heq, ZMod.val_natCast_of_lt (by omega)]
 
 private lemma reflectPlaq_neg_iff_pos {M : ℕ} [NeZero M] (t : Lat4 (2 * M) × Fin 4 × Fin 4) :
@@ -256,6 +256,7 @@ private lemma reflectPlaq_neg_iff_pos {M : ℕ} [NeZero M] (t : Lat4 (2 * M) × 
       simp only [hν, ne_eq, not_false_eq_true, and_self, ↓reduceIte, true_or, true_and]
       by_cases htop : (x 0).val = 2 * M - 1
       · have h0 := reflectSite_sub_step0_cutTop_val x htop
+        simp only [Pi.sub_apply] at h0
         simp [htop, h0]
       · have hval := reflectSite_sub_step0_zero_val x (by omega)
         rw [hval]
@@ -267,19 +268,20 @@ private lemma reflectPlaq_neg_iff_pos {M : ℕ} [NeZero M] (t : Lat4 (2 * M) × 
       have hx_ne : (x 0).val ≠ 2 * M - 1 := fun h => hcut ⟨Or.inl ⟨rfl, hν⟩, Or.inr h⟩
       have hx_neM : (x 0).val ≠ M - 1 := fun h => hcut ⟨Or.inl ⟨rfl, hν⟩, Or.inl h⟩
       have hval := reflectSite_sub_step0_zero_val x (by omega)
-      dsimp [isNegPlaq, isPosPlaq, reflectPlaq]
-      simp only [hν, ne_eq, not_false_eq_true, and_self, ↓reduceIte, hcut, hcut',
-        not_false_eq_true, true_and]
+      simp only [isNegPlaq, isPosPlaq, hcut, hcut', not_false_eq_true, true_and]
+      dsimp [reflectPlaq]
+      simp only [hν, ne_eq, not_false_eq_true, and_self, ↓reduceIte]
       rw [hval]
-      omega
+      constructor <;> intro h <;> omega
   · by_cases h2 : ν = 0 ∧ μ ≠ 0
     · obtain ⟨rfl, hμ⟩ := h2
       have h1' : ¬ (μ = 0 ∧ (0 : Fin 4) ≠ 0) := fun h => hμ h.1
       have hc_iff : isCutPlaq M (reflectPlaq M (x, μ, 0)) ↔ isCutPlaq M (x, μ, 0) := by
         dsimp [reflectPlaq, isCutPlaq]
-        simp only [h1', ↓reduceIte, hμ, ne_eq, not_false_eq_true, and_self, or_true, true_and]
+        simp only [h1', false_and, ↓reduceIte, hμ, ne_eq, not_false_eq_true, and_self, or_true, true_and]
         by_cases htop : (x 0).val = 2 * M - 1
         · have h0 := reflectSite_sub_step0_cutTop_val x htop
+          simp only [Pi.sub_apply] at h0
           simp [htop, h0]
         · have hval := reflectSite_sub_step0_zero_val x (by omega)
           rw [hval]
@@ -291,11 +293,11 @@ private lemma reflectPlaq_neg_iff_pos {M : ℕ} [NeZero M] (t : Lat4 (2 * M) × 
         have hx_ne : (x 0).val ≠ 2 * M - 1 := fun h => hcut ⟨Or.inr ⟨rfl, hμ⟩, Or.inr h⟩
         have hx_neM : (x 0).val ≠ M - 1 := fun h => hcut ⟨Or.inr ⟨rfl, hμ⟩, Or.inl h⟩
         have hval := reflectSite_sub_step0_zero_val x (by omega)
-        dsimp [isNegPlaq, isPosPlaq, reflectPlaq]
-        simp only [h1', ↓reduceIte, hμ, ne_eq, not_false_eq_true, and_self, hcut, hcut',
-          not_false_eq_true, true_and]
+        simp only [isNegPlaq, isPosPlaq, hcut, hcut', not_false_eq_true, true_and]
+        dsimp [reflectPlaq]
+        simp only [h1', false_and, ↓reduceIte, hμ, ne_eq, not_false_eq_true, and_self]
         rw [hval]
-        omega
+        constructor <;> intro h <;> omega
     · have hcut : ¬ isCutPlaq M (x, μ, ν) := by
         rintro ⟨ha | hb, _⟩
         · exact h1 ha
@@ -304,12 +306,13 @@ private lemma reflectPlaq_neg_iff_pos {M : ℕ} [NeZero M] (t : Lat4 (2 * M) × 
         dsimp [reflectPlaq, isCutPlaq]
         simp only [h1, h2, ↓reduceIte]
         rintro ⟨ha | hb, _⟩
-        · exact h1 ha
-        · exact h2 hb
-      dsimp [isNegPlaq, isPosPlaq, reflectPlaq]
-      simp only [h1, h2, ↓reduceIte, hcut, hcut', not_false_eq_true, true_and]
+        · exact ha.elim
+        · exact hb.elim
+      simp only [isNegPlaq, isPosPlaq, hcut, hcut', not_false_eq_true, true_and]
+      dsimp [reflectPlaq]
+      simp only [h1, h2, ↓reduceIte]
       rw [reflectSite_zero_val]
-      omega
+      constructor <;> intro h <;> omega
 
 private lemma realTrace_plaquette_linkReflect {N M : ℕ} [NeZero N] [NeZero M]
     (U : LinkConfig N (2 * M)) (t : Lat4 (2 * M) × Fin 4 × Fin 4) :
@@ -344,7 +347,6 @@ private lemma realTrace_plaquette_linkReflect {N M : ℕ} [NeZero N] [NeZero M]
         (U y 0)⁻¹ * (U y ν * U (y + stepDir (2 * M) ν) 0 * (U (y + stepDir (2 * M) 0) ν)⁻¹) := by
       simp only [mul_assoc]
     rw [hcomm, realTrace_mul_comm]
-    simp only [mul_assoc]
   · by_cases h2 : ν = 0 ∧ μ ≠ 0
     · obtain ⟨rfl, hμ⟩ := h2
       have h1' : ¬ (μ = 0 ∧ (0 : Fin 4) ≠ 0) := fun h => hμ h.1
@@ -375,6 +377,7 @@ private lemma realTrace_plaquette_linkReflect {N M : ℕ} [NeZero N] [NeZero M]
       rw [h_eq]
       have hflip : plaquetteHolonomy U y μ 0 = (plaquetteHolonomy U y 0 μ)⁻¹ := by
         simp only [plaquetteHolonomy, mul_inv_rev, inv_inv, mul_assoc]
+      simp only [false_and, ↓reduceIte]
       rw [hflip, realTrace_inv]
     · dsimp [reflectPlaq]
       simp only [h1, h2, ↓reduceIte]
@@ -412,6 +415,7 @@ private lemma glueConfig_posPlaq_eq {N M : ℕ} [NeZero N] [NeZero M]
   have hM : 0 < M := NeZero.pos M
   rcases t with ⟨x, μ, ν⟩
   rcases ht with ⟨hncut, hx⟩
+  dsimp only at hncut hx
   by_cases hμν : μ = ν
   · subst hμν; simp [plaquetteHolonomy]
   · by_cases h1 : μ = 0 ∧ ν ≠ 0
@@ -419,7 +423,7 @@ private lemma glueConfig_posPlaq_eq {N M : ℕ} [NeZero N] [NeZero M]
       have hx_lt : (x 0).val < M - 1 := by
         by_contra hge
         apply hncut
-        exact ⟨Or.inl ⟨rfl, hν⟩, Or.inl (by omega)⟩
+        exact ⟨Or.inl ⟨rfl, hν⟩, Or.inl (by dsimp only; omega)⟩
       have h0_lt : ((x + stepDir (2 * M) 0) 0).val < M := by
         simp only [stepDir, Pi.add_apply, ↓reduceIte]
         have hlt : (x 0).val + 1 < 2 * M := by omega
@@ -439,7 +443,7 @@ private lemma glueConfig_posPlaq_eq {N M : ℕ} [NeZero N] [NeZero M]
         have hx_lt : (x 0).val < M - 1 := by
           by_contra hge
           apply hncut
-          exact ⟨Or.inr ⟨rfl, hμ⟩, Or.inl (by omega)⟩
+          exact ⟨Or.inr ⟨rfl, hμ⟩, Or.inl (by dsimp only; omega)⟩
         have h0_lt : ((x + stepDir (2 * M) 0) 0).val < M := by
           simp only [stepDir, Pi.add_apply, ↓reduceIte]
           have hlt : (x 0).val + 1 < 2 * M := by omega
@@ -472,10 +476,11 @@ private lemma glueConfig_negPlaq_eq {N M : ℕ} [NeZero N] [NeZero M]
   have hM : 0 < M := NeZero.pos M
   rcases t with ⟨x, μ, ν⟩
   rcases ht with ⟨hncut, hx⟩
+  dsimp only at hncut hx
   have hneg_eval : ∀ y α, IsNegLink M y α → glueConfig p q y α = linkReflect q.1 y α := by
     intro y α hy
     have hnp : ¬ IsPosLink M y α := fun h => absurd h.1 (not_lt.mpr hy.1)
-    have hncm : ¬ IsCutLinkMid M y α := fun ⟨_, heq⟩ => by omega
+    have hncm : ¬ IsCutLinkMid M y α := fun ⟨_, heq⟩ => by have := hy.1; omega
     have hnct : ¬ IsCutLinkTop M y α := fun ⟨h0, heq⟩ => hy.2 h0 heq
     simp only [glueConfig, hnp, hncm, hnct, ↓reduceIte]
   by_cases hμν : μ = ν
@@ -486,7 +491,7 @@ private lemma glueConfig_negPlaq_eq {N M : ℕ} [NeZero N] [NeZero M]
         have hlt := ZMod.val_lt (x 0)
         by_contra hge
         apply hncut
-        exact ⟨Or.inl ⟨rfl, hν⟩, Or.inr (by omega)⟩
+        exact ⟨Or.inl ⟨rfl, hν⟩, Or.inr (by dsimp only; omega)⟩
       have h0_ge : M ≤ ((x + stepDir (2 * M) 0) 0).val := by
         simp only [stepDir, Pi.add_apply, ↓reduceIte]
         have hlt : (x 0).val + 1 < 2 * M := by omega
@@ -508,7 +513,7 @@ private lemma glueConfig_negPlaq_eq {N M : ℕ} [NeZero N] [NeZero M]
           have hlt := ZMod.val_lt (x 0)
           by_contra hge
           apply hncut
-          exact ⟨Or.inr ⟨rfl, hμ⟩, Or.inr (by omega)⟩
+          exact ⟨Or.inr ⟨rfl, hμ⟩, Or.inr (by dsimp only; omega)⟩
         have h0_ge : M ≤ ((x + stepDir (2 * M) 0) 0).val := by
           simp only [stepDir, Pi.add_apply, ↓reduceIte]
           have hlt : (x 0).val + 1 < 2 * M := by omega
@@ -625,7 +630,7 @@ private lemma glueConfig_cutPlaq_eq {N M : ℕ} [NeZero N] [NeZero M]
     rw [hflip, realTrace_inv, h_0ν μ hμ0 htime]
     simp only [cutAmp, hμ0, ↓reduceIte]
 
-private noncomputable def posAction (N M : ℕ) [NeZero N] (β : ℝ) (p : HalfVar N M) : ℝ :=
+private noncomputable def posAction (N M : ℕ) [NeZero N] [NeZero M] (β : ℝ) (p : HalfVar N M) : ℝ :=
   letI := Classical.propDecidable
   β * ∑ t : Lat4 (2 * M) × Fin 4 × Fin 4,
     if isPosPlaq M t then 1 - realTrace (plaquetteHolonomy p.1 t.1 t.2.1 t.2.2) / (N : ℝ) else 0
@@ -649,8 +654,6 @@ private lemma wilsonAction_glue_split {N M : ℕ} [NeZero N] [NeZero M] (β : �
       β * ((Finset.univ.filter (isCutPlaq M)).card : ℝ) -
       (β / (N : ℝ)) * ∑ t ∈ Finset.univ.filter (isCutPlaq M),
         realTrace (cutAmp t.1 t.2.1 t.2.2 p * (cutAmp t.1 t.2.1 t.2.2 q)⁻¹) := by
-  classical
-  haveI : NeZero (2 * M) := zmod_2m_neZero M
   let term : LinkConfig N (2 * M) → Lat4 (2 * M) × Fin 4 × Fin 4 → ℝ := fun U t =>
     1 - realTrace (plaquetteHolonomy U t.1 t.2.1 t.2.2) / (N : ℝ)
   have h_w : wilsonAction N (2 * M) β (glueConfig p q) =
@@ -660,7 +663,6 @@ private lemma wilsonAction_glue_split {N M : ℕ} [NeZero N] [NeZero M] (β : �
     rw [Fintype.sum_prod_type]
     refine Finset.sum_congr rfl fun x _ => ?_
     rw [Fintype.sum_prod_type]
-    rfl
   have h_part :
       (∑ t : Lat4 (2 * M) × Fin 4 × Fin 4, term (glueConfig p q) t) =
       (∑ t : Lat4 (2 * M) × Fin 4 × Fin 4, if isPosPlaq M t then term (glueConfig p q) t else 0) +
@@ -719,7 +721,10 @@ private lemma wilsonAction_glue_split {N M : ℕ} [NeZero N] [NeZero M] (β : �
       · have hnpos : ¬ isPosPlaq M (reflectPlaq M t) := fun h => hneg (hp_iff.mp h)
         simp [hneg, hnpos]
     rw [h_eq1, h_eq2]
-    rfl
+    unfold posAction
+    congr 1
+    refine Finset.sum_congr rfl fun t _ => ?_
+    split_ifs <;> rfl
   have h_cut_mul :
       β * (∑ t : Lat4 (2 * M) × Fin 4 × Fin 4, if isCutPlaq M t then term (glueConfig p q) t else 0) =
       β * ((Finset.univ.filter (isCutPlaq M)).card : ℝ) -
@@ -751,7 +756,6 @@ private lemma sum_range_hasDerivAt (n : ℕ) (t : ℝ) :
     rw [Finset.sum_range_succ']
     simp [add_comm]
   rw [h_eq]
-  have h0 : HasDerivAt (fun _ : ℝ => (1 : ℝ)) 0 t := hasDerivAt_const t _
   have hs : HasDerivAt
       (fun y : ℝ => ∑ k ∈ Finset.range n, y ^ (k + 1) / ((k + 1).factorial : ℝ))
       (∑ k ∈ Finset.range n, t ^ k / (k.factorial : ℝ)) t := by
@@ -762,7 +766,7 @@ private lemma sum_range_hasDerivAt (n : ℕ) (t : ℝ) :
     push_cast
     have hne : ((k : ℝ) + 1) ≠ 0 := by positivity
     field_simp [hne]
-  simpa using h0.add hs
+  exact hs.const_add (1 : ℝ)
 
 private lemma exp_rem_nonneg (n : ℕ) :
     ∀ t : ℝ, 0 ≤ t → ∑ k ∈ Finset.range n, t ^ k / (k.factorial : ℝ) ≤ Real.exp t := by
@@ -821,10 +825,11 @@ private lemma exp_taylor_remainder_bound :
         have := (hasDerivAt_pow (n + 1) t).div_const (((n + 1 : ℕ) : ℝ))
         convert this using 1
         have hne : ((n + 1 : ℕ) : ℝ) ≠ 0 := by positivity
+        simp only [Nat.add_sub_cancel]
         field_simp [hne]
       have hsub := intervalIntegral.integral_eq_sub_of_hasDerivAt (a := 0) (b := b)
         (fun t _ => hp t) (Continuous.intervalIntegrable (continuous_pow n) 0 b)
-      simpa [zero_pow (Nat.succ_ne_zero n)] using hsub.symm
+      rw [hsub, zero_pow (Nat.succ_ne_zero n), zero_div, sub_zero]
     by_cases hx0 : 0 ≤ x
     · have hbound : ∀ t ∈ Set.Icc (0 : ℝ) x,
           ‖Real.exp t - ∑ k ∈ Finset.range n, t ^ k / (k.factorial : ℝ)‖ ≤
@@ -833,21 +838,22 @@ private lemma exp_taylor_remainder_bound :
         refine le_trans (ih t) ?_
         rw [abs_of_nonneg ht.1]
         have h1 : Real.exp t ≤ Real.exp |x| := Real.exp_le_exp.mpr (le_trans ht.2 (le_abs_self x))
-        gcongr
+        exact div_le_div_of_nonneg_right
+          (mul_le_mul_of_nonneg_right h1 (pow_nonneg ht.1 n)) (Nat.cast_nonneg _)
       have h_norm : ‖∫ t in (0 : ℝ)..x,
           (Real.exp t - ∑ k ∈ Finset.range n, t ^ k / (k.factorial : ℝ))‖ ≤
           ∫ t in (0 : ℝ)..x, Real.exp |x| * t ^ n / (n.factorial : ℝ) := by
         refine intervalIntegral.norm_integral_le_of_norm_le hx0 ?_
           (Continuous.intervalIntegrable (by continuity) 0 x)
-        filter_upwards [MeasureTheory.ae_restrict_mem measurableSet_Ioc] with t ht
+        refine Filter.Eventually.of_forall fun t ht => ?_
         exact hbound t ⟨ht.1.le, ht.2⟩
       refine le_trans h_norm ?_
       have h_eq : (∫ t in (0 : ℝ)..x, Real.exp |x| * t ^ n / (n.factorial : ℝ)) =
           (Real.exp |x| / (n.factorial : ℝ)) * ∫ t in (0 : ℝ)..x, t ^ n := by
         rw [← intervalIntegral.integral_const_mul]
         refine intervalIntegral.integral_congr fun t _ => by ring
-      rw [h_eq, h_int_pow x, abs_of_nonneg hx0, Nat.factorial_succ]
-      push_cast; ring_nf; exact le_rfl
+      rw [h_eq, h_int_pow x, abs_of_nonneg hx0, Nat.factorial_succ, Nat.cast_mul]
+      apply le_of_eq; field_simp
     · have hxlt : x < 0 := lt_of_not_ge hx0
       have hbound : ∀ t ∈ Set.Icc x (0 : ℝ),
           ‖Real.exp t - ∑ k ∈ Finset.range n, t ^ k / (k.factorial : ℝ)‖ ≤
@@ -858,37 +864,25 @@ private lemma exp_taylor_remainder_bound :
         have h1 : Real.exp (-t) ≤ Real.exp |x| := by
           rw [abs_of_neg hxlt]
           exact Real.exp_le_exp.mpr (neg_le_neg ht.1)
-        gcongr
+        exact div_le_div_of_nonneg_right
+          (mul_le_mul_of_nonneg_right h1 (pow_nonneg (neg_nonneg.mpr ht.2) n)) (Nat.cast_nonneg _)
       rw [intervalIntegral.integral_symm x 0, norm_neg]
       have h_norm : ‖∫ t in x..(0 : ℝ),
           (Real.exp t - ∑ k ∈ Finset.range n, t ^ k / (k.factorial : ℝ))‖ ≤
           ∫ t in x..(0 : ℝ), Real.exp |x| * (-t) ^ n / (n.factorial : ℝ) := by
         refine intervalIntegral.norm_integral_le_of_norm_le hxlt.le ?_
           (Continuous.intervalIntegrable (by continuity) x 0)
-        filter_upwards [MeasureTheory.ae_restrict_mem measurableSet_Ioc] with t ht
+        refine Filter.Eventually.of_forall fun t ht => ?_
         exact hbound t ⟨ht.1.le, ht.2⟩
       refine le_trans h_norm ?_
-      have hp_neg : ∀ t : ℝ, HasDerivAt
-          (fun u : ℝ => -((-u) ^ (n + 1) / ((n + 1 : ℕ) : ℝ))) ((-t) ^ n) t := by
-        intro t
-        have h1 : HasDerivAt (fun u : ℝ => (-u) ^ (n + 1))
-            (((n + 1 : ℕ) : ℝ) * (-t) ^ n * (-1)) t := by
-          have := (hasDerivAt_pow (n + 1) (-t)).comp t (hasDerivAt_neg t)
-          simpa using this
-        have h2 := (h1.div_const (((n + 1 : ℕ) : ℝ))).neg
-        convert h2 using 1
-        have hne : ((n + 1 : ℕ) : ℝ) ≠ 0 := by positivity
-        field_simp [hne]
       have h_int_neg : ∫ t in x..(0 : ℝ), (-t) ^ n = (-x) ^ (n + 1) / ((n + 1 : ℕ) : ℝ) := by
-        have hsub := intervalIntegral.integral_eq_sub_of_hasDerivAt (a := x) (b := 0)
-          (fun t _ => hp_neg t) (Continuous.intervalIntegrable (by continuity) x 0)
-        simpa [zero_pow (Nat.succ_ne_zero n)] using hsub.symm
+        rw [intervalIntegral.integral_comp_neg (fun u : ℝ => u ^ n), neg_zero, h_int_pow (-x)]
       have h_eq : (∫ t in x..(0 : ℝ), Real.exp |x| * (-t) ^ n / (n.factorial : ℝ)) =
           (Real.exp |x| / (n.factorial : ℝ)) * ∫ t in x..(0 : ℝ), (-t) ^ n := by
         rw [← intervalIntegral.integral_const_mul]
         refine intervalIntegral.integral_congr fun t _ => by ring
-      rw [h_eq, h_int_neg, abs_of_neg hxlt, Nat.factorial_succ]
-      push_cast; ring_nf; exact le_rfl
+      rw [h_eq, h_int_neg, abs_of_neg hxlt, Nat.factorial_succ, Nat.cast_mul]
+      apply le_of_eq; field_simp
 
 private lemma tendsto_const_pow_div_factorial (C : ℝ) (hC : 0 ≤ C) :
     Filter.Tendsto (fun n : ℕ => C ^ n / (n.factorial : ℝ)) Filter.atTop (nhds 0) := by
@@ -904,8 +898,7 @@ private lemma tendsto_const_pow_div_factorial (C : ℝ) (hC : 0 ≤ C) :
       have ih' := ih (Nat.le_add_right N₀ m)
       have h1 : C ^ (N₀ + (m + 1)) / ((N₀ + (m + 1)).factorial : ℝ) =
           (C / ((N₀ + m + 1 : ℕ) : ℝ)) * (C ^ (N₀ + m) / ((N₀ + m).factorial : ℝ)) := by
-        rw [← add_assoc, pow_succ, Nat.factorial_succ]
-        push_cast
+        rw [← add_assoc, pow_succ, Nat.factorial_succ, Nat.cast_mul]
         ring
       have h2 : C / ((N₀ + m + 1 : ℕ) : ℝ) ≤ 1 / 2 := by
         have hpos : (0 : ℝ) < ((N₀ + m + 1 : ℕ) : ℝ) := by positivity
@@ -944,15 +937,18 @@ theorem wilson4D_reflection_positivity
   have h_cutAmp_meas : ∀ (x : Lat4 (2 * M)) (μ_d ν_d : Fin 4),
       Measurable (fun r : HalfVar N M => cutAmp x μ_d ν_d r) := by
     intro x μ_d ν_d
-    dsimp [cutAmp]
+    unfold cutAmp
     have hm_fst : ∀ y α, Measurable (fun r : HalfVar N M => r.1 y α) := fun y α =>
       ((measurable_pi_apply α).comp
         (measurable_pi_apply y : Measurable fun U : LinkConfig N (2 * M) => U y)).comp measurable_fst
     have hm_snd : ∀ y, Measurable (fun r : HalfVar N M => r.2 y) := fun y =>
       (measurable_pi_apply y).comp measurable_snd
-    split_ifs
-    · exact ((hm_snd _).mul (hm_fst _ _).inv).mul (hm_snd _).inv
-    · exact ((hm_snd _).mul (hm_fst _ _)).mul (hm_snd _).inv
+    set s : Fin 4 := if μ_d = 0 then ν_d else μ_d
+    by_cases hM1 : (x 0).val = M - 1
+    · simp only [hM1, ↓reduceIte]
+      exact ((hm_snd _).mul (hm_fst _ _).inv).mul (hm_snd _).inv
+    · simp only [hM1, ↓reduceIte]
+      exact ((hm_snd _).mul (hm_fst _ _)).mul (hm_snd _).inv
   have h_posAct_meas : Measurable (posAction N M β) := by
     unfold posAction
     refine measurable_const.mul (Finset.measurable_sum _ fun t _ => ?_)
@@ -970,6 +966,7 @@ theorem wilson4D_reflection_positivity
       change Measurable (fun r : HalfVar N M =>
         Matrix.trace ((plaquetteHolonomy r.1 t.1 t.2.1 t.2.2 : GaugeGroup N) :
           Matrix (Fin N) (Fin N) ℂ))
+      simp only [Matrix.trace, Matrix.diag_apply]
       exact Finset.measurable_sum _ fun k _ => (hEntry k k).comp mprod
     · exact measurable_const
   let G : HalfVar N M → ℂ := fun p => F p * (Real.exp (-posAction N M β p) : ℂ)
@@ -1073,8 +1070,8 @@ theorem wilson4D_reflection_positivity
       · exact ((measurable_const.mul hG_meas).mul
           (Complex.continuous_ofReal.measurable.comp
             (((hK_cut_meas.comp (measurable_const.prodMk measurable_id)).pow_const k).div_const _))).aestronglyMeasurable
-      · rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div,
-          abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ)), abs_pow]
+      · rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div, abs_pow,
+          abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ))]
         have h1 : ‖G p‖ * ‖G q‖ ≤ BF * BF :=
           mul_le_mul (hG_bound p) (hG_bound q) (norm_nonneg _) hBF
         have h2 : |K_cut p q| ^ k / (k.factorial : ℝ) ≤ C_bd ^ k / (k.factorial : ℝ) :=
@@ -1114,29 +1111,23 @@ theorem wilson4D_reflection_positivity
             dsimp [K_cut]
             rw [mul_pow, hsum p q]
             push_cast
-            rw [Finset.mul_sum]
+            rw [Finset.sum_div, Finset.mul_sum]
             refine Finset.sum_congr rfl fun i _ => ?_
             ring
           rw [h_q_eq, integral_finset_sum _ fun i _ => ?_, Finset.mul_sum]
           · refine Finset.sum_congr rfl fun i _ => ?_
             rw [integral_const_mul, integral_const_mul]
-            ring
           · refine Integrable.of_bound ?_
               ((r ^ k / (k.factorial : ℝ)) * (BF * 1 * (BF * 1)))
               (Filter.Eventually.of_forall fun q => ?_)
-            · exact (measurable_const.mul ((hG_meas.mul (Complex.continuous_ofReal.measurable.comp (hm i))))).aestronglyMeasurable
-            · rw [norm_mul, norm_mul, norm_mul, norm_star, Complex.norm_real, Complex.norm_real,
-                Complex.norm_real, Real.norm_of_nonneg (by positivity), Real.norm_eq_abs,
-                Real.norm_eq_abs]
+            · exact (measurable_const.mul (measurable_const.mul (hG_meas.mul (Complex.continuous_ofReal.measurable.comp (hm i))))).aestronglyMeasurable
+            · simp only [norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs]
+              rw [abs_of_nonneg (by positivity)]
               have hGp := hG_bound p; have hGq := hG_bound q
               have hbp := hb i p; have hbq := hb i q
-              rw [Real.norm_of_nonneg (hb i p |>.trans (by norm_num) |> fun _ => le_rfl)] at *
-              have h_rk : 0 ≤ r ^ k / (k.factorial : ℝ) := by positivity
-              calc r ^ k / (k.factorial : ℝ) * (‖G p‖ * |ψ i p| * (‖G q‖ * |ψ i q|))
-                  ≤ r ^ k / (k.factorial : ℝ) * (BF * 1 * (BF * 1)) := by
-                    refine mul_le_mul_of_nonneg_left ?_ h_rk
-                    exact mul_le_mul (mul_le_mul hGp hbp (abs_nonneg _) hBF)
-                      (mul_le_mul hGq hbq (abs_nonneg _) hBF) (by positivity) (by positivity)
+              refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+              exact mul_le_mul (mul_le_mul hGp hbp (abs_nonneg _) hBF)
+                (mul_le_mul hGq hbq (abs_nonneg _) hBF) (by positivity) (by positivity)
         rw [h_eq]
         refine measurable_const.mul (Finset.measurable_sum _ fun i _ => ?_)
         exact ((continuous_star.measurable.comp hG_meas).mul
@@ -1148,8 +1139,8 @@ theorem wilson4D_reflection_positivity
       have h_pt : ∀ q, ‖star (G p) * G q * (((K_cut p q) ^ k / (k.factorial : ℝ) : ℝ) : ℂ)‖ ≤
           BF * BF * (C_bd ^ k / (k.factorial : ℝ)) := by
         intro q
-        rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div,
-          abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ)), abs_pow]
+        rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div, abs_pow,
+          abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ))]
         have h1 : ‖G p‖ * ‖G q‖ ≤ BF * BF :=
           mul_le_mul (hG_bound p) (hG_bound q) (norm_nonneg _) hBF
         have h2 : |K_cut p q| ^ k / (k.factorial : ℝ) ≤ C_bd ^ k / (k.factorial : ℝ) :=
@@ -1161,7 +1152,7 @@ theorem wilson4D_reflection_positivity
             integral_mono_of_nonneg (Filter.Eventually.of_forall fun _ => norm_nonneg _)
               (integrable_const _) (Filter.Eventually.of_forall h_pt)
         _ = BF * BF * (C_bd ^ k / (k.factorial : ℝ)) * (μ Set.univ).toReal := by
-            simp [integral_const, Measure.real_def, mul_comm]
+            rw [integral_const, Measure.real_def, smul_eq_mul]; ring
     simp_rw [h_inner_eq]
     rw [integral_finset_sum _ fun k _ => h_outer_int k, Complex.re_sum]
     refine Finset.sum_nonneg fun k _ => ?_
@@ -1190,14 +1181,13 @@ theorem wilson4D_reflection_positivity
           dsimp [K_cut]
           rw [mul_pow, hsum p q]
           push_cast
-          rw [Finset.mul_sum]
+          rw [Finset.sum_div, Finset.mul_sum]
           refine Finset.sum_congr rfl fun i _ => ?_
           ring
         rw [h_q_eq, integral_finset_sum _ fun i _ => ((h_int_ψ i).const_mul _).const_mul _,
           Finset.mul_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         rw [integral_const_mul, integral_const_mul]
-        ring
       simp_rw [h_in, integral_const_mul]
       congr 1
       have h_int_conj : ∀ i : ι_k,
@@ -1205,7 +1195,7 @@ theorem wilson4D_reflection_positivity
             star (G p) * (ψ i p : ℂ) * ∫ q, G q * (ψ i q : ℂ) ∂μ) μ := by
         intro i
         have hstar : Integrable (fun p : HalfVar N M => star (G p * (ψ i p : ℂ))) μ :=
-          Complex.conjCLE.integrable_comp (h_int_ψ i)
+          (Complex.conjCLE.toContinuousLinearMap).integrable_comp (h_int_ψ i)
         have h_eq : (fun p : HalfVar N M => star (G p * (ψ i p : ℂ))) =
             fun p => star (G p) * (ψ i p : ℂ) := by
           funext p; rw [star_mul, Complex.star_def, Complex.conj_ofReal, mul_comm]
@@ -1215,10 +1205,12 @@ theorem wilson4D_reflection_positivity
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [integral_mul_const]
       congr 1
-      rw [← integral_conj]
+      change (∫ p, star (G p) * (ψ i p : ℂ) ∂μ) =
+        (Complex.conjCLE.toContinuousLinearMap) (∫ q, G q * (ψ i q : ℂ) ∂μ)
+      rw [← (Complex.conjCLE.toContinuousLinearMap).integral_comp_comm (h_int_ψ i)]
       refine integral_congr_ae (Filter.Eventually.of_forall fun p => ?_)
-      rw [star_mul, Complex.star_def, Complex.conj_ofReal]
-      ring
+      simp only [ContinuousLinearEquiv.coe_toContinuousLinearMap, Complex.conjCLE_apply,
+        map_mul, Complex.conj_ofReal, ← Complex.star_def]
     rw [h_k_eq]
     have hre : (((r ^ k / (k.factorial : ℝ) : ℝ) : ℂ) *
         ∑ i : ι_k, star (∫ p, G p * (ψ i p : ℂ) ∂μ) * (∫ q, G q * (ψ i q : ℂ) ∂μ)).re =
@@ -1241,7 +1233,7 @@ theorem wilson4D_reflection_positivity
     have h_tri : |S_K K p q| ≤ ∑ k ∈ Finset.range K, C_bd ^ k / (k.factorial : ℝ) := by
       dsimp [S_K]
       refine le_trans (Finset.abs_sum_le_sum_abs _ _) (Finset.sum_le_sum fun k _ => ?_)
-      rw [abs_div, abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ)), abs_pow]
+      rw [abs_div, abs_pow, abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ))]
       exact div_le_div_of_nonneg_right (pow_le_pow_left₀ (abs_nonneg _) (hK_cut_bound p q) k)
         (Nat.cast_nonneg _)
     exact le_trans h_tri (exp_rem_nonneg K C_bd hC_bd)
@@ -1252,7 +1244,7 @@ theorem wilson4D_reflection_positivity
         Real.exp C_bd * (C_bd ^ K / (K.factorial : ℝ)) := by
       intro K
       refine le_trans (exp_taylor_remainder_bound K (K_cut p q)) ?_
-      rw [mul_div_assoc']
+      rw [mul_div_assoc]
       exact mul_le_mul (Real.exp_le_exp.mpr (hK_cut_bound p q))
         (div_le_div_of_nonneg_right (pow_le_pow_left₀ (abs_nonneg _) (hK_cut_bound p q) K)
           (Nat.cast_nonneg _)) (by positivity) (Real.exp_pos _).le
@@ -1261,10 +1253,10 @@ theorem wilson4D_reflection_positivity
       simpa using tendsto_const_nhds.mul (tendsto_const_pow_div_factorial C_bd hC_bd)
     have h_diff0 : Filter.Tendsto (fun K : ℕ => S_K K p q - Real.exp (K_cut p q))
         Filter.atTop (nhds 0) := by
-      refine squeeze_zero (fun _ => norm_nonneg _) (fun K => ?_) h_rhs0
+      refine squeeze_zero (fun K => norm_nonneg (S_K K p q - Real.exp (K_cut p q))) (fun K => ?_) h_rhs0
       rw [norm_sub_rev]
       exact h_err K
-    simpa using h_diff0.add tendsto_const_nhds
+    simpa using h_diff0.add (tendsto_const_nhds (x := Real.exp (K_cut p q)))
   let F_K : ℕ → HalfVar N M → ℂ := fun K p =>
     ∫ q, star (G p) * G q * (S_K K p q : ℂ) ∂μ
   let F_inf : HalfVar N M → ℂ := fun p =>
@@ -1296,18 +1288,14 @@ theorem wilson4D_reflection_positivity
               (((K_cut p q) ^ k / (k.factorial : ℝ) : ℝ) : ℂ) ∂μ := by
           funext p
           dsimp [F_K, S_K]
-          have h_sum : (fun q => star (G p) * G q * ((∑ k ∈ Finset.range K, (K_cut p q) ^ k / (k.factorial : ℝ) : ℝ) : ℂ)) =
-              fun q => ∑ k ∈ Finset.range K, star (G p) * G q *
-                (((K_cut p q) ^ k / (k.factorial : ℝ) : ℝ) : ℂ) := by
-            funext q; push_cast; rw [Finset.mul_sum]
-          rw [h_sum]
+          simp only [Complex.ofReal_sum, Finset.mul_sum]
           refine integral_finset_sum _ fun k _ => Integrable.of_bound ?_
             (BF * BF * (C_bd ^ k / (k.factorial : ℝ))) (Filter.Eventually.of_forall fun q => ?_)
           · exact ((measurable_const.mul hG_meas).mul
               (Complex.continuous_ofReal.measurable.comp
                 (((hK_cut_meas.comp (measurable_const.prodMk measurable_id)).pow_const k).div_const _))).aestronglyMeasurable
-          · rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div,
-              abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ)), abs_pow]
+          · rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div, abs_pow,
+              abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ))]
             exact mul_le_mul (mul_le_mul (hG_bound p) (hG_bound q) (norm_nonneg _) hBF)
               (div_le_div_of_nonneg_right (pow_le_pow_left₀ (abs_nonneg _) (hK_cut_bound p q) k)
                 (Nat.cast_nonneg _)) (by positivity) (by positivity)
@@ -1323,22 +1311,21 @@ theorem wilson4D_reflection_positivity
               fun q => ∑ i : ι_k, ((r ^ k / (k.factorial : ℝ) : ℝ) : ℂ) *
                 (star (G p) * (ψ i p : ℂ) * (G q * (ψ i q : ℂ))) := by
             funext q; dsimp [K_cut]; rw [mul_pow, hsum p q]; push_cast
-            rw [Finset.mul_sum]; refine Finset.sum_congr rfl fun i _ => ?_; ring
-          rw [h_q_eq, integral_finset_sum _ fun i _ => Integrable.of_bound
-              (measurable_const.mul (hG_meas.mul (Complex.continuous_ofReal.measurable.comp (hm i)))).aestronglyMeasurable
+            rw [Finset.sum_div, Finset.mul_sum]; refine Finset.sum_congr rfl fun i _ => ?_; ring
+          rw [h_q_eq, integral_finset_sum _ fun i _ => ?_, Finset.mul_sum]
+          · refine Finset.sum_congr rfl fun i _ => ?_
+            rw [integral_const_mul, integral_const_mul]
+          · refine Integrable.of_bound
+              (measurable_const.mul (measurable_const.mul (hG_meas.mul (Complex.continuous_ofReal.measurable.comp (hm i))))).aestronglyMeasurable
               ((r ^ k / (k.factorial : ℝ)) * (BF * 1 * (BF * 1)))
               (Filter.Eventually.of_forall fun q => by
-                rw [norm_mul, norm_mul, norm_mul, norm_star, Complex.norm_real, Complex.norm_real,
-                  Complex.norm_real, Real.norm_of_nonneg (by positivity), Real.norm_eq_abs,
-                  Real.norm_eq_abs]
+                simp only [norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs]
+                rw [abs_of_nonneg (by positivity)]
                 have hGp := hG_bound p; have hGq := hG_bound q
                 have hbp := hb i p; have hbq := hb i q
                 refine mul_le_mul_of_nonneg_left ?_ (by positivity)
                 exact mul_le_mul (mul_le_mul hGp hbp (abs_nonneg _) hBF)
-                  (mul_le_mul hGq hbq (abs_nonneg _) hBF) (by positivity) (by positivity)),
-            Finset.mul_sum]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [integral_const_mul, integral_const_mul]; ring
+                  (mul_le_mul hGq hbq (abs_nonneg _) hBF) (by positivity) (by positivity))
         rw [h_term_eq]
         refine measurable_const.mul (Finset.measurable_sum _ fun i _ => ?_)
         exact ((continuous_star.measurable.comp hG_meas).mul
@@ -1354,7 +1341,7 @@ theorem wilson4D_reflection_positivity
                 exact mul_le_mul (mul_le_mul (hG_bound p) (hG_bound q) (norm_nonneg _) hBF)
                   (hS_K_le_exp K p q) (abs_nonneg _) (by positivity))
         _ = BF * BF * Real.exp C_bd * (μ Set.univ).toReal := by
-            simp [integral_const, Measure.real_def, mul_comm]
+            rw [integral_const, Measure.real_def, smul_eq_mul]; ring
   have h_re_lim : Filter.Tendsto (fun K : ℕ => (∫ p, F_K K p ∂μ).re) Filter.atTop
       (nhds (∫ p, F_inf p ∂μ).re) :=
     Complex.continuous_re.continuousAt.tendsto.comp h_outer_lim

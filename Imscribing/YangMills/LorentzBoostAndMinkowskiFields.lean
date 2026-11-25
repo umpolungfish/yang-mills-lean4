@@ -115,8 +115,12 @@ instance : Mul Lorentz4 where
             Matrix.diagonal_apply, Fin.sum_univ_four, ↓reduceIte,
             h01, h01.symm, h02, h02.symm, h03, h03.symm,
             h12, h12.symm, h13, h13.symm, h23, h23.symm] at h00
-          norm_num at h00
-          linarith
+          have hv0 : (![1, -1, -1, -1] : Fin 4 → ℝ) 0 = 1 := by simp
+          have hv1 : (![1, -1, -1, -1] : Fin 4 → ℝ) 1 = -1 := by simp
+          have hv2 : (![1, -1, -1, -1] : Fin 4 → ℝ) 2 = -1 := by simp
+          have hv3 : (![1, -1, -1, -1] : Fin 4 → ℝ) 3 = -1 := by simp
+          rw [hv0, hv1, hv2, hv3] at h00
+          rw [← h00]; ring
         have h_norm2 : Λ₂.mat 0 0 ^ 2 -
             (Λ₂.mat 1 0 ^ 2 + Λ₂.mat 2 0 ^ 2 + Λ₂.mat 3 0 ^ 2) = 1 := by
           have h00 := congrArg (fun M : Matrix (Fin 4) (Fin 4) ℝ => M 0 0) (mat_transpose_eta_mul Λ₂)
@@ -124,8 +128,12 @@ instance : Mul Lorentz4 where
             Matrix.diagonal_apply, Fin.sum_univ_four, ↓reduceIte,
             h01, h01.symm, h02, h02.symm, h03, h03.symm,
             h12, h12.symm, h13, h13.symm, h23, h23.symm] at h00
-          norm_num at h00
-          linarith
+          have hv0 : (![1, -1, -1, -1] : Fin 4 → ℝ) 0 = 1 := by simp
+          have hv1 : (![1, -1, -1, -1] : Fin 4 → ℝ) 1 = -1 := by simp
+          have hv2 : (![1, -1, -1, -1] : Fin 4 → ℝ) 2 = -1 := by simp
+          have hv3 : (![1, -1, -1, -1] : Fin 4 → ℝ) 3 = -1 := by simp
+          rw [hv0, hv1, hv2, hv3] at h00
+          rw [← h00]; ring
         have h_cs : (Λ₁.mat 0 1 * Λ₂.mat 1 0 + Λ₁.mat 0 2 * Λ₂.mat 2 0 +
             Λ₁.mat 0 3 * Λ₂.mat 3 0) ^ 2 ≤
             (Λ₁.mat 0 1 ^ 2 + Λ₁.mat 0 2 ^ 2 + Λ₁.mat 0 3 ^ 2) *

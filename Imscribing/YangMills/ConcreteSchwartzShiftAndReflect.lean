@@ -41,7 +41,9 @@ def shiftPos {n : ℕ} (v : Fin n → Spacetime4) (f : EuclideanSchwartz n) :
             ((fderiv ℝ (iteratedFDeriv ℝ l (⇑f)) (x - v)).comp
               (ContinuousLinearMap.id ℝ (Fin n → Spacetime4))) x :=
           (h_diff (x - v)).hasFDerivAt.comp x ((hasFDerivAt_id x).sub_const v)
-        rw [h_fun, h_has.fderiv]
+        rw [h_fun]
+        simp only [Function.comp_apply]
+        rw [h_has.fderiv]
         simp
     refine ⟨∑ j ∈ Finset.range (k + 1),
       (k.choose j : ℝ) * ‖v‖ ^ (k - j) * SchwartzMap.seminorm ℂ j l f, fun x => ?_⟩
@@ -133,7 +135,7 @@ private lemma iteratedFDeriv_comp_clm {E F G : Type*}
     let Φ : ContinuousMultilinearMap ℝ (fun _ : Fin l => F) G →L[ℝ]
         ContinuousMultilinearMap ℝ (fun _ : Fin l => E) G :=
       LinearMap.mkContinuous Φ_lin (‖L‖ ^ l) fun M => by
-        simpa [Φ_lin] using M.norm_compContinuousLinearMap_le (fun _ => L)
+        simpa [Φ_lin, mul_comm] using M.norm_compContinuousLinearMap_le (fun _ => L)
     have h_comp : HasFDerivAt (fun y => Φ (iteratedFDeriv ℝ l f (L y)))
         (Φ.comp ((fderiv ℝ (iteratedFDeriv ℝ l f) (L x)).comp L)) x :=
       Φ.hasFDerivAt.comp x ((h_diff (L x)).hasFDerivAt.comp x L.hasFDerivAt)
@@ -166,7 +168,7 @@ def timeReflect {n : ℕ} (f : EuclideanSchwartz n) : EuclideanSchwartz n where
           (fun _ => timeReflectCLM n)‖
         ≤ ‖timeReflectCLM n x‖ ^ k * ‖iteratedFDeriv ℝ l f (timeReflectCLM n x)‖ := by
           rw [timeReflectCLM_norm_eq]
-          exact mul_le_mul_of_nonneg_right h1 (pow_nonneg (norm_nonneg x) _)
+          exact mul_le_mul_of_nonneg_left h1 (pow_nonneg (norm_nonneg x) k)
       _ ≤ SchwartzMap.seminorm ℂ k l f := SchwartzMap.le_seminorm ℂ k l f (timeReflectCLM n x)
 
 private lemma iteratedFDeriv_conj_left {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]

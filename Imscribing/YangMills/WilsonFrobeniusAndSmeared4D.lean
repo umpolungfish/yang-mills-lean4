@@ -46,11 +46,11 @@ theorem wilson_plaquette_eq_frobenius_sq {N : ℕ} (A : GaugeGroup N) :
         have h_sub : ‖(A : Matrix (Fin N) (Fin N) ℂ) i i - 1‖ ^ 2 =
             ((A : Matrix (Fin N) (Fin N) ℂ) i i - 1).re ^ 2 +
             ((A : Matrix (Fin N) (Fin N) ℂ) i i - 1).im ^ 2 := by
-          rw [← Complex.normSq_eq_norm_sq]; rfl
+          rw [← Complex.normSq_eq_norm_sq, Complex.normSq_apply]; ring
         have h_self : ‖(A : Matrix (Fin N) (Fin N) ℂ) i i‖ ^ 2 =
             ((A : Matrix (Fin N) (Fin N) ℂ) i i).re ^ 2 +
             ((A : Matrix (Fin N) (Fin N) ℂ) i i).im ^ 2 := by
-          rw [← Complex.normSq_eq_norm_sq]; rfl
+          rw [← Complex.normSq_eq_norm_sq, Complex.normSq_apply]; ring
         rw [h_sub, h_self]
         simp only [Complex.sub_re, Complex.one_re, Complex.sub_im, Complex.one_im, sub_zero]
         ring
@@ -91,22 +91,22 @@ theorem large_field_gibbs_suppression (N L : ℕ) [NeZero N] [NeZero L] {β : �
       frobeniusNormSq ((plaquetteHolonomy U x₀ μ₀ ν₀ : Matrix (Fin N) (Fin N) ℂ) - 1) ≤
         ∑ x : Lat4 L, ∑ μ : Fin 4, ∑ ν : Fin 4,
           frobeniusNormSq ((plaquetteHolonomy U x μ ν : Matrix (Fin N) (Fin N) ℂ) - 1) := by
-    have h1 : frobeniusNormSq ((plaquetteHolonomy U x₀ μ₀ ν₀ : Matrix (Fin N) (Fin N) ℂ) - 1) ≤
-        ∑ ν : Fin 4, frobeniusNormSq ((plaquetteHolonomy U x₀ μ₀ ν : Matrix (Fin N) (Fin N) ℂ) - 1) :=
-      Finset.single_le_sum (fun ν _ => frobeniusNormSq_nonneg _) (Finset.mem_univ ν₀)
-    have h2 : (∑ ν : Fin 4, frobeniusNormSq ((plaquetteHolonomy U x₀ μ₀ ν : Matrix (Fin N) (Fin N) ℂ) - 1)) ≤
-        ∑ μ : Fin 4, ∑ ν : Fin 4, frobeniusNormSq ((plaquetteHolonomy U x₀ μ ν : Matrix (Fin N) (Fin N) ℂ) - 1) :=
-      Finset.single_le_sum (fun μ _ => Finset.sum_nonneg fun ν _ => frobeniusNormSq_nonneg _)
-        (Finset.mem_univ μ₀)
-    have h3 : (∑ μ : Fin 4, ∑ ν : Fin 4,
-        frobeniusNormSq ((plaquetteHolonomy U x₀ μ ν : Matrix (Fin N) (Fin N) ℂ) - 1)) ≤
-        ∑ x : Lat4 L, ∑ μ : Fin 4, ∑ ν : Fin 4,
-          frobeniusNormSq ((plaquetteHolonomy U x μ ν : Matrix (Fin N) (Fin N) ℂ) - 1) :=
-      Finset.single_le_sum (fun x _ => Finset.sum_nonneg fun μ _ =>
-        Finset.sum_nonneg fun ν _ => frobeniusNormSq_nonneg _) (Finset.mem_univ x₀)
+    let E : Lat4 L → Fin 4 → Fin 4 → ℝ := fun x μ ν =>
+      frobeniusNormSq ((plaquetteHolonomy U x μ ν : Matrix (Fin N) (Fin N) ℂ) - 1)
+    have hE_nn : ∀ x μ ν, 0 ≤ E x μ ν := fun _ _ _ => frobeniusNormSq_nonneg _
+    have h1 : E x₀ μ₀ ν₀ ≤ ∑ ν : Fin 4, E x₀ μ₀ ν :=
+      Finset.single_le_sum (f := E x₀ μ₀) (fun ν _ => hE_nn x₀ μ₀ ν) (Finset.mem_univ ν₀)
+    have h2 : (∑ ν : Fin 4, E x₀ μ₀ ν) ≤ ∑ μ : Fin 4, ∑ ν : Fin 4, E x₀ μ ν :=
+      Finset.single_le_sum (f := fun μ => ∑ ν : Fin 4, E x₀ μ ν)
+        (fun μ _ => Finset.sum_nonneg fun ν _ => hE_nn x₀ μ ν) (Finset.mem_univ μ₀)
+    have h3 : (∑ μ : Fin 4, ∑ ν : Fin 4, E x₀ μ ν) ≤
+        ∑ x : Lat4 L, ∑ μ : Fin 4, ∑ ν : Fin 4, E x μ ν :=
+      Finset.single_le_sum (f := fun x => ∑ μ : Fin 4, ∑ ν : Fin 4, E x μ ν)
+        (fun x _ => Finset.sum_nonneg fun μ _ => Finset.sum_nonneg fun ν _ => hE_nn x μ ν)
+        (Finset.mem_univ x₀)
     exact le_trans h1 (le_trans h2 h3)
   have h_le := mul_le_mul_of_nonneg_left (le_trans hlarge h_sum_ge) h_coeff
-  rw [neg_mul_eq_neg_mul]
+  rw [neg_mul]
   exact neg_le_neg h_le
 
 /-- Local gauge-invariant plaquette energy density `∑_{μ, ν} (1 - Re Tr(U_p) / N)`. -/
@@ -175,7 +175,7 @@ theorem smearedPlaqSchwinger_norm_le (N L n : ℕ) [NeZero N] [NeZero L]
     rw [show (Z_ren ^ n * a ^ (4 * n) : ℂ) = ((Z_ren ^ n * a ^ (4 * n) : ℝ) : ℂ) by push_cast; rfl]
     rw [Complex.norm_real, Real.norm_eq_abs, abs_mul, abs_pow,
         abs_of_nonneg (pow_nonneg ha (4 * n))]
-  rw [h_pref]
+  rw [← norm_mul, h_pref]
   have h_term : ∀ xs : Fin n → Lat4 L,
       ‖f (fun k => latSiteToSpacetime L a (xs k)) *
           wilsonExpectation N L β μ (fun U => (∏ k : Fin n, localPlaqDensity N L U (xs k) : ℂ))‖ ≤

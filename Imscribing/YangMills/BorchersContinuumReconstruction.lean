@@ -171,8 +171,8 @@ theorem borchers_to_clay_target {N : ℕ} (D : BorchersOSData N) :
       T_vac := hT_vac
       T_symm := hT_symm
       T_add := hT_add
-      T_poly := fun x => ⟨‖x‖ + 1, 0, by positivity, le_rfl, fun t _ => by
-        simpa using le_trans (hT_contr t (by assumption) x) (by linarith)⟩
+      T_poly := fun x => ⟨‖x‖ + 1, 0, by positivity, le_rfl, fun t ht => by
+        simpa using le_trans (hT_contr t ht x) (by linarith)⟩
       Δ := D.Δ
       Δ_pos := D.Δ_pos
       T_decay := hT_decay
@@ -181,7 +181,7 @@ theorem borchers_to_clay_target {N : ℕ} (D : BorchersOSData N) :
       Ω_in_fieldDom := hΩ_dom
       field := field
       field_maps_into := h_maps
-      locality := fun a b hab ψ => h_loc a b hab ψ _ _
+      locality := fun a b hab ψ => h_loc a b hab ψ (h_maps b ψ) (h_maps a ψ)
       variance_witness := ((Submodule.Quotient.mk D.variance_elem :
         BorchersPos ⧸ OSBorchers.nullSubmodule pre) : H)
       variance_strict := hvar

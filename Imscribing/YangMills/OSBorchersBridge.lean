@@ -204,8 +204,8 @@ theorem os_borchers_to_completion (pre : EuclideanPreData E) :
           rw [inner_self_eq_norm_sq_to_K]; norm_cast
         rw [← h1, hT₀_mk t ht F, mul_pow, ← h2]
         have hexp : Real.exp (-pre.Δ * t) ^ 2 = Real.exp (-2 * pre.Δ * t) := by
-          rw [← Real.exp_natCast_mul]
-          congr 1; push_cast; ring
+          rw [sq, ← Real.exp_add]
+          congr 1; ring
         rw [hexp]
         exact hdec
       have h_rhs_nn : 0 ≤ Real.exp (-pre.Δ * t) * ‖(Submodule.Quotient.mk F : H₀)‖ :=
