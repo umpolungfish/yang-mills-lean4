@@ -76,24 +76,25 @@ theorem wilson4D_os_cauchy_schwarz
     (F G : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B }) :
     ‖wilsonGlueRPForm N M β Z μ F.1 G.1‖ ^ 2 ≤
       (wilsonGlueRPForm N M β Z μ F.1 F.1).re * (wilsonGlueRPForm N M β Z μ G.1 G.1).re := by
-  let E := HalfVar N M → ℂ
-  have h_quad : ∀ F : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B },
-      0 ≤ (wilsonGlueRPForm N M β Z μ F.1 F.1).re := by
+  have h_quad : ∀ X : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B },
+      0 ≤ (wilsonGlueRPForm N M β Z μ X.1 X.1).re := by
     intro X
     obtain ⟨hXm, B, hB, hXb⟩ := X.2
     exact wilson4D_normalized_rp_nonneg hβ hZ hEntry μ X.1 hXm B hB hXb
-  -- Apply direct quadratic Cauchy–Schwarz via linearity on the measurable bounded subspace
   by_cases hFG : wilsonGlueRPForm N M β Z μ F.1 G.1 = 0
   · rw [hFG, norm_zero, zero_pow (by norm_num)]
     exact mul_nonneg (h_quad F) (h_quad G)
   · have h_pos : 0 < ‖wilsonGlueRPForm N M β Z μ F.1 G.1‖ := norm_pos_iff.mpr hFG
     let B : (HalfVar N M → ℂ) → (HalfVar N M → ℂ) → ℂ := wilsonGlueRPForm N M β Z μ
-    -- Use the exact same phase-discriminant proof as `sesquilinear_cauchy_schwarz`
     let u : ℂ := B F.1 G.1 / (‖B F.1 G.1‖ : ℂ)
     have h_quad_t : ∀ t : ℝ,
         0 ≤ t ^ 2 * (B F.1 F.1).re + 2 * t * ‖B F.1 G.1‖ + (B G.1 G.1).re := by
       intro t
       let a : ℂ := (t : ℂ) * u
+      let aF : { X : HalfVar N M → ℂ // Measurable X ∧ ∃ Bx : ℝ, 0 ≤ Bx ∧ ∀ p, ‖X p‖ ≤ Bx } :=
+        ⟨fun p => a * F.1 p, measurable_const.mul F.2.1,
+         ‖a‖ * F.2.2.choose, mul_nonneg (norm_nonneg _) F.2.2.choose_spec.1,
+         fun p => by rw [norm_mul]; exact mul_le_mul_of_nonneg_left (F.2.2.choose_spec.2 p) (norm_nonneg _)⟩
       let H_comb : { H : HalfVar N M → ℂ // Measurable H ∧ ∃ Bh : ℝ, 0 ≤ Bh ∧ ∀ p, ‖H p‖ ≤ Bh } :=
         ⟨fun p => a * F.1 p + G.1 p,
          (measurable_const.mul F.2.1).add G.2.1,
@@ -119,21 +120,12 @@ theorem wilson4D_os_cauchy_schwarz
           rw [mul_comm, show star (B F.1 G.1) = starRingEnd ℂ _ from rfl, Complex.mul_conj]
           norm_cast; exact Complex.normSq_eq_norm_sq _
         rw [hnsq, sq]; push_cast; rw [mul_div_cancel_right₀ _ hnz]
-      have ha_GF : a * B G.1 F.1 = (‖B F.1 G.1‖ : ℂ) := by
-        rw [h_herm F G, ← star_mul']
-        have h1 : star (star a * B F.1 G.1) = a * star (B F.1 G.1) := by
-          rw [star_mul, star_star, mul_comm]
-        rw [← h1, hsa_B, Complex.conj_ofReal]
-      let aF : { X : HalfVar N M → ℂ // Measurable X ∧ ∃ Bx : ℝ, 0 ≤ Bx ∧ ∀ p, ‖X p‖ ≤ Bx } :=
-        ⟨fun p => a * F.1 p, measurable_const.mul F.2.1,
-         ‖a‖ * F.2.2.choose, mul_nonneg (norm_nonneg _) F.2.2.choose_spec.1,
-         fun p => by rw [norm_mul]; exact mul_le_mul_of_nonneg_left (F.2.2.choose_spec.2 p) (norm_nonneg _)⟩
       have hexp : B H_comb.1 H_comb.1 =
           (star a * a) * B F.1 F.1 + star a * B F.1 G.1 + a * B G.1 F.1 + B G.1 G.1 := by
         dsimp [B]
         rw [show H_comb.1 = fun p => aF.1 p + G.1 p from rfl]
         rw [h_add_left aF G H_comb, h_add_right aF aF G, h_add_right G aF G]
-        rw [h_smul_left a F F, h_smul_right a F F, h_smul_left a F G, h_smul_right a G F]
+        rw [h_smul_left a F aF, h_smul_right a F F, h_smul_left a F G, h_smul_right a G F]
         ring
       have hsa_a : star a * a = ((t ^ 2 : ℝ) : ℂ) := by
         dsimp [a]
@@ -148,7 +140,7 @@ theorem wilson4D_os_cauchy_schwarz
           (star u * (t : ℂ)) * B F.1 G.1 = (t : ℂ) * (star u * B F.1 G.1) := by ring
           _ = ((t * ‖B F.1 G.1‖ : ℝ) : ℂ) := by rw [hu_B]; push_cast; rfl
       have ha_GF : a * B G.1 F.1 = ((t * ‖B F.1 G.1‖ : ℝ) : ℂ) := by
-        rw [h_herm F G, ← star_mul']
+        rw [h_herm F G]
         have h1 : star (star a * B F.1 G.1) = a * star (B F.1 G.1) := by
           rw [star_mul, star_star, mul_comm]
         rw [← h1, hsa_B, Complex.conj_ofReal]
@@ -170,11 +162,7 @@ theorem wilson4D_os_cauchy_schwarz
       rw [heq] at hmin
       exact (div_le_iff₀ hxx_pos).mp (sub_nonneg.mp hmin)
 
-/-- **Transfer-Matrix Continuum Scaling → Generator Spectral Gap & Vacuum Uniqueness.**
-    Any strongly convergent family of symmetric contractive Wilson transfer operators
-    `T_lat m` along `a_m → 0⁺` with uniform lattice gap `Δ ≤ gap m / a_m` yields a
-    continuum Hamiltonian `semigroupGenerator T` with global strict mass gap `Δ`
-    and `ker H_op = ℂ ∙ Ω`. -/
+/-- **Transfer-Matrix Continuum Scaling → Generator Spectral Gap & Vacuum Uniqueness.** -/
 theorem lattice_transfer_to_continuum_generator_gap
     {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     (a gap : ℕ → ℝ) (ha_pos : ∀ m, 0 < a m)

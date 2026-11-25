@@ -3,15 +3,6 @@ import Imscribing.YangMills.WilsonFrobeniusAndSmeared4D
 
 /-!
 # Reflection Positivity for Smeared Positive-Time 4D SU(N) Magnetic Observables
-
-Connects `WilsonFrobeniusAndSmeared4D` directly to `LatticeOSReflectionPositivity4D`
-(`0 sorry`):
-1. Defines `spatialPlaqDensity` (gauge-invariant magnetic plaquette energy at site `x`).
-2. Proves `spatialPlaqDensity_glue_pos` and `spatialPlaqDensity_reflect_glue_pos`
-   at every positive-time site `(x 0).val < M`.
-3. Proves **`smeared_magnetic_wilson_rp_nonneg`**: every positive-time polynomial
-   of smeared spatial plaquette densities satisfies exact finite-volume
-   Osterwalder–Seiler reflection positivity.
 -/
 
 namespace Imscribing.YangMills.LatticeSchwingerRP4D
@@ -109,10 +100,7 @@ theorem spatialPlaqDensity_reflect_glue_pos {N M : ℕ} [NeZero N] [NeZero M] (p
   have h4 := linkReflect_glueConfig_pos_spatial_eq p q hx j
   simp only [plaquetteHolonomy, h1, h2, h3, h4]
 
-/-- **Finite-Volume Reflection Positivity for Smeared Positive-Time Magnetic Observables:**
-    For any finite linear combination `F(U) = ∑ α, c α * ∏ k, spatialPlaqDensity U (xs α k)`
-    with all sites in the positive time slice `(xs α k 0).val < M`,
-    `0 ≤ Re ∫∫ star(F(Θ(glue p q))) * F(glue p q) * exp(-S_W(glue p q)) dμ(p) dμ(q)`. -/
+/-- **Finite-Volume Reflection Positivity for Smeared Positive-Time Magnetic Observables.** -/
 theorem smeared_magnetic_wilson_rp_nonneg
     {N M : ℕ} [NeZero N] [NeZero M] {β : ℝ} (hβ : 0 ≤ β)
     [MeasurableSpace (GaugeGroup N)] [MeasurableMul₂ (GaugeGroup N)] [MeasurableInv (GaugeGroup N)]
@@ -131,7 +119,7 @@ theorem smeared_magnetic_wilson_rp_nonneg
       Measurable (fun p : HalfVar N M => (spatialPlaqDensity N (2 * M) p.1 x : ℂ)) := by
     intro x
     apply Complex.continuous_ofReal.measurable.comp
-    unfold spatialPlaqDensity
+    unfold spatialPlaqDensity realTrace
     refine Finset.measurable_sum _ fun i _ => Finset.measurable_sum _ fun j _ => ?_
     refine measurable_const.sub ((Complex.continuous_re.measurable.comp ?_).div_const _)
     unfold plaquetteHolonomy
@@ -154,7 +142,7 @@ theorem smeared_magnetic_wilson_rp_nonneg
     exact Finset.measurable_prod _ fun k _ => h_meas_site (xs α k)
   let BF : ℝ := ∑ α ∈ s, ‖c α‖ * (18 : ℝ) ^ (n α)
   have hBF_nn : 0 ≤ BF := Finset.sum_nonneg fun α _ => by positivity
-  have hF_bound : ∀ p : HalfVar N M, ‖F_half p ‖ ≤ BF := by
+  have hF_bound : ∀ p : HalfVar N M, ‖F_half p‖ ≤ BF := by
     intro p
     dsimp [F_half, F, BF]
     refine le_trans (norm_sum_le _ _) (Finset.sum_le_sum fun α _ => ?_)
@@ -187,7 +175,6 @@ theorem smeared_magnetic_wilson_rp_nonneg
       refine Finset.prod_congr rfl fun k _ => ?_
       rw [spatialPlaqDensity_reflect_glue_pos p q (hpos α hα k)]
     rw [hp, hq]
-  -- Take the conjugate of the double integral instead of swapping p and q
   have h_conj_eq :
       (∫ p, ∫ q, star (F (linkReflect (glueConfig p q))) * F (glueConfig p q) *
         (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ) =
@@ -200,7 +187,6 @@ theorem smeared_magnetic_wilson_rp_nonneg
     rw [h_eq p q, star_mul, star_mul, star_star, Complex.conj_ofReal]
     ring
   rw [h_conj_eq]
-  -- The real part of the conjugate equals the real part of the original
   change (starRingEnd ℂ _).re ≥ 0
   rw [Complex.conj_re]
   exact h_rp

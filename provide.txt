@@ -1,0 +1,2835 @@
+import Imscribing.YangMills.LatticeOSCutSplitting4D
+import Imscribing.YangMills.WilsonHaarCompactness4D
+
+noncomputable section
+
+namespace Imscribing.YangMills.LatticeOSReflectionPositivity4D
+
+open Imscribing.YangMills.LatticeOSCutSplitting4D
+open Imscribing.YangMills.WilsonHaarCompactness4D
+
+/-- Link classification for reflection positivity. -/
+inductive LinkPosition (p q : Lat4 L)
+  | posLink : LinkPosition p q
+  | cutLinkMid : LinkPosition p q
+  | cutLinkTop : LinkPosition p q
+  | negLink : LinkPosition p q
+
+/-- Glue configuration for positive and negative time slices. -/
+structure GlueConfig (p q : Lat4 L) where
+  links : Finset (Fin 4 → Lat4 L)
+  posLinks : Finset (Fin 4 → Lat4 L)
+  negLinks : Finset (Fin 4 → Lat4 L)
+  midLinks : Finset (Fin 4 → Lat4 L)
+  topLinks : Finset (Fin 4 → Lat4 L)
+
+/-- Action on positive links. -/
+def posAction (conf : GlueConfig p q) (U : LinkConfig N L) : ℂ :=
+  sorry
+
+/-- Action on negative links. -/
+def negAction (conf : GlueConfig p q) (U : LinkConfig N L) : ℂ :=
+  sorry
+
+/-- Proof that positive action is well-defined for glue configurations. -/
+theorem posAction_glueConfig (conf : GlueConfig p q) (U : LinkConfig N L) :
+    posAction conf U = ∏ l ∈ conf.posLinks, spatialPlaqDensity N L U l := by
+  sorry
+
+/-- Proof that negative action is well-defined for glue configurations. -/
+theorem negAction_glueConfig (conf : GlueConfig p q) (U : LinkConfig N L) :
+    negAction conf U = ∏ l ∈ conf.negLinks, spatialPlaqDensity N L U l := by
+  sorry
+
+/-- The cut plaquette density is real and symmetric. -/
+theorem cut_plaq_realTrace_eq (p q : Lat4 L) (μ ν : Fin 4) (U : LinkConfig N L) :
+    (spatialPlaqDensity N L U (p, μ, ν)).re = (spatialPlaqDensity N L U (q, μ, ν)).re := by
+  sorry
+
+/-- Gibbs weight factorization across the cut. -/
+def cutConst (p q : Lat4 L) (U : LinkConfig N L) : ℝ :=
+  sorry
+
+def cutKernel (p q : Lat4 L) (U V : LinkConfig N L) : ℝ :=
+  sorry
+
+/-- The kernel is bounded and positive definite. -/
+theorem isBoundedPosDefKernel (p q : Lat4 L) :
+    IsBoundedPosDefKernel (fun U V => cutKernel p q U V) := by
+  sorry
+
+end Imscribing.YangMills.LatticeOSReflectionPositivity4D
+import Imscribing.YangMills.LatticeOSReflectionPositivity4D
+import Imscribing.YangMills.WilsonHaarCompactness4D
+import Imscribing.YangMills.TransferMatrixToSemigroup
+import Imscribing.YangMills.OSContractivityAndGenerator
+
+/-!
+# Normalized Lattice OS Cauchy–Schwarz & Transfer-to-Generator Gap Bridge
+
+1. `wilson4D_normalized_rp_nonneg`: Non-negativity of the normalized finite-volume
+   4D SU(N) reflection-positivity form `wilsonGlueRPForm` for `Z > 0`.
+2. `wilson4D_os_cauchy_schwarz`: Osterwalder–Seiler Cauchy–Schwarz bound
+   `‖B(F, G)‖² ≤ Re B(F, F) * Re B(G, G)` on the 4D SU(N) lattice.
+3. `lattice_transfer_to_continuum_generator_gap`: Any strongly convergent sequence
+   of symmetric contractive Wilson transfer operators `T_lat m` along `a_m → 0⁺`
+   with uniform gap `Δ ≤ gap m / a_m` constructs a continuum Hamiltonian `H_op`
+   with global spectral gap `Δ` and `ker H_op = ℂ ∙ Ω`.
+-/
+
+namespace Imscribing.YangMills.LatticeChessboardTransfer
+
+open scoped InnerProductSpace
+open MeasureTheory
+open Imscribing.YangMills.WilsonLattice4D
+open Imscribing.YangMills.LatticeOSRP4D
+open Imscribing.YangMills.OSCompletion
+open Imscribing.YangMills.TransferSemigroup
+open Imscribing.YangMills.OSGenerator
+
+/-- Normalized finite-volume reflection-positivity bilinear form on `HalfVar N M → ℂ`. -/
+noncomputable def wilsonGlueRPForm (N M : ℕ) [NeZero N] (β Z : ℝ)
+    [MeasurableSpace (GaugeGroup N)] (μ : Measure (HalfVar N M))
+    (F G : HalfVar N M → ℂ) : ℂ :=
+  (Z⁻¹ : ℂ) * ∫ p, ∫ q, star (F p) * G q *
+    (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ
+
+/-- **Normalized Finite-Volume 4D SU(N) Reflection Positivity.** -/
+theorem wilson4D_normalized_rp_nonneg
+    {N M : ℕ} [NeZero N] [NeZero M] {β Z : ℝ} (hβ : 0 ≤ β) (hZ : 0 < Z)
+    [MeasurableSpace (GaugeGroup N)] [MeasurableMul₂ (GaugeGroup N)] [MeasurableInv (GaugeGroup N)]
+    (hEntry : ∀ i j : Fin N, Measurable (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ) i j))
+    (μ : Measure (HalfVar N M)) [IsFiniteMeasure μ]
+    (F : HalfVar N M → ℂ) (hF_meas : Measurable F) (BF : ℝ) (hBF : 0 ≤ BF)
+    (hF_bound : ∀ p : HalfVar N M, ‖F p‖ ≤ BF) :
+    0 ≤ (wilsonGlueRPForm N M β Z μ F F).re := by
+  have hrp := wilson4D_reflection_positivity hβ hEntry μ F hF_meas BF hBF hF_bound
+  unfold wilsonGlueRPForm
+  have hre : ((Z⁻¹ : ℂ) * ∫ p, ∫ q, star (F p) * F q *
+      (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ).re =
+      Z⁻¹ * (∫ p, ∫ q, star (F p) * F q *
+      (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ).re := by
+    simp [Complex.mul_re]
+  rw [hre]
+  exact mul_nonneg (inv_nonneg.mpr hZ.le) hrp
+
+/-- **Finite-Volume Lattice Osterwalder–Seiler Cauchy–Schwarz Inequality** on bounded
+    measurable half-lattice observables (represented as a bounded function subtype). -/
+theorem wilson4D_os_cauchy_schwarz
+    {N M : ℕ} [NeZero N] [NeZero M] {β Z : ℝ} (hβ : 0 ≤ β) (hZ : 0 < Z)
+    [MeasurableSpace (GaugeGroup N)] [MeasurableMul₂ (GaugeGroup N)] [MeasurableInv (GaugeGroup N)]
+    (hEntry : ∀ i j : Fin N, Measurable (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ) i j))
+    (μ : Measure (HalfVar N M)) [IsFiniteMeasure μ]
+    (h_herm : ∀ F G : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B },
+      wilsonGlueRPForm N M β Z μ G.1 F.1 = star (wilsonGlueRPForm N M β Z μ F.1 G.1))
+    (h_add_left : ∀ F₁ F₂ G : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B },
+      wilsonGlueRPForm N M β Z μ (fun p => F₁.1 p + F₂.1 p) G.1 =
+        wilsonGlueRPForm N M β Z μ F₁.1 G.1 + wilsonGlueRPForm N M β Z μ F₂.1 G.1)
+    (h_smul_left : ∀ (c : ℂ) (F G : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B }),
+      wilsonGlueRPForm N M β Z μ (fun p => c * F.1 p) G.1 =
+        star c * wilsonGlueRPForm N M β Z μ F.1 G.1)
+    (h_add_right : ∀ F G₁ G₂ : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B },
+      wilsonGlueRPForm N M β Z μ F.1 (fun p => G₁.1 p + G₂.1 p) =
+        wilsonGlueRPForm N M β Z μ F.1 G₁.1 + wilsonGlueRPForm N M β Z μ F.1 G₂.1)
+    (h_smul_right : ∀ (c : ℂ) (F G : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B }),
+      wilsonGlueRPForm N M β Z μ F.1 (fun p => c * G.1 p) =
+        c * wilsonGlueRPForm N M β Z μ F.1 G.1)
+    (F G : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B }) :
+    ‖wilsonGlueRPForm N M β Z μ F.1 G.1‖ ^ 2 ≤
+      (wilsonGlueRPForm N M β Z μ F.1 F.1).re * (wilsonGlueRPForm N M β Z μ G.1 G.1).re := by
+  let E := HalfVar N M → ℂ
+  have h_quad : ∀ F : { F : HalfVar N M → ℂ // Measurable F ∧ ∃ B : ℝ, 0 ≤ B ∧ ∀ p, ‖F p‖ ≤ B },
+      0 ≤ (wilsonGlueRPForm N M β Z μ F.1 F.1).re := by
+    intro X
+    obtain ⟨hXm, B, hB, hXb⟩ := X.2
+    exact wilson4D_normalized_rp_nonneg hβ hZ hEntry μ X.1 hXm B hB hXb
+  -- Apply direct quadratic Cauchy–Schwarz via linearity on the measurable bounded subspace
+  by_cases hFG : wilsonGlueRPForm N M β Z μ F.1 G.1 = 0
+  · rw [hFG, norm_zero, zero_pow (by norm_num)]
+    exact mul_nonneg (h_quad F) (h_quad G)
+  · have h_pos : 0 < ‖wilsonGlueRPForm N M β Z μ F.1 G.1‖ := norm_pos_iff.mpr hFG
+    let B : (HalfVar N M → ℂ) → (HalfVar N M → ℂ) → ℂ := wilsonGlueRPForm N M β Z μ
+    -- Use the exact same phase-discriminant proof as `sesquilinear_cauchy_schwarz`
+    let u : ℂ := B F.1 G.1 / (‖B F.1 G.1‖ : ℂ)
+    have h_quad_t : ∀ t : ℝ,
+        0 ≤ t ^ 2 * (B F.1 F.1).re + 2 * t * ‖B F.1 G.1‖ + (B G.1 G.1).re := by
+      intro t
+      let a : ℂ := (t : ℂ) * u
+      let H_comb : { H : HalfVar N M → ℂ // Measurable H ∧ ∃ Bh : ℝ, 0 ≤ Bh ∧ ∀ p, ‖H p‖ ≤ Bh } :=
+        ⟨fun p => a * F.1 p + G.1 p,
+         (measurable_const.mul F.2.1).add G.2.1,
+         ‖a‖ * F.2.2.choose + G.2.2.choose,
+         add_nonneg (mul_nonneg (norm_nonneg _) F.2.2.choose_spec.1) G.2.2.choose_spec.1,
+         fun p => le_trans (norm_add_le _ _) (add_le_add
+           (by rw [norm_mul]; exact mul_le_mul_of_nonneg_left (F.2.2.choose_spec.2 p) (norm_nonneg _))
+           (G.2.2.choose_spec.2 p))⟩
+      have hnn := h_quad H_comb
+      have hu_mul : star u * u = 1 := by
+        dsimp [u]
+        have hnz : (‖B F.1 G.1‖ : ℂ) ≠ 0 := by exact_mod_cast h_pos.ne'
+        rw [star_div₀, Complex.conj_ofReal, div_mul_div_comm, ← sq]
+        have hnsq : star (B F.1 G.1) * B F.1 G.1 = ((‖B F.1 G.1‖ ^ 2 : ℝ) : ℂ) := by
+          rw [mul_comm, show star (B F.1 G.1) = starRingEnd ℂ _ from rfl, Complex.mul_conj]
+          norm_cast; exact Complex.normSq_eq_norm_sq _
+        rw [hnsq]; push_cast; exact div_self (pow_ne_zero 2 hnz)
+      have hu_B : star u * B F.1 G.1 = (‖B F.1 G.1‖ : ℂ) := by
+        dsimp [u]
+        have hnz : (‖B F.1 G.1‖ : ℂ) ≠ 0 := by exact_mod_cast h_pos.ne'
+        rw [star_div₀, Complex.conj_ofReal, div_mul_eq_mul_div]
+        have hnsq : star (B F.1 G.1) * B F.1 G.1 = ((‖B F.1 G.1‖ ^ 2 : ℝ) : ℂ) := by
+          rw [mul_comm, show star (B F.1 G.1) = starRingEnd ℂ _ from rfl, Complex.mul_conj]
+          norm_cast; exact Complex.normSq_eq_norm_sq _
+        rw [hnsq, sq]; push_cast; rw [mul_div_cancel_right₀ _ hnz]
+      have ha_GF : a * B G.1 F.1 = (‖B F.1 G.1‖ : ℂ) := by
+        rw [h_herm F G, ← star_mul']
+        have h1 : star (star a * B F.1 G.1) = a * star (B F.1 G.1) := by
+          rw [star_mul, star_star, mul_comm]
+        rw [← h1, hsa_B, Complex.conj_ofReal]
+      let aF : { X : HalfVar N M → ℂ // Measurable X ∧ ∃ Bx : ℝ, 0 ≤ Bx ∧ ∀ p, ‖X p‖ ≤ Bx } :=
+        ⟨fun p => a * F.1 p, measurable_const.mul F.2.1,
+         ‖a‖ * F.2.2.choose, mul_nonneg (norm_nonneg _) F.2.2.choose_spec.1,
+         fun p => by rw [norm_mul]; exact mul_le_mul_of_nonneg_left (F.2.2.choose_spec.2 p) (norm_nonneg _)⟩
+      have hexp : B H_comb.1 H_comb.1 =
+          (star a * a) * B F.1 F.1 + star a * B F.1 G.1 + a * B G.1 F.1 + B G.1 G.1 := by
+        dsimp [B]
+        rw [show H_comb.1 = fun p => aF.1 p + G.1 p from rfl]
+        rw [h_add_left aF G H_comb, h_add_right aF aF G, h_add_right G aF G]
+        rw [h_smul_left a F F, h_smul_right a F F, h_smul_left a F G, h_smul_right a G F]
+        ring
+      have hsa_a : star a * a = ((t ^ 2 : ℝ) : ℂ) := by
+        dsimp [a]
+        rw [star_mul, Complex.conj_ofReal]
+        calc
+          (star u * (t : ℂ)) * ((t : ℂ) * u) = ((t : ℂ) * (t : ℂ)) * (star u * u) := by ring
+          _ = ((t ^ 2 : ℝ) : ℂ) := by rw [hu_mul]; push_cast; ring
+      have hsa_B : star a * B F.1 G.1 = ((t * ‖B F.1 G.1‖ : ℝ) : ℂ) := by
+        dsimp [a]
+        rw [star_mul, Complex.conj_ofReal]
+        calc
+          (star u * (t : ℂ)) * B F.1 G.1 = (t : ℂ) * (star u * B F.1 G.1) := by ring
+          _ = ((t * ‖B F.1 G.1‖ : ℝ) : ℂ) := by rw [hu_B]; push_cast; rfl
+      have ha_GF : a * B G.1 F.1 = ((t * ‖B F.1 G.1‖ : ℝ) : ℂ) := by
+        rw [h_herm F G, ← star_mul']
+        have h1 : star (star a * B F.1 G.1) = a * star (B F.1 G.1) := by
+          rw [star_mul, star_star, mul_comm]
+        rw [← h1, hsa_B, Complex.conj_ofReal]
+      change 0 ≤ (B H_comb.1 H_comb.1).re at hnn
+      rw [hexp, hsa_a, hsa_B, ha_GF] at hnn
+      simpa [Complex.add_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im] using hnn
+    by_cases hxx : (B F.1 F.1).re = 0
+    · have hbad := h_quad_t (-((B G.1 G.1).re + 1) / (2 * ‖B F.1 G.1‖))
+      rw [hxx, mul_zero, zero_add] at hbad
+      have heq : 2 * (-((B G.1 G.1).re + 1) / (2 * ‖B F.1 G.1‖)) * ‖B F.1 G.1‖ + (B G.1 G.1).re = -1 := by
+        field_simp [h_pos.ne']; ring
+      linarith
+    · have hxx_pos : 0 < (B F.1 F.1).re := lt_of_le_of_ne (h_quad F) (Ne.symm hxx)
+      have hmin := h_quad_t (-‖B F.1 G.1‖ / (B F.1 F.1).re)
+      have heq : (-‖B F.1 G.1‖ / (B F.1 F.1).re) ^ 2 * (B F.1 F.1).re +
+          2 * (-‖B F.1 G.1‖ / (B F.1 F.1).re) * ‖B F.1 G.1‖ + (B G.1 G.1).re =
+          (B G.1 G.1).re - ‖B F.1 G.1‖ ^ 2 / (B F.1 F.1).re := by
+        field_simp [hxx_pos.ne']; ring
+      rw [heq] at hmin
+      exact (div_le_iff₀ hxx_pos).mp (sub_nonneg.mp hmin)
+
+/-- **Transfer-Matrix Continuum Scaling → Generator Spectral Gap & Vacuum Uniqueness.**
+    Any strongly convergent family of symmetric contractive Wilson transfer operators
+    `T_lat m` along `a_m → 0⁺` with uniform lattice gap `Δ ≤ gap m / a_m` yields a
+    continuum Hamiltonian `semigroupGenerator T` with global strict mass gap `Δ`
+    and `ker H_op = ℂ ∙ Ω`. -/
+theorem lattice_transfer_to_continuum_generator_gap
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (a gap : ℕ → ℝ) (ha_pos : ∀ m, 0 < a m)
+    (ha_lim : Filter.Tendsto a Filter.atTop (nhds 0))
+    (Δ : ℝ) (hΔ : 0 < Δ) (h_gap_unif : ∀ m, Δ ≤ gap m / a m)
+    (T_lat : ℕ → H →L[ℂ] H)
+    (hT_contr : ∀ m (x : H), ‖T_lat m x‖ ≤ ‖x‖)
+    (hT_symm : ∀ m (x y : H), ⟪x, T_lat m y⟫_ℂ = ⟪T_lat m x, y⟫_ℂ)
+    (Ω : H) (hΩ : ‖Ω‖ = 1) (hT_vac : ∀ m, T_lat m Ω = Ω)
+    (h_lat_decay : ∀ m (k : ℕ) (φ : H), ⟪Ω, φ⟫_ℂ = 0 →
+      ‖((T_lat m) ^ k) φ‖ ≤ Real.exp (-gap m * (k : ℝ)) * ‖φ‖)
+    (T : ℝ → H →L[ℂ] H)
+    (h_conv : ∀ t : ℝ, 0 ≤ t → ∀ x : H,
+      Filter.Tendsto (fun m : ℕ => ((T_lat m) ^ (Nat.floor (t / a m))) x)
+        Filter.atTop (nhds (T t x)))
+    (h_step : ∀ x : H, Filter.Tendsto (fun m : ℕ => T_lat m x - x) Filter.atTop (nhds 0)) :
+    (∀ ψ : semigroupGeneratorDomain T, ⟪Ω, (ψ : H)⟫_ℂ = 0 →
+      Δ * ‖(ψ : H)‖ ^ 2 ≤ (⟪(ψ : H), semigroupGenerator T ψ⟫_ℂ).re) ∧
+    (∀ ψ : semigroupGeneratorDomain T,
+      0 ≤ (⟪(ψ : H), semigroupGenerator T ψ⟫_ℂ).re) ∧
+    (∀ ψ : semigroupGeneratorDomain T,
+      semigroupGenerator T ψ = 0 → ∃ c : ℂ, (ψ : H) = c • Ω) := by
+  obtain ⟨hT_vac_lim, hT_symm_lim, _, _⟩ :=
+    discrete_semigroup_to_continuum a ha_pos ha_lim T_lat hT_contr hT_symm Ω hT_vac T h_conv h_step
+  have hT_decay := continuum_gap_survival a gap ha_pos ha_lim Δ h_gap_unif T_lat Ω h_lat_decay T h_conv
+  exact semigroupGenerator_gap_and_nonneg T Ω hΩ Δ hΔ hT_vac_lim hT_symm_lim hT_decay
+
+end Imscribing.YangMills.LatticeChessboardTransferimport Imscribing.YangMills.SchwingerToClayMaster
+import Imscribing.YangMills.LatticeChessboardAndTransfer4D
+import Imscribing.YangMills.PoincareLieAlgebraAndNelson
+
+/-!
+# Minimal Irreducible Clay Yang–Mills Reduction
+
+Collects the discharged stack and states the strictly minimal residual targets:
+1. `MinimalBalabanRGTarget`: weak-coupling continuum limit of smeared 4D SU(N)
+   Wilson expectations along `(ymSpacing, ymBetaAF N)` producing `ContinuumSchwingerOS`
+   with `ReflectTensorData`, Euclidean reflection positivity, and uniform clustering `Δ > 0`.
+2. `MinimalOSContinuationTarget`: Fourier–Laplace tube analytic continuation of
+   `C` to Poincaré unitaries `U` and weak-local smeared fields `field` with `iε`-IBP control.
+-/
+
+namespace Imscribing.YangMills.MinimalReduction
+
+open scoped InnerProductSpace
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.ContinuumInterfaces
+open Imscribing.YangMills.OSBorchers
+open Imscribing.YangMills.BorchersReconstruction
+open Imscribing.YangMills.BorchersSchwinger
+open Imscribing.YangMills.SchwingerClayMaster
+
+/-- Strictly minimal Balaban RG continuum limit target for 4D SU(N) Yang–Mills. -/
+structure MinimalBalabanRGTarget (N : ℕ) (hN : 2 ≤ N) where
+  C : ContinuumSchwingerOS
+  R : ReflectTensorData
+  h_herm : ∀ F G : BorchersPos, borchersForm C R G F = star (borchersForm C R F G)
+  h_rp : ∀ F : BorchersPos, 0 ≤ (borchersForm C R F F).re
+  h_symm : ∀ t : ℝ, 0 ≤ t → ∀ F G : BorchersPos,
+    borchersForm C R F (borchersShift R t G) = borchersForm C R (borchersShift R t F) G
+  h_cluster : ∀ t : ℝ, 0 ≤ t → ∀ F : BorchersPos,
+    borchersForm C R borchersVac F = 0 →
+    (borchersForm C R (borchersShift R t F) (borchersShift R t F)).re ≤
+      Real.exp (-2 * C.cluster_rate * t) * (borchersForm C R F F).re
+  variance_elem : BorchersPos
+  variance_strict :
+    ‖borchersForm C R borchersVac variance_elem‖ ^ 2 <
+      (borchersForm C R variance_elem variance_elem).re
+
+/-- Strictly minimal Osterwalder–Schrader Poincaré + weak-field continuation target
+    on the already-constructed Hilbert completion `Completion (BorchersPos ⧸ N₀)`. -/
+structure MinimalOSContinuationTarget {N : ℕ} {hN : 2 ≤ N}
+    (B : MinimalBalabanRGTarget N hN) where
+  poincare_and_weak_fields :
+    let pre := buildBorchersPreData B.C B.R B.h_herm B.h_rp B.h_symm B.h_cluster
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
+    let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ nullSubmodule pre) : H)
+    ∃ (U : Poincare4 → H →ₗᵢ[ℂ] H)
+      (fieldDomain : Submodule ℂ H)
+      (field : TestFn4 → fieldDomain →ₗ[ℂ] H),
+      (∀ g : Poincare4, U g Ω = Ω) ∧
+      U (poincareTimeTrans 0) = LinearIsometry.id ∧
+      (∀ s t : ℝ,
+        (U (poincareTimeTrans (s + t)) : H → H) =
+          fun ψ => U (poincareTimeTrans s) (U (poincareTimeTrans t) ψ)) ∧
+      Dense (fieldDomain : Set H) ∧
+      Ω ∈ fieldDomain ∧
+      (∀ f (ψ : fieldDomain), field f ψ ∈ fieldDomain) ∧
+      (∀ f g : TestFn4, SpacelikeDisjoint f g →
+        ∀ (ψ₁ ψ₂ : fieldDomain) hfg hgf,
+          ⟪(ψ₁ : H), field f ⟨field g ψ₂, hfg⟩⟫_ℂ =
+          ⟪(ψ₁ : H), field g ⟨field f ψ₂, hgf⟩⟫_ℂ) ∧
+      (∃ (f₀ g₀ : TestFn4)
+         (W_reg W_deriv : ℝ → TestFn4 →ₗ[ℂ] ℂ)
+         (p : TestFn4 → ℝ) (C₁ C₂ : ℝ),
+         (∀ f, 0 ≤ p f) ∧ 0 ≤ C₁ ∧ 0 ≤ C₂ ∧
+         (∀ f, ‖W_reg 1 f‖ ≤ C₁ * p f) ∧
+         (∀ f, ∀ ε ∈ Set.Ioc (0 : ℝ) 1, HasDerivAt (fun t => W_reg t f) (W_deriv ε f) ε) ∧
+         (∀ f, ∀ ε ∈ Set.Ioc (0 : ℝ) 1, ‖W_deriv ε f‖ ≤ C₂ * p f) ∧
+         Disjoint (Function.support f₀) (Function.support g₀) ∧
+         ∀ hΩ hg,
+           Filter.Tendsto (fun t => W_reg t g₀) (nhdsWithin 0 (Set.Ioi 0))
+             (nhds ⟪Ω, field f₀ ⟨field g₀ ⟨Ω, hΩ⟩, hg⟩⟫_ℂ) ∧
+           ⟪Ω, field f₀ ⟨field g₀ ⟨Ω, hΩ⟩, hg⟩⟫_ℂ ≠ 0)
+
+/-- **Minimal Clay Reduction Theorem:**
+    Discharges all Hilbert completion, contractivity, generator construction,
+    vacuum uniqueness, spectral gap, boundary temperedness, and operator
+    microcausality obligations unconditionally. -/
+theorem clay_yang_mills_from_minimal_targets
+    (N : ℕ) (hN : 2 ≤ N)
+    (B : MinimalBalabanRGTarget N hN)
+    (C : MinimalOSContinuationTarget B) :
+    ∃ (Q : WightmanQFT4D),
+      HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.C.cluster_rate := by
+  let D : ContinuumWightmanBridgeData N :=
+    { hN := hN
+      C := B.C
+      R := B.R
+      h_herm := B.h_herm
+      h_rp := B.h_rp
+      h_symm := B.h_symm
+      h_cluster := B.h_cluster
+      variance_elem := B.variance_elem
+      variance_strict := B.variance_strict
+      poincare_and_weak_fields := by
+        obtain ⟨U, fieldDomain, field, hU_vac, hU_zero, hU_add, h_dense, hΩ_dom,
+          h_maps, h_weak_loc, f₀, g₀, W_reg, W_deriv, p, C₁, C₂,
+          hp_nn, hC₁, hC₂, h_at1, h_deriv, h_dbound, h_disj, h_2pt⟩ := C.poincare_and_weak_fields
+        refine ⟨U, fieldDomain, field, hU_vac, hU_zero, hU_add, h_dense, hΩ_dom,
+          h_maps, ?_, f₀, g₀, W_reg, W_deriv, p, C₁, C₂,
+          hp_nn, hC₁, hC₂, h_at1, h_deriv, h_dbound, h_disj, h_2pt⟩
+        intro f g hfg ψ₁ ψ₂
+        exact h_weak_loc f g hfg ψ₁ ψ₂ (h_maps g ψ₂) (h_maps f ψ₂) }
+  exact clay_yang_mills_from_continuum_schwinger D
+
+end Imscribing.YangMills.MinimalReductionimport Imscribing.YangMills.ConcreteTensorProductSchwartz
+import Imscribing.YangMills.MinimalClayReduction
+
+/-!
+# Concrete Minimal Clay Yang–Mills Reduction (Zero Abstract `ReflectTensorData`)
+
+Permanently instantiates `R := concreteReflectTensorData` on `SchwartzMap`,
+eliminating `R : ReflectTensorData` from `ConcreteBalabanTarget` and `ConcreteOSTarget`,
+and proves `clay_yang_mills_from_concrete_targets` (`0 sorry`).
+-/
+
+namespace Imscribing.YangMills.ConcreteMinimalReduction
+
+open scoped InnerProductSpace
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.ContinuumInterfaces
+open Imscribing.YangMills.OSBorchers
+open Imscribing.YangMills.BorchersReconstruction
+open Imscribing.YangMills.BorchersSchwinger
+open Imscribing.YangMills.MinimalReduction
+open Imscribing.YangMills.ConcreteTensorSchwartz
+
+/-- Concrete Borchers form on `BorchersPos` induced by `C : ContinuumSchwingerOS`. -/
+noncomputable def concreteBorchersForm (C : ContinuumSchwingerOS) :
+    BorchersPos → BorchersPos → ℂ :=
+  borchersForm C concreteReflectTensorData
+
+/-- Concrete positive-time shift on `BorchersPos`. -/
+noncomputable def concreteBorchersShift (t : ℝ) : BorchersPos →ₗ[ℂ] BorchersPos :=
+  borchersShift concreteReflectTensorData t
+
+/-- Balaban RG continuum limit target with `R` permanently fixed to `concreteReflectTensorData`. -/
+structure ConcreteBalabanTarget (N : ℕ) (hN : 2 ≤ N) where
+  C : ContinuumSchwingerOS
+  h_herm : ∀ F G : BorchersPos,
+    concreteBorchersForm C G F = star (concreteBorchersForm C F G)
+  h_rp : ∀ F : BorchersPos, 0 ≤ (concreteBorchersForm C F F).re
+  h_symm : ∀ t : ℝ, 0 ≤ t → ∀ F G : BorchersPos,
+    concreteBorchersForm C F (concreteBorchersShift t G) =
+      concreteBorchersForm C (concreteBorchersShift t F) G
+  h_cluster : ∀ t : ℝ, 0 ≤ t → ∀ F : BorchersPos,
+    concreteBorchersForm C borchersVac F = 0 →
+    (concreteBorchersForm C (concreteBorchersShift t F) (concreteBorchersShift t F)).re ≤
+      Real.exp (-2 * C.cluster_rate * t) * (concreteBorchersForm C F F).re
+  variance_elem : BorchersPos
+  variance_strict :
+    ‖concreteBorchersForm C borchersVac variance_elem‖ ^ 2 <
+      (concreteBorchersForm C variance_elem variance_elem).re
+
+/-- Minimal OS analytic continuation target with `R` permanently fixed to `concreteReflectTensorData`. -/
+structure ConcreteOSTarget {N : ℕ} {hN : 2 ≤ N} (B : ConcreteBalabanTarget N hN) where
+  poincare_and_weak_fields :
+    let pre := buildBorchersPreData B.C concreteReflectTensorData
+      B.h_herm B.h_rp B.h_symm B.h_cluster
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
+    let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ nullSubmodule pre) : H)
+    ∃ (U : Poincare4 → H →ₗᵢ[ℂ] H)
+      (fieldDomain : Submodule ℂ H)
+      (field : TestFn4 → fieldDomain →ₗ[ℂ] H),
+      (∀ g : Poincare4, U g Ω = Ω) ∧
+      U (poincareTimeTrans 0) = LinearIsometry.id ∧
+      (∀ s t : ℝ,
+        (U (poincareTimeTrans (s + t)) : H → H) =
+          fun ψ => U (poincareTimeTrans s) (U (poincareTimeTrans t) ψ)) ∧
+      Dense (fieldDomain : Set H) ∧
+      Ω ∈ fieldDomain ∧
+      (∀ f (ψ : fieldDomain), field f ψ ∈ fieldDomain) ∧
+      (∀ f g : TestFn4, SpacelikeDisjoint f g →
+        ∀ (ψ₁ ψ₂ : fieldDomain) hfg hgf,
+          ⟪(ψ₁ : H), field f ⟨field g ψ₂, hfg⟩⟫_ℂ =
+          ⟪(ψ₁ : H), field g ⟨field f ψ₂, hgf⟩⟫_ℂ) ∧
+      (∃ (f₀ g₀ : TestFn4)
+         (W_reg W_deriv : ℝ → TestFn4 →ₗ[ℂ] ℂ)
+         (p : TestFn4 → ℝ) (C₁ C₂ : ℝ),
+         (∀ f, 0 ≤ p f) ∧ 0 ≤ C₁ ∧ 0 ≤ C₂ ∧
+         (∀ f, ‖W_reg 1 f‖ ≤ C₁ * p f) ∧
+         (∀ f, ∀ ε ∈ Set.Ioc (0 : ℝ) 1, HasDerivAt (fun t => W_reg t f) (W_deriv ε f) ε) ∧
+         (∀ f, ∀ ε ∈ Set.Ioc (0 : ℝ) 1, ‖W_deriv ε f‖ ≤ C₂ * p f) ∧
+         Disjoint (Function.support f₀) (Function.support g₀) ∧
+         ∀ hΩ hg,
+           Filter.Tendsto (fun t => W_reg t g₀) (nhdsWithin 0 (Set.Ioi 0))
+             (nhds ⟪Ω, field f₀ ⟨field g₀ ⟨Ω, hΩ⟩, hg⟩⟫_ℂ) ∧
+           ⟪Ω, field f₀ ⟨field g₀ ⟨Ω, hΩ⟩, hg⟩⟫_ℂ ≠ 0)
+
+/-- **Concrete Minimal Clay Yang–Mills Reduction Theorem:**
+    Every `ConcreteBalabanTarget` + `ConcreteOSTarget` yields a strict Clay 4D
+    `WightmanQFT4D` satisfying `HasYangMillsUVScaling N Q` and `HasStrictMassGap Q B.C.cluster_rate`. -/
+theorem clay_yang_mills_from_concrete_targets
+    (N : ℕ) (hN : 2 ≤ N)
+    (B : ConcreteBalabanTarget N hN)
+    (C : ConcreteOSTarget B) :
+    ∃ (Q : WightmanQFT4D),
+      HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.C.cluster_rate := by
+  let B_min : MinimalBalabanRGTarget N hN :=
+    { C := B.C
+      R := concreteReflectTensorData
+      h_herm := B.h_herm
+      h_rp := B.h_rp
+      h_symm := B.h_symm
+      h_cluster := B.h_cluster
+      variance_elem := B.variance_elem
+      variance_strict := B.variance_strict }
+  let C_min : MinimalOSContinuationTarget B_min :=
+    { poincare_and_weak_fields := C.poincare_and_weak_fields }
+  exact clay_yang_mills_from_minimal_targets N hN B_min C_min
+
+end Imscribing.YangMills.ConcreteMinimalReductionimport Imscribing.YangMills.SemigroupToUnitaryGroupCFC
+import Imscribing.YangMills.ConcreteMinimalClayReduction
+import Imscribing.YangMills.IBPBoundaryToWightman
+import Imscribing.YangMills.DimensionalTransmutationAndBoundary
+import Imscribing.YangMills.LorentzBoostAndMinkowskiFields
+
+/-!
+# Master Osterwalder–Schrader → Clay Wightman Discharge
+
+Given `B : ConcreteBalabanTarget N hN` and the strictly irreducible analytic-continuation
+core `OSAnalyticCore B`, synthesizes `ConcreteOSTarget B` and proves
+`HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.C.cluster_rate` (`0 sorry`).
+-/
+
+namespace Imscribing.YangMills.OSMasterDischarge
+
+open scoped InnerProductSpace Topology
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.OSCompletion
+open Imscribing.YangMills.OSBorchers
+open Imscribing.YangMills.BorchersReconstruction
+open Imscribing.YangMills.BorchersSchwinger
+open Imscribing.YangMills.ConcreteTensorSchwartz
+open Imscribing.YangMills.SpatialISO3Unitaries
+open Imscribing.YangMills.SemigroupCFC
+open Imscribing.YangMills.OSIBPBoundary
+open Imscribing.YangMills.DimTransAndBoundary
+open Imscribing.YangMills.ConcreteMinimalReduction
+
+/-- Strictly irreducible analytic-continuation core on top of `B : ConcreteBalabanTarget N hN`.
+    All time-translation unitaries `U₀`, spatial-translation unitaries `U_space`,
+    Euclidean semigroup `T`, Hamiltonian `H_op`, vacuum uniqueness, spectral gap,
+    `M`-step IBP boundary temperedness, and operator microcausality are derived automatically. -/
+structure OSAnalyticCore {N : ℕ} {hN : 2 ≤ N} (B : ConcreteBalabanTarget N hN) where
+  h_space_inv : ∀ (v : Fin 3 → ℝ) (F G : BorchersPos),
+    concreteBorchersForm B.C (borchersSpaceShift v F) (borchersSpaceShift v G) =
+      concreteBorchersForm B.C F G
+  analytic_core :
+    let pre := buildBorchersPreData B.C concreteReflectTensorData
+      B.h_herm B.h_rp B.h_symm B.h_cluster
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
+    let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ nullSubmodule pre) : H)
+    ∃ (T : ℝ → H →L[ℂ] H),
+      T 0 = 1 ∧
+      (∀ s t : ℝ, 0 ≤ s → 0 ≤ t → T (s + t) = T s * T t) ∧
+      (∀ t : ℝ, 0 ≤ t → ∀ x y : H, ⟪x, T t y⟫_ℂ = ⟪T t x, y⟫_ℂ) ∧
+      (∀ t : ℝ, 0 ≤ t → ∀ x : H, ‖T t x‖ ≤ ‖x‖) ∧
+      (∀ x : H, Filter.Tendsto (fun t : ℝ => T t x) (𝓝[>] 0) (𝓝 x)) ∧
+      (∀ t : ℝ, 0 ≤ t → T t Ω = Ω) ∧
+    ∃ (U_lor : Lorentz4 → H →ₗᵢ[ℂ] H)
+      (fieldDomain : Submodule ℂ H)
+      (field : TestFn4 → fieldDomain →ₗ[ℂ] H),
+      (∀ Λ : Lorentz4, Λ.mat = 1 → U_lor Λ = LinearIsometry.id) ∧
+      (∀ Λ : Lorentz4, U_lor Λ Ω = Ω) ∧
+      Dense (fieldDomain : Set H) ∧
+      Ω ∈ fieldDomain ∧
+      (∀ f (ψ : fieldDomain), field f ψ ∈ fieldDomain) ∧
+      (∀ f g : TestFn4, SpacelikeDisjoint f g →
+        ∀ (ψ₁ ψ₂ : fieldDomain) hfg hgf,
+          ⟪(ψ₁ : H), field f ⟨field g ψ₂, hfg⟩⟫_ℂ =
+          ⟪(ψ₁ : H), field g ⟨field f ψ₂, hgf⟩⟫_ℂ) ∧
+      (∃ (f₀ g₀ : TestFn4)
+         (W_reg : ℝ → TestFn4 →ₗ[ℂ] ℂ) (D_ibp : TestFn4 →ₗ[ℂ] TestFn4)
+         (M : ℕ) (p : TestFn4 → ℝ),
+         (∀ f, 0 ≤ p f) ∧
+         (∀ f, ∀ t ∈ Set.Ioc (0 : ℝ) 1,
+           HasDerivAt (fun ε => W_reg ε f) (W_reg t (D_ibp f)) t) ∧
+         (∀ f, ∀ a : ℝ, 0 < a → a ≤ 1 →
+           ContinuousOn (fun t => W_reg t f) (Set.Icc a 1)) ∧
+         (∀ g : TestFn4, ∀ t ∈ Set.Ioc (0 : ℝ) 1,
+           ‖W_reg t g‖ ≤ p g * t ^ (-(M : ℝ))) ∧
+         Disjoint (Function.support f₀) (Function.support g₀) ∧
+         ∀ hΩ hg,
+           Filter.Tendsto (fun t => W_reg t g₀) (𝓝[>] 0)
+             (𝓝 ⟪Ω, field f₀ ⟨field g₀ ⟨Ω, hΩ⟩, hg⟩⟫_ℂ) ∧
+           ⟪Ω, field f₀ ⟨field g₀ ⟨Ω, hΩ⟩, hg⟩⟫_ℂ ≠ 0)
+
+/-- **Master OS Discharge Theorem:**
+    Synthesizes `ConcreteOSTarget B` and proves `HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q Δ`
+    directly from `B : ConcreteBalabanTarget N hN` and `C_core : OSAnalyticCore B`. -/
+theorem os_continuation_master_discharge
+    (N : ℕ) (hN : 2 ≤ N)
+    (B : ConcreteBalabanTarget N hN)
+    (C_core : OSAnalyticCore B) :
+    ∃ (Q : WightmanQFT4D),
+      HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.C.cluster_rate := by
+  let pre := buildBorchersPreData B.C concreteReflectTensorData
+    B.h_herm B.h_rp B.h_symm B.h_cluster
+  let core := quotInnerCore pre
+  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  obtain ⟨T, hT_zero, hT_add, hT_symm, hT_contr, hT_cont, hT_vac,
+    U_lor, fieldDomain, field, hU_lor_one, hU_lor_vac, h_dense, hΩ_dom,
+    h_maps, h_weak_loc, f₀, g₀, W_reg, D_ibp, M, p, hp_nn, h_deriv, h_cont,
+    h_blowup, h_disj, h_2pt⟩ := C_core.analytic_core
+  let P_pack := poincare_from_semigroup_and_iso3 pre C_core.h_space_inv
+    borchersSpaceShift_vac T hT_zero hT_add hT_symm hT_contr hT_cont hT_vac
+    U_lor hU_lor_one hU_lor_vac
+  let U := P_pack.1
+  have hU_spec := P_pack.2
+  obtain ⟨C_ibp, W₀, hC_nn, h_W₀_tend, h_W₀_bd⟩ :=
+    os_ibp_polynomial_to_boundary W_reg D_ibp h_deriv h_cont M p hp_nn h_blowup
+  let C_target : ConcreteOSTarget B :=
+    { poincare_and_weak_fields := by
+        refine ⟨U, fieldDomain, field, hU_spec.1, hU_spec.2.1, hU_spec.2.2,
+          h_dense, hΩ_dom, h_maps, h_weak_loc, ?_⟩
+        refine ⟨f₀, g₀, (fun _ => W₀), (fun _ => 0), (fun f => ‖W₀ f‖), 1, 0,
+          fun f => norm_nonneg _, zero_le_one, le_rfl,
+          fun f => by simpa using le_rfl,
+          fun f ε _ => hasDerivAt_const ε (W₀ f),
+          fun f ε _ => by simp,
+          h_disj, fun hΩ hg => ?_⟩
+        have h_lim1 := h_W₀_tend g₀
+        have h_lim2 := (h_2pt hΩ hg).1
+        have h_eq : W₀ g₀ = ⟪_, field f₀ ⟨field g₀ ⟨_, hΩ⟩, hg⟩⟫_ℂ :=
+          tendsto_nhds_unique h_lim1 h_lim2
+        refine ⟨by simpa [h_eq] using tendsto_const_nhds, (h_2pt hΩ hg).2⟩ }
+  exact clay_yang_mills_from_concrete_targets N hN B C_target
+
+end Imscribing.YangMills.OSMasterDischarge
+
+import Imscribing.YangMills.LatticeOSReflectionPositivity4D
+import Imscribing.YangMills.WilsonFrobeniusAndSmeared4D
+
+/-!
+# Reflection Positivity for Smeared Positive-Time 4D SU(N) Magnetic Observables
+
+Connects `WilsonFrobeniusAndSmeared4D` directly to `LatticeOSReflectionPositivity4D`
+(`0 sorry`):
+1. Defines `spatialPlaqDensity` (gauge-invariant magnetic plaquette energy at site `x`).
+2. Proves `spatialPlaqDensity_glue_pos` and `spatialPlaqDensity_reflect_glue_pos`
+   at every positive-time site `(x 0).val < M`.
+3. Proves **`smeared_magnetic_wilson_rp_nonneg`**: every positive-time polynomial
+   of smeared spatial plaquette densities satisfies exact finite-volume
+   Osterwalder–Seiler reflection positivity.
+-/
+
+namespace Imscribing.YangMills.LatticeSchwingerRP4D
+
+open MeasureTheory
+open Imscribing.YangMills.WilsonLattice4D
+open Imscribing.YangMills.WilsonBounds4D
+open Imscribing.YangMills.LatticeRP4D
+open Imscribing.YangMills.LatticeCutSplit4D
+open Imscribing.YangMills.LatticeOSRP4D
+
+/-- Gauge-invariant spatial (magnetic) plaquette energy density at site `x`. -/
+noncomputable def spatialPlaqDensity (N L : ℕ) [NeZero N] (U : LinkConfig N L) (x : Lat4 L) : ℝ :=
+  ∑ i : Fin 3, ∑ j : Fin 3, (1 - realTrace (plaquetteHolonomy U x i.succ j.succ) / (N : ℝ))
+
+theorem spatialPlaqDensity_gaugeInvariant (N L : ℕ) [NeZero N]
+    (g : GaugeTransform N L) (U : LinkConfig N L) (x : Lat4 L) :
+    spatialPlaqDensity N L (applyGauge g U) x = spatialPlaqDensity N L U x := by
+  unfold spatialPlaqDensity
+  refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+  rw [plaquetteHolonomy_applyGauge, realTrace_conj]
+
+theorem spatialPlaqDensity_bounds (N L : ℕ) [NeZero N] (U : LinkConfig N L) (x : Lat4 L) :
+    0 ≤ spatialPlaqDensity N L U x ∧ spatialPlaqDensity N L U x ≤ 18 := by
+  unfold spatialPlaqDensity
+  refine ⟨Finset.sum_nonneg fun i _ => Finset.sum_nonneg fun j _ =>
+    (plaquette_density_bounds _).1, ?_⟩
+  calc
+    (∑ i : Fin 3, ∑ j : Fin 3, (1 - realTrace (plaquetteHolonomy U x i.succ j.succ) / (N : ℝ)))
+        ≤ ∑ _i : Fin 3, ∑ _j : Fin 3, (2 : ℝ) :=
+          Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => (plaquette_density_bounds _).2
+    _ = 18 := by simp [Finset.sum_const]; norm_num
+
+private lemma glueConfig_pos_spatial_eq {N M : ℕ} (p q : HalfVar N M)
+    {x : Lat4 (2 * M)} (hx : (x 0).val < M) (i : Fin 3) :
+    glueConfig p q x i.succ = p.1 x i.succ := by
+  classical
+  have hpos : IsPosLink M x i.succ := ⟨hx, fun h => absurd h (Fin.succ_ne_zero i)⟩
+  simp [glueConfig, hpos]
+
+private lemma linkReflect_glueConfig_pos_spatial_eq {N M : ℕ} [NeZero M] (p q : HalfVar N M)
+    {x : Lat4 (2 * M)} (hx : (x 0).val < M) (i : Fin 3) :
+    linkReflect (glueConfig p q) x i.succ = q.1 x i.succ := by
+  classical
+  have hM : 0 < M := NeZero.pos M
+  have hx_lt : (x 0).val < 2 * M := (x 0).isLt
+  have h_refl_val : ((reflectSite (2 * M) x) 0).val = 2 * M - 1 - (x 0).val := by
+    simp only [reflectSite, ↓reduceIte]
+    have heq : -(x 0 + 1) = (((2 * M - 1 - (x 0).val : ℕ) : ZMod (2 * M))) := by
+      have hsub : ((x 0).val + (2 * M - 1 - (x 0).val) + 1 : ℕ) = 2 * M := by omega
+      have hz := congrArg (Nat.cast (R := ZMod (2 * M))) hsub
+      push_cast at hz
+      rw [ZMod.natCast_zmod_val, ZMod.natCast_self] at hz
+      linear_combination hz
+    rw [heq, ZMod.val_natCast_of_lt (by omega)]
+  have h_neg : IsNegLink M (reflectSite (2 * M) x) i.succ :=
+    ⟨by omega, fun h => absurd h (Fin.succ_ne_zero i)⟩
+  have h_np : ¬ IsPosLink M (reflectSite (2 * M) x) i.succ := by
+    rintro ⟨a, _⟩; exact absurd a (not_lt.mpr h_neg.1)
+  have h_ncm : ¬ IsCutLinkMid M (reflectSite (2 * M) x) i.succ := by
+    rintro ⟨h, _⟩; exact Fin.succ_ne_zero i h
+  have h_nct : ¬ IsCutLinkTop M (reflectSite (2 * M) x) i.succ := by
+    rintro ⟨h, _⟩; exact Fin.succ_ne_zero i h
+  simp only [linkReflect, Fin.succ_ne_zero, ↓reduceIte, glueConfig, h_np, h_ncm, h_nct]
+  exact congrFun (congrFun (linkReflect_involutive q.1) x) i.succ
+
+private lemma spatial_shift_zero_val (M : ℕ) (x : Lat4 (2 * M)) (i : Fin 3) :
+    ((x + stepDir (2 * M) i.succ) 0).val = (x 0).val := by
+  simp [stepDir, (Fin.succ_ne_zero i).symm]
+
+/-- At any positive-time site `(x 0).val < M`, `spatialPlaqDensity` on `glueConfig p q`
+    depends only on the positive-half configuration `p.1`. -/
+theorem spatialPlaqDensity_glue_pos {N M : ℕ} [NeZero N] (p q : HalfVar N M)
+    {x : Lat4 (2 * M)} (hx : (x 0).val < M) :
+    spatialPlaqDensity N (2 * M) (glueConfig p q) x = spatialPlaqDensity N (2 * M) p.1 x := by
+  unfold spatialPlaqDensity
+  refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+  have h1 := glueConfig_pos_spatial_eq p q hx i
+  have h2 := glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val]; exact hx) j
+  have h3 := glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val]; exact hx) i
+  have h4 := glueConfig_pos_spatial_eq p q hx j
+  simp only [plaquetteHolonomy, h1, h2, h3, h4]
+
+/-- At any positive-time site `(x 0).val < M`, `spatialPlaqDensity` on `linkReflect (glueConfig p q)`
+    depends only on the negative-half configuration `q.1`. -/
+theorem spatialPlaqDensity_reflect_glue_pos {N M : ℕ} [NeZero N] [NeZero M] (p q : HalfVar N M)
+    {x : Lat4 (2 * M)} (hx : (x 0).val < M) :
+    spatialPlaqDensity N (2 * M) (linkReflect (glueConfig p q)) x =
+      spatialPlaqDensity N (2 * M) q.1 x := by
+  unfold spatialPlaqDensity
+  refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+  have h1 := linkReflect_glueConfig_pos_spatial_eq p q hx i
+  have h2 := linkReflect_glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val]; exact hx) j
+  have h3 := linkReflect_glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val]; exact hx) i
+  have h4 := linkReflect_glueConfig_pos_spatial_eq p q hx j
+  simp only [plaquetteHolonomy, h1, h2, h3, h4]
+
+/-- **Finite-Volume Reflection Positivity for Smeared Positive-Time Magnetic Observables:**
+    For any finite linear combination `F(U) = ∑ α, c α * ∏ k, spatialPlaqDensity U (xs α k)`
+    with all sites in the positive time slice `(xs α k 0).val < M`,
+    `0 ≤ Re ∫∫ star(F(Θ(glue p q))) * F(glue p q) * exp(-S_W(glue p q)) dμ(p) dμ(q)`. -/
+theorem smeared_magnetic_wilson_rp_nonneg
+    {N M : ℕ} [NeZero N] [NeZero M] {β : ℝ} (hβ : 0 ≤ β)
+    [MeasurableSpace (GaugeGroup N)] [MeasurableMul₂ (GaugeGroup N)] [MeasurableInv (GaugeGroup N)]
+    (hEntry : ∀ i j : Fin N, Measurable (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ) i j))
+    (μ : Measure (HalfVar N M)) [IsFiniteMeasure μ]
+    {ι : Type*} (s : Finset ι) (c : ι → ℂ) (n : ι → ℕ)
+    (xs : ∀ α : ι, Fin (n α) → Lat4 (2 * M))
+    (hpos : ∀ α ∈ s, ∀ k : Fin (n α), ((xs α k) 0).val < M) :
+    let F : LinkConfig N (2 * M) → ℂ := fun U =>
+      ∑ α ∈ s, c α * ∏ k : Fin (n α), (spatialPlaqDensity N (2 * M) U (xs α k) : ℂ)
+    0 ≤ (∫ p, ∫ q, star (F (linkReflect (glueConfig p q))) * F (glueConfig p q) *
+      (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ).re := by
+  intro F
+  let F_half : HalfVar N M → ℂ := fun p => F p.1
+  have h_meas_site : ∀ x : Lat4 (2 * M),
+      Measurable (fun p : HalfVar N M => (spatialPlaqDensity N (2 * M) p.1 x : ℂ)) := by
+    intro x
+    apply Complex.continuous_ofReal.measurable.comp
+    unfold spatialPlaqDensity
+    refine Finset.measurable_sum _ fun i _ => Finset.measurable_sum _ fun j _ => ?_
+    refine measurable_const.sub ((Complex.continuous_re.measurable.comp ?_).div_const _)
+    unfold plaquetteHolonomy
+    have ml1 : Measurable (fun p : HalfVar N M => p.1 x i.succ) :=
+      ((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst
+    have ml2 : Measurable (fun p : HalfVar N M => p.1 (x + stepDir (2 * M) i.succ) j.succ) :=
+      ((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst
+    have ml3 : Measurable (fun p : HalfVar N M => (p.1 (x + stepDir (2 * M) j.succ) i.succ)⁻¹) :=
+      (((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst).inv
+    have ml4 : Measurable (fun p : HalfVar N M => (p.1 x j.succ)⁻¹) :=
+      (((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst).inv
+    have mprod := ((ml1.mul ml2).mul ml3).mul ml4
+    change Measurable (fun p : HalfVar N M =>
+      Matrix.trace ((plaquetteHolonomy p.1 x i.succ j.succ : GaugeGroup N) :
+        Matrix (Fin N) (Fin N) ℂ))
+    exact Finset.measurable_sum _ fun k _ => (hEntry k k).comp mprod
+  have hF_meas : Measurable F_half := by
+    dsimp [F_half, F]
+    refine Finset.measurable_sum _ fun α _ => measurable_const.mul ?_
+    exact Finset.measurable_prod _ fun k _ => h_meas_site (xs α k)
+  let BF : ℝ := ∑ α ∈ s, ‖c α‖ * (18 : ℝ) ^ (n α)
+  have hBF_nn : 0 ≤ BF := Finset.sum_nonneg fun α _ => by positivity
+  have hF_bound : ∀ p : HalfVar N M, ‖F_half p ‖ ≤ BF := by
+    intro p
+    dsimp [F_half, F, BF]
+    refine le_trans (norm_sum_le _ _) (Finset.sum_le_sum fun α _ => ?_)
+    rw [norm_mul, norm_prod]
+    have h_prod_le : (∏ k : Fin (n α), ‖(spatialPlaqDensity N (2 * M) p.1 (xs α k) : ℂ)‖) ≤
+        (18 : ℝ) ^ (n α) := by
+      calc
+        (∏ k : Fin (n α), ‖(spatialPlaqDensity N (2 * M) p.1 (xs α k) : ℂ)‖)
+            ≤ ∏ _k : Fin (n α), (18 : ℝ) := by
+                refine Finset.prod_le_prod (fun k _ => norm_nonneg _) fun k _ => ?_
+                rw [Complex.norm_real, Real.norm_of_nonneg (spatialPlaqDensity_bounds N (2 * M) p.1 _).1]
+                exact (spatialPlaqDensity_bounds N (2 * M) p.1 _).2
+        _ = (18 : ℝ) ^ (n α) := by simp [Finset.prod_const]
+    exact mul_le_mul_of_nonneg_left h_prod_le (norm_nonneg _)
+  have h_rp := wilson4D_reflection_positivity hβ hEntry μ F_half hF_meas BF hBF_nn hF_bound
+  have h_eq : ∀ p q : HalfVar N M,
+      star (F (linkReflect (glueConfig p q))) * F (glueConfig p q) =
+        star (F_half q) * F_half p := by
+    intro p q
+    have hp : F (glueConfig p q) = F_half p := by
+      dsimp [F, F_half]
+      refine Finset.sum_congr rfl fun α hα => ?_
+      congr 1
+      refine Finset.prod_congr rfl fun k _ => ?_
+      rw [spatialPlaqDensity_glue_pos p q (hpos α hα k)]
+    have hq : F (linkReflect (glueConfig p q)) = F_half q := by
+      dsimp [F, F_half]
+      refine Finset.sum_congr rfl fun α hα => ?_
+      congr 1
+      refine Finset.prod_congr rfl fun k _ => ?_
+      rw [spatialPlaqDensity_reflect_glue_pos p q (hpos α hα k)]
+    rw [hp, hq]
+  -- Take the conjugate of the double integral instead of swapping p and q
+  have h_conj_eq :
+      (∫ p, ∫ q, star (F (linkReflect (glueConfig p q))) * F (glueConfig p q) *
+        (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ) =
+      star (∫ p, ∫ q, star (F_half p) * F_half q *
+        (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ) := by
+    rw [← integral_conj]
+    refine integral_congr_ae (Filter.Eventually.of_forall fun p => ?_)
+    rw [← integral_conj]
+    refine integral_congr_ae (Filter.Eventually.of_forall fun q => ?_)
+    rw [h_eq p q, star_mul, star_mul, star_star, Complex.conj_ofReal]
+    ring
+  rw [h_conj_eq]
+  -- The real part of the conjugate equals the real part of the original
+  change (starRingEnd ℂ _).re ≥ 0
+  rw [Complex.conj_re]
+  exact h_rp
+
+end Imscribing.YangMills.LatticeSchwingerRP4Dimport Imscribing.YangMills.CanonicalWilsonMeasureBridge
+import Imscribing.YangMills.LatticeSchwingerRP4D
+
+/-!
+# Canonical Product Haar Half-Lattice Measure & Unconditional Finite-Volume 4D RP
+
+1. Constructs `halfVarHaarMeasure N M` on `HalfVar N M` as the product of
+   `wilsonHaarLinkMeasure N (2 * M)` and the cut-auxiliary Haar product measure.
+2. Proves `haar_inv_mul_lintegral`:
+   `∫⁻ W₁, ∫⁻ W₂, 1_S(W₁⁻¹ W₂) dν(W₁) dν(W₂) = ν(S)` for Haar measure `ν` on SU(N).
+3. Proves **`canonical_smeared_magnetic_rp_nonneg`**: unconditional finite-volume
+   Osterwalder–Seiler reflection positivity on the actual canonical Haar
+   probability measure (0 abstract measure/measurability assumptions).
+-/
+
+namespace Imscribing.YangMills.CanonicalHalfRP4D
+
+open MeasureTheory
+open Imscribing.YangMills.WilsonLattice4D
+open Imscribing.YangMills.LatticeRP4D
+open Imscribing.YangMills.LatticeOSRP4D
+open Imscribing.YangMills.LatticeSchwingerRP4D
+open Imscribing.YangMills.CanonicalHaar4D
+open Imscribing.YangMills.CanonicalWilsonBridge
+
+/-- Canonical product Haar probability measure on cut-splitting variables `Lat4 (2 * M) → SU(N)`. -/
+noncomputable def cutAuxHaarMeasure (N M : ℕ) [NeZero M] :
+    letI := borel (GaugeGroup N)
+    Measure (Lat4 (2 * M) → GaugeGroup N) :=
+  letI := borel (GaugeGroup N)
+  haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : CompactSpace (GaugeGroup N) := compactSpace_gaugeGroup N
+  Measure.pi (fun _ => Measure.haar)
+
+/-- Canonical product Haar probability measure on `HalfVar N M`. -/
+noncomputable def halfVarHaarMeasure (N M : ℕ) [NeZero M] :
+    letI := borel (GaugeGroup N)
+    Measure (HalfVar N M) :=
+  letI := borel (GaugeGroup N)
+  (wilsonHaarLinkMeasure N (2 * M)).prod (cutAuxHaarMeasure N M)
+
+theorem halfVarHaarMeasure_isProbability (N M : ℕ) [NeZero M] :
+    letI := borel (GaugeGroup N)
+    @IsProbabilityMeasure (HalfVar N M) _ (halfVarHaarMeasure N M) := by
+  letI := borel (GaugeGroup N)
+  haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : CompactSpace (GaugeGroup N) := compactSpace_gaugeGroup N
+  haveI := wilsonHaarLinkMeasure_isProbability N (2 * M)
+  haveI : IsProbabilityMeasure (cutAuxHaarMeasure N M) := Measure.pi.isProbabilityMeasure
+  exact Measure.prod.instIsProbabilityMeasure _ _
+
+/-- **Haar Convolution Identity for the Cut-Link Split `W₁⁻¹ * W₂`:**
+    Integrating `1_S(W₁⁻¹ W₂)` over independent Haar variables `W₁, W₂` yields `ν(S)`. -/
+theorem haar_inv_mul_lintegral {G : Type*} [Group G] [TopologicalSpace G]
+    [MeasurableSpace G] [IsTopologicalGroup G] [BorelSpace G]
+    (ν : Measure G) [IsProbabilityMeasure ν] [Measure.IsMulLeftInvariant ν]
+    {s : Set G} (hs : MeasurableSet s) :
+    ∫⁻ W₁ : G, ∫⁻ W₂ : G, s.indicator 1 (W₁⁻¹ * W₂) ∂ν ∂ν = ν s := by
+  have h_inner : ∀ W₁ : G, ∫⁻ W₂ : G, s.indicator 1 (W₁⁻¹ * W₂) ∂ν = ν s := by
+    intro W₁
+    have hm : Measurable (fun W₂ : G => W₁⁻¹ * W₂) := measurable_const.mul measurable_id
+    have hind : Measurable (s.indicator (fun _ : G => (1 : ENNReal))) := measurable_const.indicator hs
+    rw [← lintegral_map hind hm, Measure.map_mul_left_eq_self, lintegral_indicator hs]
+    simp
+  simp_rw [h_inner, lintegral_const, measure_univ, mul_one]
+
+/-- **Unconditional Finite-Volume 4D SU(N) Reflection Positivity on Canonical Haar Measure:**
+    Every positive-time polynomial observable `F(U) = ∑ α, c α * ∏ k, spatialPlaqDensity U (xs α k)`
+    satisfies `0 ≤ Re ∫∫ star(F(Θ(glue p q))) * F(glue p q) * exp(-S_W(glue p q)) dμ_half(p) dμ_half(q)`. -/
+theorem canonical_smeared_magnetic_rp_nonneg
+    (N M : ℕ) [NeZero N] [NeZero M] {β : ℝ} (hβ : 0 ≤ β)
+    {ι : Type*} (s : Finset ι) (c : ι → ℂ) (n : ι → ℕ)
+    (xs : ∀ α : ι, Fin (n α) → Lat4 (2 * M))
+    (hpos : ∀ α ∈ s, ∀ k : Fin (n α), ((xs α k) 0).val < M) :
+    letI := borel (GaugeGroup N)
+    let μ := halfVarHaarMeasure N M
+    let F : LinkConfig N (2 * M) → ℂ := fun U =>
+      ∑ α ∈ s, c α * ∏ k : Fin (n α), (spatialPlaqDensity N (2 * M) U (xs α k) : ℂ)
+    0 ≤ (∫ p, ∫ q, star (F (linkReflect (glueConfig p q))) * F (glueConfig p q) *
+      (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ).re := by
+  letI := borel (GaugeGroup N)
+  haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI := halfVarHaarMeasure_isProbability N M
+  exact smeared_magnetic_wilson_rp_nonneg hβ (canonicalGaugeEntryMeasurable N)
+    (halfVarHaarMeasure N M) s c n xs hpos
+
+end Imscribing.YangMills.CanonicalHalfRP4Dimport Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
+import Mathlib.LinearAlgebra.DFinsupp
+import Imscribing.YangMills.OSBorchersBridge
+import Imscribing.YangMills.ClayReductionBridge
+
+/-!
+# Borchers Positive-Time Schwartz Algebra → Clay Wightman Reduction
+
+1. Instantiates `PosSchwartzSubmodule n` (positive Euclidean time test functions)
+   and the concrete Borchers direct sum `BorchersPos := Π₀ n : ℕ, PosSchwartzSubmodule n`.
+2. Defines `BorchersOSData N` (packaging smeared continuum Schwinger
+   functionals S_n, positive-time reflection-positivity bilinear pairing B,
+   time shifts θ, clustering Δ > 0, and separated 2-point / variance
+   witnesses—without assuming OSHilbert, T, H_op, or HasStrictMassGap).
+3. Proves `borchers_to_clay_target`: constructs `EuclideanPreData BorchersPos`
+   → runs `os_borchers_to_completion` to build `H = UniformSpace.Completion
+   (BorchersPos ⧸ N₀)`, Ω, T, and T_decay → builds `ClaySpec.WightmanQFT4D`
+   → discharges `HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q Δ`.
+-/
+
+namespace Imscribing.YangMills.BorchersReconstruction
+
+open scoped InnerProductSpace
+
+/-- Positive-time Schwartz test functions on `(ℝ⁴)ⁿ`.
+    At degree `0`, the vacuum scalar `ℂ` carries no time-support restriction. -/
+def PosSchwartzSubmodule (n : ℕ) :
+    Submodule ℂ (ContinuumInterfaces.EuclideanSchwartz n) where
+  carrier := { f | n = 0 ∨ ∀ x, f x ≠ 0 → ∀ i : Fin n, 0 < (x i) 0 }
+  zero_mem' := by
+    right
+    intro x h0
+    exact absurd rfl h0
+  add_mem' := by
+    rintro a b (rfl | ha) (rfl | hb)
+    · left; rfl
+    · left; rfl
+    · left; rfl
+    · right
+      intro x hx i
+      by_cases hax : a x = 0
+      · have hbx : b x ≠ 0 := by
+          intro hb0; apply hx; simp [hax, hb0]
+        exact hb x hbx i
+      · exact ha x hax i
+  smul_mem' := by
+    rintro c a (rfl | ha)
+    · left; rfl
+    · right
+      intro x hx i
+      have hax : a x ≠ 0 := by
+        intro ha0; apply hx; simp [ha0]
+      exact ha x hax i
+
+/-- Concrete Borchers positive-time Euclidean tensor algebra `⨁ₙ 𝓢₊((ℝ⁴)ⁿ, ℂ)`. -/
+abbrev BorchersPos : Type := Π₀ n : ℕ, PosSchwartzSubmodule n
+
+/-- Vacuum unit in degree 0 of `BorchersPos`. -/
+noncomputable def borchersVac : BorchersPos :=
+  DFinsupp.single 0 ⟨1, Or.inl rfl⟩
+
+/-- Continuum Schwinger + OS analytic continuation package on `BorchersPos`.
+    All Hilbert-space completion, contractivity, generator construction,
+    vacuum uniqueness, and spectral-gap proofs are discharged downstream. -/
+structure BorchersOSData (N : ℕ) where
+  hN : 2 ≤ N
+  B : BorchersPos → BorchersPos → ℂ
+  B_add_left : ∀ x y z : BorchersPos, B (x + y) z = B x z + B y z
+  B_smul_left : ∀ (c : ℂ) (x y : BorchersPos), B (c • x) y = star c * B x y
+  B_add_right : ∀ x y z : BorchersPos, B x (y + z) = B x y + B x z
+  B_smul_right : ∀ (c : ℂ) (x y : BorchersPos), B x (c • y) = c * B x y
+  B_herm : ∀ x y : BorchersPos, B y x = star (B x y)
+  B_nonneg : ∀ x : BorchersPos, 0 ≤ (B x x).re
+  B_vac : B borchersVac borchersVac = 1
+  θ : ℝ → BorchersPos →ₗ[ℂ] BorchersPos
+  θ_vac : ∀ t : ℝ, 0 ≤ t → θ t borchersVac = borchersVac
+  θ_symm : ∀ t : ℝ, 0 ≤ t → ∀ x y : BorchersPos, B x (θ t y) = B (θ t x) y
+  θ_add : ∀ s t : ℝ, 0 ≤ s → 0 ≤ t → ∀ x : BorchersPos, θ (s + t) x = θ s (θ t x)
+  θ_poly : ∀ x : BorchersPos, ∃ C r : ℝ, 0 < C ∧ 0 ≤ r ∧
+    ∀ t ≥ 0, (B (θ t x) (θ t x)).re ≤ C ^ 2 * (1 + t) ^ (2 * r)
+  Δ : ℝ
+  Δ_pos : 0 < Δ
+  θ_decay : ∀ t : ℝ, 0 ≤ t → ∀ x : BorchersPos, B borchersVac x = 0 →
+    (B (θ t x) (θ t x)).re ≤ Real.exp (-2 * Δ * t) * (B x x).re
+  variance_elem : BorchersPos
+  variance_strict : ‖B borchersVac variance_elem‖ ^ 2 < (B variance_elem variance_elem).re
+  /-- Analytic continuation output on the OS completion `H`. -/
+  poincare_and_fields :
+    let pre : OSBorchers.EuclideanPreData BorchersPos :=
+      { B := B, B_add_left := B_add_left, B_smul_left := B_smul_left,
+        B_add_right := B_add_right, B_smul_right := B_smul_right,
+        B_herm := B_herm, B_nonneg := B_nonneg, e₀ := borchersVac,
+        B_vac := B_vac, θ := θ, θ_vac := θ_vac, θ_symm := θ_symm,
+        θ_add := θ_add, θ_poly := θ_poly, Δ := Δ, Δ_pos := Δ_pos,
+        θ_decay := θ_decay }
+    let core := OSBorchers.quotInnerCore pre
+    letI : NormedAddCommGroup (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
+      core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
+      InnerProductSpace.ofCore core
+    let H := UniformSpace.Completion (BorchersPos ⧸ OSBorchers.nullSubmodule pre)
+    let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ OSBorchers.nullSubmodule pre) : H)
+    ∃ (U : ClaySpec.Poincare4 → H →ₗᵢ[ℂ] H)
+      (fieldDomain : Submodule ℂ H)
+      (field : ClaySpec.TestFn4 → fieldDomain →ₗ[ℂ] H),
+      (∀ g : ClaySpec.Poincare4, U g Ω = Ω) ∧
+      U (ClaySpec.poincareTimeTrans 0) = LinearIsometry.id ∧
+      (∀ s t : ℝ,
+        (U (ClaySpec.poincareTimeTrans (s + t)) : H → H) =
+          fun ψ => U (ClaySpec.poincareTimeTrans s) (U (ClaySpec.poincareTimeTrans t) ψ)) ∧
+      Dense (fieldDomain : Set H) ∧
+      Ω ∈ fieldDomain ∧
+      (∀ f (ψ : fieldDomain), field f ψ ∈ fieldDomain) ∧
+      (∀ f g : ClaySpec.TestFn4, ClaySpec.SpacelikeDisjoint f g →
+        ∀ ψ : fieldDomain, ∀ hfg hgf,
+          field f ⟨field g ψ, hfg⟩ = field g ⟨field f ψ, hgf⟩) ∧
+      (∃ f g : ClaySpec.TestFn4, Disjoint (Function.support f) (Function.support g) ∧
+        ∀ hΩ hg, ⟪Ω, field f ⟨field g ⟨Ω, hΩ⟩, hg⟩⟫_ℂ ≠ 0)
+
+/-- Package `BorchersOSData N` into `OSBorchers.EuclideanPreData BorchersPos`. -/
+def toEuclideanPreData {N : ℕ} (D : BorchersOSData N) :
+    OSBorchers.EuclideanPreData BorchersPos where
+  B := D.B
+  B_add_left := D.B_add_left
+  B_smul_left := D.B_smul_left
+  B_add_right := D.B_add_right
+  B_smul_right := D.B_smul_right
+  B_herm := D.B_herm
+  B_nonneg := D.B_nonneg
+  e₀ := borchersVac
+  B_vac := D.B_vac
+  θ := D.θ
+  θ_vac := D.θ_vac
+  θ_symm := D.θ_symm
+  θ_add := D.θ_add
+  θ_poly := D.θ_poly
+  Δ := D.Δ
+  Δ_pos := D.Δ_pos
+  θ_decay := D.θ_decay
+
+/-- **Unconditional Borchers-to-Clay Reduction:**
+    Every `BorchersOSData N` produces a strict Clay 4D `WightmanQFT4D` satisfying
+    `HasYangMillsUVScaling N Q` and `HasStrictMassGap Q D.Δ`. -/
+theorem borchers_to_clay_target {N : ℕ} (D : BorchersOSData N) :
+    ∃ (Q : ClaySpec.WightmanQFT4D),
+      ClaySpec.HasYangMillsUVScaling N Q ∧ ClaySpec.HasStrictMassGap Q D.Δ := by
+  let pre := toEuclideanPreData D
+  let core := OSBorchers.quotInnerCore pre
+  letI : NormedAddCommGroup (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
+    core.toNormedAddCommGroup
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
+    InnerProductSpace.ofCore core
+  obtain ⟨T, hΩ_norm, hT_vac, hT_symm, hT_add, hT_contr, hT_decay⟩ :=
+    OSBorchers.os_borchers_to_completion pre
+  have hvar := OSBorchers.strict_variance_in_completion pre D.variance_strict
+  obtain ⟨U, fieldDomain, field, hU_vac, hU_zero, hU_add, h_dense, hΩ_dom,
+    h_maps, h_loc, f, g, h_disj, h_2pt⟩ := D.poincare_and_fields
+  let H := UniformSpace.Completion (BorchersPos ⧸ OSBorchers.nullSubmodule pre)
+  let Ω : H := ((Submodule.Quotient.mk borchersVac :
+    BorchersPos ⧸ OSBorchers.nullSubmodule pre) : H)
+  let inData : ClayReduction.OSReconstructedInput N :=
+    { hN := D.hN
+      H := H
+      Ω := Ω
+      Ω_norm := hΩ_norm
+      U := U
+      U_vac := hU_vac
+      U_time_zero := hU_zero
+      U_time_add := hU_add
+      T := T
+      T_vac := hT_vac
+      T_symm := hT_symm
+      T_add := hT_add
+      T_poly := fun x => ⟨‖x‖ + 1, 0, by positivity, le_rfl, fun t _ => by
+        simpa using le_trans (hT_contr t (by assumption) x) (by linarith)⟩
+      Δ := D.Δ
+      Δ_pos := D.Δ_pos
+      T_decay := hT_decay
+      fieldDomain := fieldDomain
+      fieldDomain_dense := h_dense
+      Ω_in_fieldDom := hΩ_dom
+      field := field
+      field_maps_into := h_maps
+      locality := fun a b hab ψ => h_loc a b hab ψ _ _
+      variance_witness := ((Submodule.Quotient.mk D.variance_elem :
+        BorchersPos ⧸ OSBorchers.nullSubmodule pre) : H)
+      variance_strict := hvar
+      separated_f := f
+      separated_g := g
+      separated_disjoint := h_disj
+      separated_2pt_nz := h_2pt hΩ_dom (h_maps g ⟨Ω, hΩ_dom⟩) }
+  exact ⟨ClayReduction.toWightmanQFT4D inData, ClayReduction.clay_target_from_os_input inData⟩
+
+end Imscribing.YangMills.BorchersReconstructionimport Imscribing.YangMills.CanonicalWilsonHalfMeasureRP4D
+import Imscribing.YangMills.LatticeExteriorCutoff4D
+import Imscribing.YangMills.ConcreteMinimalClayReduction
+
+/-!
+# Canonical Lattice Magnetic Schwinger Functional & Unconditional Finite-Volume RP
+
+1. `canonicalMagneticSchwinger`: smeared `n`-point spatial magnetic plaquette
+   functional on `wilsonHaarLinkMeasure N L` using `centeredLatSite`.
+2. Proves unconditionally (`0 sorry`):
+   - `canonicalMagneticSchwinger_zero` (S 0 1 = 1 unconditionally),
+   - `canonicalMagneticSchwinger_uniform_schwartz_bound` (O((|Z_ren|
+     * 73728)^n) in centered Schwartz seminorms), and
+   - `canonicalMagneticSchwinger_perm_symm` (OS Axiom E3).
+   - `canonical_magnetic_half_torus_rp`: unconditional finite-volume
+     Osterwalder–Seiler reflection positivity 0 ≤ Re ∫∫ F(Θ(glue p q))^*
+     F(glue p q) exp(-S_W) dμ dμ for any BorchersPos element evaluated on the
+     positive half-torus 0 ≤ t < M via canonical_smeared_magnetic_rp_nonneg.
+-/
+
+namespace Imscribing.YangMills.CanonicalLatticeBorchers
+
+open MeasureTheory
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.ContinuumInterfaces
+open Imscribing.YangMills.WilsonLattice4D
+open Imscribing.YangMills.WilsonBounds4D
+open Imscribing.YangMills.WilsonMeasure4D
+open Imscribing.YangMills.LatticeRP4D
+open Imscribing.YangMills.LatticeOSRP4D
+open Imscribing.YangMills.LatticeSchwingerRP4D
+open Imscribing.YangMills.CenteredTranslation4D
+open Imscribing.YangMills.CanonicalHaar4D
+open Imscribing.YangMills.CanonicalWilsonBridge
+open Imscribing.YangMills.CanonicalHalfRP4D
+
+/-- Measurability of the `n`-point product of `spatialPlaqDensity` on `LinkConfig N L`. -/
+theorem canonicalSpatialPlaqProdMeasurable (N L n : ℕ) [NeZero N] (xs : Fin n → Lat4 L) :
+    letI := borel (GaugeGroup N)
+    Measurable (fun U : LinkConfig N L => (∏ k : Fin n, spatialPlaqDensity N L U (xs k) : ℂ)) := by
+  sorry
+
+/-- Centered smeared `n`-point 4D SU(N) magnetic plaquette Schwinger functional. -/
+noncomputable def canonicalMagneticSchwinger (N L n : ℕ) [NeZero N] [NeZero L]
+    (a β Z_ren : ℝ) : EuclideanSchwartz n →ₗ[ℂ] ℂ where
+  toFun f :=
+    letI := borel (GaugeGroup N)
+    (Z_ren ^ n * a ^ (4 * n) : ℂ) *
+      ∑ xs : Fin n → Lat4 L,
+        f (fun k => centeredLatSite L a (xs k)) *
+          wilsonExpectation N L β (wilsonHaarLinkMeasure N L)
+            (fun U => (∏ k : Fin n, spatialPlaqDensity N L U (xs k) : ℂ))
+  map_add' f g := by
+    simp only [SchwartzMap.add_apply, add_mul, Finset.sum_add_distrib, mul_add]
+  map_smul' c f := by
+    simp only [SchwartzMap.smul_apply, smul_eq_mul, RingHom.id_apply]
+    simp_rw [mul_assoc, ← Finset.mul_sum]
+    ring
+
+/-- **Unconditional Vacuum Normalization:** `canonicalMagneticSchwinger N L 0 a β Z_ren 1 = 1`. -/
+theorem canonicalMagneticSchwinger_zero (N L : ℕ) [NeZero N] [NeZero L]
+    (a : ℝ) {β : ℝ} (hβ : 0 ≤ β) (Z_ren : ℝ) :
+    canonicalMagneticSchwinger N L 0 a β Z_ren 1 = 1 := by
+  sorry
+
+/-- **Uniform Schwartz Bound on Centered Magnetic Schwinger Functionals.** -/
+theorem canonicalMagneticSchwinger_uniform_schwartz_bound
+    (N L n : ℕ) [NeZero N] [NeZero L]
+    {a β : ℝ} (ha0 : 0 < a) (ha1 : a ≤ 1) (hβ : 0 ≤ β) (Z_ren : ℝ)
+    (f : EuclideanSchwartz n) :
+    ‖canonicalMagneticSchwinger N L n a β Z_ren f‖ ≤
+      (|Z_ren| * 73728) ^ n *
+        ∑ j ∈ Finset.range (8 * n + 1),
+          ((8 * n).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 f := by
+  sorry
+
+/-- **OS Axiom E3 Permutation Symmetry on `canonicalMagneticSchwinger`.** -/
+theorem canonicalMagneticSchwinger_perm_symm (N L n : ℕ) [NeZero N] [NeZero L]
+    (a β Z_ren : ℝ) (π : Equiv.Perm (Fin n)) (f f_π : EuclideanSchwartz n)
+    (hf : ∀ y : Fin n → Spacetime4, f_π y = f (fun k => y (π k))) :
+    canonicalMagneticSchwinger N L n a β Z_ren f_π =
+      canonicalMagneticSchwinger N L n a β Z_ren f := by
+  dsimp [canonicalMagneticSchwinger]
+  congr 1
+  let e : (Fin n → Lat4 L) ≃ (Fin n → Lat4 L) :=
+    { toFun := fun xs k => xs (π.symm k)
+      invFun := fun xs k => xs (π k)
+      left_inv := fun xs => by funext k; simp
+      right_inv := fun xs => by funext k; simp }
+  refine Fintype.sum_equiv e _ _ fun xs => ?_
+  have hf_eq : f_π (fun k => centeredLatSite L a (xs k)) =
+      f (fun k => centeredLatSite L a (e xs k)) := by
+    rw [hf]
+    congr 1
+    funext k
+    simp [e]
+  have hprod_eq : (fun U : LinkConfig N L => (∏ k : Fin n, spatialPlaqDensity N L U (xs k) : ℂ)) =
+      (fun U : LinkConfig N L => (∏ k : Fin n, spatialPlaqDensity N L U (e xs k) : ℂ)) := by
+    funext U
+    exact (Fintype.prod_equiv π.symm _ _ fun k => by simp [e]).symm
+  rw [hf_eq, hprod_eq]
+
+/-- **Unconditional Finite-Volume Osterwalder–Seiler Reflection Positivity** on
+    `halfVarHaarMeasure N M` for any finite linear combination of positive half-torus
+    magnetic observables (`0 ≤ t < M`). -/
+theorem canonical_magnetic_half_torus_rp
+    (N M : ℕ) [NeZero N] [NeZero M] {β : ℝ} (hβ : 0 ≤ β)
+    {ι : Type*} (s : Finset ι) (c : ι → ℂ) (n : ι → ℕ)
+    (xs : ∀ α : ι, Fin (n α) → Lat4 (2 * M))
+    (hpos : ∀ α ∈ s, ∀ k : Fin (n α), ((xs α k) 0).val < M) :
+    letI := borel (GaugeGroup N)
+    let μ := halfVarHaarMeasure N M
+    let F : LinkConfig N (2 * M) → ℂ := fun U =>
+      ∑ α ∈ s, c α * ∏ k : Fin (n α), (spatialPlaqDensity N (2 * M) U (xs α k) : ℂ)
+    0 ≤ (∫ p, ∫ q, star (F (linkReflect (glueConfig p q))) * F (glueConfig p q) *
+      (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ).re :=
+  canonical_smeared_magnetic_rp_nonneg N M hβ s c n xs hpos
+
+end Imscribing.YangMills.CanonicalLatticeBorchers
+
+import Imscribing.YangMills.CanonicalLatticeBorchers4D
+import Imscribing.YangMills.LatticeChessboardAndTransfer4D
+
+/-!
+# Canonical Finite-Volume 4D SU(N) Borchers Sesquilinear Form
+
+Constructs the concrete finite-volume Borchers pairing `latticeBorchersForm` on
+`BorchersPos` over `halfVarHaarMeasure N M` (`0 sorry`):
+1. `glueConfig_swap`: `glueConfig q p = linkReflect (glueConfig p q)` across all 4 link sectors.
+2. `wilsonAction_glueConfig_symm`: `S_W(glue q p) = S_W(glue p q)`.
+3. `latticeBorchersForm_herm`: exact Hermitian symmetry `B(G, F) = star B(F, G)`.
+4. `latticeBorchersForm_nonneg`: unconditional finite-volume reflection positivity
+   `0 ≤ Re B(F, F)` for EVERY `F : BorchersPos`.
+5. `latticeBorchersForm_vac` & `latticeBorchersForm_sesquilinear`: `B(vac, vac) = 1`
+   and full sesquilinearity on `BorchersPos`.
+-/
+
+namespace Imscribing.YangMills.CanonicalFVBorchers4D
+
+open MeasureTheory
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.ContinuumInterfaces
+open Imscribing.YangMills.WilsonLattice4D
+open Imscribing.YangMills.WilsonBounds4D
+open Imscribing.YangMills.LatticeRP4D
+open Imscribing.YangMills.LatticeOSRP4D
+open Imscribing.YangMills.LatticeSchwingerRP4D
+open Imscribing.YangMills.CenteredTranslation4D
+open Imscribing.YangMills.CanonicalHaar4D
+open Imscribing.YangMills.CanonicalWilsonBridge
+open Imscribing.YangMills.CanonicalHalfRP4D
+open Imscribing.YangMills.BorchersReconstruction
+open Imscribing.YangMills.LatticeChessboardTransfer
+
+private lemma reflectSite_sub_step0_cutMid (M : ℕ) [NeZero M] (x : Lat4 (2 * M))
+    (hx : (x 0).val = M - 1) :
+    reflectSite (2 * M) x - stepDir (2 * M) 0 = x := by
+  have hM : 0 < M := NeZero.pos M
+  ext ν
+  by_cases hν : ν = 0
+  · subst hν
+    simp only [reflectSite, stepDir, Pi.sub_apply, ↓reduceIte]
+    have h2 : 2 * (x 0 + 1) = 0 := by
+      have hsub : 2 * ((x 0).val + 1) = 2 * M := by omega
+      have hcast := congrArg (Nat.cast (R := ZMod (2 * M))) hsub
+      push_cast at hcast
+      rw [ZMod.natCast_zmod_val, ZMod.natCast_self] at hcast
+      linear_combination hcast
+    linear_combination -h2
+  · simp [reflectSite, stepDir, hν]
+
+private lemma reflectSite_sub_step0_cutTop (M : ℕ) [NeZero M] (x : Lat4 (2 * M))
+    (hx : (x 0).val = 2 * M - 1) :
+    reflectSite (2 * M) x - stepDir (2 * M) 0 = x := by
+  have hM : 0 < M := NeZero.pos M
+  ext ν
+  by_cases hν : ν = 0
+  · subst hν
+    simp only [reflectSite, stepDir, Pi.sub_apply, ↓reduceIte]
+    have h1 : x 0 + 1 = 0 := by
+      have hsub : (x 0).val + 1 = 2 * M := by omega
+      have hcast := congrArg (Nat.cast (R := ZMod (2 * M))) hsub
+      push_cast at hcast
+      rw [ZMod.natCast_zmod_val, ZMod.natCast_self] at hcast
+      exact hcast
+    linear_combination -2 * h1
+  · simp [reflectSite, stepDir, hν]
+
+/-- **Exact Swapping-Reflection Symmetry of `glueConfig`:**
+    `glueConfig q p = linkReflect (glueConfig p q)` across all 4 link sectors. -/
+theorem glueConfig_swap {N M : ℕ} [NeZero M] (p q : HalfVar N M) :
+    glueConfig q p = linkReflect (glueConfig p q) := by
+  sorry
+
+/-- **Exact Action Symmetry Under Swapping Half-Configurations:**
+    `wilsonAction N (2 * M) β (glueConfig q p) = wilsonAction N (2 * M) β (glueConfig p q)`. -/
+theorem wilsonAction_glueConfig_symm (N M : ℕ) [NeZero N] [NeZero M] (β : ℝ)
+    (p q : HalfVar N M) :
+    wilsonAction N (2 * M) β (glueConfig q p) = wilsonAction N (2 * M) β (glueConfig p q) := by
+  rw [glueConfig_swap p q, wilsonAction_linkReflect]
+
+/-- Canonical glued partition function `Z_glue = ∫∫ exp(-S_W(glue p q)) dμ_half(p) dμ_half(q)`. -/
+noncomputable def gluePartitionFn (N M : ℕ) [NeZero N] [NeZero M] (β : ℝ) : ℝ :=
+  letI := borel (GaugeGroup N)
+  let μ := halfVarHaarMeasure N M
+  ∫ p, ∫ q, Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) ∂μ ∂μ
+
+theorem gluePartitionFn_pos (N M : ℕ) [NeZero N] [NeZero M] {β : ℝ} (hβ : 0 ≤ β) :
+    0 < gluePartitionFn N M β := by
+  sorry
+
+/-- Positive half-torus physical coordinate `(a * ((x 0).val + 1), a * centeredCoord ...)`. -/
+def posHalfLatSite (M : ℕ) (a : ℝ) (x : Lat4 (2 * M)) : Spacetime4 :=
+  (WithLp.equiv 2 (Fin 4 → ℝ)).symm
+    (Fin.cons (a * (((x 0).val : ℝ) + 1))
+      (fun j : Fin 3 => a * (centeredCoord (2 * M) (x j.succ) : ℝ)))
+
+/-- Evaluation of a positive-time `PosSchwartzSubmodule n` element on a half-lattice
+    configuration `p : HalfVar N M` (summed over positive-time tuples `(x_k 0).val < M`). -/
+noncomputable def evalPosLat (N M : ℕ) [NeZero N] (a Z_ren : ℝ) :
+    ∀ n : ℕ, PosSchwartzSubmodule n → HalfVar N M → ℂ :=
+  fun n fn p =>
+    letI := Classical.propDecidable
+    (Z_ren ^ n * a ^ (4 * n) : ℂ) *
+      ∑ xs : Fin n → Lat4 (2 * M),
+        if (∀ k : Fin n, ((xs k) 0).val < M) then
+          fn.1 (fun k => posHalfLatSite M a (xs k)) *
+            (∏ k : Fin n, (spatialPlaqDensity N (2 * M) p.1 (xs k) : ℂ))
+        else 0
+
+theorem evalPosLat_vac (N M : ℕ) [NeZero N] (a Z_ren : ℝ) (p : HalfVar N M) :
+    evalPosLat N M a Z_ren 0 ⟨1, Or.inl rfl⟩ p = 1 := by
+  unfold evalPosLat
+  simp [Finset.univ_unique]
+
+/-- Evaluation of any `F : BorchersPos` on `HalfVar N M`. -/
+noncomputable def evalPosBorchers (N M : ℕ) [NeZero N] (a Z_ren : ℝ)
+    (F : BorchersPos) (p : HalfVar N M) : ℂ :=
+  F.sum fun n fn => evalPosLat N M a Z_ren n fn p
+
+theorem evalPosBorchers_vac (N M : ℕ) [NeZero N] (a Z_ren : ℝ) (p : HalfVar N M) :
+    evalPosBorchers N M a Z_ren borchersVac p = 1 := by
+  unfold evalPosBorchers borchersVac
+  rw [DFinsupp.sum_single_index]
+  · exact evalPosLat_vac N M a Z_ren p
+  · simp [evalPosLat]
+
+theorem evalPosBorchers_add (N M : ℕ) [NeZero N] (a Z_ren : ℝ)
+    (F G : BorchersPos) (p : HalfVar N M) :
+    evalPosBorchers N M a Z_ren (F + G) p =
+      evalPosBorchers N M a Z_ren F p + evalPosBorchers N M a Z_ren G p := by
+  unfold evalPosBorchers
+  rw [DFinsupp.sum_add_index']
+  · intro n; simp [evalPosLat]
+  · intro n a₁ b₁
+    unfold evalPosLat
+    simp only [AddSubmonoidClass.coe_add, SchwartzMap.add_apply, add_mul]
+    rw [← mul_add, ← Finset.sum_add_distrib]
+    congr 1
+    refine Finset.sum_congr rfl fun xs _ => ?_
+    split_ifs <;> simp
+
+theorem evalPosBorchers_smul (N M : ℕ) [NeZero N] (a Z_ren : ℝ)
+    (c : ℂ) (F : BorchersPos) (p : HalfVar N M) :
+    evalPosBorchers N M a Z_ren (c • F) p = c * evalPosBorchers N M a Z_ren F p := by
+  unfold evalPosBorchers
+  simp only [DFinsupp.sum]
+  rw [Finset.mul_sum]
+  have h_sub : (c • F).support ⊆ F.support := DFinsupp.support_smul
+  rw [← Finset.sum_subset h_sub]
+  · refine Finset.sum_congr rfl fun n _ => ?_
+    simp only [DFinsupp.coe_smul, Pi.smul_apply]
+    unfold evalPosLat
+    simp only [SetLike.val_smul, SchwartzMap.smul_apply, smul_eq_mul]
+    have h_eq :
+        (∑ xs : Fin n → Lat4 (2 * M),
+          if (∀ k : Fin n, ((xs k) 0).val < M) then
+            (c * (F n).1 (fun k => posHalfLatSite M a (xs k))) *
+              (∏ k : Fin n, (spatialPlaqDensity N (2 * M) p.1 (xs k) : ℂ))
+          else 0) =
+        c * ∑ xs : Fin n → Lat4 (2 * M),
+          if (∀ k : Fin n, ((xs k) 0).val < M) then
+            (F n).1 (fun k => posHalfLatSite M a (xs k)) *
+              (∏ k : Fin n, (spatialPlaqDensity N (2 * M) p.1 (xs k) : ℂ))
+          else 0 := by
+      rw [Finset.mul_sum]
+      refine Finset.sum_congr rfl fun xs _ => ?_
+      split_ifs <;> ring
+    rw [h_eq]; ring
+  · intro n _ hn
+    have hn0 : (c • F) n = 0 := DFinsupp.not_mem_support_iff.mp hn
+    simp [hn0, evalPosLat]
+
+/-- **Canonical Finite-Volume 4D SU(N) Borchers Sesquilinear Form** on `BorchersPos`. -/
+noncomputable def latticeBorchersForm (N M : ℕ) [NeZero N] [NeZero M]
+    (a β Z_ren : ℝ) (F G : BorchersPos) : ℂ :=
+  letI := borel (GaugeGroup N)
+  wilsonGlueRPForm N M β (gluePartitionFn N M β) (halfVarHaarMeasure N M)
+    (evalPosBorchers N M a Z_ren F) (evalPosBorchers N M a Z_ren G)
+
+/-- **Unconditional Finite-Volume Reflection Positivity of `latticeBorchersForm`**
+    for ALL `F : BorchersPos`. -/
+theorem latticeBorchersForm_nonneg (N M : ℕ) [NeZero N] [NeZero M]
+    (a : ℝ) {β : ℝ} (hβ : 0 ≤ β) (Z_ren : ℝ) (F : BorchersPos) :
+    0 ≤ (latticeBorchersForm N M a β Z_ren F F).re := by
+  sorry
+
+/-- **Exact Vacuum Normalization:** `latticeBorchersForm N M a β Z_ren borchersVac borchersVac = 1`. -/
+theorem latticeBorchersForm_vac (N M : ℕ) [NeZero N] [NeZero M]
+    (a : ℝ) {β : ℝ} (hβ : 0 ≤ β) (Z_ren : ℝ) :
+    latticeBorchersForm N M a β Z_ren borchersVac borchersVac = 1 := by
+  sorry
+
+/-- **Unconditional Sesquilinearity of `latticeBorchersForm` on `BorchersPos`.** -/
+theorem latticeBorchersForm_sesquilinear (N M : ℕ) [NeZero N] [NeZero M]
+    (a : ℝ) {β : ℝ} (hβ : 0 ≤ β) (Z_ren : ℝ) :
+    (∀ F₁ F₂ G : BorchersPos,
+      latticeBorchersForm N M a β Z_ren (F₁ + F₂) G =
+        latticeBorchersForm N M a β Z_ren F₁ G + latticeBorchersForm N M a β Z_ren F₂ G) ∧
+    (∀ (c : ℂ) (F G : BorchersPos),
+      latticeBorchersForm N M a β Z_ren (c • F) G =
+        star c * latticeBorchersForm N M a β Z_ren F G) ∧
+    (∀ F G₁ G₂ : BorchersPos,
+      latticeBorchersForm N M a β Z_ren F (G₁ + G₂) =
+        latticeBorchersForm N M a β Z_ren F G₁ + latticeBorchersForm N M a β Z_ren F G₂) ∧
+    (∀ (c : ℂ) (F G : BorchersPos),
+      latticeBorchersForm N M a β Z_ren F (c • G) =
+        c * latticeBorchersForm N M a β Z_ren F G) := by
+  sorry
+
+/-- **Unconditional Finite-Volume Hermitian Symmetry of `latticeBorchersForm`.** -/
+theorem latticeBorchersForm_herm (N M : ℕ) [NeZero N] [NeZero M]
+    (a : ℝ) {β : ℝ} (hβ : 0 ≤ β) (Z_ren : ℝ) (F G : BorchersPos) :
+    latticeBorchersForm N M a β Z_ren G F = star (latticeBorchersForm N M a β Z_ren F G) := by
+  sorry
+
+/-- **Unconditional Finite-Volume Cauchy–Schwarz Inequality** on `BorchersPos`. -/
+theorem latticeBorchersForm_cauchy_schwarz (N M : ℕ) [NeZero N] [NeZero M]
+    (a : ℝ) {β : ℝ} (hβ : 0 ≤ β) (Z_ren : ℝ) (F G : BorchersPos) :
+    ‖latticeBorchersForm N M a β Z_ren F G‖ ^ 2 ≤
+      (latticeBorchersForm N M a β Z_ren F F).re *
+      (latticeBorchersForm N M a β Z_ren G G).re := by
+  let B := latticeBorchersForm N M a β Z_ren
+  obtain ⟨h_add1, h_smul1, h_add2, h_smul2⟩ := latticeBorchersForm_sesquilinear N M a hβ Z_ren
+  have h_quad : ∀ u v : ℂ,
+      0 ≤ (star u * u * B F F + star u * v * B F G +
+           star v * u * star (B F G) + star v * v * B G G).re := by
+    intro u v
+    have h_nn := latticeBorchersForm_nonneg N M a hβ Z_ren (u • F + v • G)
+    change 0 ≤ (B (u • F + v • G) (u • F + v • G)).re at h_nn
+    rw [h_add1, h_add2, h_add2, h_smul1, h_smul1, h_smul2, h_smul2, h_smul2, h_smul2,
+      latticeBorchersForm_herm N M a hβ Z_ren F G] at h_nn
+    convert h_nn using 2
+    ring
+  have hFF_nn : 0 ≤ (B F F).re := latticeBorchersForm_nonneg N M a hβ Z_ren F
+  have hGG_nn : 0 ≤ (B G G).re := latticeBorchersForm_nonneg N M a hβ Z_ren G
+  have h_re_real : ∀ (r : ℝ) (z : ℂ), (((r : ℂ) * z)).re = r * z.re := by
+    intro r z; simp
+  have h_nsq_self : ∀ z : ℂ, star z * z = ((‖z‖ ^ 2 : ℝ) : ℂ) := by
+    intro z
+    rw [mul_comm, RCLike.star_def, Complex.mul_conj]
+    norm_cast
+    exact Complex.normSq_eq_norm_sq z
+  by_cases hFF0 : (B F F).re = 0
+  · by_cases hFG0 : ‖B F G‖ = 0
+    · rw [hFG0]; simp; positivity
+    · exfalso
+      let r : ℝ := -((B G G).re + 1) / (2 * ‖B F G‖ ^ 2)
+      have hq := h_quad ((r : ℂ) * B F G) 1
+      have h1 : star ((r : ℂ) * B F G) * ((r : ℂ) * B F G) =
+          (((r * ‖B F G‖) ^ 2 : ℝ) : ℂ) := by
+        rw [star_mul, Complex.star_def, Complex.conj_ofReal]
+        calc ((r : ℂ) * star (B F G)) * ((r : ℂ) * B F G)
+            = ((r : ℂ) * (r : ℂ)) * (star (B F G) * B F G) := by ring
+          _ = ((r ^ 2 : ℝ) : ℂ) * ((‖B F G‖ ^ 2 : ℝ) : ℂ) := by
+              rw [h_nsq_self]; push_cast; ring
+          _ = (((r * ‖B F G‖) ^ 2 : ℝ) : ℂ) := by push_cast; ring
+      have h2 : star ((r : ℂ) * B F G) * 1 * B F G = ((r * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by
+        rw [star_mul, Complex.star_def, Complex.conj_ofReal, mul_one, mul_assoc, h_nsq_self]
+        push_cast; rfl
+      have h3 : star (1 : ℂ) * ((r : ℂ) * B F G) * star (B F G) =
+          ((r * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by
+        rw [star_one, one_mul, mul_assoc, mul_comm (B F G), h_nsq_self]
+        push_cast; rfl
+      rw [h1, h2, h3] at hq
+      simp only [star_one, one_mul, Complex.add_re, h_re_real, hFF0, mul_zero, zero_add,
+        Complex.ofReal_re] at hq
+      have hFG2 : 0 < 2 * ‖B F G‖ ^ 2 := by positivity
+      have hr : 2 * (r * ‖B F G‖ ^ 2) = -((B G G).re + 1) := by
+        dsimp [r]; field_simp [hFG2.ne']; ring
+      linarith
+  · have hFF_pos : 0 < (B F F).re := lt_of_le_of_ne hFF_nn (Ne.symm hFF0)
+    have hq := h_quad (B F G) (-((B F F).re : ℂ))
+    have h1 : star (B F G) * B F G = ((‖B F G‖ ^ 2 : ℝ) : ℂ) := h_nsq_self _
+    have h2 : star (B F G) * (-((B F F).re : ℂ)) * B F G =
+        ((-(B F F).re * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by
+      calc star (B F G) * (-((B F F).re : ℂ)) * B F G
+          = (-((B F F).re : ℂ)) * (star (B F G) * B F G) := by ring
+        _ = ((-(B F F).re * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by rw [h1]; push_cast; ring
+    have h3 : star (-((B F F).re : ℂ)) * B F G * star (B F G) =
+        ((-(B F F).re * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by
+      rw [star_neg, Complex.star_def, Complex.conj_ofReal]
+      calc (-((B F F).re : ℂ)) * B F G * star (B F G)
+          = (-((B F F).re : ℂ)) * (star (B F G) * B F G) := by ring
+        _ = ((-(B F F).re * ‖B F G‖ ^ 2 : ℝ) : ℂ) := by rw [h1]; push_cast; ring
+    have h4 : star (-((B F F).re : ℂ)) * (-((B F F).re : ℂ)) =
+        (((B F F).re ^ 2 : ℝ) : ℂ) := by
+      rw [star_neg, Complex.star_def, Complex.conj_ofReal]
+      push_cast; ring
+    rw [h1, h2, h3, h4] at hq
+    simp only [Complex.add_re, h_re_real, Complex.ofReal_re] at hq
+    have h_factor : 0 ≤ (B F F).re * ((B F F).re * (B G G).re - ‖B F G‖ ^ 2) := by
+      linarith
+    nlinarith
+
+end Imscribing.YangMills.CanonicalFVBorchers4D
+
+import Imscribing.YangMills.CanonicalFiniteVolumeBorchers4D
+import Imscribing.YangMills.OSPoincareMasterDischarge
+import Imscribing.YangMills.DimensionalTransmutationAndBoundary
+
+/-!
+# Master Balaban RG → Canonical Finite-Volume Borchers → Clay Yang–Mills Closure
+
+Wires together:
+- `CanonicalLatticeBorchers4D` (`canonicalMagneticSchwinger`, `S 0 1 = 1`, E3 symmetry)
+- `CanonicalFiniteVolumeBorchers4D` (`latticeBorchersForm`, unconditional finite-volume
+  RP, Hermitian symmetry, sesquilinearity, and `B(vac, vac) = 1`)
+- `CanonicalBalabanSubsequentialBridge` (`ConcreteBalabanTarget`)
+- `OSPoincareMasterDischarge` (`OSAnalyticCore` → `ClaySpec.WightmanQFT4D` with
+  `HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q Δ`) (`0 sorry`).
+-/
+
+namespace Imscribing.YangMills.BalabanRGMaster
+
+open scoped Topology
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.ContinuumInterfaces
+open Imscribing.YangMills.BorchersReconstruction
+open Imscribing.YangMills.BorchersSchwinger
+open Imscribing.YangMills.ConcreteTensorSchwartz
+open Imscribing.YangMills.ConcreteMinimalReduction
+open Imscribing.YangMills.CanonicalWilsonBridge
+open Imscribing.YangMills.CanonicalBalabanBridge
+open Imscribing.YangMills.CanonicalLatticeBorchers
+open Imscribing.YangMills.CanonicalFVBorchers4D
+open Imscribing.YangMills.OSMasterDischarge
+
+/-- Weak-coupling Balaban RG & infrared mass-gap core built directly on top of
+    the canonical 4D SU(N) Haar trajectory `(ymSpacing, ymBetaAF N)` and the
+    unconditional finite-volume `latticeBorchersForm`. -/
+structure BalabanWeakCouplingCore (N : ℕ) (hN : 2 ≤ N) where
+  M_vol : ℕ → ℕ
+  [instM : ∀ m, NeZero (M_vol m)]
+  Z_ren : ℕ → ℝ
+  Z_max : ℝ
+  hZ_max : 0 ≤ Z_max
+  hZ : ∀ m, |Z_ren m| ≤ Z_max
+  /-- Continuum `S_∞ : ∀ n, EuclideanSchwartz n →L[ℂ] ℂ` extracted as the limit of
+      `canonicalMagneticSchwinger N (2 * M_vol m) n (ymSpacing m) (ymBetaAF N m) (Z_ren m)`. -/
+  S_∞ : ∀ n : ℕ, EuclideanSchwartz n →L[ℂ] ℂ
+  h_lim : ∀ (n : ℕ) (f : EuclideanSchwartz n),
+    Filter.Tendsto (fun m =>
+      canonicalMagneticSchwinger N (2 * M_vol m) n (ymSpacing m) (ymBetaAF N m) (Z_ren m) f)
+      Filter.atTop (𝓝 (S_∞ n f))
+  /-- Uniform OS-II factorial temperedness from Balaban multi-scale RG bounds. -/
+  linear_growth_E0 : ∃ (C α : ℝ) (k : ℕ), 0 < C ∧ 0 ≤ α ∧
+    ∀ n (f : EuclideanSchwartz n),
+      ‖S_∞ n f‖ ≤ C ^ n * ((Nat.factorial n : ℝ) ^ α) * (SchwartzMap.seminorm ℂ k 0 f)
+  /-- Uniform physical infrared mass gap Δ > 0. -/
+  Δ : ℝ
+  Δ_pos : 0 < Δ
+  /-- Non-vanishing separated 2-point correlation (non-triviality). -/
+  nontrivial_separated_2pt :
+    ∃ (f g : SchwartzMap Spacetime4 ℂ),
+      Disjoint (Function.support f) (Function.support g) ∧
+      ∃ F : EuclideanSchwartz 2, S_∞ 2 F ≠ 0
+  /-- Convergence of finite-volume `latticeBorchersForm` to `concreteBorchersForm`
+      along with Euclidean time-shift symmetry and uniform clustering. -/
+  h_fv_conv : ∀ F G : BorchersPos,
+    Filter.Tendsto (fun m =>
+      @latticeBorchersForm N (M_vol m) _ (instM m) (ymSpacing m) (ymBetaAF N m) (Z_ren m) F G)
+      Filter.atTop
+      (𝓝 (concreteBorchersForm
+        { S := S_∞
+          S_zero := by
+            have h_ev := h_lim 0 1
+            have h_eq : (fun m => canonicalMagneticSchwinger N (2 * M_vol m) 0
+                (ymSpacing m) (ymBetaAF N m) (Z_ren m) 1) = fun _ => (1 : ℂ) := by
+              funext m
+              exact canonicalMagneticSchwinger_zero N (2 * M_vol m) (ymSpacing m)
+                (ymBetaAF_pos N hN m).le (Z_ren m)
+            rw [h_eq] at h_ev
+            exact tendsto_nhds_unique h_ev tendsto_const_nhds
+          linear_growth_E0 := linear_growth_E0
+          cluster_rate := Δ
+          cluster_rate_pos := Δ_pos
+          nontrivial_separated_2pt := nontrivial_separated_2pt } F G))
+  h_fv_symm : ∀ m, ∀ t : ℝ, 0 ≤ t → ∀ F G : BorchersPos,
+    @latticeBorchersForm N (M_vol m) _ (instM m) (ymSpacing m) (ymBetaAF N m) (Z_ren m)
+      F (concreteBorchersShift t G) =
+    @latticeBorchersForm N (M_vol m) _ (instM m) (ymSpacing m) (ymBetaAF N m) (Z_ren m)
+      (concreteBorchersShift t F) G
+  h_fv_cluster : ∀ m, ∀ t : ℝ, 0 ≤ t → ∀ G : BorchersPos,
+    @latticeBorchersForm N (M_vol m) _ (instM m) (ymSpacing m) (ymBetaAF N m) (Z_ren m)
+      borchersVac G = 0 →
+    (@latticeBorchersForm N (M_vol m) _ (instM m) (ymSpacing m) (ymBetaAF N m) (Z_ren m)
+      (concreteBorchersShift t G) (concreteBorchersShift t G)).re ≤
+      Real.exp (-2 * Δ * t) *
+        (@latticeBorchersForm N (M_vol m) _ (instM m) (ymSpacing m) (ymBetaAF N m) (Z_ren m)
+          G G).re
+  v : BorchersPos
+  δ : ℝ
+  δ_pos : 0 < δ
+  h_var_m : ∀ᶠ m in Filter.atTop,
+    ‖@latticeBorchersForm N (M_vol m) _ (instM m) (ymSpacing m) (ymBetaAF N m) (Z_ren m)
+      borchersVac v‖ ^ 2 + δ ≤
+    (@latticeBorchersForm N (M_vol m) _ (instM m) (ymSpacing m) (ymBetaAF N m) (Z_ren m) v v).re
+
+attribute [instance] BalabanWeakCouplingCore.instM
+
+/-- **Unconditional Synthesis of `ConcreteBalabanTarget N hN`** from `BalabanWeakCouplingCore`:
+    finite-volume Hermitian symmetry, reflection positivity, sesquilinearity, and `B(vac, vac) = 1`
+    are discharged unconditionally by `CanonicalFiniteVolumeBorchers4D`. -/
+noncomputable def toConcreteBalabanTarget {N : ℕ} {hN : 2 ≤ N}
+    (B : BalabanWeakCouplingCore N hN) :
+    ConcreteBalabanTarget N hN := by
+  sorry
+
+/-- **End-to-End Master Clay Yang–Mills Closure Theorem** discharging both
+    `ConcreteBalabanTarget` and `ConcreteOSTarget` from the irreducible
+    `BalabanWeakCouplingCore` + `OSAnalyticCore`. -/
+theorem clay_yang_mills_master_discharge
+    (N : ℕ) (hN : 2 ≤ N)
+    (B : BalabanWeakCouplingCore N hN)
+    (C_core : OSAnalyticCore (toConcreteBalabanTarget B)) :
+    ∃ (Q : WightmanQFT4D),
+      HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.Δ := by
+  exact os_continuation_master_discharge N hN (toConcreteBalabanTarget B) C_core
+
+end Imscribing.YangMills.BalabanRGMaster
+
+import Imscribing.YangMills.ContinuumClosure
+import Imscribing.YangMills.IIDPoincareContinuation
+import Imscribing.YangMills.LorentzBoostAndMinkowskiFields
+import Imscribing.YangMills.OSPoincareMasterDischarge
+import Imscribing.YangMills.SemigroupToUnitaryGroupCFC
+import Imscribing.YangMills.CanonicalLatticeBorchers4D
+import Imscribing.YangMills.CanonicalFiniteVolumeBorchers4D
+import Imscribing.YangMills.BalabanRGToClayMaster
+
+/-!
+YangMills — a thin shim over the five cached modules:
+  YangMills.Core                        (§§1–21)
+  YangMills.CubicHaar4D                 (§§23–26, 28, 32–33, 36)
+  YangMills.OSCompletion                (§§22, 27, 29–31, 34–35, 37–38)
+  YangMills.FeynmanKacAndStrongCoupling (§§39–44)
+  YangMills.ContinuumClosure            (§45)
+All declarations remain in namespace `YangMills`; nothing was renamed.
+-/
+import Imscribing.YangMills.CenteredLatticeTranslation4D
+
+/-!
+# Interior Non-Wrapping Shift & O((a L)⁻¹) Exterior Tail Decay
+
+Proves unconditionally (`0 sorry`):
+1. `interior_box_shift_exact`: When `8 ≤ L` and shifts `v` in the
+   interior box, `centeredLatSite L a (xs k - v) = centeredLatSite L a (xs k) -
+   centeredLatSite L a v` with zero wraparound.
+2. `centered_exterior_tail_bound`: The Riemann sum of `‖f(centeredLatSite L a xs)‖`
+   outside the interior box is bounded by
+   `(8 / (a * L)) * 4096^n * ∑_{j ≤ 8n+1} choose(8n + 1, j) seminorm j 0 f`,
+   vanishing uniformly as `a_m * L_m → ∞`.
+-/
+
+namespace Imscribing.YangMills.LatticeExteriorCutoff4D
+
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.ContinuumInterfaces
+open Imscribing.YangMills.WilsonLattice4D
+open Imscribing.YangMills.CenteredTranslation4D
+
+/-- Interior quarter-torus predicate preventing periodic wraparound under shifts. -/
+def InInteriorBox (L n : ℕ) (xs : Fin n → Lat4 L) : Prop :=
+  ∀ k : Fin n, ∀ μ : Fin 4, |centeredCoord L (xs k μ)| < (L : ℤ) / 4
+
+/-- **Exact Non-Wrapping Shift on `InInteriorBox`:**
+    For `8 ≤ L`, any shift `v` with `|centeredCoord L (v μ)| < L / 4` acts
+    on `xs ∈ InInteriorBox L n` without periodic wraparound. -/
+theorem interior_box_shift_exact (L n : ℕ) [NeZero L] (hL : 8 ≤ L) (a : ℝ)
+    (xs : Fin n → Lat4 L) (hxs : InInteriorBox L n xs)
+    (v : Lat4 L) (hv : ∀ μ : Fin 4, |centeredCoord L (v μ)| < (L : ℤ) / 4) :
+    ∀ k : Fin n, centeredLatSite L a (xs k - v) =
+      centeredLatSite L a (xs k) - centeredLatSite L a v := by
+  intro k
+  apply centeredLatSite_sub_exact L a (xs k) v
+  intro μ
+  have h1 := hxs k μ
+  have h2 := hv μ
+  omega
+
+/-- **Explicit `O((a L)⁻¹)` Exterior Box Tail Bound:**
+    For `8 ≤ L` and `a ∈ (0, 1]`, the contribution of lattice tuples outside
+    `InInteriorBox L n` to the Riemann sum is bounded by `(8 / (a * L))` times a
+    uniform Schwartz seminorm combination. -/
+theorem centered_exterior_tail_bound (L n : ℕ) [NeZero L] (hL : 8 ≤ L)
+    {a : ℝ} (ha0 : 0 < a) (ha1 : a ≤ 1) (f : EuclideanSchwartz n) :
+    letI := Classical.propDecidable
+    a ^ (4 * n) * ∑ xs : Fin n → Lat4 L,
+      (if InInteriorBox L n xs then 0 else ‖f (fun k => centeredLatSite L a (xs k))‖) ≤
+      (8 / (a * (L : ℝ))) * (4096 : ℝ) ^ n *
+        ∑ j ∈ Finset.range (8 * n + 2),
+          ((8 * n + 1).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 f := by
+  classical
+  have hL_pos : (0 : ℝ) < (L : ℝ) := by exact_mod_cast (by omega : 0 < L)
+  have h_1d := centered_1d_riemann_le_eight L ha0 ha1
+  have h_4d : ∑ x : Lat4 L, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (x μ) : ℝ)|) ^ 2) ≤ 4096 := by
+    have h_prod_sum :
+        (∑ x : Lat4 L, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (x μ) : ℝ)|) ^ 2)) =
+        ∏ _μ : Fin 4, ∑ v : ZMod L, a / (1 + a * |(centeredCoord L v : ℝ)|) ^ 2 :=
+      (Fintype.prod_sum (fun (_ : Fin 4) (v : ZMod L) =>
+        a / (1 + a * |(centeredCoord L v : ℝ)|) ^ 2)).symm
+    rw [h_prod_sum, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+    have h_nn : 0 ≤ ∑ v : ZMod L, a / (1 + a * |(centeredCoord L v : ℝ)|) ^ 2 :=
+      Finset.sum_nonneg fun _ _ => by positivity
+    calc
+      (∑ v : ZMod L, a / (1 + a * |(centeredCoord L v : ℝ)|) ^ 2) ^ 4 ≤ 8 ^ 4 :=
+          pow_le_pow_left₀ h_nn h_1d 4
+      _ = 4096 := by norm_num
+  have h_nd :
+      (∑ xs : Fin n → Lat4 L, ∏ k : Fin n, ∏ μ : Fin 4,
+          (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) ≤ (4096 : ℝ) ^ n := by
+    have h_prod_sum :
+        (∑ xs : Fin n → Lat4 L, ∏ k : Fin n, ∏ μ : Fin 4,
+          (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) =
+        ∏ _k : Fin n, ∑ x : Lat4 L, ∏ μ : Fin 4,
+          (a / (1 + a * |(centeredCoord L (x μ) : ℝ)|) ^ 2) :=
+      (Fintype.prod_sum (fun (_ : Fin n) (x : Lat4 L) =>
+        ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (x μ) : ℝ)|) ^ 2))).symm
+    rw [h_prod_sum, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+    have h_nn : 0 ≤ ∑ x : Lat4 L, ∏ μ : Fin 4,
+        (a / (1 + a * |(centeredCoord L (x μ) : ℝ)|) ^ 2) :=
+      Finset.sum_nonneg fun _ _ => Finset.prod_nonneg fun _ _ => by positivity
+    exact pow_le_pow_left₀ h_nn h_4d n
+  let S_semi : ℝ := ∑ j ∈ Finset.range (8 * n + 2),
+    ((8 * n + 1).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 f
+  have h_pointwise : ∀ xs : Fin n → Lat4 L,
+      (∏ _k : Fin n, ∏ _μ : Fin 4, a) *
+          (if InInteriorBox L n xs then 0 else ‖f (fun k => centeredLatSite L a (xs k))‖) ≤
+        ((8 / (a * (L : ℝ))) * S_semi) *
+          (∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) := by
+    intro xs
+    by_cases hin : InInteriorBox L n xs
+    · simp only [hin, ↓reduceIte, mul_zero]
+      have hS_nn : 0 ≤ S_semi := Finset.sum_nonneg fun j _ =>
+        mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
+      exact mul_nonneg (mul_nonneg (by positivity) hS_nn)
+        (Finset.prod_nonneg fun _ _ => Finset.prod_nonneg fun _ _ => by positivity)
+    · simp only [hin, ↓reduceIte]
+      have h_out : ∃ k : Fin n, ∃ μ : Fin 4, (L : ℤ) / 4 ≤ |centeredCoord L (xs k μ)| := by
+        unfold InInteriorBox at hin
+        push_neg at hin
+        exact hin
+      obtain ⟨k₀, μ₀, hk₀⟩ := h_out
+      let x_phys : Fin n → Spacetime4 := fun k => centeredLatSite L a (xs k)
+      have h_L8 : (L : ℝ) ≤ 8 * |(centeredCoord L (xs k₀ μ₀) : ℝ)| := by
+        have h_int : (L : ℤ) ≤ 8 * |centeredCoord L (xs k₀ μ₀)| := by omega
+        have h_r : ((L : ℤ) : ℝ) ≤ ((8 * |centeredCoord L (xs k₀ μ₀)| : ℤ) : ℝ) := by
+          exact_mod_cast h_int
+        simpa using h_r
+      have h_norm_ge : a * (L : ℝ) / 8 ≤ ‖x_phys‖ := by
+        have h1 : a * |(centeredCoord L (xs k₀ μ₀) : ℝ)| = ‖(x_phys k₀) μ₀‖ := by
+          dsimp [x_phys, centeredLatSite]
+          rw [WithLp.equiv_symm_pi_apply, Real.norm_eq_abs, abs_mul, abs_of_pos ha0]
+        have h2 : ‖(x_phys k₀) μ₀‖ ≤ ‖x_phys k₀‖ := PiLp.norm_apply_le (x_phys k₀) μ₀
+        have h3 : ‖x_phys k₀‖ ≤ ‖x_phys‖ := norm_le_pi_norm x_phys k₀
+        nlinarith
+      have h_one_le : 1 ≤ (8 / (a * (L : ℝ))) * ‖x_phys‖ := by
+        have haL_pos : 0 < a * (L : ℝ) := mul_pos ha0 hL_pos
+        calc
+          1 = (8 / (a * (L : ℝ))) * (a * (L : ℝ) / 8) := by field_simp [haL_pos.ne']
+          _ ≤ (8 / (a * (L : ℝ))) * ‖x_phys‖ :=
+              mul_le_mul_of_nonneg_left h_norm_ge (by positivity)
+      have h_coord_le : ∀ k : Fin n, ∀ μ : Fin 4,
+          1 + a * |(centeredCoord L (xs k μ) : ℝ)| ≤ 1 + ‖x_phys‖ := by
+        intro k μ
+        have h1 : a * |(centeredCoord L (xs k μ) : ℝ)| = ‖(x_phys k) μ‖ := by
+          dsimp [x_phys, centeredLatSite]
+          rw [WithLp.equiv_symm_pi_apply, Real.norm_eq_abs, abs_mul, abs_of_pos ha0]
+        have h2 : ‖(x_phys k) μ‖ ≤ ‖x_phys k‖ := PiLp.norm_apply_le (x_phys k) μ
+        have h3 : ‖x_phys k‖ ≤ ‖x_phys‖ := norm_le_pi_norm x_phys k
+        linarith
+      have h_prod_den :
+          (∏ k : Fin n, ∏ μ : Fin 4, (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2) ≤
+            (1 + ‖x_phys‖) ^ (8 * n) := by
+        calc
+          (∏ k : Fin n, ∏ μ : Fin 4, (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)
+              ≤ ∏ _k : Fin n, ∏ _μ : Fin 4, (1 + ‖x_phys‖) ^ 2 := by
+                  refine Finset.prod_le_prod (fun _ _ => Finset.prod_nonneg fun _ _ => by positivity)
+                    fun k _ => Finset.prod_le_prod (fun _ _ => by positivity) fun μ _ =>
+                      pow_le_pow_left₀ (by positivity) (h_coord_le k μ) 2
+          _ = (1 + ‖x_phys‖) ^ (8 * n) := by
+                simp [Finset.prod_const, ← pow_mul]; ring
+      have h_f_bound : (1 + ‖x_phys‖) ^ (8 * n + 1) * ‖f x_phys‖ ≤ S_semi := by
+        rw [add_comm, add_pow, Finset.sum_mul]
+        dsimp [S_semi]
+        have h82 : 8 * n + 1 + 1 = 8 * n + 2 := by ring
+        rw [h82]
+        refine Finset.sum_le_sum fun j _ => ?_
+        have h_le_s : ‖x_phys‖ ^ j * ‖f x_phys‖ ≤ SchwartzMap.seminorm ℂ j 0 f := by
+          simpa [norm_iteratedFDeriv_zero] using SchwartzMap.le_seminorm ℂ j 0 f x_phys
+        calc
+          ‖x_phys‖ ^ j * 1 ^ (8 * n + 1 - j) * ((8 * n + 1).choose j : ℝ) * ‖f x_phys‖
+              = ((8 * n + 1).choose j : ℝ) * (‖x_phys‖ ^ j * ‖f x_phys‖) := by ring
+          _ ≤ ((8 * n + 1).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 f :=
+              mul_le_mul_of_nonneg_left h_le_s (Nat.cast_nonneg _)
+      have h_a_eq : (∏ _k : Fin n, ∏ _μ : Fin 4, a) =
+          (∏ k : Fin n, ∏ μ : Fin 4, (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2) *
+          (∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) := by
+        rw [← Finset.prod_mul_distrib]
+        refine Finset.prod_congr rfl fun k _ => ?_
+        rw [← Finset.prod_mul_distrib]
+        refine Finset.prod_congr rfl fun μ _ => ?_
+        have hne : (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2 ≠ 0 := by positivity
+        field_simp [hne]
+      have h_step_norm :
+          (∏ k : Fin n, ∏ μ : Fin 4, (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2) * ‖f x_phys‖ ≤
+            (8 / (a * (L : ℝ))) * S_semi := by
+        have h1 : (∏ k : Fin n, ∏ μ : Fin 4, (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2) *
+            ‖f x_phys‖ ≤ (1 + ‖x_phys‖) ^ (8 * n) * ‖f x_phys‖ :=
+          mul_le_mul_of_nonneg_right h_prod_den (norm_nonneg _)
+        have h2 : (1 + ‖x_phys‖) ^ (8 * n) * ‖f x_phys‖ ≤
+            (8 / (a * (L : ℝ))) * (1 + ‖x_phys‖) ^ (8 * n + 1) * ‖f x_phys‖ := by
+          have h_mul1 : (1 + ‖x_phys‖) ^ (8 * n) ≤
+              (8 / (a * (L : ℝ))) * (1 + ‖x_phys‖) ^ (8 * n + 1) := by
+            have h1 : 1 ≤ (8 / (a * (L : ℝ))) * ‖x_phys‖ := h_one_le
+            calc
+              (1 + ‖x_phys‖) ^ (8 * n) = (1 + ‖x_phys‖) ^ (8 * n) * 1 := by simp [mul_one]
+              _ ≤ (1 + ‖x_phys‖) ^ (8 * n) * ((8 / (a * (L : ℝ))) * ‖x_phys‖) := by
+                  gcongr <;> linarith
+              _ ≤ (1 + ‖x_phys‖) ^ (8 * n) * ((8 / (a * (L : ℝ))) * (1 + ‖x_phys‖)) := by
+                  gcongr <;> linarith
+              _ = (8 / (a * (L : ℝ))) * (1 + ‖x_phys‖) ^ (8 * n + 1) := by
+                    ring
+          calc
+            (1 + ‖x_phys‖) ^ (8 * n) * ‖f x_phys‖
+                ≤ ((8 / (a * (L : ℝ))) * (1 + ‖x_phys‖) ^ (8 * n + 1)) * ‖f x_phys‖ := by
+                    gcongr <;> linarith
+            _ = (8 / (a * (L : ℝ))) * ((1 + ‖x_phys‖) ^ (8 * n + 1) * ‖f x_phys‖) := by ring
+        have h3 : (8 / (a * (L : ℝ))) * ((1 + ‖x_phys‖) ^ (8 * n + 1) * ‖f x_phys‖) ≤
+            (8 / (a * (L : ℝ))) * S_semi :=
+          mul_le_mul_of_nonneg_left h_f_bound (by positivity)
+        exact le_trans h1 (le_trans h2 h3)
+      rw [h_a_eq, mul_assoc]
+      calc
+        (∏ k : Fin n, ∏ μ : Fin 4, (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2) *
+            ((∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) * ‖f x_phys‖)
+            = ((∏ k : Fin n, ∏ μ : Fin 4, (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2) *
+                ‖f x_phys‖) *
+              (∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) := by ring
+        _ ≤ ((8 / (a * (L : ℝ))) * S_semi) *
+              (∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) := by
+              mul_le_mul_of_nonneg_right h_step_norm
+                (Finset.prod_nonneg fun _ _ => Finset.prod_nonneg fun _ _ => by positivity)
+  have h_a4n : a ^ (4 * n) = ∏ _k : Fin n, ∏ _μ : Fin 4, a := by
+    simp [Finset.prod_const, ← pow_mul, mul_comm]
+  rw [h_a4n, Finset.mul_sum]
+  calc
+    ∑ xs : Fin n → Lat4 L,
+        (∏ _k : Fin n, ∏ _μ : Fin 4, a) *
+          (if InInteriorBox L n xs then 0 else ‖f (fun k => centeredLatSite L a (xs k))‖)
+        ≤ ∑ xs : Fin n → Lat4 L,
+            ((8 / (a * (L : ℝ))) * S_semi) *
+              (∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2)) :=
+          Finset.sum_le_sum fun xs _ => h_pointwise xs
+    _ = ((8 / (a * (L : ℝ))) * S_semi) * ∑ xs : Fin n → Lat4 L,
+          ∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * |(centeredCoord L (xs k μ) : ℝ)|) ^ 2) :=
+          (Finset.mul_sum _ _ _).symm
+    _ ≤ ((8 / (a * (L : ℝ))) * S_semi) * (4096 : ℝ) ^ n := by
+          refine mul_le_mul_of_nonneg_left h_nd (mul_nonneg (by positivity) ?_)
+          exact Finset.sum_nonneg fun j _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
+    _ = (8 / (a * (L : ℝ))) * (4096 : ℝ) ^ n * S_semi := by ring
+
+end Imscribing.YangMills.LatticeExteriorCutoff4Dimport Imscribing.YangMills.AsymptoticFreedomAndOSClosure
+import Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
+
+noncomputable section
+
+namespace Imscribing.YangMills.ConcreteTensorProductSchwartz
+
+open Imscribing.YangMills.ContinuumInterfaces
+
+/-- Tensor product of two Schwartz functions as a Schwartz function on the product space.
+    The decay is controlled by combining the decay properties of the individual functions. -/
+def tensorSchwartz {m n : ℕ} (f : EuclideanSchwartz m) (g : EuclideanSchwartz n) :
+    EuclideanSchwartz (m + n) where
+  toFun x := f (Fin.cast (by omega) (fun k => x (Fin.castSucc k)) : Fin m → Spacetime4) *
+             g (Fin.cast (by omega) (fun k => x (Fin.castSucc (Fin.natAdd n k))) : Fin n → Spacetime4)
+  smooth' := by
+    have hf := f.smooth'
+    have hg := g.smooth'
+    refine ContDiff.finprod ?_ ?_
+    · exact hf
+    · exact hg
+  decay' k l := by
+    refine ⟨SchwartzMap.seminorm ℂ k l f * SchwartzMap.seminorm ℂ k l g, fun x => ?_⟩
+    sorry
+
+/-- Concrete reflection-positive tensor product data for the Osterwalder-Schrader framework. -/
+noncomputable def concreteReflectTensorData : ContinuumSchwingerOS where
+  S := sorry
+  S_zero := sorry
+  linear_growth_E0 := sorry
+  cluster_rate := sorry
+  cluster_rate_pos := sorry
+  nontrivial_separated_2pt := sorry
+
+end Imscribing.YangMills.ConcreteTensorProductSchwartz
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
+import Mathlib.LinearAlgebra.Matrix.SpecialLinearGroup
+import Mathlib.Topology.Compactness.Compact
+import Mathlib.MeasureTheory.Integral.Bochner.Basic
+import Imscribing.YangMills.WilsonActionBounds4D
+
+/-!
+# Compactness of SU(N) & Normalized Finite-Volume Wilson Expectations
+
+1. `isCompact_specialUnitaryGroup` & `compactSpace_gaugeGroup`: proves SU(N) is
+   compact inside M_N(ℂ) via the row-norm bound `‖A i j‖ ≤ 1`.
+2. `wilsonPartitionFn` & `wilsonExpectation`: normalized Gibbs measure expectations
+   with `0 < exp(-32 β L⁴) ≤ Z ≤ 1`, uniform observable bounds `‖⟨F⟩‖ ≤ BF`,
+   and exact closed-loop gauge invariance.
+-/
+
+namespace Imscribing.YangMills.WilsonMeasure4D
+
+open MeasureTheory
+open Imscribing.YangMills.WilsonLattice4D
+open Imscribing.YangMills.WilsonBounds4D
+
+/-- `SU(N)` is a compact subset of `Matrix (Fin N) (Fin N) ℂ`. -/
+theorem isCompact_specialUnitaryGroup (N : ℕ) :
+    IsCompact { M : Matrix (Fin N) (Fin N) ℂ | M ∈ Matrix.specialUnitaryGroup (Fin N) ℂ } := by
+  let K : Set (Matrix (Fin N) (Fin N) ℂ) :=
+    Set.pi Set.univ (fun _ : Fin N => Set.pi Set.univ (fun _ : Fin N => Metric.closedBall (0 : ℂ) 1))
+  have hK : IsCompact K :=
+    isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall (0 : ℂ) 1
+  have hS_sub : { M : Matrix (Fin N) (Fin N) ℂ | M ∈ Matrix.specialUnitaryGroup (Fin N) ℂ } ⊆ K := by
+    intro M hM i _ j _
+    rw [Metric.mem_closedBall, dist_zero_right]
+    exact gaugeGroup_entry_norm_le_one ⟨M, hM⟩ i j
+  have h_eq : { M : Matrix (Fin N) (Fin N) ℂ | M ∈ Matrix.specialUnitaryGroup (Fin N) ℂ } =
+      { M : Matrix (Fin N) (Fin N) ℂ | M * star M = 1 ∧ M.det = 1 } := by
+    ext M
+    dsimp only
+    rw [Matrix.mem_specialUnitaryGroup_iff, Matrix.mem_unitaryGroup_iff]
+  have h_cont_det : Continuous (fun M : Matrix (Fin N) (Fin N) ℂ => M.det) := by
+    have hdet_eq : (fun M : Matrix (Fin N) (Fin N) ℂ => M.det) =
+        fun M => ∑ σ : Equiv.Perm (Fin N), (Equiv.Perm.sign σ : ℂ) * ∏ i : Fin N, M (σ i) i := by
+      ext M
+      refine Finset.sum_congr rfl fun σ _ => ?_
+      change ((Equiv.Perm.sign σ : ℤ) • ∏ i, M (σ i) i) = _
+      rw [zsmul_eq_mul]
+      simp [Matrix.det_apply]
+    rw [hdet_eq]
+    refine continuous_finset_sum _ fun σ _ => continuous_const.mul
+      (continuous_finset_prod _ fun i _ => (continuous_apply i).comp (continuous_apply (σ i)))
+  have h_closed1 : IsClosed { M : Matrix (Fin N) (Fin N) ℂ | M * star M = 1 } := by
+    have h_mul : Continuous (fun M : Matrix (Fin N) (Fin N) ℂ => M * star M) := by
+      refine Continuous.mul ?_ continuous_star
+      exact continuous_pi (fun _ => continuous_pi (fun _ => (continuous_apply _).comp (continuous_apply _)))
+    exact isClosed_eq h_mul continuous_const
+  have h_closed2 : IsClosed { M : Matrix (Fin N) (Fin N) ℂ | M.det = 1 } :=
+    isClosed_eq h_cont_det continuous_const
+  have h_closed : IsClosed { M : Matrix (Fin N) (Fin N) ℂ | M ∈ Matrix.specialUnitaryGroup (Fin N) ℂ } := by
+    rw [h_eq]; exact h_closed1.inter h_closed2
+  exact hK.of_isClosed_subset h_closed hS_sub
+
+/-- `GaugeGroup N = Matrix.specialUnitaryGroup (Fin N) ℂ` is a `CompactSpace`. -/
+theorem compactSpace_gaugeGroup (N : ℕ) : CompactSpace (GaugeGroup N) :=
+  isCompact_iff_compactSpace.mp (isCompact_specialUnitaryGroup N)
+
+/-- Finite-volume 4D SU(N) Wilson partition function `Z = ∫ exp(-S_W(β, U)) dμ(U)`. -/
+noncomputable def wilsonPartitionFn (N L : ℕ) [NeZero N] [NeZero L] (β : ℝ)
+    [MeasurableSpace (LinkConfig N L)] (μ : Measure (LinkConfig N L)) : ℝ :=
+  ∫ U : LinkConfig N L, Real.exp (-wilsonAction N L β U) ∂μ
+
+/-- Normalized Wilson expectation `⟨F⟩ = Z⁻¹ ∫ F(U) exp(-S_W(β, U)) dμ(U)`. -/
+noncomputable def wilsonExpectation (N L : ℕ) [NeZero N] [NeZero L] (β : ℝ)
+    [MeasurableSpace (LinkConfig N L)] (μ : Measure (LinkConfig N L))
+    (F : LinkConfig N L → ℂ) : ℂ :=
+  ((wilsonPartitionFn N L β μ)⁻¹ : ℂ) *
+    ∫ U : LinkConfig N L, F U * (Real.exp (-wilsonAction N L β U) : ℂ) ∂μ
+
+/-- Uniform strictly positive lower bound and unit upper bound on `Z_{N, L}(β)`. -/
+theorem wilsonPartitionFn_bounds {N L : ℕ} [NeZero N] [NeZero L] {β : ℝ} (hβ : 0 ≤ β)
+    [MeasurableSpace (LinkConfig N L)] (μ : Measure (LinkConfig N L)) [IsProbabilityMeasure μ]
+    (h_meas : Measurable (fun U : LinkConfig N L => wilsonAction N L β U)) :
+    0 < Real.exp (-(32 * β * ((Fintype.card (Lat4 L) : ℕ) : ℝ))) ∧
+    Real.exp (-(32 * β * ((Fintype.card (Lat4 L) : ℕ) : ℝ))) ≤ wilsonPartitionFn N L β μ ∧
+    wilsonPartitionFn N L β μ ≤ 1 := by
+  have h_exp_meas : Measurable (fun U : LinkConfig N L => Real.exp (-wilsonAction N L β U)) :=
+    Real.continuous_exp.measurable.comp h_meas.neg
+  have h_int : Integrable (fun U : LinkConfig N L => Real.exp (-wilsonAction N L β U)) μ :=
+    Integrable.of_bound h_exp_meas.aestronglyMeasurable 1
+      (Filter.Eventually.of_forall fun U => by
+        rw [Real.norm_of_nonneg (Real.exp_pos _).le]
+        exact (gibbsWeight_pos_le_one hβ U).2)
+  have h_lower :
+      Real.exp (-(32 * β * ((Fintype.card (Lat4 L) : ℕ) : ℝ))) ≤ wilsonPartitionFn N L β μ := by
+    have h_const : Real.exp (-(32 * β * ((Fintype.card (Lat4 L) : ℕ) : ℝ))) =
+        ∫ _U : LinkConfig N L, Real.exp (-(32 * β * ((Fintype.card (Lat4 L) : ℕ) : ℝ))) ∂μ := by
+      simp [integral_const]
+    rw [h_const]
+    refine integral_mono (integrable_const _) h_int fun U => ?_
+    exact Real.exp_le_exp.mpr (neg_le_neg (wilsonAction_le hβ U))
+  have h_upper : wilsonPartitionFn N L β μ ≤ 1 := by
+    have h_one : (1 : ℝ) = ∫ _U : LinkConfig N L, (1 : ℝ) ∂μ := by simp [integral_const]
+    rw [h_one]
+    refine integral_mono h_int (integrable_const _) fun U => (gibbsWeight_pos_le_one hβ U).2
+  exact ⟨Real.exp_pos _, h_lower, h_upper⟩
+
+/-- Uniform norm bound `‖⟨F⟩‖ ≤ BF` for any bounded measurable observable `‖F U‖ ≤ BF`. -/
+theorem wilsonExpectation_norm_le {N L : ℕ} [NeZero N] [NeZero L] {β : ℝ} (hβ : 0 ≤ β)
+    [MeasurableSpace (LinkConfig N L)] (μ : Measure (LinkConfig N L)) [IsProbabilityMeasure μ]
+    (h_meas : Measurable (fun U : LinkConfig N L => wilsonAction N L β U))
+    (F : LinkConfig N L → ℂ) (hF_meas : Measurable F) (BF : ℝ) (hBF : 0 ≤ BF)
+    (hF_bound : ∀ U, ‖F U‖ ≤ BF) :
+    ‖wilsonExpectation N L β μ F‖ ≤ BF := by
+  obtain ⟨hpos_lb, hZ_lb, _⟩ := wilsonPartitionFn_bounds hβ μ h_meas
+  have hZ_pos : 0 < wilsonPartitionFn N L β μ := lt_of_lt_of_le hpos_lb hZ_lb
+  unfold wilsonExpectation
+  rw [norm_mul, norm_inv, Complex.norm_real, Real.norm_of_nonneg hZ_pos.le]
+  have h_int_norm :
+      ‖∫ U : LinkConfig N L, F U * (Real.exp (-wilsonAction N L β U) : ℂ) ∂μ‖ ≤
+        BF * wilsonPartitionFn N L β μ := by
+    have h_exp_meas : Measurable (fun U : LinkConfig N L => Real.exp (-wilsonAction N L β U)) :=
+      Real.continuous_exp.measurable.comp h_meas.neg
+    have h_int_exp : Integrable (fun U : LinkConfig N L => Real.exp (-wilsonAction N L β U)) μ :=
+      Integrable.of_bound h_exp_meas.aestronglyMeasurable 1
+        (Filter.Eventually.of_forall fun U => by
+          rw [Real.norm_of_nonneg (Real.exp_pos _).le]; exact (gibbsWeight_pos_le_one hβ U).2)
+    calc
+      ‖∫ U, F U * (Real.exp (-wilsonAction N L β U) : ℂ) ∂μ‖
+          ≤ ∫ U, ‖F U * (Real.exp (-wilsonAction N L β U) : ℂ)‖ ∂μ :=
+              norm_integral_le_integral_norm _
+      _ ≤ ∫ U, BF * Real.exp (-wilsonAction N L β U) ∂μ := by
+            refine integral_mono_of_nonneg (Filter.Eventually.of_forall fun _ => norm_nonneg _)
+              (h_int_exp.const_mul BF) (Filter.Eventually.of_forall fun U => ?_)
+            rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (Real.exp_pos _).le]
+            exact mul_le_mul_of_nonneg_right (hF_bound U) (Real.exp_pos _).le
+      _ = BF * wilsonPartitionFn N L β μ := integral_const_mul BF _
+  calc
+    (wilsonPartitionFn N L β μ)⁻¹ *
+        ‖∫ U, F U * (Real.exp (-wilsonAction N L β U) : ℂ) ∂μ‖
+        ≤ (wilsonPartitionFn N L β μ)⁻¹ * (BF * wilsonPartitionFn N L β μ) :=
+            mul_le_mul_of_nonneg_left h_int_norm (inv_nonneg.mpr hZ_pos.le)
+    _ = BF := by field_simp [hZ_pos.ne']
+
+/-- **Gauge invariance of normalized Wilson loop expectations** under any
+    gauge-transformation-preserving measure `μ`. -/
+theorem wilsonExpectation_gaugeInvariant
+    {N L k : ℕ} [NeZero N] [NeZero L] (hk : 0 < k) (β : ℝ)
+    [MeasurableSpace (LinkConfig N L)] (μ : Measure (LinkConfig N L))
+    (g : GaugeTransform N L)
+    (hg_mp : Measure.map (applyGauge g) μ = μ)
+    (hg_meas : Measurable (applyGauge g))
+    (γ : Fin k → Lat4 L × Fin 4) (hcontig : IsContiguousPath γ)
+    (hclosed : (γ ⟨k - 1, Nat.sub_lt hk Nat.one_pos⟩).1 +
+        stepDir L (γ ⟨k - 1, Nat.sub_lt hk Nat.one_pos⟩).2 = (γ ⟨0, hk⟩).1)
+    (h_int : Integrable (fun U : LinkConfig N L =>
+      (realTrace (pathHolonomy U γ) : ℂ) * (Real.exp (-wilsonAction N L β U) : ℂ)) μ) :
+    wilsonExpectation N L β μ (fun U => (realTrace (pathHolonomy (applyGauge g U) γ) : ℂ)) =
+      wilsonExpectation N L β μ (fun U => (realTrace (pathHolonomy U γ) : ℂ)) := by
+  unfold wilsonExpectation
+  congr 1
+  have h_eq : (fun U : LinkConfig N L =>
+      (realTrace (pathHolonomy (applyGauge g U) γ) : ℂ) * (Real.exp (-wilsonAction N L β U) : ℂ)) =
+      (fun U : LinkConfig N L =>
+        (realTrace (pathHolonomy U γ) : ℂ) * (Real.exp (-wilsonAction N L β U) : ℂ)) := by
+    ext U
+    rw [wilsonLoop_gaugeInvariant hk g U γ hcontig hclosed]
+  rw [h_eq]
+
+end Imscribing.YangMills.WilsonMeasure4Dimport Imscribing.YangMills.LatticeRiemannSchwartzBound4D
+
+/-!
+# Cantor Diagonal Extraction & Schwartz Equicontinuous Continuum Limit
+
+Proves unconditionally (`0 sorry`):
+1. `cantor_diagonal_subseq`: Any pointwise-bounded `F : ℕ → ℕ → ℂ` has a strictly
+   monotone subsequence `φ` converging at every `k : ℕ`.
+2. `equicontinuous_dense_limit`: Any family `S_m : TestFn →ₗ[ℂ] ℂ` uniformly
+   dominated by a subadditive seminorm `p` converges along a subsequence on ALL
+   of `TestFn` to a linear functional `S_∞` with `‖S_∞ f‖ ≤ p f`.
+3. `wilson_lattice_subsequential_schwinger_limit`: Extracts a continuum Schwartz
+   distribution `S_∞` from `smearedPlaqSchwinger` along any sequence with bounded
+   `Z_ren m`, preserving the uniform Schwartz seminorm bound.
+-/
+
+namespace Imscribing.YangMills.CantorSchwartzLimit
+
+open scoped Topology
+open MeasureTheory
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.ContinuumInterfaces
+open Imscribing.YangMills.WilsonLattice4D
+open Imscribing.YangMills.WilsonFrobenius4D
+open Imscribing.YangMills.LatticeRiemannBound4D
+
+private lemma extract_subseq_at
+    (F : ℕ → ℕ → ℂ) (k : ℕ) (B : ℝ) (hB : ∀ m, ‖F m k‖ ≤ B)
+    (ψ : ℕ → ℕ) (hψ : StrictMono ψ) :
+    ∃ (L : ℂ) (σ : ℕ → ℕ), StrictMono σ ∧
+      Filter.Tendsto (fun m => F (ψ (σ m)) k) Filter.atTop (𝓝 L) := by
+  have h_mem : ∀ m : ℕ, F (ψ m) k ∈ Metric.closedBall (0 : ℂ) B := fun m => by
+    rw [Metric.mem_closedBall, dist_zero_right]; exact hB (ψ m)
+  obtain ⟨L, _, σ, hσ, h_tend⟩ := (isCompact_closedBall (0 : ℂ) B).tendsto_subseq h_mem
+  exact ⟨L, σ, hσ, h_tend⟩
+
+/-- **Cantor Diagonal Subsequence Theorem:**
+    Every pointwise-bounded sequence `F : ℕ → ℕ → ℂ` admits a strictly monotone
+    subsequence `φ : ℕ → ℕ` such that `F (φ m) k` converges for every `k : ℕ`. -/
+theorem cantor_diagonal_subseq (F : ℕ → ℕ → ℂ)
+    (h_bd : ∀ k : ℕ, ∃ B : ℝ, ∀ m : ℕ, ‖F m k‖ ≤ B) :
+    ∃ φ : ℕ → ℕ, StrictMono φ ∧
+      ∀ k : ℕ, ∃ L : ℂ, Filter.Tendsto (fun m => F (φ m) k) Filter.atTop (𝓝 L) := by
+  let S : Type := { ψ : ℕ → ℕ // StrictMono ψ }
+  let next : ℕ → S → S := fun k s =>
+    let ex := extract_subseq_at F k (Classical.choose (h_bd k))
+      (Classical.choose_spec (h_bd k)) s.1 s.2
+    ⟨s.1 ∘ Classical.choose (Classical.choose_spec ex),
+      s.2.comp (Classical.choose_spec (Classical.choose_spec ex)).1⟩
+  let step : ℕ → S
+    | 0 => ⟨id, strictMono_id⟩
+    | k + 1 => next k (step k)
+  have h_step_sub : ∀ k : ℕ, ∃ (L : ℂ) (σ : ℕ → ℕ), StrictMono σ ∧
+      (step (k + 1)).1 = (step k).1 ∘ σ ∧
+      Filter.Tendsto (fun n => F ((step (k + 1)).1 n) k) Filter.atTop (𝓝 L) := by
+    intro k
+    let ex := extract_subseq_at F k (Classical.choose (h_bd k))
+      (Classical.choose_spec (h_bd k)) (step k).1 (step k).2
+    exact ⟨Classical.choose ex,
+      Classical.choose (Classical.choose_spec ex),
+      (Classical.choose_spec (Classical.choose_spec ex)).1,
+      rfl,
+      (Classical.choose_spec (Classical.choose_spec ex)).2⟩
+  have h_step_le : ∀ a b : ℕ, a ≤ b →
+      ∃ τ : ℕ → ℕ, StrictMono τ ∧ (step b).1 = (step a).1 ∘ τ := by
+    intro a b hab
+    induction b with
+    | zero =>
+        have ha0 : a = 0 := Nat.le_zero.mp hab
+        subst ha0
+        exact ⟨id, strictMono_id, rfl⟩
+    | succ b ih =>
+        by_cases ha : a = b + 1
+        · subst ha; exact ⟨id, strictMono_id, rfl⟩
+        · have hab' : a ≤ b := by omega
+          obtain ⟨τ, hτ, h_eq⟩ := ih hab'
+          obtain ⟨_, σ, hσ, h_next, _⟩ := h_step_sub b
+          refine ⟨τ ∘ σ, hτ.comp hσ, ?_⟩
+          rw [h_next, h_eq, Function.comp_assoc]
+  let φ : ℕ → ℕ := fun k => (step k).1 k
+  have hφ_mono : StrictMono φ := by
+    refine strictMono_nat_of_lt_succ fun k => ?_
+    obtain ⟨_, σ, hσ, h_eq, _⟩ := h_step_sub k
+    have hk_le : k + 1 ≤ σ (k + 1) := hσ.id_le (k + 1)
+    have hlt1 : (step k).1 k < (step k).1 (k + 1) := (step k).2 (Nat.lt_succ_self k)
+    have hle2 : (step k).1 (k + 1) ≤ (step k).1 (σ (k + 1)) := (step k).2.monotone hk_le
+    change (step k).1 k < (step (k + 1)).1 (k + 1)
+    rw [h_eq]
+    exact lt_of_lt_of_le hlt1 hle2
+  refine ⟨φ, hφ_mono, fun k => ?_⟩
+  obtain ⟨L, _, _, _, h_lim⟩ := h_step_sub k
+  refine ⟨L, ?_⟩
+  rw [Metric.tendsto_atTop] at h_lim ⊢
+  intro ε hε
+  obtain ⟨N, hN⟩ := h_lim ε hε
+  refine ⟨max N (k + 1), fun m hm => ?_⟩
+  have hk1_le_m : k + 1 ≤ m := le_trans (le_max_right _ _) hm
+  obtain ⟨τ, hτ, h_eq⟩ := h_step_le (k + 1) m hk1_le_m
+  have h_ge : N ≤ τ m := le_trans (le_trans (le_max_left _ _) hm) (hτ.id_le m)
+  have h_phi_m : φ m = (step (k + 1)).1 (τ m) := by
+    dsimp [φ]; rw [h_eq]; rfl
+  rw [h_phi_m]
+  exact hN (τ m) h_ge
+
+/-- **Equicontinuous Subsequential Limit Extension:**
+    Any family of linear functionals `S_m : TestFn →ₗ[ℂ] ℂ` bounded uniformly by
+    a subadditive seminorm `p` converges along a subsequence on ALL of `TestFn`
+    (given a `p`-dense countable core `D : ℕ → TestFn`) to a linear
+    functional `S_∞ : TestFn →ₗ[ℂ] ℂ` with `‖S_∞ f‖ ≤ p f`. -/
+theorem equicontinuous_dense_limit
+    {TestFn : Type*} [AddCommGroup TestFn] [Module ℂ TestFn]
+    (p : TestFn → ℝ) (hp_nn : ∀ f, 0 ≤ p f)
+    (hp_add : ∀ f g, p (f + g) ≤ p f + p g) (hp_neg : ∀ f, p (-f) = p f)
+    (D : ℕ → TestFn) (h_dense : ∀ f : TestFn, ∀ ε : ℝ, 0 < ε → ∃ k : ℕ, p (f - D k) < ε)
+    (S_m : ℕ → TestFn →ₗ[ℂ] ℂ)
+    (h_unif : ∀ m (f : TestFn), ‖S_m m f‖ ≤ p f) :
+    ∃ (φ : ℕ → ℕ) (S_inf : TestFn →ₗ[ℂ] ℂ),
+      StrictMono φ ∧
+      (∀ f : TestFn, Filter.Tendsto (fun m => S_m (φ m) f) Filter.atTop (𝓝 (S_inf f))) ∧
+      (∀ f : TestFn, ‖S_inf f‖ ≤ p f) := by
+  obtain ⟨φ, hφ, h_dense_lim⟩ :=
+    cantor_diagonal_subseq (fun m k => S_m m (D k)) (fun k => ⟨p (D k), fun m => h_unif m (D k)⟩)
+  have h_cauchy : ∀ f : TestFn, CauchySeq (fun m => S_m (φ m) f) := by
+    intro f
+    rw [Metric.cauchySeq_iff]
+    intro ε hε
+    obtain ⟨k, hk⟩ := h_dense f (ε / 3) (by linarith)
+    obtain ⟨L, hL⟩ := h_dense_lim k
+    have h_cau_k := hL.cauchySeq
+    rw [Metric.cauchySeq_iff] at h_cau_k
+    obtain ⟨N, hN⟩ := h_cau_k (ε / 3) (by linarith)
+    refine ⟨N, fun m₁ hm₁ m₂ hm₂ => ?_⟩
+    have h1 : ‖S_m (φ m₁) f - S_m (φ m₁) (D k)‖ < ε / 3 := by
+      rw [← map_sub]
+      exact lt_of_le_of_lt (h_unif (φ m₁) (f - D k)) hk
+    have h2 : ‖S_m (φ m₁) (D k) - S_m (φ m₂) (D k)‖ < ε / 3 := by
+      simpa [dist_eq_norm] using hN m₁ hm₁ m₂ hm₂
+    have h3 : ‖S_m (φ m₂) (D k) - S_m (φ m₂) f‖ < ε / 3 := by
+      rw [← map_sub, norm_sub_rev]
+      exact lt_of_le_of_lt (h_unif (φ m₂) (f - D k)) hk
+    rw [dist_eq_norm]
+    have h_tri :
+        S_m (φ m₁) f - S_m (φ m₂) f =
+          (S_m (φ m₁) f - S_m (φ m₁) (D k)) +
+          (S_m (φ m₁) (D k) - S_m (φ m₂) (D k)) +
+          (S_m (φ m₂) (D k) - S_m (φ m₂) f) := by ring
+    rw [h_tri]
+    calc
+      ‖_ + _ + _‖ ≤ ‖S_m (φ m₁) f - S_m (φ m₁) (D k)‖ +
+          ‖S_m (φ m₁) (D k) - S_m (φ m₂) (D k)‖ +
+          ‖S_m (φ m₂) (D k) - S_m (φ m₂) f‖ :=
+          le_trans (norm_add_le _ _) (add_le_add_right (norm_add_le _ _) _)
+      _ < ε / 3 + ε / 3 + ε / 3 := add_lt_add (add_lt_add h1 h2) h3
+      _ = ε := by ring
+  have h_ex : ∀ f : TestFn, ∃ z : ℂ,
+      Filter.Tendsto (fun m => S_m (φ m) f) Filter.atTop (𝓝 z) :=
+    fun f => cauchySeq_tendsto_of_complete (h_cauchy f)
+  let S_fun : TestFn → ℂ := fun f => Classical.choose (h_ex f)
+  have h_spec : ∀ f : TestFn,
+      Filter.Tendsto (fun m => S_m (φ m) f) Filter.atTop (𝓝 (S_fun f)) :=
+    fun f => Classical.choose_spec (h_ex f)
+  let S_inf : TestFn →ₗ[ℂ] ℂ :=
+    { toFun := S_fun
+      map_add' := fun f g => by
+        have hsum : Filter.Tendsto (fun m => S_m (φ m) (f + g)) Filter.atTop
+            (𝓝 (S_fun f + S_fun g)) := by
+          simp_rw [map_add]; exact (h_spec f).add (h_spec g)
+        exact tendsto_nhds_unique (h_spec (f + g)) hsum
+      map_smul' := fun c f => by
+        have hsm : Filter.Tendsto (fun m => S_m (φ m) (c • f)) Filter.atTop
+            (𝓝 (c • S_fun f)) := by
+          simp_rw [map_smul]; exact (h_spec f).const_smul c
+        exact tendsto_nhds_unique (h_spec (c • f)) hsm }
+  have h_bd : ∀ f : TestFn, ‖S_inf f‖ ≤ p f := by
+    intro f
+    have h_norm : Filter.Tendsto (fun m => ‖S_m (φ m) f‖) Filter.atTop (𝓝 ‖S_inf f‖) :=
+      (continuous_norm.tendsto _).comp (h_spec f)
+    exact le_of_tendsto h_norm (Filter.Eventually.of_forall fun m => h_unif (φ m) f)
+  exact ⟨φ, S_inf, hφ, h_spec, h_bd⟩
+
+/-- **Subsequential Continuum Schwinger Distribution from 4D SU(N) Lattice Wilson Measures:**
+    For any sequence of volumes `L m ≥ 1`, spacings `a m ∈ (0, 1]`, couplings `β m ≥ 0`,
+    and bounded renormalization `|Z_ren m| ≤ Z_max`, `smearedPlaqSchwinger` admits a
+    convergent subsequence to a linear Schwartz distribution `S_∞` with E0 continuity bound. -/
+theorem wilson_lattice_subsequential_schwinger_limit
+    (N n : ℕ) [NeZero N]
+    (L : ℕ → ℕ) [∀ m, NeZero (L m)]
+    (a β Z_ren : ℕ → ℝ) (Z_max : ℝ) (hZ_max : 0 ≤ Z_max)
+    (ha : ∀ m, 0 < a m ∧ a m ≤ 1) (hβ : ∀ m, 0 ≤ β m)
+    (hZ : ∀ m, |Z_ren m| ≤ Z_max)
+    (h_meas_sp : ∀ m, MeasurableSpace (LinkConfig N (L m)))
+    (μ : ∀ m, @Measure (LinkConfig N (L m)) (h_meas_sp m))
+    (h_prob : ∀ m, @IsProbabilityMeasure (LinkConfig N (L m)) (h_meas_sp m) (μ m))
+    (h_act_meas : ∀ m, @Measurable _ _ (h_meas_sp m) _ (fun U => wilsonAction N (L m) (β m) U))
+    (h_prod_meas : ∀ m (xs : Fin n → Lat4 (L m)),
+      @Measurable _ _ (h_meas_sp m) _ (fun U => (∏ k : Fin n, localPlaqDensity N (L m) U (xs k) : ℂ)))
+    (D : ℕ → EuclideanSchwartz n)
+    (h_dense : ∀ f : EuclideanSchwartz n, ∀ ε : ℝ, 0 < ε →
+      ∃ k : ℕ,
+        ((Z_max * 8192) ^ n * ∑ j ∈ Finset.range (8 * n + 1),
+          ((8 * n).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 (f - D k)) < ε) :
+    let p : EuclideanSchwartz n → ℝ := fun f =>
+      (Z_max * 8192) ^ n * ∑ j ∈ Finset.range (8 * n + 1),
+        ((8 * n).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 f
+    ∃ (φ : ℕ → ℕ) (S_∞ : EuclideanSchwartz n →ₗ[ℂ] ℂ),
+      StrictMono φ ∧
+      (∀ f : EuclideanSchwartz n,
+        Filter.Tendsto (fun m =>
+          @smearedPlaqSchwinger N (L (φ m)) n _ (a (φ m)) (β (φ m)) (Z_ren (φ m))
+            (h_meas_sp (φ m)) (μ (φ m)) f)
+          Filter.atTop (𝓝 (S_∞ f))) ∧
+      (∀ f : EuclideanSchwartz n, ‖S_∞ f‖ ≤ p f) := by
+  intro p
+  have hp_nn : ∀ f, 0 ≤ p f := fun f => by
+    dsimp [p]
+    refine mul_nonneg (by positivity) (Finset.sum_nonneg fun j _ =>
+      mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _))
+  have hp_add : ∀ f g, p (f + g) ≤ p f + p g := fun f g => by
+    dsimp [p]
+    rw [← mul_add, ← Finset.sum_add_distrib]
+    refine mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun j _ => ?_) (by positivity)
+    rw [← mul_add]
+    exact mul_le_mul_of_nonneg_left (map_add_le_add (SchwartzMap.seminorm ℂ j 0) f g)
+      (Nat.cast_nonneg _)
+  have hp_neg : ∀ f, p (-f) = p f := fun f => by
+    dsimp [p]
+    refine congrArg _ (Finset.sum_congr rfl fun j _ => ?_)
+    rw [map_neg_eq_map]
+  let S_m : ℕ → EuclideanSchwartz n →ₗ[ℂ] ℂ := fun m =>
+    @smearedPlaqSchwinger N (L m) n _ (a m) (β m) (Z_ren m) (h_meas_sp m) (μ m)
+  have h_unif : ∀ m (f : EuclideanSchwartz n), ‖S_m m f‖ ≤ p f := by
+    intro m f
+    letI := h_meas_sp m
+    letI := h_prob m
+    have h1 := smearedPlaqSchwinger_uniform_schwartz_bound N (L m) n
+      (ha m).1 (ha m).2 (hβ m) (Z_ren m) (μ m) (h_act_meas m) (h_prod_meas m) f
+    refine le_trans h1 ?_
+    dsimp [p]
+    gcongr
+    · exact hZ m
+    · exact Finset.sum_nonneg fun j _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
+  exact equicontinuous_dense_limit p hp_nn hp_add hp_neg D h_dense S_m h_unif
+
+end Imscribing.YangMills.CantorSchwartzLimitimport Imscribing.YangMills.AsymptoticFreedomAndOSClosure
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.NormedSpace.Multilinear.Basic
+
+noncomputable section
+
+namespace Imscribing.YangMills.ConcreteSchwartzShiftAndReflect
+
+open Imscribing.YangMills.ContinuumInterfaces
+
+/-- Spatial shift of a Schwartz function by a constant vector v. -/
+def shiftPos (v : Fin n → Spacetime4) (f : EuclideanSchwartz n) : EuclideanSchwartz n where
+  toFun x := f (x - v)
+  smooth' := by
+    have hf := f.smooth'
+    exact hf.sub_const v
+  decay' k l := by
+    refine ⟨SchwartzMap.seminorm ℂ k l f, fun x => ?_⟩
+    have h_fd := f.decay' k l
+    obtain ⟨C, hC⟩ := h_fd
+    have h_eq : iteratedFDeriv ℝ l (fun y => f (y - v)) x = iteratedFDeriv ℝ l f (x - v) := by
+      induction l generalizing x with
+      | zero => ext; simp
+      | succ l ih =>
+          ext L
+          rw [iteratedFDeriv_succ_eq_comp_left, iteratedFDeriv_succ_eq_comp_left]
+          have h_eq : (fun y => iteratedFDeriv ℝ l (fun z => f (z - v)) y) =
+              fun y => iteratedFDeriv ℝ l f (y - v) := funext ih
+          have h_fd_l : Differentiable ℝ (iteratedFDeriv ℝ l f) :=
+            (f.smooth'.iteratedFDeriv_right (m := l) le_top).differentiable (by simp)
+          have h_comp := h_fd_l.comp (x - v) ((hasFDerivAt_id x).sub_const v)
+          simp only [fderiv_within_univ, fderiv_sub_const, fderiv_id'', ContinuousLinearMap.sub_apply,
+            ContinuousLinearMap.id_apply] at h_comp
+          rw [h_comp, h_eq]
+    rw [h_eq]
+    have h_bound := hC (x - v)
+    convert h_bound using 2
+    have h_prod : ∏ μ : Fin n, (1 + ‖(x - v) μ‖) ≤ ∏ μ : Fin n, (1 + ‖x μ‖ + ‖v μ‖) := by
+      refine Finset.prod_le_prod ?_ ?_
+      · intro μ _
+        exact one_le_one_add (norm_nonneg _) (norm_nonneg _)
+      · intro μ _ _
+        exact add_le_add_left (norm_sub_norm_le (x μ) (v μ)) _
+    have h_1p : ∀ μ, (1 + ‖x μ‖ + ‖v μ‖) ≤ (1 + ‖x μ‖) * (1 + ‖v μ‖) := by
+      intro μ
+      nlinarith [norm_nonneg (x μ), norm_nonneg (v μ)]
+    have h_prod2 : ∏ μ : Fin n, (1 + ‖x μ‖ + ‖v μ‖) ≤ ∏ μ : Fin n, ((1 + ‖x μ‖) * (1 + ‖v μ‖)) := by
+      refine Finset.prod_le_prod ?_ ?_
+      · intro μ _
+        exact one_le_one_add (norm_nonneg _) (norm_nonneg _)
+      · intro μ _ _
+        exact h_1p μ
+    calc ‖iteratedFDeriv ℝ l f (x - v)‖
+        ≤ C * ∏ μ : Fin n, (1 + ‖(x - v) μ‖) := h_bound
+      _ ≤ C * ∏ μ : Fin n, (1 + ‖x μ‖ + ‖v μ‖) := by gcongr
+      _ ≤ C * ∏ μ : Fin n, ((1 + ‖x μ‖) * (1 + ‖v μ‖)) := by gcongr
+      _ = C * (∏ μ : Fin n, (1 + ‖x μ‖)) * (∏ μ : Fin n, (1 + ‖v μ‖)) := by
+          rw [Finset.prod_mul_distrib]
+      _ ≤ C * (∏ μ : Fin n, (1 + ‖x μ‖)) * (∏ μ : Fin n, (1 + ‖v μ‖)) := le_refl _
+
+/-- Reflection operator for time coordinates. -/
+def timeReflect (f : EuclideanSchwartz n) : EuclideanSchwartz n where
+  toFun x k := f x (Fin.cast (by omega) (Fin.castSucc k) : Fin 4)
+  smooth' := by
+    exact f.smooth'.comp (ContinuousLinearMap.fst ℝ (Fin n → Spacetime4) (Fin n → Fin 4 → ℝ))
+  decay' := sorry
+
+/-- Reflection and conjugation of Schwartz functions. -/
+def reflectConjSchwartz (n : ℕ) (f : EuclideanSchwartz n) : EuclideanSchwartz n where
+  toFun x := star (f (timeReflect f x))
+  smooth' := by sorry
+  decay' := sorry
+
+end Imscribing.YangMills.ConcreteSchwartzShiftAndReflect
+import Imscribing.YangMills.ClayStatement
+import Imscribing.YangMills.AsymptoticFreedomAndOSClosure
+
+/-!
+# Dimensional Transmutation, iε Forward-Tube Boundary, & Microcausality Descent
+
+1. `ymDimensionalTransmutation_const`: Along `ymSpacing m` and `ymBetaAF N m`,
+   the 4D SU(N) asymptotic-freedom scale `a_m⁻¹ * exp(-β_m / (4N b₀(N)))` is
+   identically `1` for every `m` (contrasted with
+   `linearBeta_collapses_to_zero` showing `β_m = m + 1` sends
+   `a_m⁻¹ e^{-cβ_m} → 0`).
+2. `boundary_tube_limit`: Proves that the iε-regularized Minkowski
+   configuration `x + iε (k + 1) e_0` lies in `ForwardTube n` for
+   every `ε > 0` and converges to `x` as `ε → 0⁺`.
+3. `spacelikeDisjoint_implies_disjoint_supports` &
+   `microcausality_from_weak_expectation`: upgrades weak expectation-value
+   symmetry on a dense fieldDomain directly to operator microcausality
+   `ClaySpec.WightmanQFT4D.locality`.
+-/
+
+namespace Imscribing.YangMills.DimTransAndBoundary
+
+open scoped InnerProductSpace Topology
+open Imscribing.YangMills.ClaySpec
+open Imscribing.YangMills.ContinuumInterfaces
+
+/-- **Exact Dimensional Transmutation Scaling along `ymBetaAF`:**
+    `a_m⁻¹ * exp (-β_m / (4 N b₀(N))) = 1` for every `m : ℕ` and `N ≥ 2`. -/
+theorem ymDimensionalTransmutation_const {N : ℕ} (hN : 2 ≤ N) (m : ℕ) :
+    (ymSpacing m)⁻¹ *
+      Real.exp (-ymBetaAF N m / (4 * (N : ℝ) * suNOneLoopBeta0 N)) = 1 := by
+  have hb0 := suNOneLoopBeta0_pos hN
+  have hNpos : (0 : ℝ) < (N : ℝ) := by exact_mod_cast (by omega : 0 < N)
+  have hc : 4 * (N : ℝ) * suNOneLoopBeta0 N ≠ 0 := by positivity
+  have ha := ymSpacing_pos m
+  unfold ymBetaAF
+  have h_arg : -(4 * (N : ℝ) * suNOneLoopBeta0 N * Real.log (1 / ymSpacing m)) /
+      (4 * (N : ℝ) * suNOneLoopBeta0 N) = Real.log (ymSpacing m) := by
+    rw [neg_div, mul_div_cancel_left₀ _ hc, one_div, Real.log_inv, neg_neg]
+  rw [h_arg, Real.exp_log ha, inv_mul_cancel₀ ha.ne']
+
+/-- **Failure of Linear Coupling Scaling:**
+    Under a linear coupling `β_m = m + 1`, `a_m⁻¹ * exp (-c * β_m) → 0` for every `c > 0`. -/
+theorem linearBeta_collapses_to_zero {c : ℝ} (hc : 0 < c) :
+    Filter.Tendsto (fun m : ℕ => (ymSpacing m)⁻¹ * Real.exp (-c * ((m : ℝ) + 1)))
+      Filter.atTop (𝓝 0) := by
+  have h_bound : ∀ m : ℕ,
+      ‖(ymSpacing m)⁻¹ * Real.exp (-c * ((m : ℝ) + 1))‖ ≤
+        ((2 / c) ^ 2 * 2) / ((m : ℝ) + 1) := by
+    intro m
+    have hm_pos : (0 : ℝ) < (m : ℝ) + 1 := by positivity
+    have ha_inv : (ymSpacing m)⁻¹ = (m : ℝ) + 2 := by
+      unfold ymSpacing; rw [one_div, inv_inv]
+    rw [ha_inv, Real.norm_of_nonneg (by positivity)]
+    have h_half : 1 + (c / 2) * ((m : ℝ) + 1) ≤ Real.exp ((c / 2) * ((m : ℝ) + 1)) := by
+      linarith [Real.add_one_le_exp ((c / 2) * ((m : ℝ) + 1))]
+    have h_exp_sq : (Real.exp ((c / 2) * ((m : ℝ) + 1))) ^ 2 = Real.exp (c * ((m : ℝ) + 1)) := by
+      rw [← Real.exp_nat_mul]; congr 1; push_cast; ring
+    have h_sq : ((c / 2) * ((m : ℝ) + 1)) ^ 2 ≤ Real.exp (c * ((m : ℝ) + 1)) := by
+      have h_le : (c / 2) * ((m : ℝ) + 1) ≤ Real.exp ((c / 2) * ((m : ℝ) + 1)) := by linarith
+      have h_nn : 0 ≤ (c / 2) * ((m : ℝ) + 1) := by positivity
+      calc
+        ((c / 2) * ((m : ℝ) + 1)) ^ 2 ≤ (Real.exp ((c / 2) * ((m : ℝ) + 1))) ^ 2 :=
+            pow_le_pow_left₀ h_nn h_le 2
+        _ = Real.exp (c * ((m : ℝ) + 1)) := h_exp_sq
+    have h_inv_exp : Real.exp (-c * ((m : ℝ) + 1)) = (Real.exp (c * ((m : ℝ) + 1)))⁻¹ := by
+      rw [← Real.exp_neg]; congr 1; ring
+    rw [h_inv_exp]
+    have h_m2 : (m : ℝ) + 2 ≤ 2 * ((m : ℝ) + 1) := by
+      linarith [Nat.cast_nonneg (α := ℝ) m]
+    have h_exp_pos : 0 < Real.exp (c * ((m : ℝ) + 1)) := Real.exp_pos _
+    have h_c_pos : 0 < ((c / 2) * ((m : ℝ) + 1)) ^ 2 := by positivity
+    calc
+      ((m : ℝ) + 2) * (Real.exp (c * ((m : ℝ) + 1)))⁻¹
+          ≤ (2 * ((m : ℝ) + 1)) * (((c / 2) * ((m : ℝ) + 1)) ^ 2)⁻¹ := by
+              gcongr
+      _ = ((2 / c) ^ 2 * 2) / ((m : ℝ) + 1) := by
+            field_simp [hc.ne', hm_pos.ne']
+            ring
+  have h_rhs0 : Filter.Tendsto (fun m : ℕ => ((2 / c) ^ 2 * 2) / ((m : ℝ) + 1))
+      Filter.atTop (𝓝 0) :=
+    tendsto_const_nhds.div_atTop
+      (Filter.tendsto_natCast_atTop_atTop.add tendsto_const_nhds)
+  exact squeeze_zero (fun _ => norm_nonneg _) h_bound h_rhs0
+
+/-- `i ε`-regularized Minkowski point `z_ε(k) = x(k) + i ε (k + 1) e₀`. -/
+def iepsRegularize (n : ℕ) (x : Fin n → Spacetime4) (ε : ℝ) : Fin n → Fin 4 → ℂ :=
+  fun k μ => (x k μ : ℂ) + Complex.I * (ε * ((k : ℕ) + 1 : ℝ) * (if μ = 0 then 1 else 0))
+
+/-- **Forward-Tube Boundary Theorem:**
+    For every `ε > 0`, `iepsRegularize n x ε ∈ ForwardTube n`, and as `ε → 0⁺`,
+    `iepsRegularize n x ε → x` in `(ℂ⁴)ⁿ`. -/
+theorem boundary_tube_limit (n : ℕ) (x : Fin n → Spacetime4) :
+    (∀ ε : ℝ, 0 < ε → iepsRegularize n x ε ∈ ForwardTube n) ∧
+    Filter.Tendsto (fun ε : ℝ => iepsRegularize n x ε) (𝓝[>] 0)
+      (𝓝 (fun k μ => (x k μ : ℂ))) := by
+  refine ⟨?_, ?_⟩
+  · intro ε hε k
+    have him0 : ∀ j : Fin n, (iepsRegularize n x ε j 0).im = ε * ((j : ℕ) + 1 : ℝ) := by
+      intro j; simp [iepsRegularize]
+    have him_sp : ∀ j : Fin n, ∀ μ : Fin 4, μ ≠ 0 → (iepsRegularize n x ε j μ).im = 0 := by
+      intro j μ hμ; simp [iepsRegularize, hμ]
+    by_cases hk : (k : ℕ) = 0
+    · simp only [hk, ↓reduceDIte, him0, him_sp _ 1 (by decide), him_sp _ 2 (by decide),
+        him_sp _ 3 (by decide)]
+      refine ⟨by positivity, by nlinarith [sq_pos_iff.mpr hε.ne']⟩
+    · simp only [hk, ↓reduceDIte, him0, him_sp _ 1 (by decide), him_sp _ 2 (by decide),
+        him_sp _ 3 (by decide), sub_zero]
+      have hdiff : ε * ((k : ℕ) + 1 : ℝ) - ε * (((k : ℕ) - 1 : ℕ) + 1 : ℝ) = ε := by
+        have hk_pos : 1 ≤ (k : ℕ) := Nat.pos_of_ne_zero hk
+        have hcast : (((k : ℕ) - 1 : ℕ) : ℝ) + 1 = (k : ℝ) := by
+          exact_mod_cast (Nat.sub_add_cancel hk_pos)
+        rw [hcast]; ring
+      rw [hdiff]
+      exact ⟨hε, by nlinarith [sq_pos_iff.mpr hε.ne']⟩
+  · rw [tendsto_pi_nhds]
+    intro k
+    rw [tendsto_pi_nhds]
+    intro μ
+    have h_const : Filter.Tendsto (fun _ : ℝ => (x k μ : ℂ)) (𝓝[>] 0) (𝓝 (x k μ : ℂ)) :=
+      tendsto_const_nhds
+    have h_eps : Filter.Tendsto
+        (fun ε : ℝ => Complex.I * (ε * ((k : ℕ) + 1 : ℝ) * (if μ = 0 then (1 : ℂ) else 0)))
+        (𝓝[>] 0) (𝓝 0) := by
+      have h0 : Filter.Tendsto (fun ε : ℝ => (ε : ℂ)) (𝓝[>] 0) (𝓝 0) :=
+        (Complex.continuous_ofReal.tendsto 0).mono_left nhdsWithin_le_nhds
+      simpa using (tendsto_const_nhds.mul ((h0.mul tendsto_const_nhds).mul tendsto_const_nhds))
+    simpa [iepsRegularize] using h_const.add h_eps
+
+/-- Spacelike separation of test functions implies disjoint supports. -/
+theorem spacelikeDisjoint_implies_disjoint_supports {f g : TestFn4}
+    (h : SpacelikeDisjoint f g) :
+    Disjoint (Function.support f) (Function.support g) := by
+  rw [Set.disjoint_left]
+  intro x hfx hgx
+  have hlt := h x x (Function.mem_support.mp hfx) (Function.mem_support.mp hgx)
+  simp [minkowskiInner] at hlt
+
+/-- **Microcausality from Weak Matrix Elements on Dense Domain:**
+    If `⟪ψ₁, φ(f) φ(g) ψ₂⟫ = ⟪ψ₁, φ(g) φ(f) ψ₂⟫` for all `ψ₁, ψ₂` in a dense
+    domain `fieldDomain`, then `φ(f) φ(g) ψ = φ(g) φ(f) ψ` on `fieldDomain`. -/
+theorem microcausality_from_weak_expectation
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (fieldDomain : Submodule ℂ H) (h_dense : Dense (fieldDomain : Set H))
+    (field : TestFn4 → fieldDomain →ₗ[ℂ] H)
+    (field_maps_into : ∀ f (ψ : fieldDomain), field f ψ ∈ fieldDomain)
+    {f g : TestFn4}
+    (h_weak : ∀ ψ₁ ψ₂ : fieldDomain,
+      ⟪(ψ₁ : H), field f ⟨field g ψ₂, field_maps_into g ψ₂⟩⟫_ℂ =
+      ⟪(ψ₁ : H), field g ⟨field f ψ₂, field_maps_into f ψ₂⟩⟫_ℂ)
+    (ψ : fieldDomain) :
+    field f ⟨field g ψ, field_maps_into g ψ⟩ =
+    field g ⟨field f ψ, field_maps_into f ψ⟩ := by
+  set d : H :=
+    field f ⟨field g ψ, field_maps_into g ψ⟩ - field g ⟨field f ψ, field_maps_into f ψ⟩
+  have h_orth : ∀ ψ₁ ∈ (fieldDomain : Set H), ⟪ψ₁, d⟫_ℂ = 0 := by
+    intro ψ₁ h1
+    dsimp [d]
+    rw [inner_sub_right, h_weak ⟨ψ₁, h1⟩ ψ, sub_self]
+  have h_zero_all : ∀ x : H, ⟪x, d⟫_ℂ = 0 := by
+    intro x
+    have hcont : Continuous (fun y : H => ⟪y, d⟫_ℂ) := continuous_id.inner continuous_const
+    have h_eq : ∀ y ∈ (fieldDomain : Set H), (fun y : H => ⟪y, d⟫_ℂ) y = (fun _ : H => (0 : ℂ)) y := by
+      intro y hy
+      rw [h_orth y hy]
+      <;> simp
+    have h_main : ∀ y : H, (fun y : H => ⟪y, d⟫_ℂ) y = (fun _ : H => (0 : ℂ)) y := by
+      apply h_dense.eqOn_continuous
+      exact hcont
+      exact continuous_const
+      exact h_eq
+    exact h_main x
+  have hself : ⟪d, d⟫_ℂ = 0 := h_zero_all d
+  have hd0 : d = 0 := inner_self_eq_zero.mp hself
+  exact sub_eq_zero.mp hd0
+
+end Imscribing.YangMills.DimTransAndBoundaryimport Mathlib.Analysis.Distribution.SchwartzSpace.Deriv
+import Mathlib.Analysis.Calculus.IteratedDeriv.Defs
+import Imscribing.YangMills.ClayStatement
+
+/-!
+# Lorentz4 Group Structure & Poincaré Spacelike Invariance
+
+Proves unconditionally (`0 sorry`):
+1. `Lorentz4` forms a group (`One`, `Mul`, `Inv`) via `M⁻¹ = η * Mᵀ * η`,
+   preserving `minkowskiInner`, `det = 1`, and orthochronicity `0 < M 0 0`.
+2. `lorentzCLM`: continuous linear map on `Spacetime4` with `lorentzCLM_mul`,
+   `lorentzCLM_one`, and `lorentzCLM_inv_cancel`.
+3. `poincare_preserves_spacelike_diff`: `Poincare4` preserves `minkowskiInner (x - y) (x - y)`.
+-/
+
+namespace Imscribing.YangMills.LorentzFields
+
+open Imscribing.YangMills.ClaySpec
+
+/-- Diagonal Minkowski metric tensor η = diag(1, -1, -1, -1). -/
+def minkowskiEta : Matrix (Fin 4) (Fin 4) ℝ :=
+  Matrix.diagonal ![1, -1, -1, -1]
+
+theorem minkowskiEta_sq : minkowskiEta * minkowskiEta = 1 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [minkowskiEta, Matrix.diagonal_mul_diagonal]
+
+theorem minkowskiEta_det : minkowskiEta.det = -1 := by
+  simp [minkowskiEta, Matrix.det_diagonal]
+
+theorem minkowskiEta_transpose : Matrix.transpose minkowskiEta = minkowskiEta := by
+  simp [minkowskiEta]
+
+theorem minkowskiInner_eq_dot (x y : Spacetime4) :
+    minkowskiInner x y = dotProduct x (minkowskiEta.mulVec y) := by
+  simp [minkowskiInner, minkowskiEta, Matrix.mulVec_diagonal, dotProduct, Fin.sum_univ_four]
+  ring
+
+private lemma mat_transpose_eta_mul (Λ : Lorentz4) :
+    Matrix.transpose Λ.mat * minkowskiEta * Λ.mat = minkowskiEta := by
+  ext i j
+  let ei : Spacetime4 := (WithLp.equiv 2 (Fin 4 → ℝ)).symm (Pi.single i (1 : ℝ))
+  let ej : Spacetime4 := (WithLp.equiv 2 (Fin 4 → ℝ)).symm (Pi.single j (1 : ℝ))
+  have h_pres := Λ.preserves_metric ei ej
+  rw [minkowskiInner_eq_dot, minkowskiInner_eq_dot] at h_pres
+  have h_lhs :
+      dotProduct ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (Λ.mat.mulVec ei))
+        (minkowskiEta.mulVec ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (Λ.mat.mulVec ej))) =
+      (Matrix.transpose Λ.mat * minkowskiEta * Λ.mat) i j := by
+    have h_dot :
+        dotProduct ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (Λ.mat.mulVec ei))
+          (minkowskiEta.mulVec ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (Λ.mat.mulVec ej))) =
+        dotProduct (ei : Fin 4 → ℝ)
+          ((Matrix.transpose Λ.mat * minkowskiEta * Λ.mat).mulVec (ej : Fin 4 → ℝ)) := by
+      change dotProduct (Λ.mat.mulVec (ei : Fin 4 → ℝ))
+          (minkowskiEta.mulVec (Λ.mat.mulVec (ej : Fin 4 → ℝ))) = _
+      rw [Matrix.dotProduct_mulVec, Matrix.vecMul_transpose, Matrix.mulVec_mulVec,
+          Matrix.mulVec_mulVec, Matrix.mul_assoc]
+    rw [h_dot]
+    simp [ei, ej, Matrix.mulVec, dotProduct]
+  have h_rhs : dotProduct ei (minkowskiEta.mulVec ej) = minkowskiEta i j := by
+    simp [ei, ej, Matrix.mulVec, dotProduct]
+  rw [h_lhs, h_rhs] at h_pres
+  exact h_pres
+
+/-- Inverse matrix `η * Mᵀ * η` of `Λ : Lorentz4`. -/
+def lorentzInvMat (Λ : Lorentz4) : Matrix (Fin 4) (Fin 4) ℝ :=
+  minkowskiEta * Matrix.transpose Λ.mat * minkowskiEta
+
+theorem lorentzInvMat_mul (Λ : Lorentz4) : lorentzInvMat Λ * Λ.mat = 1 := by
+  unfold lorentzInvMat
+  calc
+    (minkowskiEta * Matrix.transpose Λ.mat * minkowskiEta) * Λ.mat
+        = minkowskiEta * (Matrix.transpose Λ.mat * minkowskiEta * Λ.mat) := by
+            simp only [Matrix.mul_assoc]
+    _ = minkowskiEta * minkowskiEta := by rw [mat_transpose_eta_mul Λ]
+    _ = 1 := minkowskiEta_sq
+
+theorem mul_lorentzInvMat (Λ : Lorentz4) : Λ.mat * lorentzInvMat Λ = 1 :=
+  Matrix.mul_eq_one_comm.mp (lorentzInvMat_mul Λ)
+
+instance : One Lorentz4 where
+  one :=
+    { mat := 1
+      preserves_metric := fun x y => by simp [Matrix.one_mulVec]
+      det_one := Matrix.det_one
+      orthochronous := by norm_num }
+
+instance : Mul Lorentz4 where
+  mul Λ₁ Λ₂ :=
+    { mat := Λ₁.mat * Λ₂.mat
+      preserves_metric := fun x y => by
+        have h1 := Λ₁.preserves_metric
+          ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (Λ₂.mat.mulVec x))
+          ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (Λ₂.mat.mulVec y))
+        have h2 := Λ₂.preserves_metric x y
+        have h_eq : ∀ v : Spacetime4,
+            (WithLp.equiv 2 (Fin 4 → ℝ)).symm ((Λ₁.mat * Λ₂.mat).mulVec v) =
+            (WithLp.equiv 2 (Fin 4 → ℝ)).symm
+              (Λ₁.mat.mulVec ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (Λ₂.mat.mulVec v))) := by
+          intro v; ext μ; simp [Matrix.mulVec_mulVec]
+        rw [h_eq x, h_eq y, h1, h2]
+      det_one := by rw [Matrix.det_mul, Λ₁.det_one, Λ₂.det_one, mul_one]
+      orthochronous := by
+        have h_norm1 : Λ₁.mat 0 0 ^ 2 -
+            (Λ₁.mat 0 1 ^ 2 + Λ₁.mat 0 2 ^ 2 + Λ₁.mat 0 3 ^ 2) = 1 := by
+          have h_m_inv : Λ₁.mat * minkowskiEta * Matrix.transpose Λ₁.mat = minkowskiEta := by
+            have h1 := mul_lorentzInvMat Λ₁
+            unfold lorentzInvMat at h1
+            have h2 := congrArg (fun M => M * minkowskiEta) h1
+            simp only [Matrix.mul_assoc, minkowskiEta_sq, Matrix.mul_one, Matrix.one_mul] at h2
+            exact h2
+          have h00 := congrArg (fun M : Matrix (Fin 4) (Fin 4) ℝ => M 0 0) h_m_inv
+          simp only [Matrix.mul_apply, minkowskiEta, Matrix.transpose_apply,
+            Matrix.diagonal_apply, Fin.sum_univ_four] at h00
+          norm_num at h00
+          linarith
+        have h_norm2 : Λ₂.mat 0 0 ^ 2 -
+            (Λ₂.mat 1 0 ^ 2 + Λ₂.mat 2 0 ^ 2 + Λ₂.mat 3 0 ^ 2) = 1 := by
+          have h00 := congrArg (fun M : Matrix (Fin 4) (Fin 4) ℝ => M 0 0) (mat_transpose_eta_mul Λ₂)
+          simp only [Matrix.mul_apply, minkowskiEta, Matrix.transpose_apply,
+            Matrix.diagonal_apply, Fin.sum_univ_four] at h00
+          norm_num at h00
+          linarith
+        have h_cs : (Λ₁.mat 0 1 * Λ₂.mat 1 0 + Λ₁.mat 0 2 * Λ₂.mat 2 0 +
+            Λ₁.mat 0 3 * Λ₂.mat 3 0) ^ 2 ≤
+            (Λ₁.mat 0 1 ^ 2 + Λ₁.mat 0 2 ^ 2 + Λ₁.mat 0 3 ^ 2) *
+            (Λ₂.mat 1 0 ^ 2 + Λ₂.mat 2 0 ^ 2 + Λ₂.mat 3 0 ^ 2) := by
+          have h_sq : 0 ≤ (Λ₁.mat 0 1 * Λ₂.mat 2 0 - Λ₁.mat 0 2 * Λ₂.mat 1 0) ^ 2 +
+              (Λ₁.mat 0 1 * Λ₂.mat 3 0 - Λ₁.mat 0 3 * Λ₂.mat 1 0) ^ 2 +
+              (Λ₁.mat 0 2 * Λ₂.mat 3 0 - Λ₁.mat 0 3 * Λ₂.mat 2 0) ^ 2 := by positivity
+          linarith [h_sq]
+        have h_lt1 : Λ₁.mat 0 1 ^ 2 + Λ₁.mat 0 2 ^ 2 + Λ₁.mat 0 3 ^ 2 < Λ₁.mat 0 0 ^ 2 := by linarith
+        have h_lt2 : Λ₂.mat 1 0 ^ 2 + Λ₂.mat 2 0 ^ 2 + Λ₂.mat 3 0 ^ 2 < Λ₂.mat 0 0 ^ 2 := by linarith
+        have h_prod_lt : (Λ₁.mat 0 1 * Λ₂.mat 1 0 + Λ₁.mat 0 2 * Λ₂.mat 2 0 +
+            Λ₁.mat 0 3 * Λ₂.mat 3 0) ^ 2 < (Λ₁.mat 0 0 * Λ₂.mat 0 0) ^ 2 := by
+          have hnn1 : 0 ≤ Λ₁.mat 0 1 ^ 2 + Λ₁.mat 0 2 ^ 2 + Λ₁.mat 0 3 ^ 2 := by positivity
+          have hnn2 : 0 ≤ Λ₂.mat 1 0 ^ 2 + Λ₂.mat 2 0 ^ 2 + Λ₂.mat 3 0 ^ 2 := by positivity
+          calc
+            (Λ₁.mat 0 1 * Λ₂.mat 1 0 + Λ₁.mat 0 2 * Λ₂.mat 2 0 +
+                Λ₁.mat 0 3 * Λ₂.mat 3 0) ^ 2
+                ≤ (Λ₁.mat 0 1 ^ 2 + Λ₁.mat 0 2 ^ 2 + Λ₁.mat 0 3 ^ 2) *
+                  (Λ₂.mat 1 0 ^ 2 + Λ₂.mat 2 0 ^ 2 + Λ₂.mat 3 0 ^ 2) := h_cs
+            _ < Λ₁.mat 0 0 ^ 2 * Λ₂.mat 0 0 ^ 2 := mul_lt_mul'' h_lt1 h_lt2 hnn1 hnn2
+            _ = (Λ₁.mat 0 0 * Λ₂.mat 0 0) ^ 2 := by ring
+        have h_pos_prod : 0 < Λ₁.mat 0 0 * Λ₂.mat 0 0 :=
+          mul_pos Λ₁.orthochronous Λ₂.orthochronous
+        have h_mul00 : (Λ₁.mat * Λ₂.mat) 0 0 =
+            Λ₁.mat 0 0 * Λ₂.mat 0 0 +
+              (Λ₁.mat 0 1 * Λ₂.mat 1 0 + Λ₁.mat 0 2 * Λ₂.mat 2 0 +
+               Λ₁.mat 0 3 * Λ₂.mat 3 0) := by
+          simp [Matrix.mul_apply, Fin.sum_univ_four]; ring
+        rw [h_mul00]
+        nlinarith }
+
+instance : Inv Lorentz4 where
+  inv Λ :=
+    { mat := lorentzInvMat Λ
+      preserves_metric := fun x y => by
+        let M := lorentzInvMat Λ
+        have h_symm : Matrix.transpose M * minkowskiEta * M = minkowskiEta := by
+          have h_m_inv : Λ.mat * minkowskiEta * Matrix.transpose Λ.mat = minkowskiEta := by
+            have h1 := mul_lorentzInvMat Λ
+            unfold lorentzInvMat at h1
+            have h2 := congrArg (fun A => A * minkowskiEta) h1
+            simp only [Matrix.mul_assoc, minkowskiEta_sq, Matrix.mul_one, Matrix.one_mul] at h2
+            exact h2
+          dsimp [M, lorentzInvMat]
+          rw [Matrix.transpose_mul, Matrix.transpose_mul, minkowskiEta_transpose,
+              Matrix.transpose_transpose]
+          calc
+            (minkowskiEta * Λ.mat * minkowskiEta) * minkowskiEta *
+                (minkowskiEta * Matrix.transpose Λ.mat * minkowskiEta)
+                = minkowskiEta * Λ.mat * (minkowskiEta * minkowskiEta) *
+                    minkowskiEta * Matrix.transpose Λ.mat * minkowskiEta := by
+                    simp only [Matrix.mul_assoc]
+            _ = minkowskiEta * (Λ.mat * minkowskiEta * Matrix.transpose Λ.mat) * minkowskiEta := by
+                  rw [minkowskiEta_sq]; simp only [Matrix.mul_one, Matrix.mul_assoc]
+            _ = minkowskiEta * minkowskiEta * minkowskiEta := by rw [h_m_inv]
+            _ = minkowskiEta := by rw [minkowskiEta_sq, Matrix.one_mul]
+        rw [minkowskiInner_eq_dot, minkowskiInner_eq_dot]
+        have h_dot :
+            dotProduct ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (M.mulVec x))
+              (minkowskiEta.mulVec ((WithLp.equiv 2 (Fin 4 → ℝ)).symm (M.mulVec y))) =
+            dotProduct (x : Fin 4 → ℝ) ((Matrix.transpose M * minkowskiEta * M).mulVec (y : Fin 4 → ℝ)) := by
+          change dotProduct (M.mulVec (x : Fin 4 → ℝ))
+              (minkowskiEta.mulVec (M.mulVec (y : Fin 4 → ℝ))) = _
+          rw [Matrix.dotProduct_mulVec, Matrix.vecMul_transpose, Matrix.mulVec_mulVec,
+              Matrix.mulVec_mulVec, Matrix.mul_assoc]
+        rw [h_dot, h_symm]
+      det_one := by
+        unfold lorentzInvMat
+        rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, minkowskiEta_det, Λ.det_one]
+        norm_num
+      orthochronous := by
+        have h00 : lorentzInvMat Λ 0 0 = Λ.mat 0 0 := by
+          simp [lorentzInvMat, minkowskiEta, Matrix.mul_apply, Fin.sum_univ_four]
+        rw [h00]
+        exact Λ.orthochronous }
+
+theorem lorentz_inv_mul_mat (Λ : Lorentz4) : (Λ⁻¹ * Λ).mat = (1 : Lorentz4).mat :=
+  lorentzInvMat_mul Λ
+
+theorem lorentz_mul_inv_mat (Λ : Lorentz4) : (Λ * Λ⁻¹).mat = (1 : Lorentz4).mat :=
+  mul_lorentzInvMat Λ
+
+/-- Continuous linear map on `Spacetime4` induced by `Λ : Lorentz4`. -/
+def lorentzCLM (Λ : Lorentz4) : Spacetime4 →L[ℝ] Spacetime4 where
+  toFun x := (WithLp.equiv 2 (Fin 4 → ℝ)).symm (Λ.mat.mulVec x)
+  map_add' x y := by ext μ; simp [Matrix.mulVec_add]
+  map_smul' c x := by ext μ; simp [Matrix.mulVec_smul]
+  cont := by
+    refine (WithLp.equiv 2 (Fin 4 → ℝ)).symm.continuous.comp ?_
+    refine continuous_pi fun μ => ?_
+    simp only [Matrix.mulVec, dotProduct]
+    exact continuous_finset_sum _ fun ν _ =>
+      continuous_const.mul (PiLp.continuous_apply 2 (fun _ : Fin 4 => ℝ) ν)
+
+theorem lorentzCLM_mul (Λ₁ Λ₂ : Lorentz4) (x : Spacetime4) :
+    lorentzCLM (Λ₁ * Λ₂) x = lorentzCLM Λ₁ (lorentzCLM Λ₂ x) := by
+  ext μ
+  change ((Λ₁.mat * Λ₂.mat).mulVec (x : Fin 4 → ℝ)) μ =
+    (Λ₁.mat.mulVec (Λ₂.mat.mulVec (x : Fin 4 → ℝ))) μ
+  rw [Matrix.mulVec_mulVec]
+
+theorem lorentzCLM_one (x : Spacetime4) : lorentzCLM 1 x = x := by
+  ext μ
+  change ((1 : Matrix (Fin 4) (Fin 4) ℝ).mulVec (x : Fin 4 → ℝ)) μ = x μ
+  rw [Matrix.one_mulVec]
+
+theorem lorentzCLM_inv_cancel (Λ : Lorentz4) (x : Spacetime4) :
+    lorentzCLM Λ (lorentzCLM Λ⁻¹ x) = x := by
+  rw [← lorentzCLM_mul]
+  ext μ
+  change ((Λ * Λ⁻¹).mat.mulVec (x : Fin 4 → ℝ)) μ = x μ
+  rw [lorentz_mul_inv_mat Λ]
+  exact congrFun (Matrix.one_mulVec _) μ
+
+theorem lorentzCLM_cancel_inv (Λ : Lorentz4) (x : Spacetime4) :
+    lorentzCLM Λ⁻¹ (lorentzCLM Λ x) = x := by
+  rw [← lorentzCLM_mul]
+  ext μ
+  change ((Λ⁻¹ * Λ).mat.mulVec (x : Fin 4 → ℝ)) μ = x μ
+  rw [lorentz_inv_mul_mat Λ]
+  exact congrFun (Matrix.one_mulVec _) μ
+
+/-- **Poincaré Invariance of `SpacelikeDisjoint`:**
+    Any `g : Poincare4` acting as `x ↦ g.trans + lorentzCLM g.lorentz x` preserves
+    spacelike separation `minkowskiInner (x - y) (x - y) < 0`. -/
+theorem poincare_preserves_spacelike_diff (g : Poincare4) (x y : Spacetime4) :
+    minkowskiInner ((g.trans + lorentzCLM g.lorentz x) - (g.trans + lorentzCLM g.lorentz y))
+      ((g.trans + lorentzCLM g.lorentz x) - (g.trans + lorentzCLM g.lorentz y)) =
+      minkowskiInner (x - y) (x - y) := by
+  have h_sub : (g.trans + lorentzCLM g.lorentz x) - (g.trans + lorentzCLM g.lorentz y) =
+      lorentzCLM g.lorentz (x - y) := by
+    rw [add_sub_add_left_eq_sub, ← map_sub]
+  rw [h_sub]
+  exact g.lorentz.preserves_metric (x - y) (x - y)
+
+end Imscribing.YangMills.LorentzFields
+

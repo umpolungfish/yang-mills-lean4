@@ -73,7 +73,7 @@ theorem sesquilinear_cauchy_schwarz
         dsimp [a]
         rw [star_mul, show star (t : ℂ) = (t : ℂ) from Complex.conj_ofReal t]
         calc
-          (u.star * (t : ℂ)) * ((t : ℂ) * u) = ((t : ℂ) * (t : ℂ)) * (star u * u) := by ring
+          (star u * (t : ℂ)) * ((t : ℂ) * u) = ((t : ℂ) * (t : ℂ)) * (star u * u) := by ring
           _ = ((t : ℂ) * (t : ℂ)) * 1 := by rw [hu_mul]
           _ = ((t ^ 2 : ℝ) : ℂ) := by push_cast; ring
       have h_sa_B : star a * B x y = ((t * ‖B x y‖ : ℝ) : ℂ) := by
@@ -84,7 +84,7 @@ theorem sesquilinear_cauchy_schwarz
           _ = (t : ℂ) * (‖B x y‖ : ℂ) := by rw [hu_B]
           _ = ((t * ‖B x y‖ : ℝ) : ℂ) := by push_cast; rfl
       have h_a_Byx : a * B y x = ((t * ‖B x y‖ : ℝ) : ℂ) := by
-        rw [h_herm x y, ← star_mul']
+        rw [h_herm x y]
         have h1 : star (star a * B x y) = a * star (B x y) := by
           rw [star_mul, star_star, mul_comm]
         rw [← h1, h_sa_B, Complex.conj_ofReal]
@@ -155,7 +155,7 @@ variable {H₀ : Type*} [NormedAddCommGroup H₀] [InnerProductSpace ℂ H₀]
 noncomputable def liftContractionToCompletion
     (f₀ : H₀ →ₗ[ℂ] H₀) (h_contr : ∀ v : H₀, ‖f₀ v‖ ≤ ‖v‖) :
     UniformSpace.Completion H₀ →L[ℂ] UniformSpace.Completion H₀ :=
-  let fCLM : H₀ →ₗ[ℂ] H₀ := LinearMap.mkContinuous f₀ 1 (fun v => by simpa using h_contr v)
+  let fCLM : H₀ →L[ℂ] H₀ := LinearMap.mkContinuous f₀ 1 (fun v => by simpa using h_contr v)
   let rawMap : UniformSpace.Completion H₀ → UniformSpace.Completion H₀ :=
     UniformSpace.Completion.map fCLM
   have h_cont : Continuous rawMap := UniformSpace.Completion.continuous_map
@@ -209,11 +209,7 @@ theorem liftContractionToCompletion_coe
       (LinearMap.mkContinuous f₀ 1 (fun w => by simpa using h_contr w)).uniformContinuous]
   rfl
 
-/-- **Full OS Completion Semigroup Theorem.**
-    Given a pre-Hilbert space `H₀`, unit vacuum `Ω₀`, and symmetric pre-semigroup `T₀`
-    with polynomial bound and `Ω₀⊥` clustering rate `Δ > 0`, produces the complete
-    Hilbert space `H = Completion H₀`, vacuum `Ω`, and contraction semigroup `T`
-    satisfying all semigroup hypotheses of `OSReconstructedInput`. -/
+/-- **Full OS Completion Semigroup Theorem.** -/
 theorem os_completion_semigroup_bridge
     (Ω₀ : H₀) (hΩ₀ : ‖Ω₀‖ = 1)
     (T₀ : ℝ → H₀ →ₗ[ℂ] H₀)

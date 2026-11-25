@@ -1,17 +1,9 @@
+
 import Imscribing.YangMills.ConcreteTensorProductSchwartz
 import Imscribing.YangMills.OSBorchersBridge
 
 /-!
 # Concrete Euclidean Field Operators on a Dense Invariant Domain of `OSHilbert`
-
-Constructs (`0 sorry`):
-1. `euclidFieldMul f n g : PosSchwartzSubmodule (1 + n)` and `borchersFieldMul f`
-   on `BorchersPos` via `tensorSchwartz`.
-2. `borchersFieldMul_preserves_null`: null-space invariance directly from
-   `sesquilinear_cauchy_schwarz`.
-3. `osFieldDomain pre`: the dense invariant subspace `LinearMap.range coeLin`
-   inside `OSHilbert = UniformSpace.Completion (BorchersPos ⧸ N₀)`,
-   together with the lifted `euclidFieldOp` and `euclidFieldOp_commute`.
 -/
 
 namespace Imscribing.YangMills.EuclideanFieldOnOS
@@ -47,13 +39,12 @@ theorem tensorSchwartz_mem_pos {m n : ℕ}
       · exact hf (projLeft m n z) hz i₁
       · exact hg (projRight m n z) hz i₂
 
-/-- Multiplication of a degree-`n` positive-time Schwartz element by a 1-point
-    positive-time test function `f : PosSchwartzSubmodule 1`. -/
+/-- Multiplication of a degree-`n` positive-time Schwartz element by `f : PosSchwartzSubmodule 1`. -/
 noncomputable def euclidFieldMul (f : PosSchwartzSubmodule 1) (n : ℕ) :
     PosSchwartzSubmodule n →ₗ[ℂ] PosSchwartzSubmodule (1 + n) where
   toFun g := ⟨tensorSchwartz f.1 g.1, tensorSchwartz_mem_pos f g⟩
-  map_add' g₁ g₂ := by ext z; simp [mul_add]
-  map_smul' c g := by ext z; simp [smul_eq_mul]; ring
+  map_add' g₁ g₂ := by ext z; simp [tensorSchwartz, mul_add]
+  map_smul' c g := by ext z; simp [tensorSchwartz, smul_eq_mul]; ring
 
 /-- Global Euclidean field creation operator on `BorchersPos := Π₀ n, PosSchwartzSubmodule n`. -/
 noncomputable def borchersFieldMul (f : PosSchwartzSubmodule 1) :
@@ -140,8 +131,7 @@ theorem vac_mem_osFieldDomain (pre : EuclideanPreData BorchersPos) :
       UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) ∈ osFieldDomain pre :=
   ⟨Submodule.Quotient.mk pre.e₀, rfl⟩
 
-/-- Lifted Euclidean field operator `φ(f) : osFieldDomain pre →ₗ[ℂ] OSHilbert` preserving
-    `osFieldDomain pre`. -/
+/-- Lifted Euclidean field operator `φ(f) : osFieldDomain pre →ₗ[ℂ] OSHilbert`. -/
 noncomputable def euclidFieldOp (pre : EuclideanPreData BorchersPos)
     (f : PosSchwartzSubmodule 1)
     (h_adj : ∃ f_adj : PosSchwartzSubmodule 1, ∀ F G : BorchersPos,
@@ -206,30 +196,6 @@ theorem euclidFieldOp_commute (pre : EuclideanPreData BorchersPos)
   rintro ⟨x, ⟨x₀, rfl⟩⟩
   induction x₀ using Submodule.Quotient.induction_on with
   | _ F =>
-    have h1 : (⟨opG.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), ⟨Submodule.Quotient.mk F, rfl⟩⟩,
-        opG.2.1 _⟩ : osFieldDomain pre) =
-        ⟨coeLin H₀ (Submodule.Quotient.mk (borchersFieldMul g F)),
-          ⟨Submodule.Quotient.mk (borchersFieldMul g F), rfl⟩⟩ := by
-      apply Subtype.ext; exact opG.2.2 F
-    have h2 : (⟨opF.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), ⟨Submodule.Quotient.mk F, rfl⟩⟩,
-        opF.2.1 _⟩ : osFieldDomain pre) =
-        ⟨coeLin H₀ (Submodule.Quotient.mk (borchersFieldMul f F)),
-          ⟨Submodule.Quotient.mk (borchersFieldMul f F), rfl⟩⟩ := by
-      apply Subtype.ext; exact opF.2.2 F
-    have h1 := (⟨opG.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), ⟨Submodule.Quotient.mk F, rfl⟩⟩,
-        opG.2.1 _⟩ : osFieldDomain pre) =
-        ⟨coeLin H₀ (Submodule.Quotient.mk (borchersFieldMul g F)),
-          ⟨Submodule.Quotient.mk (borchersFieldMul g F), rfl⟩⟩ := by
-      apply Subtype.ext; exact opG.2.2 F
-    have h2 : (⟨opF.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), ⟨Submodule.Quotient.mk F, rfl⟩⟩,
-        opF.2.1 _⟩ : osFieldDomain pre) =
-        ⟨coeLin H₀ (Submodule.Quotient.mk (borchersFieldMul f F)),
-          ⟨Submodule.Quotient.mk (borchersFieldMul f F), rfl⟩⟩ := by
-      apply Subtype.ext; exact opF.2.2 F
-    have h_comm : ∀ y : H, pre.B (borchersFieldMul f (borchersFieldMul g F)) y =
-        pre.B (borchersFieldMul g (borchersFieldMul f F)) y := by
-      intro y
-      exact h_e3_fg F y
     have h1 : (⟨opG.1 ⟨coeLin H₀ (Submodule.Quotient.mk F), ⟨Submodule.Quotient.mk F, rfl⟩⟩,
         opG.2.1 _⟩ : osFieldDomain pre) =
         ⟨coeLin H₀ (Submodule.Quotient.mk (borchersFieldMul g F)),

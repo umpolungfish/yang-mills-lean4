@@ -125,8 +125,16 @@ globs = [
   "Imscribing.YangMills.CanonicalWilsonHalfMeasureRP4D",
   "Imscribing.YangMills.AllDegreesSchwingerLimit",
   "Imscribing.YangMills.ConcreteSchwartzReflectOps",
+  "Imscribing.YangMills.ConcreteTensorProductSchwartz",
   "Imscribing.YangMills.SpatialISO3UnitariesOnOS",
   "Imscribing.YangMills.ConcreteMinimalClayReduction",
   "Imscribing.YangMills.CanonicalBalabanSubsequentialBridge",
-  "Imscribing.YangMills.EuclideanFieldOperatorOnOS"
+  "Imscribing.YangMills.EuclideanFieldOperatorOnOS",
+  "Imscribing.YangMills.LorentzBoostAndMinkowskiFields",
+  "Imscribing.YangMills.OSPoincareMasterDischarge",
+  "Imscribing.YangMills.SemigroupToUnitaryGroupCFC",
+  "Imscribing.YangMills.CanonicalLatticeBorchers4D",
+  "Imscribing.YangMills.CanonicalFiniteVolumeBorchers4D",
+  "Imscribing.YangMills.BalabanRGToClayMaster",
+  "Imscribing.YangMills.WilsonActionBounds4D"
 ]
