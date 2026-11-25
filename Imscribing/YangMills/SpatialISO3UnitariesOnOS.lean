@@ -29,7 +29,7 @@ def spaceShiftVec (n : ℕ) (v : Fin 3 → ℝ) : Fin n → ContinuumInterfaces.
   fun _ => (WithLp.equiv 2 (Fin 4 → ℝ)).symm ![0, v 0, v 1, v 2]
 
 theorem spaceShiftVec_zero (n : ℕ) : spaceShiftVec n 0 = 0 := by
-  refine PiLp.ext fun μ => ?_; fin_cases μ <;> simp [spaceShiftVec]
+  refine funext fun _ => PiLp.ext fun μ => ?_; fin_cases μ <;> simp [spaceShiftVec]
 
 theorem spaceShiftVec_add (n : ℕ) (u v : Fin 3 → ℝ) :
     spaceShiftVec n (u + v) = spaceShiftVec n u + spaceShiftVec n v := by
@@ -51,14 +51,14 @@ private lemma iteratedFDeriv_comp_sub_space {E F : Type*}
           fderiv ℝ (iteratedFDeriv ℝ m f) (x - v) := by
         have h_hd := ((h_all_diff m (x - v)).hasFDerivAt).comp x ((hasFDerivAt_id x).sub_const v)
         simpa using h_hd.fderiv
-      dsimp [Function.comp]; rw [h_fd]
+      dsimp [Function.comp]; rw [(show (iteratedFDeriv ℝ m fun y ↦ f (y - v)) = fun y ↦ iteratedFDeriv ℝ m f (y - v) from funext ih), h_fd]
 noncomputable def shiftSpaceSchwartz (n : ℕ) (v : Fin 3 → ℝ) (f : EuclideanSchwartz n) :
     EuclideanSchwartz n where
   toFun x := f (x - spaceShiftVec n v)
   smooth' := (f.smooth').comp (contDiff_id.sub contDiff_const)
   decay' k m := by
     have h_all_diff : ∀ j : ℕ, Differentiable ℝ (iteratedFDeriv ℝ j f) := fun j =>
-      (f.smooth'.iteratedFDeriv_right (m := j) le_top).differentiable one_ne_zero (by simp)
+      (f.smooth (j + 1 : ℕ)).differentiable_iteratedFDeriv (by exact_mod_cast Nat.lt_succ_self j)
     obtain ⟨C₀, hC₀⟩ := f.decay' 0 m
     obtain ⟨Ck, hCk⟩ := f.decay' k m
     have hC₀_nn : 0 ≤ C₀ := le_trans (by positivity) (hC₀ 0)
@@ -134,10 +134,10 @@ theorem borchersSpaceShift_add (u v : Fin 3 → ℝ) (F : BorchersPos) :
     borchersSpaceShift (u + v) F = borchersSpaceShift u (borchersSpaceShift v F) := by
   unfold borchersSpaceShift
   ext n x
-  simp only [DFinsupp.mapRange.linearMap_apply, shiftSpacePos, LinearMap.coe_mk, AddHom.coe_mk,
+  simp only [DFinsupp.mapRange.linearMap_apply, DFinsupp.mapRange_apply, Subtype.coe_mk, shiftSpacePos, LinearMap.coe_mk, AddHom.coe_mk,
     shiftSpaceSchwartz_apply, spaceShiftVec_add]
   congr 1
-  abel
+  abel_nf
 
 theorem borchersSpaceShift_vac (v : Fin 3 → ℝ) :
     borchersSpaceShift v borchersVac = borchersVac := by
@@ -150,6 +150,7 @@ theorem borchersSpaceShift_vac (v : Fin 3 → ℝ) :
     have h0 : x - spaceShiftVec 0 v = x := by ext i; exact i.elim0
     simp [h0]
   · simp [DFinsupp.mapRange.linearMap_apply, DFinsupp.single_eq_of_ne hn]
+set_option maxSynthPendingDepth 1 in
 
 /-- **3D Spatial Translation Unitary Group on `OSHilbert`:**
     Given any `pre : EuclideanPreData BorchersPos` whose form `B` is invariant under
@@ -173,17 +174,13 @@ noncomputable def spatialTranslationUnitaryGroup
         U_space v ((Submodule.Quotient.mk F : BorchersPos ⧸ nullSubmodule pre) : H) =
           ((Submodule.Quotient.mk (borchersSpaceShift v F) : BorchersPos ⧸ nullSubmodule pre) : H)) } := by
   intro core
-  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-  set H₀ := BorchersPos ⧸ nullSubmodule pre
-  set H := UniformSpace.Completion H₀
   have h_null : ∀ (v : Fin 3 → ℝ) {F : BorchersPos},
       F ∈ nullSubmodule pre → borchersSpaceShift v F ∈ nullSubmodule pre := by
     intro v F hF
     change (pre.B (borchersSpaceShift v F) (borchersSpaceShift v F)).re = 0
     rw [h_inv v F F]
     exact hF
-  let U₀ : (Fin 3 → ℝ) → H₀ →ₗ[ℂ] H₀ := fun v =>
+  let U₀ : (Fin 3 → ℝ) → (BorchersPos ⧸ nullSubmodule pre) →ₗ[ℂ] (BorchersPos ⧸ nullSubmodule pre) := fun v =>
     (nullSubmodule pre).liftQ ((Submodule.mkQ (nullSubmodule pre)).comp (borchersSpaceShift v))
       (fun F hF => by
         simp only [LinearMap.mem_ker, LinearMap.comp_apply, Submodule.mkQ_apply,
@@ -192,34 +189,54 @@ noncomputable def spatialTranslationUnitaryGroup
   have hU₀_mk : ∀ v (F : BorchersPos),
       U₀ v (Submodule.Quotient.mk F) = Submodule.Quotient.mk (borchersSpaceShift v F) :=
     fun _ _ => rfl
-  have hU₀_norm : ∀ v (x : H₀), ‖U₀ v x‖ = ‖x‖ := by
+  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+  let U₀' : (Fin 3 → ℝ) → (BorchersPos ⧸ nullSubmodule pre) →ₗ[ℂ] (BorchersPos ⧸ nullSubmodule pre) := fun v =>
+    { toFun := fun x => U₀ v x
+      map_add' := fun x y => by
+        induction x using Submodule.Quotient.induction_on with
+        | _ F =>
+          induction y using Submodule.Quotient.induction_on with
+          | _ G =>
+            change U₀ v (Submodule.Quotient.mk (F + G)) =
+              U₀ v (Submodule.Quotient.mk F) + U₀ v (Submodule.Quotient.mk G)
+            simp only [hU₀_mk, map_add]; rfl
+      map_smul' := fun c x => by
+        induction x using Submodule.Quotient.induction_on with
+        | _ F =>
+          change U₀ v (Submodule.Quotient.mk (c • F)) = c • U₀ v (Submodule.Quotient.mk F)
+          simp only [hU₀_mk, map_smul]; rfl }
+  have hU₀'_mk : ∀ v (F : BorchersPos),
+      U₀' v (Submodule.Quotient.mk F) = Submodule.Quotient.mk (borchersSpaceShift v F) :=
+    fun v F => hU₀_mk v F
+  have hU₀_norm : ∀ v (x : (BorchersPos ⧸ nullSubmodule pre)), ‖U₀' v x‖ = ‖x‖ := by
     intro v x
     induction x using Submodule.Quotient.induction_on with
     | _ F =>
-      have hsq : ‖U₀ v (Submodule.Quotient.mk F)‖ ^ 2 = ‖(Submodule.Quotient.mk F : H₀)‖ ^ 2 := by
-        have h1 : (⟪U₀ v (Submodule.Quotient.mk F), U₀ v (Submodule.Quotient.mk F)⟫_ℂ).re =
-            ‖U₀ v (Submodule.Quotient.mk F)‖ ^ 2 := by
+      have hsq : ‖U₀' v (Submodule.Quotient.mk F)‖ ^ 2 = ‖(Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre))‖ ^ 2 := by
+        have h1 : (⟪U₀' v (Submodule.Quotient.mk F), U₀' v (Submodule.Quotient.mk F)⟫_ℂ).re =
+            ‖U₀' v (Submodule.Quotient.mk F)‖ ^ 2 := by
           rw [inner_self_eq_norm_sq_to_K]; norm_cast
-        have h2 : (⟪(Submodule.Quotient.mk F : H₀), Submodule.Quotient.mk F⟫_ℂ).re =
-            ‖(Submodule.Quotient.mk F : H₀)‖ ^ 2 := by
+        have h2 : (⟪(Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre)), Submodule.Quotient.mk F⟫_ℂ).re =
+            ‖(Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre))‖ ^ 2 := by
           rw [inner_self_eq_norm_sq_to_K]; norm_cast
-        rw [← h1, ← h2, hU₀_mk]
+        rw [← h1, ← h2, hU₀'_mk]
         change (pre.B (borchersSpaceShift v F) (borchersSpaceShift v F)).re = (pre.B F F).re
         rw [h_inv v F F]
-      nlinarith [norm_nonneg (U₀ v (Submodule.Quotient.mk F)),
-        norm_nonneg (Submodule.Quotient.mk F : H₀)]
-  let U_clm : (Fin 3 → ℝ) → H →L[ℂ] H := fun v =>
-    liftContractionToCompletion (U₀ v) (fun x => le_of_eq (hU₀_norm v x))
-  have hU_coe : ∀ v (x : H₀), U_clm v (x : H) = (U₀ v x : H) := fun v x =>
-    liftContractionToCompletion_coe (U₀ v) _ x
-  have hU_norm : ∀ v (x : H), ‖U_clm v x‖ = ‖x‖ := by
+      nlinarith [norm_nonneg (U₀' v (Submodule.Quotient.mk F)),
+        norm_nonneg (Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre))]
+  let U_clm : (Fin 3 → ℝ) → (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) →L[ℂ] (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) := fun v =>
+    liftContractionToCompletion (U₀' v) (fun x => le_of_eq (hU₀_norm v x))
+  have hU_coe : ∀ v (x : (BorchersPos ⧸ nullSubmodule pre)), U_clm v (x : (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) = (U₀' v x : (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) := fun v x =>
+    liftContractionToCompletion_coe (U₀' v) _ x
+  have hU_norm : ∀ v (x : (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))), ‖U_clm v x‖ = ‖x‖ := by
     intro v x
     induction x using UniformSpace.Completion.induction_on with
     | hp => exact isClosed_eq (continuous_norm.comp (U_clm v).continuous) continuous_norm
     | ih x =>
         rw [hU_coe v x, UniformSpace.Completion.norm_coe, UniformSpace.Completion.norm_coe]
         exact hU₀_norm v x
-  let U_space : (Fin 3 → ℝ) → H →ₗᵢ[ℂ] H := fun v =>
+  let U_space : (Fin 3 → ℝ) → (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) →ₗᵢ[ℂ] (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) := fun v =>
     { toLinearMap := (U_clm v).toLinearMap
       norm_map' := hU_norm v }
   refine ⟨U_space, ?_, ?_, ?_, ?_⟩
@@ -229,8 +246,8 @@ noncomputable def spatialTranslationUnitaryGroup
     | ih x =>
         induction x using Submodule.Quotient.induction_on with
         | _ F =>
-          change U_clm 0 ((Submodule.Quotient.mk F : H₀) : H) = _
-          rw [hU_coe 0 _, hU₀_mk 0 F, borchersSpaceShift_zero]
+          change U_clm 0 ((Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre)) : (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) = _
+          rw [hU_coe 0 (Submodule.Quotient.mk F), hU₀'_mk 0 F, borchersSpaceShift_zero]
           rfl
   · intro u v x
     induction x using UniformSpace.Completion.induction_on with
@@ -240,16 +257,29 @@ noncomputable def spatialTranslationUnitaryGroup
     | ih x =>
         induction x using Submodule.Quotient.induction_on with
         | _ F =>
-          change U_clm (u + v) ((Submodule.Quotient.mk F : H₀) : H) =
-            U_clm u (U_clm v ((Submodule.Quotient.mk F : H₀) : H))
-          rw [hU_coe (u + v) _, hU_coe v _, hU₀_mk, hU_coe u _, hU₀_mk, hU₀_mk,
-              borchersSpaceShift_add]
+          change U_clm (u + v) ((Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre)) : (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) =
+            U_clm u (U_clm v ((Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre)) : (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))))
+          rw [hU_coe (u + v) (Submodule.Quotient.mk F), hU₀'_mk (u + v) F,
+              hU_coe v (Submodule.Quotient.mk F), hU₀'_mk v F,
+              hU_coe u (Submodule.Quotient.mk (borchersSpaceShift v F)),
+              hU₀'_mk u (borchersSpaceShift v F), borchersSpaceShift_add]
   · intro v
-    change U_clm v ((Submodule.Quotient.mk pre.e₀ : H₀) : H) = _
-    rw [hU_coe v _, hU₀_mk, h_vac v]
+    change U_clm v ((Submodule.Quotient.mk pre.e₀ : (BorchersPos ⧸ nullSubmodule pre)) : (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) = _
+    rw [hU_coe v (Submodule.Quotient.mk _), hU₀'_mk, h_vac v]
   · intro v F
-    change U_clm v ((Submodule.Quotient.mk F : H₀) : H) = _
-    rw [hU_coe v _, hU₀_mk]
+    change U_clm v ((Submodule.Quotient.mk F : (BorchersPos ⧸ nullSubmodule pre)) : (UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) = _
+    rw [hU_coe v (Submodule.Quotient.mk _), hU₀'_mk]
+section
+set_option maxSynthPendingDepth 1
+private noncomputable local instance (pre : EuclideanPreData BorchersPos) :
+    NormedAddCommGroup (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
+  (quotInnerCore pre).toNormedAddCommGroup
+
+private noncomputable local instance (pre : EuclideanPreData BorchersPos) :
+    InnerProductSpace ℂ (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
+  @InnerProductSpace.ofCore ℂ (BorchersPos ⧸ OSBorchers.nullSubmodule pre) _
+    (Submodule.Quotient.addCommGroup _) (Submodule.Quotient.module _) (quotInnerCore pre).toCore
+
 
 /-- **Commutation of `U_space v` with any OS Semigroup `T t` whose `pre.θ t` commutes
     with `borchersSpaceShift v`.** -/
@@ -266,18 +296,11 @@ theorem spatialTranslation_commutes_with_os_semigroup
         UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)) =
       ((Submodule.Quotient.mk (pre.θ t F) : BorchersPos ⧸ nullSubmodule pre) :
         UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) :
-    let core := quotInnerCore pre
-    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let U_space := (spatialTranslationUnitaryGroup pre h_inv h_vac).1
     ∀ (v : Fin 3 → ℝ) (t : ℝ), 0 ≤ t → ∀ x,
       U_space v (T t x) = T t (U_space v x) := by
-  intro core
-  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-  set U_space := (spatialTranslationUnitaryGroup pre h_inv h_vac).1
   have hU_mk := (spatialTranslationUnitaryGroup pre h_inv h_vac).2.2.2.2
-  intro v t ht x
+  intro U_space v t ht x
   induction x using UniformSpace.Completion.induction_on with
   | hp =>
       exact isClosed_eq ((U_space v).continuous.comp (T t).continuous)
@@ -285,7 +308,10 @@ theorem spatialTranslation_commutes_with_os_semigroup
   | ih y =>
       induction y using Submodule.Quotient.induction_on with
       | _ F =>
-        rw [hT_coe t ht F, hU_mk v (pre.θ t F), hU_mk v F,
-            hT_coe t ht (borchersSpaceShift v F), h_comm_θ v t ht F]
+        rw [hT_coe t ht F]
+        dsimp only [U_space]
+        rw [hU_mk v (pre.θ t F), hU_mk v F, hT_coe t ht (borchersSpaceShift v F), h_comm_θ v t ht F]
+
+end
 
 end Imscribing.YangMills.SpatialISO3Unitaries
