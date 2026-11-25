@@ -654,6 +654,7 @@ private lemma wilsonAction_glue_split {N M : ℕ} [NeZero N] [NeZero M] (β : �
       β * ((Finset.univ.filter (isCutPlaq M)).card : ℝ) -
       (β / (N : ℝ)) * ∑ t ∈ Finset.univ.filter (isCutPlaq M),
         realTrace (cutAmp t.1 t.2.1 t.2.2 p * (cutAmp t.1 t.2.1 t.2.2 q)⁻¹) := by
+  letI := Classical.propDecidable
   let term : LinkConfig N (2 * M) → Lat4 (2 * M) × Fin 4 × Fin 4 → ℝ := fun U t =>
     1 - realTrace (plaquetteHolonomy U t.1 t.2.1 t.2.2) / (N : ℝ)
   have h_w : wilsonAction N (2 * M) β (glueConfig p q) =
@@ -661,8 +662,8 @@ private lemma wilsonAction_glue_split {N M : ℕ} [NeZero N] [NeZero M] (β : �
     unfold wilsonAction
     congr 1
     rw [Fintype.sum_prod_type]
-    refine Finset.sum_congr rfl fun x _ => ?_
-    rw [Fintype.sum_prod_type]
+    simp_rw [Fintype.sum_prod_type]
+    convert rfl
   have h_part :
       (∑ t : Lat4 (2 * M) × Fin 4 × Fin 4, term (glueConfig p q) t) =
       (∑ t : Lat4 (2 * M) × Fin 4 × Fin 4, if isPosPlaq M t then term (glueConfig p q) t else 0) +
@@ -722,9 +723,7 @@ private lemma wilsonAction_glue_split {N M : ℕ} [NeZero N] [NeZero M] (β : �
         simp [hneg, hnpos]
     rw [h_eq1, h_eq2]
     unfold posAction
-    congr 1
-    refine Finset.sum_congr rfl fun t _ => ?_
-    split_ifs <;> rfl
+    convert rfl
   have h_cut_mul :
       β * (∑ t : Lat4 (2 * M) × Fin 4 × Fin 4, if isCutPlaq M t then term (glueConfig p q) t else 0) =
       β * ((Finset.univ.filter (isCutPlaq M)).card : ℝ) -
@@ -744,8 +743,7 @@ private lemma wilsonAction_glue_split {N M : ℕ} [NeZero N] [NeZero M] (β : �
         ← Finset.sum_div]
     rw [h_eq]
     ring
-  rw [h_w, h_part, mul_add, mul_add, h_pos_mul, h_neg_mul, h_cut_mul]
-  ring
+  rw [h_w, h_part, mul_add, mul_add, h_pos_mul, h_neg_mul, h_cut_mul, ← add_sub_assoc]
 
 private lemma sum_range_hasDerivAt (n : ℕ) (t : ℝ) :
     HasDerivAt (fun y : ℝ => ∑ k ∈ Finset.range (n + 1), y ^ k / (k.factorial : ℝ))
@@ -1070,8 +1068,8 @@ theorem wilson4D_reflection_positivity
       · exact ((measurable_const.mul hG_meas).mul
           (Complex.continuous_ofReal.measurable.comp
             (((hK_cut_meas.comp (measurable_const.prodMk measurable_id)).pow_const k).div_const _))).aestronglyMeasurable
-      · rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div, abs_pow,
-          abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ))]
+      · rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div, abs_pow]
+        rw [abs_of_nonneg (a := (k.factorial : ℝ)) (Nat.cast_nonneg _)]
         have h1 : ‖G p‖ * ‖G q‖ ≤ BF * BF :=
           mul_le_mul (hG_bound p) (hG_bound q) (norm_nonneg _) hBF
         have h2 : |K_cut p q| ^ k / (k.factorial : ℝ) ≤ C_bd ^ k / (k.factorial : ℝ) :=
@@ -1111,7 +1109,7 @@ theorem wilson4D_reflection_positivity
             dsimp [K_cut]
             rw [mul_pow, hsum p q]
             push_cast
-            rw [Finset.sum_div, Finset.mul_sum]
+            rw [Finset.mul_sum, Finset.sum_div, Finset.mul_sum]
             refine Finset.sum_congr rfl fun i _ => ?_
             ring
           rw [h_q_eq, integral_finset_sum _ fun i _ => ?_, Finset.mul_sum]
@@ -1139,8 +1137,8 @@ theorem wilson4D_reflection_positivity
       have h_pt : ∀ q, ‖star (G p) * G q * (((K_cut p q) ^ k / (k.factorial : ℝ) : ℝ) : ℂ)‖ ≤
           BF * BF * (C_bd ^ k / (k.factorial : ℝ)) := by
         intro q
-        rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div, abs_pow,
-          abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ))]
+        rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div, abs_pow]
+        rw [abs_of_nonneg (a := (k.factorial : ℝ)) (Nat.cast_nonneg _)]
         have h1 : ‖G p‖ * ‖G q‖ ≤ BF * BF :=
           mul_le_mul (hG_bound p) (hG_bound q) (norm_nonneg _) hBF
         have h2 : |K_cut p q| ^ k / (k.factorial : ℝ) ≤ C_bd ^ k / (k.factorial : ℝ) :=
@@ -1181,7 +1179,7 @@ theorem wilson4D_reflection_positivity
           dsimp [K_cut]
           rw [mul_pow, hsum p q]
           push_cast
-          rw [Finset.sum_div, Finset.mul_sum]
+          rw [Finset.mul_sum, Finset.sum_div, Finset.mul_sum]
           refine Finset.sum_congr rfl fun i _ => ?_
           ring
         rw [h_q_eq, integral_finset_sum _ fun i _ => ((h_int_ψ i).const_mul _).const_mul _,
@@ -1206,11 +1204,11 @@ theorem wilson4D_reflection_positivity
       rw [integral_mul_const]
       congr 1
       change (∫ p, star (G p) * (ψ i p : ℂ) ∂μ) =
-        (Complex.conjCLE.toContinuousLinearMap) (∫ q, G q * (ψ i q : ℂ) ∂μ)
-      rw [← (Complex.conjCLE.toContinuousLinearMap).integral_comp_comm (h_int_ψ i)]
+        Complex.conjCLE.toContinuousLinearMap (∫ q, G q * (ψ i q : ℂ) ∂μ)
+      rw [← Complex.conjCLE.toContinuousLinearMap.integral_comp_comm (h_int_ψ i)]
       refine integral_congr_ae (Filter.Eventually.of_forall fun p => ?_)
-      simp only [ContinuousLinearEquiv.coe_toContinuousLinearMap, Complex.conjCLE_apply,
-        map_mul, Complex.conj_ofReal, ← Complex.star_def]
+      change star (G p) * (ψ i p : ℂ) = star (G p * (ψ i p : ℂ))
+      conv_rhs => rw [star_mul, Complex.star_def, Complex.conj_ofReal, ← Complex.star_def, mul_comm]
     rw [h_k_eq]
     have hre : (((r ^ k / (k.factorial : ℝ) : ℝ) : ℂ) *
         ∑ i : ι_k, star (∫ p, G p * (ψ i p : ℂ) ∂μ) * (∫ q, G q * (ψ i q : ℂ) ∂μ)).re =
@@ -1233,7 +1231,8 @@ theorem wilson4D_reflection_positivity
     have h_tri : |S_K K p q| ≤ ∑ k ∈ Finset.range K, C_bd ^ k / (k.factorial : ℝ) := by
       dsimp [S_K]
       refine le_trans (Finset.abs_sum_le_sum_abs _ _) (Finset.sum_le_sum fun k _ => ?_)
-      rw [abs_div, abs_pow, abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ))]
+      rw [abs_div, abs_pow]
+      rw [abs_of_nonneg (a := (k.factorial : ℝ)) (Nat.cast_nonneg _)]
       exact div_le_div_of_nonneg_right (pow_le_pow_left₀ (abs_nonneg _) (hK_cut_bound p q) k)
         (Nat.cast_nonneg _)
     exact le_trans h_tri (exp_rem_nonneg K C_bd hC_bd)
@@ -1253,7 +1252,8 @@ theorem wilson4D_reflection_positivity
       simpa using tendsto_const_nhds.mul (tendsto_const_pow_div_factorial C_bd hC_bd)
     have h_diff0 : Filter.Tendsto (fun K : ℕ => S_K K p q - Real.exp (K_cut p q))
         Filter.atTop (nhds 0) := by
-      refine squeeze_zero (fun K => norm_nonneg (S_K K p q - Real.exp (K_cut p q))) (fun K => ?_) h_rhs0
+      refine tendsto_zero_iff_norm_tendsto_zero.mpr
+        (squeeze_zero (fun _ => norm_nonneg _) (fun K => ?_) h_rhs0)
       rw [norm_sub_rev]
       exact h_err K
     simpa using h_diff0.add (tendsto_const_nhds (x := Real.exp (K_cut p q)))
@@ -1294,8 +1294,9 @@ theorem wilson4D_reflection_positivity
           · exact ((measurable_const.mul hG_meas).mul
               (Complex.continuous_ofReal.measurable.comp
                 (((hK_cut_meas.comp (measurable_const.prodMk measurable_id)).pow_const k).div_const _))).aestronglyMeasurable
-          · rw [norm_mul, norm_mul, norm_star, Complex.norm_real, Real.norm_eq_abs, abs_div, abs_pow,
-              abs_of_nonneg (Nat.cast_nonneg (k.factorial : ℕ))]
+          · simp only [norm_mul, norm_star, Complex.norm_conj, Complex.norm_real,
+              Real.norm_eq_abs, abs_div, abs_pow]
+            rw [abs_of_nonneg (a := (k.factorial : ℝ)) (Nat.cast_nonneg _)]
             exact mul_le_mul (mul_le_mul (hG_bound p) (hG_bound q) (norm_nonneg _) hBF)
               (div_le_div_of_nonneg_right (pow_le_pow_left₀ (abs_nonneg _) (hK_cut_bound p q) k)
                 (Nat.cast_nonneg _)) (by positivity) (by positivity)
@@ -1311,7 +1312,7 @@ theorem wilson4D_reflection_positivity
               fun q => ∑ i : ι_k, ((r ^ k / (k.factorial : ℝ) : ℝ) : ℂ) *
                 (star (G p) * (ψ i p : ℂ) * (G q * (ψ i q : ℂ))) := by
             funext q; dsimp [K_cut]; rw [mul_pow, hsum p q]; push_cast
-            rw [Finset.sum_div, Finset.mul_sum]; refine Finset.sum_congr rfl fun i _ => ?_; ring
+            rw [Finset.mul_sum, Finset.sum_div, Finset.mul_sum]; refine Finset.sum_congr rfl fun i _ => ?_; ring
           rw [h_q_eq, integral_finset_sum _ fun i _ => ?_, Finset.mul_sum]
           · refine Finset.sum_congr rfl fun i _ => ?_
             rw [integral_const_mul, integral_const_mul]
@@ -1346,7 +1347,7 @@ theorem wilson4D_reflection_positivity
       (nhds (∫ p, F_inf p ∂μ).re) :=
     Complex.continuous_re.continuousAt.tendsto.comp h_outer_lim
   have h_inf_nonneg : 0 ≤ (∫ p, F_inf p ∂μ).re :=
-    le_of_tendsto h_re_lim (Filter.Eventually.of_forall hS_K_nonneg)
+    ge_of_tendsto h_re_lim (Filter.Eventually.of_forall fun K => hS_K_nonneg K)
   let c0 : ℝ := Real.exp (-(β * (sCut.card : ℝ)))
   have hc0 : 0 ≤ c0 := (Real.exp_pos _).le
   have h_final_eq :
@@ -1358,7 +1359,19 @@ theorem wilson4D_reflection_positivity
     dsimp [F_inf]
     rw [← integral_const_mul]
     refine integral_congr_ae (Filter.Eventually.of_forall fun q => ?_)
-    rw [wilsonAction_glue_split β p q, h_cut_eq p q]
+    dsimp only
+    have h_split : wilsonAction N (2 * M) β (glueConfig p q) =
+        posAction N M β p + posAction N M β q + β * (sCut.card : ℝ) - r * K_sum p q := by
+      have h_wsplit := wilsonAction_glue_split β p q
+      have h_flt : ∀ (inst1 : Fintype (Lat4 (2 * M) × Fin 4 × Fin 4))
+          (inst2 : DecidablePred (isCutPlaq M)),
+          @Finset.filter _ (isCutPlaq M) inst2 (@Finset.univ _ inst1) = sCut := by
+        intro inst1 inst2
+        ext t
+        simp [sCut]
+      rw [h_flt _ _] at h_wsplit
+      rw [h_wsplit, h_cut_eq p q]
+    rw [h_split]
     have hexp_eq : Real.exp (-(posAction N M β p + posAction N M β q +
         β * (sCut.card : ℝ) - r * K_sum p q)) =
         c0 * Real.exp (-posAction N M β p) * Real.exp (-posAction N M β q) *
@@ -1367,8 +1380,7 @@ theorem wilson4D_reflection_positivity
       rw [← Real.exp_add, ← Real.exp_add, ← Real.exp_add]
       congr 1; ring
     rw [hexp_eq]
-    push_cast
-    simp only [G, star_mul, Complex.star_def, Complex.conj_ofReal]
+    simp only [G, Complex.star_def, map_mul, Complex.conj_ofReal, Complex.ofReal_mul]
     ring
   rw [h_final_eq]
   have h_mul_re : ((c0 : ℂ) * (∫ p, F_inf p ∂μ)).re = c0 * (∫ p, F_inf p ∂μ).re := by

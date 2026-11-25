@@ -97,7 +97,7 @@ structure BorchersOSData (N : ℕ) where
     letI : NormedAddCommGroup (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
       core.toNormedAddCommGroup
     letI : InnerProductSpace ℂ (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
-      InnerProductSpace.ofCore core
+      InnerProductSpace.ofCore core.toCore
     let H := UniformSpace.Completion (BorchersPos ⧸ OSBorchers.nullSubmodule pre)
     let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ OSBorchers.nullSubmodule pre) : H)
     ∃ (U : ClaySpec.Poincare4 → H →ₗᵢ[ℂ] H)
@@ -149,7 +149,7 @@ theorem borchers_to_clay_target {N : ℕ} (D : BorchersOSData N) :
   letI : NormedAddCommGroup (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
     core.toNormedAddCommGroup
   letI : InnerProductSpace ℂ (BorchersPos ⧸ OSBorchers.nullSubmodule pre) :=
-    InnerProductSpace.ofCore core
+    InnerProductSpace.ofCore core.toCore
   obtain ⟨T, hΩ_norm, hT_vac, hT_symm, hT_add, hT_contr, hT_decay⟩ :=
     OSBorchers.os_borchers_to_completion pre
   have hvar := OSBorchers.strict_variance_in_completion pre D.variance_strict

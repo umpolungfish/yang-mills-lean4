@@ -2,6 +2,7 @@ import Imscribing.YangMills.LatticeOSReflectionPositivity4D
 import Imscribing.YangMills.WilsonHaarCompactness4D
 import Imscribing.YangMills.TransferMatrixToSemigroup
 import Imscribing.YangMills.OSContractivityAndGenerator
+import Imscribing.YangMills.OSHilbertCompletion
 
 /-!
 # Normalized Lattice OS Cauchy–Schwarz & Transfer-to-Generator Gap Bridge
@@ -27,7 +28,7 @@ open Imscribing.YangMills.TransferSemigroup
 open Imscribing.YangMills.OSGenerator
 
 /-- Normalized finite-volume reflection-positivity bilinear form on `HalfVar N M → ℂ`. -/
-noncomputable def wilsonGlueRPForm (N M : ℕ) [NeZero N] (β Z : ℝ)
+noncomputable def wilsonGlueRPForm (N M : ℕ) [NeZero N] [NeZero M] (β Z : ℝ)
     [MeasurableSpace (GaugeGroup N)] (μ : Measure (HalfVar N M))
     (F G : HalfVar N M → ℂ) : ℂ :=
   (Z⁻¹ : ℂ) * ∫ p, ∫ q, star (F p) * G q *
@@ -107,7 +108,8 @@ theorem wilson4D_os_cauchy_schwarz
       have hu_mul : star u * u = 1 := by
         dsimp [u]
         have hnz : (‖B F.1 G.1‖ : ℂ) ≠ 0 := by exact_mod_cast h_pos.ne'
-        rw [star_div₀, Complex.conj_ofReal, div_mul_div_comm, ← sq]
+        rw [← Complex.star_def, star_div₀, Complex.star_def, Complex.conj_ofReal,
+          ← Complex.star_def, div_mul_div_comm, ← sq]
         have hnsq : star (B F.1 G.1) * B F.1 G.1 = ((‖B F.1 G.1‖ ^ 2 : ℝ) : ℂ) := by
           rw [mul_comm, show star (B F.1 G.1) = starRingEnd ℂ _ from rfl, Complex.mul_conj]
           norm_cast; exact Complex.normSq_eq_norm_sq _
@@ -115,7 +117,8 @@ theorem wilson4D_os_cauchy_schwarz
       have hu_B : star u * B F.1 G.1 = (‖B F.1 G.1‖ : ℂ) := by
         dsimp [u]
         have hnz : (‖B F.1 G.1‖ : ℂ) ≠ 0 := by exact_mod_cast h_pos.ne'
-        rw [star_div₀, Complex.conj_ofReal, div_mul_eq_mul_div]
+        rw [← Complex.star_def, star_div₀, Complex.star_def, Complex.conj_ofReal,
+          ← Complex.star_def, div_mul_eq_mul_div]
         have hnsq : star (B F.1 G.1) * B F.1 G.1 = ((‖B F.1 G.1‖ ^ 2 : ℝ) : ℂ) := by
           rw [mul_comm, show star (B F.1 G.1) = starRingEnd ℂ _ from rfl, Complex.mul_conj]
           norm_cast; exact Complex.normSq_eq_norm_sq _
@@ -126,32 +129,38 @@ theorem wilson4D_os_cauchy_schwarz
         rw [show H_comb.1 = fun p => aF.1 p + G.1 p from rfl]
         rw [h_add_left aF G H_comb, h_add_right aF aF G, h_add_right G aF G]
         rw [h_smul_left a F aF, h_smul_right a F F, h_smul_left a F G, h_smul_right a G F]
+        simp only [Complex.star_def]
         ring
       have hsa_a : star a * a = ((t ^ 2 : ℝ) : ℂ) := by
         dsimp [a]
-        rw [star_mul, Complex.conj_ofReal]
+        rw [← Complex.star_def, star_mul, Complex.star_def, Complex.conj_ofReal,
+          ← Complex.star_def]
         calc
           (star u * (t : ℂ)) * ((t : ℂ) * u) = ((t : ℂ) * (t : ℂ)) * (star u * u) := by ring
           _ = ((t ^ 2 : ℝ) : ℂ) := by rw [hu_mul]; push_cast; ring
       have hsa_B : star a * B F.1 G.1 = ((t * ‖B F.1 G.1‖ : ℝ) : ℂ) := by
         dsimp [a]
-        rw [star_mul, Complex.conj_ofReal]
+        rw [← Complex.star_def, star_mul, Complex.star_def, Complex.conj_ofReal,
+          ← Complex.star_def]
         calc
           (star u * (t : ℂ)) * B F.1 G.1 = (t : ℂ) * (star u * B F.1 G.1) := by ring
           _ = ((t * ‖B F.1 G.1‖ : ℝ) : ℂ) := by rw [hu_B]; push_cast; rfl
       have ha_GF : a * B G.1 F.1 = ((t * ‖B F.1 G.1‖ : ℝ) : ℂ) := by
+        dsimp [B]
         rw [h_herm F G]
         have h1 : star (star a * B F.1 G.1) = a * star (B F.1 G.1) := by
           rw [star_mul, star_star, mul_comm]
-        rw [← h1, hsa_B, Complex.conj_ofReal]
+        rw [← h1, hsa_B, Complex.star_def, Complex.conj_ofReal]
       change 0 ≤ (B H_comb.1 H_comb.1).re at hnn
       rw [hexp, hsa_a, hsa_B, ha_GF] at hnn
-      simpa [Complex.add_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im] using hnn
+      simp only [Complex.add_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im] at hnn
+      linarith
     by_cases hxx : (B F.1 F.1).re = 0
     · have hbad := h_quad_t (-((B G.1 G.1).re + 1) / (2 * ‖B F.1 G.1‖))
       rw [hxx, mul_zero, zero_add] at hbad
+      have hB_nz : ‖B F.1 G.1‖ ≠ 0 := h_pos.ne'
       have heq : 2 * (-((B G.1 G.1).re + 1) / (2 * ‖B F.1 G.1‖)) * ‖B F.1 G.1‖ + (B G.1 G.1).re = -1 := by
-        field_simp [h_pos.ne']; ring
+        field_simp [hB_nz]; ring
       linarith
     · have hxx_pos : 0 < (B F.1 F.1).re := lt_of_le_of_ne (h_quad F) (Ne.symm hxx)
       have hmin := h_quad_t (-‖B F.1 G.1‖ / (B F.1 F.1).re)
@@ -160,8 +169,9 @@ theorem wilson4D_os_cauchy_schwarz
           (B G.1 G.1).re - ‖B F.1 G.1‖ ^ 2 / (B F.1 F.1).re := by
         field_simp [hxx_pos.ne']; ring
       rw [heq] at hmin
-      exact (div_le_iff₀ hxx_pos).mp (sub_nonneg.mp hmin)
+      exact ((div_le_iff₀ hxx_pos).mp (sub_nonneg.mp hmin)).trans_eq (mul_comm _ _)
 
+set_option maxHeartbeats 800000 in
 /-- **Transfer-Matrix Continuum Scaling → Generator Spectral Gap & Vacuum Uniqueness.** -/
 theorem lattice_transfer_to_continuum_generator_gap
     {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
@@ -179,15 +189,15 @@ theorem lattice_transfer_to_continuum_generator_gap
       Filter.Tendsto (fun m : ℕ => ((T_lat m) ^ (Nat.floor (t / a m))) x)
         Filter.atTop (nhds (T t x)))
     (h_step : ∀ x : H, Filter.Tendsto (fun m : ℕ => T_lat m x - x) Filter.atTop (nhds 0)) :
-    (∀ ψ : semigroupGeneratorDomain T, ⟪Ω, (ψ : H)⟫_ℂ = 0 →
-      Δ * ‖(ψ : H)‖ ^ 2 ≤ (⟪(ψ : H), semigroupGenerator T ψ⟫_ℂ).re) ∧
-    (∀ ψ : semigroupGeneratorDomain T,
-      0 ≤ (⟪(ψ : H), semigroupGenerator T ψ⟫_ℂ).re) ∧
-    (∀ ψ : semigroupGeneratorDomain T,
-      semigroupGenerator T ψ = 0 → ∃ c : ℂ, (ψ : H) = c • Ω) := by
+    (∀ ψ : semigroupGeneratorDomain (fun t => (T t).toLinearMap), ⟪Ω, (ψ : H)⟫_ℂ = 0 →
+      Δ * ‖(ψ : H)‖ ^ 2 ≤ (⟪(ψ : H), semigroupGenerator (fun t => (T t).toLinearMap) ψ⟫_ℂ).re) ∧
+    (∀ ψ : semigroupGeneratorDomain (fun t => (T t).toLinearMap),
+      0 ≤ (⟪(ψ : H), semigroupGenerator (fun t => (T t).toLinearMap) ψ⟫_ℂ).re) ∧
+    (∀ ψ : semigroupGeneratorDomain (fun t => (T t).toLinearMap),
+      semigroupGenerator (fun t => (T t).toLinearMap) ψ = 0 → ∃ c : ℂ, (ψ : H) = c • Ω) := by
   obtain ⟨hT_vac_lim, hT_symm_lim, _, _⟩ :=
     discrete_semigroup_to_continuum a ha_pos ha_lim T_lat hT_contr hT_symm Ω hT_vac T h_conv h_step
   have hT_decay := continuum_gap_survival a gap ha_pos ha_lim Δ h_gap_unif T_lat Ω h_lat_decay T h_conv
-  exact semigroupGenerator_gap_and_nonneg T Ω hΩ Δ hΔ hT_vac_lim hT_symm_lim hT_decay
+  exact semigroupGenerator_gap_and_nonneg (fun t => (T t).toLinearMap) Ω hΩ Δ hΔ hT_vac_lim hT_symm_lim hT_decay
 
 end Imscribing.YangMills.LatticeChessboardTransfer

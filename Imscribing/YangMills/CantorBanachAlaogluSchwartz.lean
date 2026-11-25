@@ -34,9 +34,7 @@ theorem cantor_diagonal_subseq (F : ℕ → ℕ → ℂ)
       (Classical.choose_spec (h_bd k)) s.1 s.2
     ⟨s.1 ∘ Classical.choose (Classical.choose_spec ex),
       s.2.comp (Classical.choose_spec (Classical.choose_spec ex)).1⟩
-  let rec step : ℕ → S
-    | 0 => ⟨id, strictMono_id⟩
-    | k + 1 => next k (step k)
+  let step : ℕ → S := fun k => Nat.rec ⟨id, strictMono_id⟩ (fun n s => next n s) k
   have h_step_sub : ∀ k : ℕ, ∃ (L : ℂ) (σ : ℕ → ℕ), StrictMono σ ∧
       (step (k + 1)).1 = (step k).1 ∘ σ ∧
       Filter.Tendsto (fun n => F ((step (k + 1)).1 n) k) Filter.atTop (𝓝 L) := by
@@ -179,14 +177,14 @@ theorem wilson_lattice_subsequential_schwinger_limit
     let p : EuclideanSchwartz n → ℝ := fun f =>
       (Z_max * 8192) ^ n * ∑ j ∈ Finset.range (8 * n + 1),
         ((8 * n).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 f
-    ∃ (φ : ℕ → ℕ) (S_∞ : EuclideanSchwartz n →ₗ[ℂ] ℂ),
+    ∃ (φ : ℕ → ℕ) (S_inf : EuclideanSchwartz n →ₗ[ℂ] ℂ),
       StrictMono φ ∧
       (∀ f : EuclideanSchwartz n,
         Filter.Tendsto (fun m =>
-          @smearedPlaqSchwinger N (L (φ m)) n _ (a (φ m)) (β (φ m)) (Z_ren (φ m))
+          @smearedPlaqSchwinger N (L (φ m)) n _ _ (a (φ m)) (β (φ m)) (Z_ren (φ m))
             (h_meas_sp (φ m)) (μ (φ m)) f)
-          Filter.atTop (𝓝 (S_∞ f))) ∧
-      (∀ f : EuclideanSchwartz n, ‖S_∞ f‖ ≤ p f) := by
+          Filter.atTop (𝓝 (S_inf f))) ∧
+      (∀ f : EuclideanSchwartz n, ‖S_inf f‖ ≤ p f) := by
   intro p
   have hp_nn : ∀ f, 0 ≤ p f := fun f => by
     dsimp [p]
@@ -204,7 +202,7 @@ theorem wilson_lattice_subsequential_schwinger_limit
     refine congrArg _ (Finset.sum_congr rfl fun j _ => ?_)
     rw [map_neg_eq_map]
   let S_m : ℕ → EuclideanSchwartz n →ₗ[ℂ] ℂ := fun m =>
-    @smearedPlaqSchwinger N (L m) n _ (a m) (β m) (Z_ren m) (h_meas_sp m) (μ m)
+    @smearedPlaqSchwinger N (L m) n _ _ (a m) (β m) (Z_ren m) (h_meas_sp m) (μ m)
   have h_unif : ∀ m (f : EuclideanSchwartz n), ‖S_m m f‖ ≤ p f := by
     intro m f
     letI := h_meas_sp m
@@ -214,8 +212,7 @@ theorem wilson_lattice_subsequential_schwinger_limit
     refine le_trans h1 ?_
     dsimp [p]
     gcongr
-    · exact hZ m
-    · exact Finset.sum_nonneg fun j _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
+    exact hZ m
   exact equicontinuous_dense_limit p hp_nn hp_add hp_neg D h_dense S_m h_unif
 
 end Imscribing.YangMills.CantorSchwartzLimit
@@ -228,7 +225,7 @@ open Imscribing.YangMills.ContinuumInterfaces
 open Imscribing.YangMills.WilsonLattice4D
 open Imscribing.YangMills.WilsonFrobenius4D
 
-theorem smearedPlaqSchwinger_perm_symm (N L n : ℕ) [NeZero N]
+theorem smearedPlaqSchwinger_perm_symm (N L n : ℕ) [NeZero N] [NeZero L]
     (a β Z_ren : ℝ) [MeasurableSpace (LinkConfig N L)] (μ : Measure (LinkConfig N L))
     (π : Equiv.Perm (Fin n)) (f f_π : EuclideanSchwartz n)
     (hf : ∀ y : Fin n → Spacetime4, f_π y = f (fun k => y (π k))) :
@@ -237,41 +234,38 @@ theorem smearedPlaqSchwinger_perm_symm (N L n : ℕ) [NeZero N]
   dsimp [smearedPlaqSchwinger]
   congr 1
   let e : (Fin n → Lat4 L) ≃ (Fin n → Lat4 L) :=
-    { toFun := fun xs k => xs (π.symm k)
-      invFun := fun xs k => xs (π k)
+    { toFun := fun xs k => xs (π k)
+      invFun := fun xs k => xs (π.symm k)
       left_inv := fun xs => by funext k; simp
       right_inv := fun xs => by funext k; simp }
   refine Fintype.sum_equiv e _ _ fun xs => ?_
   have hf_eq : f_π (fun k => latSiteToSpacetime L a (xs k)) =
       f (fun k => latSiteToSpacetime L a (e xs k)) := by
-    rw [hf]
-    congr 1
-    funext k
-    simp [e]
+    rw [hf]; rfl
   have hprod_eq : (fun U : LinkConfig N L => (∏ k : Fin n, localPlaqDensity N L U (xs k) : ℂ)) =
       (fun U : LinkConfig N L => (∏ k : Fin n, localPlaqDensity N L U (e xs k) : ℂ)) := by
     funext U
-    exact (Fintype.prod_equiv π.symm _ _ fun k => by simp [e]).symm
+    exact (Fintype.prod_equiv π _ _ fun k => by simp [e]).symm
   rw [hf_eq, hprod_eq]
 
 theorem continuum_schwinger_perm_symm
     (N n : ℕ) [NeZero N]
-    (L : ℕ → ℕ) (a β Z_ren : ℕ → ℝ)
+    (L : ℕ → ℕ) [∀ m, NeZero (L m)] (a β Z_ren : ℕ → ℝ)
     (h_meas_sp : ∀ m, MeasurableSpace (LinkConfig N (L m)))
     (μ : ∀ m, @Measure (LinkConfig N (L m)) (h_meas_sp m))
-    (S_∞ : EuclideanSchwartz n →ₗ[ℂ] ℂ)
+    (S_inf : EuclideanSchwartz n →ₗ[ℂ] ℂ)
     (h_lim : ∀ f : EuclideanSchwartz n,
       Filter.Tendsto (fun m =>
-        @smearedPlaqSchwinger N (L m) n _ (a m) (β m) (Z_ren m) (h_meas_sp m) (μ m) f)
-        Filter.atTop (𝓝 (S_∞ f)))
+        @smearedPlaqSchwinger N (L m) n _ _ (a m) (β m) (Z_ren m) (h_meas_sp m) (μ m) f)
+        Filter.atTop (𝓝 (S_inf f)))
     (π : Equiv.Perm (Fin n)) (f f_π : EuclideanSchwartz n)
     (hf : ∀ y : Fin n → Spacetime4, f_π y = f (fun k => y (π k))) :
-    S_∞ f_π = S_∞ f := by
+    S_inf f_π = S_inf f := by
   have h1 := h_lim f_π
   have h2 := h_lim f
-  have h_eq : (fun m => @smearedPlaqSchwinger N (L m) n _ (a m) (β m) (Z_ren m)
+  have h_eq : (fun m => @smearedPlaqSchwinger N (L m) n _ _ (a m) (β m) (Z_ren m)
       (h_meas_sp m) (μ m) f_π) =
-      fun m => @smearedPlaqSchwinger N (L m) n _ (a m) (β m) (Z_ren m)
+      fun m => @smearedPlaqSchwinger N (L m) n _ _ (a m) (β m) (Z_ren m)
         (h_meas_sp m) (μ m) f := by
     funext m
     exact smearedPlaqSchwinger_perm_symm N (L m) n (a m) (β m) (Z_ren m) (μ m) π f f_π hf

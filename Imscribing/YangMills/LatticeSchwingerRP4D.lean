@@ -47,16 +47,17 @@ private lemma linkReflect_glueConfig_pos_spatial_eq {N M : ℕ} [NeZero M] (p q 
     {x : Lat4 (2 * M)} (hx : (x 0).val < M) (i : Fin 3) :
     linkReflect (glueConfig p q) x i.succ = q.1 x i.succ := by
   classical
+  haveI : NeZero (2 * M) := ⟨Nat.mul_ne_zero (by decide) (NeZero.ne M)⟩
   have hM : 0 < M := NeZero.pos M
-  have hx_lt : (x 0).val < 2 * M := (x 0).isLt
+  have hx_lt : (x 0).val < 2 * M := ZMod.val_lt (x 0)
   have h_refl_val : ((reflectSite (2 * M) x) 0).val = 2 * M - 1 - (x 0).val := by
     simp only [reflectSite, ↓reduceIte]
     have heq : -(x 0 + 1) = (((2 * M - 1 - (x 0).val : ℕ) : ZMod (2 * M))) := by
       have hsub : ((x 0).val + (2 * M - 1 - (x 0).val) + 1 : ℕ) = 2 * M := by omega
-      have hz := congrArg (Nat.cast (R := ZMod (2 * M))) hsub
-      push_cast at hz
-      rw [ZMod.natCast_zmod_val, ZMod.natCast_self] at hz
-      linear_combination hz
+      have hz : (((x 0).val + (2 * M - 1 - (x 0).val) + 1 : ℕ) : ZMod (2 * M)) = 0 := by
+        rw [hsub]; exact ZMod.natCast_self (2 * M)
+      simp only [Nat.cast_add, Nat.cast_one, ZMod.natCast_zmod_val] at hz
+      linear_combination -hz
     rw [heq, ZMod.val_natCast_of_lt (by omega)]
   have h_neg : IsNegLink M (reflectSite (2 * M) x) i.succ :=
     ⟨by omega, fun h => absurd h (Fin.succ_ne_zero i)⟩
@@ -81,8 +82,8 @@ theorem spatialPlaqDensity_glue_pos {N M : ℕ} [NeZero N] (p q : HalfVar N M)
   unfold spatialPlaqDensity
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have h1 := glueConfig_pos_spatial_eq p q hx i
-  have h2 := glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val]; exact hx) j
-  have h3 := glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val]; exact hx) i
+  have h2 := glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val M x i]; exact hx) j
+  have h3 := glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val M x j]; exact hx) i
   have h4 := glueConfig_pos_spatial_eq p q hx j
   simp only [plaquetteHolonomy, h1, h2, h3, h4]
 
@@ -95,8 +96,8 @@ theorem spatialPlaqDensity_reflect_glue_pos {N M : ℕ} [NeZero N] [NeZero M] (p
   unfold spatialPlaqDensity
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   have h1 := linkReflect_glueConfig_pos_spatial_eq p q hx i
-  have h2 := linkReflect_glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val]; exact hx) j
-  have h3 := linkReflect_glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val]; exact hx) i
+  have h2 := linkReflect_glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val M x i]; exact hx) j
+  have h3 := linkReflect_glueConfig_pos_spatial_eq p q (by rw [spatial_shift_zero_val M x j]; exact hx) i
   have h4 := linkReflect_glueConfig_pos_spatial_eq p q hx j
   simp only [plaquetteHolonomy, h1, h2, h3, h4]
 
@@ -124,17 +125,24 @@ theorem smeared_magnetic_wilson_rp_nonneg
     refine measurable_const.sub ((Complex.continuous_re.measurable.comp ?_).div_const _)
     unfold plaquetteHolonomy
     have ml1 : Measurable (fun p : HalfVar N M => p.1 x i.succ) :=
-      ((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst
+      ((measurable_pi_apply i.succ).comp
+        (measurable_pi_apply x : Measurable fun U : LinkConfig N (2 * M) => U x)).comp measurable_fst
     have ml2 : Measurable (fun p : HalfVar N M => p.1 (x + stepDir (2 * M) i.succ) j.succ) :=
-      ((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst
+      ((measurable_pi_apply j.succ).comp
+        (measurable_pi_apply (x + stepDir (2 * M) i.succ) :
+          Measurable fun U : LinkConfig N (2 * M) => U (x + stepDir (2 * M) i.succ))).comp measurable_fst
     have ml3 : Measurable (fun p : HalfVar N M => (p.1 (x + stepDir (2 * M) j.succ) i.succ)⁻¹) :=
-      (((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst).inv
+      (((measurable_pi_apply i.succ).comp
+        (measurable_pi_apply (x + stepDir (2 * M) j.succ) :
+          Measurable fun U : LinkConfig N (2 * M) => U (x + stepDir (2 * M) j.succ))).comp measurable_fst).inv
     have ml4 : Measurable (fun p : HalfVar N M => (p.1 x j.succ)⁻¹) :=
-      (((measurable_pi_apply _).comp (measurable_pi_apply _)).comp measurable_fst).inv
+      (((measurable_pi_apply j.succ).comp
+        (measurable_pi_apply x : Measurable fun U : LinkConfig N (2 * M) => U x)).comp measurable_fst).inv
     have mprod := ((ml1.mul ml2).mul ml3).mul ml4
     change Measurable (fun p : HalfVar N M =>
       Matrix.trace ((plaquetteHolonomy p.1 x i.succ j.succ : GaugeGroup N) :
         Matrix (Fin N) (Fin N) ℂ))
+    simp only [Matrix.trace, Matrix.diag_apply]
     exact Finset.measurable_sum _ fun k _ => (hEntry k k).comp mprod
   have hF_meas : Measurable F_half := by
     dsimp [F_half, F]
@@ -164,27 +172,32 @@ theorem smeared_magnetic_wilson_rp_nonneg
     intro p q
     have hp : F (glueConfig p q) = F_half p := by
       dsimp [F, F_half]
-      refine Finset.sum_congr rfl fun α hα => ?_
-      congr 1
+      refine Finset.sum_congr rfl fun α hα => congrArg (c α * ·) ?_
       refine Finset.prod_congr rfl fun k _ => ?_
-      rw [spatialPlaqDensity_glue_pos p q (hpos α hα k)]
+      exact congrArg Complex.ofReal (spatialPlaqDensity_glue_pos p q (hpos α hα k))
     have hq : F (linkReflect (glueConfig p q)) = F_half q := by
       dsimp [F, F_half]
-      refine Finset.sum_congr rfl fun α hα => ?_
-      congr 1
+      refine Finset.sum_congr rfl fun α hα => congrArg (c α * ·) ?_
       refine Finset.prod_congr rfl fun k _ => ?_
-      rw [spatialPlaqDensity_reflect_glue_pos p q (hpos α hα k)]
+      exact congrArg Complex.ofReal (spatialPlaqDensity_reflect_glue_pos p q (hpos α hα k))
     rw [hp, hq]
   have h_conj_eq :
       (∫ p, ∫ q, star (F (linkReflect (glueConfig p q))) * F (glueConfig p q) *
         (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ) =
       star (∫ p, ∫ q, star (F_half p) * F_half q *
         (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ) := by
+    change _ = starRingEnd ℂ (∫ p, ∫ q, star (F_half p) * F_half q *
+      (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ)
     rw [← integral_conj]
     refine integral_congr_ae (Filter.Eventually.of_forall fun p => ?_)
+    dsimp only
     rw [← integral_conj]
     refine integral_congr_ae (Filter.Eventually.of_forall fun q => ?_)
-    rw [h_eq p q, star_mul, star_mul, star_star, Complex.conj_ofReal]
+    change star (F (linkReflect (glueConfig p q))) * F (glueConfig p q) *
+        (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) =
+      star (star (F_half p) * F_half q *
+        (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ))
+    rw [h_eq p q, star_mul, star_mul, star_star, Complex.star_def, Complex.conj_ofReal]
     ring
   rw [h_conj_eq]
   change (starRingEnd ℂ _).re ≥ 0

@@ -86,6 +86,7 @@ theorem centeredLatSite_sub_exact (L : ℕ) [NeZero L] (a : ℝ) (x v : Lat4 L)
   ext μ
   change a * (centeredCoord L (x μ - v μ) : ℝ) =
     a * (centeredCoord L (x μ) : ℝ) - a * (centeredCoord L (v μ) : ℝ)
+  dsimp only [centeredCoord]
   rw [Imscribing.YangMills.CenteredLattice4D.centeredCoord_sub_exact (x μ) (v μ)
     (h_small μ).1 (h_small μ).2]
   push_cast; ring
@@ -126,15 +127,16 @@ theorem centered_1d_riemann_le_eight (L : ℕ) [NeZero L] {a : ℝ} (ha0 : 0 < a
     have h_disj2 : Disjoint ({0} ∪ S_pos) S_neg := by
       rw [Finset.disjoint_left]
       intro v hv1 hv2
-      simp only [Finset.mem_union, Finset.mem_singleton, Finset.mem_filter, Finset.mem_univ,
-        true_and] at hv1 hv2
+      simp only [S_pos, S_neg, Finset.mem_union, Finset.mem_singleton, Finset.mem_filter,
+        Finset.mem_univ, true_and] at hv1 hv2
       rcases hv1 with rfl | hpos
-      · exact h0_not_neg (by simp [S_neg, (centeredCoord_eq_zero_iff L 0).mpr rfl])
+      · rw [(centeredCoord_eq_zero_iff L 0).mpr rfl] at hv2
+        exact lt_irrefl 0 hv2
       · omega
     have huniv : (Finset.univ : Finset (ZMod L)) = ({0} ∪ S_pos) ∪ S_neg := by
       ext v
-      simp only [Finset.mem_univ, Finset.mem_union, Finset.mem_singleton, Finset.mem_filter,
-        true_and, true_iff]
+      simp only [S_pos, S_neg, Finset.mem_univ, Finset.mem_union, Finset.mem_singleton,
+        Finset.mem_filter, true_and, true_iff]
       rcases lt_trichotomy (centeredCoord L v) 0 with hlt | heq | hgt
       · exact Or.inr hlt
       · exact Or.inl (Or.inl ((centeredCoord_eq_zero_iff L v).mp heq))
@@ -156,8 +158,7 @@ theorem centered_1d_riemann_le_eight (L : ℕ) [NeZero L] {a : ℝ} (ha0 : 0 < a
       have hpos : 0 < centeredCoord L v := (Finset.mem_filter.mp hv).2
       dsimp [f, g]
       have habs : |(centeredCoord L v : ℝ)| = ((centeredCoord L v).natAbs : ℝ) := by
-        exact_mod_cast (Int.abs_eq_natAbs (centeredCoord L v)).trans
-          (by rw [abs_of_pos hpos]; rfl)
+        rw [← Int.cast_abs, Int.abs_eq_natAbs, Int.cast_natCast]
       rw [habs]
     have hinj : ∀ v₁ ∈ S_pos, ∀ v₂ ∈ S_pos,
         (centeredCoord L v₁).natAbs = (centeredCoord L v₂).natAbs → v₁ = v₂ := by
@@ -170,7 +171,9 @@ theorem centered_1d_riemann_le_eight (L : ℕ) [NeZero L] {a : ℝ} (ha0 : 0 < a
       intro n hn
       obtain ⟨v, hv, rfl⟩ := Finset.mem_image.mp hn
       have hp : 0 < centeredCoord L v := (Finset.mem_filter.mp hv).2
-      have hbd := Imscribing.YangMills.CenteredLattice4D.centeredCoord_abs_le v
+      have hbd : |centeredCoord L v| ≤ (L : ℤ) / 2 :=
+        Imscribing.YangMills.CenteredLattice4D.centeredCoord_abs_le v
+      rw [abs_of_pos hp] at hbd
       rw [Finset.mem_Icc]
       omega
     rw [h_eq, ← Finset.sum_image hinj]
@@ -186,7 +189,7 @@ theorem centered_1d_riemann_le_eight (L : ℕ) [NeZero L] {a : ℝ} (ha0 : 0 < a
       refine Finset.sum_congr rfl fun v hv => ?_
       dsimp [f, g]
       have habs : |(centeredCoord L v : ℝ)| = ((centeredCoord L v).natAbs : ℝ) := by
-        exact_mod_cast Int.abs_eq_natAbs (centeredCoord L v)
+        rw [← Int.cast_abs, Int.abs_eq_natAbs, Int.cast_natCast]
       rw [habs]
     have hinj : ∀ v₁ ∈ S_neg, ∀ v₂ ∈ S_neg,
         (centeredCoord L v₁).natAbs = (centeredCoord L v₂).natAbs → v₁ = v₂ := by
@@ -199,7 +202,9 @@ theorem centered_1d_riemann_le_eight (L : ℕ) [NeZero L] {a : ℝ} (ha0 : 0 < a
       intro n hn
       obtain ⟨v, hv, rfl⟩ := Finset.mem_image.mp hn
       have hneg : centeredCoord L v < 0 := (Finset.mem_filter.mp hv).2
-      have hbd := Imscribing.YangMills.CenteredLattice4D.centeredCoord_abs_le v
+      have hbd : |centeredCoord L v| ≤ (L : ℤ) / 2 :=
+        Imscribing.YangMills.CenteredLattice4D.centeredCoord_abs_le v
+      rw [abs_of_neg hneg] at hbd
       rw [Finset.mem_Icc]
       omega
     rw [h_eq, ← Finset.sum_image hinj]

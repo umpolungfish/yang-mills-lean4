@@ -10,7 +10,7 @@ open Imscribing.YangMills.ContinuumInterfaces
 open Imscribing.YangMills.ConcreteSchwartzShiftAndReflect
 
 /-- Time-reflection map `Θ : (Fin m → Spacetime4) →L[ℝ] (Fin m → Spacetime4)`. -/
-def euclidTimeReflect (m : ℕ) : (Fin m → Spacetime4) →L[ℝ] (Fin m → Spacetime4) :=
+noncomputable def euclidTimeReflect (m : ℕ) : (Fin m → Spacetime4) →L[ℝ] (Fin m → Spacetime4) :=
   timeReflectCLM m
 
 theorem euclidTimeReflect_involutive (m : ℕ) (x : Fin m → Spacetime4) :

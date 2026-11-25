@@ -98,9 +98,9 @@ private lemma suHaar_left_right_mul_eq (N : ℕ) (a b : GaugeGroup N) :
   haveI : IsTopologicalGroup (GaugeGroup N) := gaugeGroupTopologicalGroup N
   haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) :=
     inferInstanceAs (SecondCountableTopology (Fin N → Fin N → ℂ))
-  haveI : SecondCountableTopology (GaugeGroup N) := by
-    change SecondCountableTopology {A : Matrix (Fin N) (Fin N) ℂ // A ∈ Matrix.specialUnitaryGroup (Fin N) ℂ}
-    infer_instance
+  haveI : SecondCountableTopology (GaugeGroup N) :=
+    Topology.IsInducing.secondCountableTopology
+      (⟨rfl⟩ : Topology.IsInducing (Subtype.val : GaugeGroup N → Matrix (Fin N) (Fin N) ℂ))
   haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
   haveI : IsProbabilityMeasure (suHaar N) := suHaar_isProbability N
   have h1 : (fun u : GaugeGroup N => a * u * b) =
@@ -134,9 +134,9 @@ theorem wilsonHaar_gaugeInvariant (N L : ℕ) [NeZero L] (g : GaugeTransform N L
   haveI : IsTopologicalGroup (GaugeGroup N) := gaugeGroupTopologicalGroup N
   haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) :=
     inferInstanceAs (SecondCountableTopology (Fin N → Fin N → ℂ))
-  haveI : SecondCountableTopology (GaugeGroup N) := by
-    change SecondCountableTopology {A : Matrix (Fin N) (Fin N) ℂ // A ∈ Matrix.specialUnitaryGroup (Fin N) ℂ}
-    infer_instance
+  haveI : SecondCountableTopology (GaugeGroup N) :=
+    Topology.IsInducing.secondCountableTopology
+      (⟨rfl⟩ : Topology.IsInducing (Subtype.val : GaugeGroup N → Matrix (Fin N) (Fin N) ℂ))
   haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
   haveI : IsProbabilityMeasure (suHaar N) := suHaar_isProbability N
   haveI : ∀ _ : Lat4 L,

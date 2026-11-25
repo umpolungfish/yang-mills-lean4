@@ -94,10 +94,9 @@ private lemma zmod_1d_riemann_le_four (L : ℕ) [NeZero L] {a : ℝ} (ha0 : 0 < 
     have hnn : 0 ≤ a * (n : ℝ) := by positivity
     nlinarith
   have h_eq : (∑ v : ZMod L, g v.val) = ∑ n ∈ Finset.range L, g n := by
-    let e : ZMod L ≃ Fin L := ZMod.finEquiv L
-    have heq : (∑ v : ZMod L, g v.val) = ∑ k : Fin L, g k.val :=
-      Fintype.sum_equiv e _ _ fun v => by simp [e, ZMod.finEquiv]
-    rw [heq, Fin.sum_univ_eq_sum_range]
+    obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (NeZero.ne L)
+    change (∑ v : Fin (m + 1), g v.val) = ∑ n ∈ Finset.range (m + 1), g n
+    rw [Fin.sum_univ_eq_sum_range]
   rw [h_eq]
   have hL : 0 < L := NeZero.pos L
   have hsplit : Finset.range L = insert 0 (Finset.Icc 1 (L - 1)) := by
@@ -177,7 +176,7 @@ theorem smearedPlaqSchwinger_uniform_schwartz_bound
               fun k _ => Finset.prod_le_prod (fun _ _ => by positivity) fun μ _ =>
                 pow_le_pow_left₀ (by positivity) (h_coord_le k μ) 2
         _ = (1 + ‖x_phys‖) ^ (8 * n) := by
-            simp [Finset.prod_const, ← pow_mul]; ring
+            simp [Finset.prod_const, ← pow_mul]
     have h_f_bound : (1 + ‖x_phys‖) ^ (8 * n) * ‖f x_phys‖ ≤ S_semi := by
       rw [add_comm, add_pow, Finset.sum_mul]
       dsimp [S_semi]
@@ -220,12 +219,13 @@ theorem smearedPlaqSchwinger_uniform_schwartz_bound
         mul_le_mul_of_nonneg_left (Finset.sum_le_sum fun xs _ => h_pt xs) (by positivity)
     _ = (|Z_ren| * 32) ^ n * (S_semi * ∑ xs : Fin n → Lat4 L,
           ∏ k : Fin n, ∏ μ : Fin 4, (a / (1 + a * ((xs k μ).val : ℝ)) ^ 2)) := by
-        rw [Finset.mul_sum]
+        rw [← Finset.mul_sum]
     _ ≤ (|Z_ren| * 32) ^ n * (S_semi * (256 : ℝ) ^ n) :=
         mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left h_nd hS_nn) (by positivity)
     _ = (|Z_ren| * 8192) ^ n * S_semi := by
         have h81 : (8192 : ℝ) = 32 * 256 := by norm_num
-        rw [h81, ← mul_assoc, mul_pow]
+        rw [h81]
+        simp only [mul_pow]
         ring
 
 end Imscribing.YangMills.LatticeRiemannBound4D
