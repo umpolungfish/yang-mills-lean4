@@ -16,6 +16,12 @@ open Imscribing.YangMills.BorchersReconstruction
 
 /-- Reflection-conjugation, tensor product, and positive-time shift data on
     `EuclideanSchwartz` / `PosSchwartzSubmodule`. -/
+private noncomputable instance instDecidableEqPosSchwartz (n : ℕ) :
+    DecidableEq (PosSchwartzSubmodule n) := Classical.decEq _
+private noncomputable instance (priority := high) instSMulZeroClassPosSchwartz (n : ℕ) :
+    SMulZeroClass ℂ (PosSchwartzSubmodule n) :=
+  { smul := (· • ·), smul_zero := smul_zero }
+
 structure ReflectTensorData where
   reflectConj : ∀ m : ℕ, EuclideanSchwartz m → EuclideanSchwartz m
   reflectConj_zero_one : reflectConj 0 vacTest0 = vacTest0
@@ -64,35 +70,35 @@ private lemma termEval_zero_left (C : ContinuumSchwingerOS) (R : ReflectTensorDa
     have h0 : (0 : EuclideanSchwartz 0) = (0 : ℂ) • (0 : EuclideanSchwartz 0) := by simp
     rw [h0, R.tensor_smul_left]
     simp
-  rw [h1, h2, map_zero]
+  simp only [Submodule.coe_zero] at h1; rw [h1, h2, map_zero]
 
 private lemma termEval_add_left (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     (m n : ℕ) (a b : PosSchwartzSubmodule m) (gn : PosSchwartzSubmodule n) :
     termEval C R m n (a + b) gn = termEval C R m n a gn + termEval C R m n b gn := by
   dsimp [termEval]
-  rw [AddSubmonoidClass.coe_add, R.reflectConj_add, R.tensor_add_left, map_add]
+  rw [R.reflectConj_add, R.tensor_add_left, map_add]
 
 private lemma termEval_smul_left (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     (m n : ℕ) (c : ℂ) (fm : PosSchwartzSubmodule m) (gn : PosSchwartzSubmodule n) :
     termEval C R m n (c • fm) gn = star c * termEval C R m n fm gn := by
   dsimp [termEval]
-  rw [SetLike.val_smul, R.reflectConj_smul, R.tensor_smul_left, map_smul, smul_eq_mul]
+  rw [R.reflectConj_smul, R.tensor_smul_left, map_smul, smul_eq_mul]; rfl
 
 private lemma termEval_add_right (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     (m n : ℕ) (fm : PosSchwartzSubmodule m) (a b : PosSchwartzSubmodule n) :
     termEval C R m n fm (a + b) = termEval C R m n fm a + termEval C R m n fm b := by
   dsimp [termEval]
-  rw [AddSubmonoidClass.coe_add, R.tensor_add_right, map_add]
+  rw [R.tensor_add_right, map_add]
 
 private lemma termEval_smul_right (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     (m n : ℕ) (c : ℂ) (fm : PosSchwartzSubmodule m) (gn : PosSchwartzSubmodule n) :
     termEval C R m n fm (c • gn) = c * termEval C R m n fm gn := by
   dsimp [termEval]
-  rw [SetLike.val_smul, R.tensor_smul_right, map_smul, smul_eq_mul]
+  rw [R.tensor_smul_right, map_smul, smul_eq_mul]
 
 /-- Borchers sesquilinear pairing on `BorchersPos` induced by `C : ContinuumSchwingerOS`
     and `R : ReflectTensorData`. -/
-def borchersForm (C : ContinuumSchwingerOS) (R : ReflectTensorData)
+noncomputable def borchersForm (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     (F G : BorchersPos) : ℂ :=
   F.sum fun m fm => G.sum fun n gn => termEval C R m n fm gn
 
@@ -100,7 +106,7 @@ theorem borchersForm_add_left (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     (F₁ F₂ G : BorchersPos) :
     borchersForm C R (F₁ + F₂) G = borchersForm C R F₁ G + borchersForm C R F₂ G := by
   unfold borchersForm
-  rw [DFinsupp.sum_add_index']
+  rw [DFinsupp.sum_add_index]
   · intro m
     simp only [DFinsupp.sum]
     refine Finset.sum_eq_zero fun n _ => ?_
@@ -112,7 +118,7 @@ theorem borchersForm_add_left (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     have h2 : R.tensor m n 0 (G n).1 = 0 := by
       have h0 : (0 : EuclideanSchwartz m) = (0 : ℂ) • (0 : EuclideanSchwartz m) := by simp
       rw [h0, R.tensor_smul_left]; simp
-    rw [h1, h2, map_zero]
+    simp only [Submodule.coe_zero] at h1; rw [h1, h2, map_zero]
   · intro m a b
     simp only [DFinsupp.sum, ← Finset.sum_add_distrib]
     refine Finset.sum_congr rfl fun n _ => termEval_add_left C R m n a b (G n)
@@ -123,25 +129,19 @@ theorem borchersForm_smul_left (C : ContinuumSchwingerOS) (R : ReflectTensorData
   unfold borchersForm
   simp only [DFinsupp.sum]
   rw [Finset.mul_sum]
-  have h_sub : (c • F).support ⊆ F.support := DFinsupp.support_smul
+  have h_sub : (c • F).support ⊆ F.support := fun i hi => by
+    simp only [DFinsupp.mem_support_iff, ne_eq] at hi ⊢
+    exact fun h0 => hi (show (c • F) i = 0 from by change c • F i = 0; rw [h0, smul_zero])
   rw [← Finset.sum_subset h_sub]
   · refine Finset.sum_congr rfl fun m _ => ?_
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun n _ => ?_
-    simp only [DFinsupp.coe_smul, Pi.smul_apply]
     exact termEval_smul_left C R m n c (F m) (G n)
-  · intro m _ hm
-    have hm0 : (c • F) m = 0 := DFinsupp.not_mem_support_iff.mp hm
-    rw [hm0]
-    refine Finset.sum_eq_zero fun n _ => ?_
-    dsimp [termEval]
-    have h1 : R.reflectConj m (0 : PosSchwartzSubmodule m).1 = 0 := by
-      have h0 : (0 : EuclideanSchwartz m) = (0 : ℂ) • (0 : EuclideanSchwartz m) := by simp
-      rw [show (0 : PosSchwartzSubmodule m).1 = 0 from rfl, h0, R.reflectConj_smul]; simp
-    have h2 : R.tensor m n 0 (G n).1 = 0 := by
-      have h0 : (0 : EuclideanSchwartz m) = (0 : ℂ) • (0 : EuclideanSchwartz m) := by simp
-      rw [h0, R.tensor_smul_left]; simp
-    rw [h1, h2, map_zero]
+  · intro m hmF hm
+    have hm0 : (c • F) m = 0 := DFinsupp.notMem_support_iff.mp hm
+    rcases smul_eq_zero.mp (show c • F m = 0 from hm0) with rfl | hFm0
+    · simp
+    · exact absurd hFm0 (DFinsupp.mem_support_iff.mp hmF)
 
 theorem borchersForm_add_right (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     (F G₁ G₂ : BorchersPos) :
@@ -151,13 +151,14 @@ theorem borchersForm_add_right (C : ContinuumSchwingerOS) (R : ReflectTensorData
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun m _ => ?_
   change (G₁ + G₂).sum (fun n gn => termEval C R m n (F m) gn) = _
-  rw [DFinsupp.sum_add_index']
+  rw [DFinsupp.sum_add_index]
+  · rfl
   · intro n
     dsimp [termEval]
     have h2 : R.tensor m n (R.reflectConj m (F m).1) (0 : PosSchwartzSubmodule n).1 = 0 := by
       have h0 : (0 : EuclideanSchwartz n) = (0 : ℂ) • (0 : EuclideanSchwartz n) := by simp
       rw [show (0 : PosSchwartzSubmodule n).1 = 0 from rfl, h0, R.tensor_smul_right]; simp
-    rw [h2, map_zero]
+    simp only [Submodule.coe_zero] at h2; rw [h2, map_zero]
   · intro n a b
     exact termEval_add_right C R m n (F m) a b
 
@@ -169,19 +170,17 @@ theorem borchersForm_smul_right (C : ContinuumSchwingerOS) (R : ReflectTensorDat
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [Finset.mul_sum]
-  have h_sub : (c • G).support ⊆ G.support := DFinsupp.support_smul
+  have h_sub : (c • G).support ⊆ G.support := fun i hi => by
+    simp only [DFinsupp.mem_support_iff, ne_eq] at hi ⊢
+    exact fun h0 => hi (show (c • G) i = 0 from by change c • G i = 0; rw [h0, smul_zero])
   rw [← Finset.sum_subset h_sub]
   · refine Finset.sum_congr rfl fun n _ => ?_
-    simp only [DFinsupp.coe_smul, Pi.smul_apply]
     exact termEval_smul_right C R m n c (F m) (G n)
-  · intro n _ hn
-    have hn0 : (c • G) n = 0 := DFinsupp.not_mem_support_iff.mp hn
-    rw [hn0]
-    dsimp [termEval]
-    have h2 : R.tensor m n (R.reflectConj m (F m).1) (0 : PosSchwartzSubmodule n).1 = 0 := by
-      have h0 : (0 : EuclideanSchwartz n) = (0 : ℂ) • (0 : EuclideanSchwartz n) := by simp
-      rw [show (0 : PosSchwartzSubmodule n).1 = 0 from rfl, h0, R.tensor_smul_right]; simp
-    rw [h2, map_zero]
+  · intro n hnG hn
+    have hn0 : (c • G) n = 0 := DFinsupp.notMem_support_iff.mp hn
+    rcases smul_eq_zero.mp (show c • G n = 0 from hn0) with rfl | hGn0
+    · simp
+    · exact absurd hGn0 (DFinsupp.mem_support_iff.mp hnG)
 
 theorem borchersForm_vac (C : ContinuumSchwingerOS) (R : ReflectTensorData) :
     borchersForm C R borchersVac borchersVac = 1 := by
@@ -190,20 +189,21 @@ theorem borchersForm_vac (C : ContinuumSchwingerOS) (R : ReflectTensorData) :
   · rw [DFinsupp.sum_single_index]
     · dsimp [termEval]
       have h1 : (⟨(1 : EuclideanSchwartz 0), Or.inl rfl⟩ : PosSchwartzSubmodule 0).1 = vacTest0 := rfl
-      rw [h1, R.reflectConj_zero_one, R.tensor_zero_one]
+      simp only [Submodule.coe_mk] at h1; rw [h1, R.reflectConj_zero_one, R.tensor_zero_one]
       exact C.S_zero
     · dsimp [termEval]
       have h2 : R.tensor 0 0 (R.reflectConj 0 (⟨(1 : EuclideanSchwartz 0), Or.inl rfl⟩ :
           PosSchwartzSubmodule 0).1) (0 : PosSchwartzSubmodule 0).1 = 0 := by
         have h0 : (0 : EuclideanSchwartz 0) = (0 : ℂ) • (0 : EuclideanSchwartz 0) := by simp
         rw [show (0 : PosSchwartzSubmodule 0).1 = 0 from rfl, h0, R.tensor_smul_right]; simp
+      simp only [Submodule.coe_zero, Submodule.coe_mk] at h2
       rw [h2, map_zero]
   · simp only [DFinsupp.sum]
     refine Finset.sum_eq_zero fun n _ => ?_
     exact termEval_zero_left C R n _
 
 /-- Positive Euclidean time-shift operator on `BorchersPos`. -/
-def borchersShift (R : ReflectTensorData) (t : ℝ) : BorchersPos →ₗ[ℂ] BorchersPos :=
+noncomputable def borchersShift (R : ReflectTensorData) (t : ℝ) : BorchersPos →ₗ[ℂ] BorchersPos :=
   DFinsupp.mapRange.linearMap (R.shiftPos t)
 
 theorem borchersShift_vac (R : ReflectTensorData) (t : ℝ) (ht : 0 ≤ t) :
@@ -216,7 +216,8 @@ theorem borchersShift_vac (R : ReflectTensorData) (t : ℝ) (ht : 0 ≤ t) :
     have hvac := R.shiftPos_vac t ht
     have h1 : (⟨(1 : EuclideanSchwartz 0), Or.inl rfl⟩ : PosSchwartzSubmodule 0) =
         ⟨vacTest0, Or.inl rfl⟩ := rfl
-    rw [h1, hvac]
+    simp only [DFinsupp.mapRange_apply, DFinsupp.single_eq_same]
+    rw [h1, hvac]; exact congrFun (congrArg DFunLike.coe (congrArg Subtype.val h1.symm)) x
   · simp [DFinsupp.mapRange.linearMap_apply, DFinsupp.single_eq_of_ne hn]
 
 theorem borchersShift_add (R : ReflectTensorData) (s t : ℝ) (hs : 0 ≤ s) (ht : 0 ≤ t)
@@ -225,6 +226,7 @@ theorem borchersShift_add (R : ReflectTensorData) (s t : ℝ) (hs : 0 ≤ s) (ht
   unfold borchersShift
   ext n x
   simp only [DFinsupp.mapRange.linearMap_apply]
+  simp only [DFinsupp.mapRange_apply]
   rw [R.shiftPos_add s t hs ht n (F n)]
 
 /-- Polynomial bound on `(borchersForm C R (borchersShift R t F) (borchersShift R t F)).re`
@@ -256,12 +258,12 @@ theorem borchers_E0_poly_bound (C : ContinuumSchwingerOS) (R : ReflectTensorData
   have h_re_le : (borchersForm C R (borchersShift R t F) (borchersShift R t F)).re ≤
       ‖borchersForm C R (borchersShift R t F) (borchersShift R t F)‖ :=
     Complex.re_le_norm _
-  have h_supp : (borchersShift R t F).support ⊆ F.support := DFinsupp.support_mapRange
+  have h_supp : (borchersShift R t F).support ⊆ F.support := DFinsupp.support_mapRange (hf := fun i => map_zero (R.shiftPos t i))
   have h_norm_le : ‖borchersForm C R (borchersShift R t F) (borchersShift R t F)‖ ≤
       M_bd * (1 + t) ^ (2 * (k : ℝ)) := by
     unfold borchersForm
     simp only [DFinsupp.sum]
-    rw [← Finset.sum_subset h_supp]
+    rw [Finset.sum_subset h_supp]
     · have h_inner_sub : ∀ m ∈ F.support,
           (∑ n ∈ (borchersShift R t F).support,
             termEval C R m n ((borchersShift R t F) m) ((borchersShift R t F) n)) =
@@ -269,14 +271,14 @@ theorem borchers_E0_poly_bound (C : ContinuumSchwingerOS) (R : ReflectTensorData
             termEval C R m n ((borchersShift R t F) m) ((borchersShift R t F) n) := by
         intro m _
         refine Finset.sum_subset h_supp fun n _ hn => ?_
-        have hn0 : (borchersShift R t F) n = 0 := DFinsupp.not_mem_support_iff.mp hn
+        have hn0 : (borchersShift R t F) n = 0 := DFinsupp.notMem_support_iff.mp hn
         rw [hn0]
         dsimp [termEval]
         have h2 : R.tensor m n (R.reflectConj m ((borchersShift R t F) m).1)
             (0 : PosSchwartzSubmodule n).1 = 0 := by
           have h0 : (0 : EuclideanSchwartz n) = (0 : ℂ) • (0 : EuclideanSchwartz n) := by simp
           rw [show (0 : PosSchwartzSubmodule n).1 = 0 from rfl, h0, R.tensor_smul_right]; simp
-        rw [h2, map_zero]
+        simp only [Submodule.coe_zero] at h2; rw [h2, map_zero]
       have h_sum_eq :
           (∑ m ∈ F.support, ∑ n ∈ (borchersShift R t F).support,
             termEval C R m n ((borchersShift R t F) m) ((borchersShift R t F) n)) =
@@ -291,7 +293,7 @@ theorem borchers_E0_poly_bound (C : ContinuumSchwingerOS) (R : ReflectTensorData
       rw [Finset.sum_mul]
       refine Finset.sum_le_sum fun n _ => ?_
       dsimp [termEval, borchersShift]
-      simp only [DFinsupp.mapRange.linearMap_apply]
+      try simp only [DFinsupp.mapRange.linearMap_apply, DFinsupp.mapRange_apply]
       have h1 := h_E0 (m + n) (R.tensor m n (R.reflectConj m (R.shiftPos t m (F m)).1)
         (R.shiftPos t n (F n)).1)
       have h2 := hC_t_bd m n (R.reflectConj m (R.shiftPos t m (F m)).1) (R.shiftPos t n (F n)).1
@@ -344,23 +346,23 @@ theorem borchers_E0_poly_bound (C : ContinuumSchwingerOS) (R : ReflectTensorData
             refine mul_le_mul_of_nonneg_left ?_ h_fac_nn
             refine mul_le_mul ?_ h_sum_g
               (Finset.sum_nonneg fun _ _ => apply_nonneg _ _)
-              (mul_nonneg (hC_t_nn m n) (by positivity))
+              (mul_nonneg (hC_t_nn m n) (by (first | positivity | (repeat' (first | exact zero_le_one | exact zero_lt_one | exact apply_nonneg _ _ | exact hC_t_nn _ _ | exact hC_s_nn _ | exact hM_nn | exact hC_E0.le | exact hC₀_pos.le | exact hα | exact ht | exact Nat.cast_nonneg _ | (apply Finset.sum_nonneg; intro _ _) | apply mul_nonneg | apply add_nonneg | apply pow_nonneg | apply Real.rpow_nonneg | positivity)))))
             exact mul_le_mul_of_nonneg_left h_sum_refl (hC_t_nn m n)
         _ = (C_E0 ^ (m + n) * ((Nat.factorial (m + n) : ℝ) ^ α) * C_t m n *
               (((k + 1 : ℕ) : ℝ) * C_s m) * (((k + 1 : ℕ) : ℝ) * C_s n)) *
               (1 + t) ^ (2 * (k : ℝ)) := by
             rw [← h_pow_r]; ring
     · intro m _ hm
-      have hm0 : (borchersShift R t F) m = 0 := DFinsupp.not_mem_support_iff.mp hm
+      have hm0 : (borchersShift R t F) m = 0 := DFinsupp.notMem_support_iff.mp hm
       rw [hm0]
       refine Finset.sum_eq_zero fun n _ => ?_
-      exact termEval_zero_left C R n _
+      simpa using termEval_smul_left C R m n 0 0 ((borchersShift R t) F n)
   have h_final : M_bd * (1 + t) ^ (2 * (k : ℝ)) ≤ C₀ ^ 2 * (1 + t) ^ (2 * (k : ℝ)) :=
     mul_le_mul_of_nonneg_right hM_le_sq (Real.rpow_nonneg (by linarith) _)
   exact le_trans h_re_le (le_trans h_norm_le h_final)
 
 /-- Package `(C, R)` and the RP/symmetry/clustering axioms into `OSBorchers.EuclideanPreData BorchersPos`. -/
-def buildBorchersPreData (C : ContinuumSchwingerOS) (R : ReflectTensorData)
+noncomputable def buildBorchersPreData (C : ContinuumSchwingerOS) (R : ReflectTensorData)
     (h_herm : ∀ F G : BorchersPos, borchersForm C R G F = star (borchersForm C R F G))
     (h_rp : ∀ F : BorchersPos, 0 ≤ (borchersForm C R F F).re)
     (h_symm : ∀ t : ℝ, 0 ≤ t → ∀ F G : BorchersPos,

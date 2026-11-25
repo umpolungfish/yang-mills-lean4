@@ -15,6 +15,9 @@ Wires together:
 
 namespace Imscribing.YangMills.SchwingerClayMaster
 
+set_option synthInstance.maxHeartbeats 200000
+set_option maxHeartbeats 800000
+
 open scoped InnerProductSpace
 open Imscribing.YangMills.ClaySpec
 open Imscribing.YangMills.ContinuumInterfaces
@@ -51,12 +54,12 @@ structure ContinuumWightmanBridgeData (N : ℕ) where
     let pre := buildBorchersPreData C R h_herm h_rp h_symm h_cluster
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
     let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ nullSubmodule pre) : H)
     ∃ (U : Poincare4 → H →ₗᵢ[ℂ] H)
       (fieldDomain : Submodule ℂ H)
-      (field : TestFn4 → fieldDomain →ₗ[ℂ] H),
+      (field : TestFn4 → ↥fieldDomain →ₗ[ℂ] H),
       (∀ g : Poincare4, U g Ω = Ω) ∧
       U (poincareTimeTrans 0) = LinearIsometry.id ∧
       (∀ s t : ℝ,
@@ -64,11 +67,11 @@ structure ContinuumWightmanBridgeData (N : ℕ) where
           fun ψ => U (poincareTimeTrans s) (U (poincareTimeTrans t) ψ)) ∧
       Dense (fieldDomain : Set H) ∧
       Ω ∈ fieldDomain ∧
-      (∀ f (ψ : fieldDomain), field f ψ ∈ fieldDomain) ∧
-      (∀ f g : TestFn4, SpacelikeDisjoint f g →
-        ∀ (ψ₁ ψ₂ : fieldDomain),
-          ⟪(ψ₁ : H), field f ⟨field g ψ₂, ‹∀ f ψ, _› g ψ₂⟩⟫_ℂ =
-          ⟪(ψ₁ : H), field g ⟨field f ψ₂, ‹∀ f ψ, _› f ψ₂⟩⟫_ℂ) ∧
+      ∃ (h_maps : ∀ f (ψ : ↥fieldDomain), field f ψ ∈ fieldDomain),
+        (∀ f g : TestFn4, SpacelikeDisjoint f g →
+          ∀ (ψ₁ ψ₂ : ↥fieldDomain),
+            ⟪(ψ₁ : H), field f ⟨field g ψ₂, h_maps g ψ₂⟩⟫_ℂ =
+            ⟪(ψ₁ : H), field g ⟨field f ψ₂, h_maps f ψ₂⟩⟫_ℂ) ∧
       (∃ (f₀ g₀ : TestFn4)
          (W_reg W_deriv : ℝ → TestFn4 →ₗ[ℂ] ℂ)
          (p : TestFn4 → ℝ) (C₁ C₂ : ℝ),
@@ -92,7 +95,7 @@ theorem clay_yang_mills_from_continuum_schwinger {N : ℕ}
   let pre := buildBorchersPreData D.C D.R D.h_herm D.h_rp D.h_symm D.h_cluster
   let core := quotInnerCore pre
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
   obtain ⟨U, fieldDomain, field, hU_vac, hU_zero, hU_add, h_dense, hΩ_dom,
     h_maps, h_weak_loc, f₀, g₀, W_reg, W_deriv, p, C₁, C₂,
     hp_nn, hC₁, hC₂, h_at1, h_deriv, h_dbound, h_disj, h_2pt⟩ := D.poincare_and_weak_fields

@@ -36,49 +36,80 @@ theorem canonicalGaugeEntryMeasurable (N : ℕ) (i j : Fin N) :
   exact hcont.measurable
 
 /-- `wilsonAction N L β` is measurable with respect to the product Borel σ-algebra on `LinkConfig N L`. -/
-theorem canonicalWilsonActionMeasurable (N L : ℕ) [NeZero N] (β : ℝ) :
+theorem canonicalWilsonActionMeasurable (N L : ℕ) [NeZero N] [NeZero L] (β : ℝ) :
     letI := borel (GaugeGroup N)
     Measurable (fun U : LinkConfig N L => wilsonAction N L β U) := by
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) := by unfold Matrix; infer_instance
+  haveI : SecondCountableTopology (GaugeGroup N) := by
+    have h_ind : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ)) := ⟨rfl⟩
+    exact h_ind.secondCountableTopology
+  haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
+  haveI : ContinuousInv (GaugeGroup N) := by
+    refine ⟨?_⟩
+    have h_ind : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ)) := ⟨rfl⟩
+    rw [h_ind.continuous_iff]
+    change Continuous (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ))
+    have h_eq : (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)) =
+        (fun A : GaugeGroup N => star (A : Matrix (Fin N) (Fin N) ℂ)) := by
+      funext A
+      first | rfl | rw [← Matrix.star_eq_inv, Matrix.specialUnitaryGroup.coe_star]
+    rw [h_eq]
+    exact continuous_pi fun i => continuous_pi fun j =>
+      continuous_star.comp ((continuous_apply i).comp ((continuous_apply j).comp continuous_subtype_val))
+  haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
   unfold wilsonAction
   refine measurable_const.mul (Finset.measurable_sum _ fun x _ =>
     Finset.measurable_sum _ fun μ _ => Finset.measurable_sum _ fun ν _ => ?_)
   refine measurable_const.sub ((Complex.continuous_re.measurable.comp ?_).div_const _)
   unfold plaquetteHolonomy
-  have ml1 : Measurable (fun U : LinkConfig N L => U x μ) :=
-    (measurable_pi_apply μ).comp (measurable_pi_apply x)
-  have ml2 : Measurable (fun U : LinkConfig N L => U (x + stepDir L μ) ν) :=
-    (measurable_pi_apply ν).comp (measurable_pi_apply _)
-  have ml3 : Measurable (fun U : LinkConfig N L => (U (x + stepDir L ν) μ)⁻¹) :=
-    ((measurable_pi_apply μ).comp (measurable_pi_apply _)).inv
-  have ml4 : Measurable (fun U : LinkConfig N L => (U x ν)⁻¹) :=
-    ((measurable_pi_apply ν).comp (measurable_pi_apply x)).inv
+  have h_link : ∀ (y : Lat4 L) (ν : Fin 4), Measurable (fun U : LinkConfig N L => U y ν) :=
+    fun y ν => (measurable_pi_apply ν).comp (measurable_pi_apply y : Measurable fun U : LinkConfig N L => U y)
+  have ml1 := h_link x μ
+  have ml2 := h_link (x + stepDir L μ) ν
+  have ml3 := (h_link (x + stepDir L ν) μ).inv
+  have ml4 := (h_link x ν).inv
   have mprod := ((ml1.mul ml2).mul ml3).mul ml4
   change Measurable (fun U : LinkConfig N L =>
     Matrix.trace ((plaquetteHolonomy U x μ ν : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ))
   exact Finset.measurable_sum _ fun k _ => (canonicalGaugeEntryMeasurable N k k).comp mprod
 
 /-- Product of `localPlaqDensity` over `Fin n` is measurable on `LinkConfig N L`. -/
-theorem canonicalLocalPlaqProdMeasurable (N L n : ℕ) [NeZero N] (xs : Fin n → Lat4 L) :
+theorem canonicalLocalPlaqProdMeasurable (N L n : ℕ) [NeZero N] [NeZero L] (xs : Fin n → Lat4 L) :
     letI := borel (GaugeGroup N)
     Measurable (fun U : LinkConfig N L => (∏ k : Fin n, localPlaqDensity N L U (xs k) : ℂ)) := by
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
-  apply Complex.continuous_ofReal.measurable.comp
-  refine Finset.measurable_prod _ fun k _ => ?_
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) := by unfold Matrix; infer_instance
+  haveI : SecondCountableTopology (GaugeGroup N) := by
+    have h_ind : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ)) := ⟨rfl⟩
+    exact h_ind.secondCountableTopology
+  haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
+  haveI : ContinuousInv (GaugeGroup N) := by
+    refine ⟨?_⟩
+    have h_ind : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ)) := ⟨rfl⟩
+    rw [h_ind.continuous_iff]
+    change Continuous (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ))
+    have h_eq : (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)) =
+        (fun A : GaugeGroup N => star (A : Matrix (Fin N) (Fin N) ℂ)) := by
+      funext A
+      first | rfl | rw [← Matrix.star_eq_inv, Matrix.specialUnitaryGroup.coe_star]
+    rw [h_eq]
+    exact continuous_pi fun i => continuous_pi fun j =>
+      continuous_star.comp ((continuous_apply i).comp ((continuous_apply j).comp continuous_subtype_val))
+  haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
+  refine Finset.measurable_prod _ fun k _ => Complex.continuous_ofReal.measurable.comp ?_
   unfold localPlaqDensity
   refine Finset.measurable_sum _ fun μ _ => Finset.measurable_sum _ fun ν _ => ?_
   refine measurable_const.sub ((Complex.continuous_re.measurable.comp ?_).div_const _)
   unfold plaquetteHolonomy
-  have ml1 : Measurable (fun U : LinkConfig N L => U (xs k) μ) :=
-    (measurable_pi_apply μ).comp (measurable_pi_apply (xs k))
-  have ml2 : Measurable (fun U : LinkConfig N L => U (xs k + stepDir L μ) ν) :=
-    (measurable_pi_apply ν).comp (measurable_pi_apply _)
-  have ml3 : Measurable (fun U : LinkConfig N L => (U (xs k + stepDir L ν) μ)⁻¹) :=
-    ((measurable_pi_apply μ).comp (measurable_pi_apply _)).inv
-  have ml4 : Measurable (fun U : LinkConfig N L => (U (xs k) ν)⁻¹) :=
-    ((measurable_pi_apply ν).comp (measurable_pi_apply (xs k))).inv
+  have h_link : ∀ (y : Lat4 L) (ν : Fin 4), Measurable (fun U : LinkConfig N L => U y ν) :=
+    fun y ν => (measurable_pi_apply ν).comp (measurable_pi_apply y : Measurable fun U : LinkConfig N L => U y)
+  have ml1 := h_link (xs k) μ
+  have ml2 := h_link (xs k + stepDir L μ) ν
+  have ml3 := (h_link (xs k + stepDir L ν) μ).inv
+  have ml4 := (h_link (xs k) ν).inv
   have mprod := ((ml1.mul ml2).mul ml3).mul ml4
   change Measurable (fun U : LinkConfig N L =>
     Matrix.trace ((plaquetteHolonomy U (xs k) μ ν : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ))
@@ -125,6 +156,24 @@ theorem canonicalWilsonExpectation_loop_gaugeInvariant
         (fun U => (realTrace (pathHolonomy U γ) : ℂ)) := by
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) := by unfold Matrix; infer_instance
+  haveI : SecondCountableTopology (GaugeGroup N) := by
+    have h_ind : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ)) := ⟨rfl⟩
+    exact h_ind.secondCountableTopology
+  haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
+  haveI : ContinuousInv (GaugeGroup N) := by
+    refine ⟨?_⟩
+    have h_ind : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ)) := ⟨rfl⟩
+    rw [h_ind.continuous_iff]
+    change Continuous (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ))
+    have h_eq : (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)) =
+        (fun A : GaugeGroup N => star (A : Matrix (Fin N) (Fin N) ℂ)) := by
+      funext A
+      first | rfl | rw [← Matrix.star_eq_inv, Matrix.specialUnitaryGroup.coe_star]
+    rw [h_eq]
+    exact continuous_pi fun i => continuous_pi fun j =>
+      continuous_star.comp ((continuous_apply i).comp ((continuous_apply j).comp continuous_subtype_val))
+  haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
   haveI := wilsonHaarLinkMeasure_isProbability N L
   have h_loop_meas : Measurable (fun U : LinkConfig N L =>
       (realTrace (pathHolonomy U γ) : ℂ) * (Real.exp (-wilsonAction N L β U) : ℂ)) := by
@@ -165,8 +214,9 @@ theorem canonicalWilsonExpectation_loop_gaugeInvariant
     simpa using mul_le_mul h1 h2 (Real.exp_pos _).le (Nat.cast_nonneg N)
   have hg_meas : Measurable (applyGauge g) := by
     refine measurable_pi_lambda _ fun x => measurable_pi_lambda _ fun μ => ?_
-    exact (measurable_const.mul ((measurable_pi_apply μ).comp (measurable_pi_apply x))).mul
-      measurable_const
+    have hU : Measurable (fun U : LinkConfig N L => U x μ) :=
+      (measurable_pi_apply μ).comp (measurable_pi_apply x : Measurable fun U : LinkConfig N L => U x)
+    exact (measurable_const.mul hU).mul measurable_const
   exact wilsonExpectation_gaugeInvariant hk β (wilsonHaarLinkMeasure N L) g
     (wilsonHaar_gaugeInvariant N L g) hg_meas γ hcontig hclosed h_int
 
@@ -185,7 +235,7 @@ theorem canonicalWilsonSchwinger_uniform_schwartz_bound (N L n : ℕ) [NeZero N]
     (canonicalLocalPlaqProdMeasurable N L n) f
 
 /-- **Unconditional Continuum Subsequential Extraction on Canonical 4D SU(N) Haar Measures:**
-    Extracts a continuum Schwartz distribution `S_∞` with uniform E0 continuity bound
+    Extracts a continuum Schwartz distribution `S_lim` with uniform E0 continuity bound
     and exact E3 permutation symmetry directly from `wilsonHaarLinkMeasure N (L m)`. -/
 theorem canonicalWilsonSchwinger_subsequential_limit
     (N n : ℕ) [NeZero N]
@@ -201,29 +251,29 @@ theorem canonicalWilsonSchwinger_subsequential_limit
     let p : EuclideanSchwartz n → ℝ := fun f =>
       (Z_max * 8192) ^ n * ∑ j ∈ Finset.range (8 * n + 1),
         ((8 * n).choose j : ℝ) * SchwartzMap.seminorm ℂ j 0 f
-    ∃ (φ : ℕ → ℕ) (S_∞ : EuclideanSchwartz n →ₗ[ℂ] ℂ),
+    ∃ (φ : ℕ → ℕ) (S_lim : EuclideanSchwartz n →ₗ[ℂ] ℂ),
       StrictMono φ ∧
       (∀ f : EuclideanSchwartz n,
         Filter.Tendsto (fun m =>
           canonicalSmearedPlaqSchwinger N (L (φ m)) n (a (φ m)) (β (φ m)) (Z_ren (φ m)) f)
-          Filter.atTop (𝓝 (S_∞ f))) ∧
-      (∀ f : EuclideanSchwartz n, ‖S_∞ f‖ ≤ p f) ∧
+          Filter.atTop (𝓝 (S_lim f))) ∧
+      (∀ f : EuclideanSchwartz n, ‖S_lim f‖ ≤ p f) ∧
       (∀ (π : Equiv.Perm (Fin n)) (f f_π : EuclideanSchwartz n),
-        (∀ y : Fin n → Spacetime4, f_π y = f (fun k => y (π k))) →
-        S_∞ f_π = S_∞ f) := by
+        (∀ y : Fin n → ContinuumInterfaces.Spacetime4, f_π y = f (fun k => y (π k))) →
+        S_lim f_π = S_lim f) := by
   letI := borel (GaugeGroup N)
   intro p
-  obtain ⟨φ, S_∞, hφ, h_lim, h_bd⟩ := wilson_lattice_subsequential_schwinger_limit N n L a β
+  obtain ⟨φ, S_lim, hφ, h_lim, h_bd⟩ := wilson_lattice_subsequential_schwinger_limit N n L a β
     Z_ren Z_max hZ_max ha hβ hZ (fun _ => inferInstance)
     (fun m => wilsonHaarLinkMeasure N (L m))
     (fun m => wilsonHaarLinkMeasure_isProbability N (L m))
     (fun m => canonicalWilsonActionMeasurable N (L m) (β m))
     (fun m xs => canonicalLocalPlaqProdMeasurable N (L m) n xs)
     D h_dense
-  refine ⟨φ, S_∞, hφ, h_lim, h_bd, fun π f f_π hf => ?_⟩
+  refine ⟨φ, S_lim, hφ, h_lim, h_bd, fun π f f_π hf => ?_⟩
   exact continuum_schwinger_perm_symm N n (fun m => L (φ m)) (fun m => a (φ m))
     (fun m => β (φ m)) (fun m => Z_ren (φ m))
-    (fun _ => inferInstance) (fun m => wilsonHaarLinkMeasure N (L m))
-    S_∞ h_lim π f f_π hf
+    (fun _ => inferInstance) (fun m => wilsonHaarLinkMeasure N (L (φ m)))
+    S_lim h_lim π f f_π hf
 
 end Imscribing.YangMills.CanonicalWilsonBridge

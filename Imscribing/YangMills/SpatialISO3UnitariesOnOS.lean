@@ -14,6 +14,9 @@ directly on `H = UniformSpace.Completion (BorchersPos ⧸ N₀)` (`0 sorry`):
 
 namespace Imscribing.YangMills.SpatialISO3Unitaries
 
+set_option synthInstance.maxHeartbeats 200000
+set_option maxHeartbeats 800000
+
 open scoped InnerProductSpace
 open Imscribing.YangMills.ClaySpec
 open Imscribing.YangMills.ContinuumInterfaces
@@ -22,11 +25,11 @@ open Imscribing.YangMills.OSBorchers
 open Imscribing.YangMills.BorchersReconstruction
 
 /-- Purely spatial translation vector `(0, v₀, v₁, v₂)` across all `n` coordinates. -/
-def spaceShiftVec (n : ℕ) (v : Fin 3 → ℝ) : Fin n → Spacetime4 :=
+def spaceShiftVec (n : ℕ) (v : Fin 3 → ℝ) : Fin n → ContinuumInterfaces.Spacetime4 :=
   fun _ => (WithLp.equiv 2 (Fin 4 → ℝ)).symm ![0, v 0, v 1, v 2]
 
 theorem spaceShiftVec_zero (n : ℕ) : spaceShiftVec n 0 = 0 := by
-  ext k μ; fin_cases μ <;> simp [spaceShiftVec]
+  refine PiLp.ext fun μ => ?_; fin_cases μ <;> simp [spaceShiftVec]
 
 theorem spaceShiftVec_add (n : ℕ) (u v : Fin 3 → ℝ) :
     spaceShiftVec n (u + v) = spaceShiftVec n u + spaceShiftVec n v := by
@@ -48,17 +51,14 @@ private lemma iteratedFDeriv_comp_sub_space {E F : Type*}
           fderiv ℝ (iteratedFDeriv ℝ m f) (x - v) := by
         have h_hd := ((h_all_diff m (x - v)).hasFDerivAt).comp x ((hasFDerivAt_id x).sub_const v)
         simpa using h_hd.fderiv
-      simp only [ContinuousMultilinearMap.comp_apply, continuousMultilinearCurryLeftEquiv_symm_apply,
-        h_eq, h_fd]
-
-/-- Concrete 3D spatial translation `f ↦ (x ↦ f (x - (0, v)))` on `EuclideanSchwartz n`. -/
+      dsimp [Function.comp]; rw [h_fd]
 noncomputable def shiftSpaceSchwartz (n : ℕ) (v : Fin 3 → ℝ) (f : EuclideanSchwartz n) :
     EuclideanSchwartz n where
   toFun x := f (x - spaceShiftVec n v)
   smooth' := (f.smooth').comp (contDiff_id.sub contDiff_const)
   decay' k m := by
     have h_all_diff : ∀ j : ℕ, Differentiable ℝ (iteratedFDeriv ℝ j f) := fun j =>
-      (f.smooth'.iteratedFDeriv_right (m := j) le_top).differentiable (by simp)
+      (f.smooth'.iteratedFDeriv_right (m := j) le_top).differentiable one_ne_zero (by simp)
     obtain ⟨C₀, hC₀⟩ := f.decay' 0 m
     obtain ⟨Ck, hCk⟩ := f.decay' k m
     have hC₀_nn : 0 ≤ C₀ := le_trans (by positivity) (hC₀ 0)
@@ -98,7 +98,7 @@ noncomputable def shiftSpaceSchwartz (n : ℕ) (v : Fin 3 → ℝ) (f : Euclidea
 
 @[simp]
 theorem shiftSpaceSchwartz_apply (n : ℕ) (v : Fin 3 → ℝ) (f : EuclideanSchwartz n)
-    (x : Fin n → Spacetime4) :
+    (x : Fin n → ContinuumInterfaces.Spacetime4) :
     shiftSpaceSchwartz n v f x = f (x - spaceShiftVec n v) := rfl
 
 theorem shiftSpaceSchwartz_mem_pos {n : ℕ} (v : Fin 3 → ℝ)
@@ -109,7 +109,7 @@ theorem shiftSpaceSchwartz_mem_pos {n : ℕ} (v : Fin 3 → ℝ)
   · right
     intro x hx i
     have h1 := hpos (x - spaceShiftVec n v) hx i
-    simp only [Pi.sub_apply, spaceShiftVec, PiLp.sub_apply, WithLp.equiv_symm_pi_apply,
+    simp only [Pi.sub_apply, spaceShiftVec, PiLp.sub_apply, WithLp.equiv_symm_apply,
       Matrix.cons_val_zero, sub_zero] at h1
     exact h1
 
@@ -162,7 +162,7 @@ noncomputable def spatialTranslationUnitaryGroup
     (h_vac : ∀ v : Fin 3 → ℝ, borchersSpaceShift v pre.e₀ = pre.e₀) :
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
     let Ω : H := ((Submodule.Quotient.mk pre.e₀ : BorchersPos ⧸ nullSubmodule pre) : H)
     { U_space : (Fin 3 → ℝ) → H →ₗᵢ[ℂ] H //
@@ -174,7 +174,7 @@ noncomputable def spatialTranslationUnitaryGroup
           ((Submodule.Quotient.mk (borchersSpaceShift v F) : BorchersPos ⧸ nullSubmodule pre) : H)) } := by
   intro core
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
   set H₀ := BorchersPos ⧸ nullSubmodule pre
   set H := UniformSpace.Completion H₀
   have h_null : ∀ (v : Fin 3 → ℝ) {F : BorchersPos},
@@ -268,13 +268,13 @@ theorem spatialTranslation_commutes_with_os_semigroup
         UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre))) :
     let core := quotInnerCore pre
     letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let U_space := (spatialTranslationUnitaryGroup pre h_inv h_vac).1
     ∀ (v : Fin 3 → ℝ) (t : ℝ), 0 ≤ t → ∀ x,
       U_space v (T t x) = T t (U_space v x) := by
   intro core
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
   set U_space := (spatialTranslationUnitaryGroup pre h_inv h_vac).1
   have hU_mk := (spatialTranslationUnitaryGroup pre h_inv h_vac).2.2.2.2
   intro v t ht x

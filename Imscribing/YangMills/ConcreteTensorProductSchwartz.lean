@@ -44,6 +44,7 @@ private lemma projRight_opNorm_le (m n : ℕ) : ‖projRight m n‖ ≤ 1 :=
 private lemma norm_le_projLeft_add_projRight (m n : ℕ) (x : Fin (m + n) → Spacetime4) :
     ‖x‖ ≤ ‖projLeft m n x‖ + ‖projRight m n x‖ := by
   rw [Pi.norm_def]
+  change ((Finset.univ.sup fun b => ‖x b‖₊ : NNReal) : ℝ) ≤ ((‖projLeft m n x‖₊ + ‖projRight m n x‖₊ : NNReal) : ℝ)
   refine NNReal.coe_le_coe.mpr (Finset.sup_le fun k _ => ?_)
   by_cases hk : k.val < m
   · have h_eq : k = Fin.castAdd n ⟨k.val, hk⟩ := Fin.ext rfl
@@ -85,7 +86,7 @@ private lemma iteratedFDeriv_comp_clm' {E F G : Type*}
     let Φ : ContinuousMultilinearMap ℝ (fun _ : Fin l => F) G →L[ℝ]
         ContinuousMultilinearMap ℝ (fun _ : Fin l => E) G :=
       LinearMap.mkContinuous Φ_lin (‖L‖ ^ l) fun M => by
-        simpa [Φ_lin] using M.norm_compContinuousLinearMap_le (fun _ => L)
+        simpa [Φ_lin, mul_comm] using M.norm_compContinuousLinearMap_le (fun _ => L)
     have h_comp : HasFDerivAt (fun y => Φ (iteratedFDeriv ℝ l f (L y)))
         (Φ.comp ((fderiv ℝ (iteratedFDeriv ℝ l f) (L x)).comp L)) x :=
       Φ.hasFDerivAt.comp x ((h_diff (L x)).hasFDerivAt.comp x L.hasFDerivAt)
@@ -114,7 +115,7 @@ def tensorSchwartz {m n : ℕ} (f : EuclideanSchwartz m) (g : EuclideanSchwartz 
           ∑ i ∈ Finset.range (l + 1), (l.choose i : ℝ) *
             ‖iteratedFDeriv ℝ i (fun y => f (projLeft m n y)) x‖ *
             ‖iteratedFDeriv ℝ (l - i) (fun y => g (projRight m n y)) x‖ :=
-      norm_iteratedFDeriv_mul_le hf_smooth hg_smooth x
+      norm_iteratedFDeriv_mul_le hf_smooth hg_smooth x le_rfl
     have h_f_norm : ∀ i, ‖iteratedFDeriv ℝ i (fun y => f (projLeft m n y)) x‖ ≤
         ‖iteratedFDeriv ℝ i f (projLeft m n x)‖ := by
       intro i
@@ -212,7 +213,7 @@ private lemma timeShiftVec_norm_le (n : ℕ) {t : ℝ} (ht : 0 ≤ t) :
     have h0 : timeShiftVec 0 t = 0 := by ext k; exact k.elim0
     rw [h0, norm_zero]
     exact ht
-  · rw [Pi.norm_def]
+  · rw [Pi.norm_def, show t = ((⟨t, ht⟩ : NNReal) : ℝ) from rfl]
     refine NNReal.coe_le_coe.mpr (Finset.sup_le fun k _ => ?_)
     have hk : ‖timeShiftVec n t k‖ = t := by
       dsimp [timeShiftVec]
@@ -239,14 +240,14 @@ private def concreteShiftPos (t : ℝ) (n : ℕ) :
   if ht : 0 ≤ t then
     { toFun := fun f => ⟨ConcreteSchwartzShiftAndReflect.shiftPos (timeShiftVec n t) f.1,
         timeShift_mem_pos ht f⟩
-      map_add' := fun f g => by ext x; simp [ConcreteSchwartzShiftAndReflect.shiftPos]
-      map_smul' := fun c f => by ext x; simp [ConcreteSchwartzShiftAndReflect.shiftPos] }
+      map_add' := fun f g => by ext x; rfl
+      map_smul' := fun c f => by ext x; rfl }
   else LinearMap.id
 
 /-- Concrete reflection-positive tensor product data on `SchwartzMap`. -/
 noncomputable def concreteReflectTensorData : ReflectTensorData where
   reflectConj := ConcreteReflectOps.reflectConjSchwartz
-  reflectConj_zero_one := by ext x; simp
+  reflectConj_zero_one := by ext x; change (starRingEnd ℂ) (1 : ℂ) = 1; exact map_one _
   reflectConj_add := ConcreteReflectOps.reflectConjSchwartz_add
   reflectConj_smul := ConcreteReflectOps.reflectConjSchwartz_smul
   reflectConj_seminorm_le := fun m j f => by
@@ -257,11 +258,11 @@ noncomputable def concreteReflectTensorData : ReflectTensorData where
     simpa [norm_iteratedFDeriv_zero] using
       SchwartzMap.le_seminorm ℂ j 0 f (ConcreteReflectOps.euclidTimeReflect m x)
   tensor := @tensorSchwartz
-  tensor_zero_one := by ext x; simp [tensorSchwartz, vacTest0]
-  tensor_add_left := fun m n f₁ f₂ g => by ext x; simp [tensorSchwartz, add_mul]
-  tensor_smul_left := fun m n c f g => by ext x; simp [tensorSchwartz]; ring
-  tensor_add_right := fun m n f g₁ g₂ => by ext x; simp [tensorSchwartz, mul_add]
-  tensor_smul_right := fun m n c f g => by ext x; simp [tensorSchwartz]; ring
+  tensor_zero_one := by ext x; change (1 : ℂ) * 1 = 1; exact one_mul 1
+  tensor_add_left := fun m n f₁ f₂ g => by ext x; exact add_mul (f₁ (projLeft m n x)) (f₂ (projLeft m n x)) (g (projRight m n x))
+  tensor_smul_left := fun m n c f g => by ext x; exact mul_assoc c (f (projLeft m n x)) (g (projRight m n x))
+  tensor_add_right := fun m n f g₁ g₂ => by ext x; exact mul_add (f (projLeft m n x)) (g₁ (projRight m n x)) (g₂ (projRight m n x))
+  tensor_smul_right := fun m n c f g => by ext x; change f (projLeft m n x) * (c * g (projRight m n x)) = c * (f (projLeft m n x) * g (projRight m n x)); ring
   tensor_seminorm_le := fun m n k => by
     refine ⟨∑ j ∈ Finset.range (k + 1), (k.choose j : ℝ),
       Finset.sum_nonneg fun _ _ => Nat.cast_nonneg _, fun f g => ?_⟩
@@ -301,8 +302,8 @@ noncomputable def concreteReflectTensorData : ReflectTensorData where
             ((∑ a ∈ Finset.range (k + 1), SchwartzMap.seminorm ℂ a 0 f) *
               (∑ b ∈ Finset.range (k + 1), SchwartzMap.seminorm ℂ b 0 g)) := by
           refine Finset.sum_le_sum fun j hj => mul_le_mul_of_nonneg_left (mul_le_mul
-            (Finset.single_le_sum (fun a _ => apply_nonneg _ _) hj)
-            (Finset.single_le_sum (fun b _ => apply_nonneg _ _)
+            (Finset.single_le_sum (f := fun a => SchwartzMap.seminorm ℂ a 0 f) (fun a _ => apply_nonneg _ _) hj)
+            (Finset.single_le_sum (f := fun b => SchwartzMap.seminorm ℂ b 0 g) (fun b _ => apply_nonneg _ _)
               (Finset.mem_range.mpr (by have := Finset.mem_range.mp hj; omega)))
             (apply_nonneg _ _)
             (Finset.sum_nonneg fun _ _ => apply_nonneg _ _)) (Nat.cast_nonneg _)
@@ -312,70 +313,77 @@ noncomputable def concreteReflectTensorData : ReflectTensorData where
           rw [← Finset.sum_mul]; ring
   shiftPos := concreteShiftPos
   shiftPos_vac := fun t ht => by
-    ext x
-    simp [concreteShiftPos, ht, ConcreteSchwartzShiftAndReflect.shiftPos, vacTest0]
+    refine Subtype.ext (DFunLike.ext _ _ fun x => ?_)
+    simp only [concreteShiftPos, dif_pos ht, LinearMap.coe_mk, AddHom.coe_mk,
+      ConcreteSchwartzShiftAndReflect.shiftPos]
+    rfl
   shiftPos_add := fun s t hs ht n f => by
     have hst : 0 ≤ s + t := add_nonneg hs ht
-    ext x
+    refine Subtype.ext (DFunLike.ext _ _ fun x => ?_)
     simp only [concreteShiftPos, dif_pos hst, dif_pos hs, dif_pos ht, LinearMap.coe_mk,
-      AddHom.coe_mk, ConcreteSchwartzShiftAndReflect.shiftPos, SchwartzMap.coe_mk,
-      timeShiftVec_add]
+      AddHom.coe_mk, ConcreteSchwartzShiftAndReflect.shiftPos, timeShiftVec_add]
+    change f.1 (x - (timeShiftVec n s + timeShiftVec n t)) =
+      f.1 ((x - timeShiftVec n s) - timeShiftVec n t)
     congr 1
     abel
-    shiftPos_seminorm_le := fun n k f => by
-        let C_s : ℝ := ∑ i ∈ Finset.range (k + 1),
-          (k.choose i : ℝ) * SchwartzMap.seminorm ℂ i 0 f.1
-        refine ⟨C_s, Finset.sum_nonneg fun i _ =>
-          mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _), fun t ht j hj => ?_⟩
-        have h_bd : 0 ≤ C_s * (1 + t) ^ k :=
-          mul_nonneg (Finset.sum_nonneg fun i _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _))
-            (pow_nonneg (by linarith) _)
-        refine SchwartzMap.seminorm_le_bound ℂ j 0 (concreteShiftPos t n f).1 h_bd fun x => ?_
-        simp only [concreteShiftPos, dif_pos ht, LinearMap.coe_mk, AddHom.coe_mk,
-          ConcreteSchwartzShiftAndReflect.shiftPos, norm_iteratedFDeriv_zero, SchwartzMap.coe_mk]
-        have hnx : ‖x‖ ^ j ≤ ∑ i ∈ Finset.range (j + 1),
-            (j.choose i : ℝ) * ‖x - timeShiftVec n t‖ ^ i * ‖timeShiftVec n t‖ ^ (j - i) := by
-          have htri : ‖x‖ ≤ ‖x - timeShiftVec n t‖ + ‖timeShiftVec n t‖ := by
-            simpa [sub_add_cancel] using norm_add_le (x - timeShiftVec n t) (timeShiftVec n t)
-          calc ‖x‖ ^ j ≤ (‖x - timeShiftVec n t‖ + ‖timeShiftVec n t‖) ^ j :=
-                pow_le_pow_left₀ (norm_nonneg _) htri j
-            _ = ∑ i ∈ Finset.range (j + 1),
-                  (j.choose i : ℝ) * ‖x - timeShiftVec n t‖ ^ i * ‖timeShiftVec n t‖ ^ (j - i) := by
-                rw [add_pow]; refine Finset.sum_congr rfl fun i _ => ?_; ring
-        calc ‖x‖ ^ j * ‖f.1 (x - timeShiftVec n t)‖
-            ≤ (∑ i ∈ Finset.range (j + 1),
-                  (j.choose i : ℝ) * ‖x - timeShiftVec n t‖ ^ i * ‖timeShiftVec n t‖ ^ (j - i)) *
-                ‖f.1 (x - timeShiftVec n t)‖ :=
-              mul_le_mul_of_nonneg_right hnx (norm_nonneg _)
-          _ = ∑ i ∈ Finset.range (j + 1),
-                (j.choose i : ℝ) * ‖timeShiftVec n t‖ ^ (j - i) *
-                  (‖x - timeShiftVec n t‖ ^ i * ‖f.1 (x - timeShiftVec n t)‖) := by
-              rw [Finset.sum_mul]; refine Finset.sum_congr rfl fun i _ => ?_; ring
-          _ ≤ ∑ i ∈ Finset.range (j + 1),
-                (k.choose i : ℝ) * (1 + t) ^ k * SchwartzMap.seminorm ℂ i 0 f.1 := by
-              refine Finset.sum_le_sum fun i _ => ?_
-              have h_ch : (j.choose i : ℝ) ≤ (k.choose i : ℝ) :=
-                Nat.cast_le.mpr (Nat.choose_le_choose i hj)
-              have h_tv : ‖timeShiftVec n t‖ ^ (j - i) ≤ (1 + t) ^ k := by
-                have hle1 : ‖timeShiftVec n t‖ ≤ 1 + t := le_trans (timeShiftVec_norm_le n ht) (by linarith)
-                have hle2 : ‖timeShiftVec n t‖ ^ (j - i) ≤ (1 + t) ^ (j - i) :=
-                  pow_le_pow_left₀ (norm_nonneg _) hle1 (j - i)
-                have h1t : 1 ≤ 1 + t := by linarith
-                have hexp : j - i ≤ k := le_trans (Nat.sub_le j i) hj
-                exact le_trans hle2 (pow_le_pow_right₀ h1t hexp)
-              have h_sf : ‖x - timeShiftVec n t‖ ^ i * ‖f.1 (x - timeShiftVec n t)‖ ≤
-                  SchwartzMap.seminorm ℂ i 0 f.1 := by
-                simpa [norm_iteratedFDeriv_zero] using
-                  SchwartzMap.le_seminorm ℂ i 0 f.1 (x - timeShiftVec n t)
-              exact mul_le_mul (mul_le_mul h_ch h_tv (by positivity) (Nat.cast_nonneg _)) h_sf
-                (by positivity) (by positivity)
-          _ ≤ ∑ i ∈ Finset.range (k + 1),
-                (k.choose i : ℝ) * (1 + t) ^ k * SchwartzMap.seminorm ℂ i 0 f.1 := by
-              refine Finset.sum_le_sum_of_subset_of_nonneg
-                (Finset.range_mono (Nat.add_le_add_right hj 1)) ?_
-              intro i _ _
-              positivity
-          _ = C_s * (1 + t) ^ k := by
-              dsimp [C_s]; rw [Finset.sum_mul]; refine Finset.sum_congr rfl fun i _ => ?_; ring
+  shiftPos_seminorm_le := fun n k f => by
+    let C_s : ℝ := ∑ i ∈ Finset.range (k + 1),
+      (k.choose i : ℝ) * SchwartzMap.seminorm ℂ i 0 f.1
+    refine ⟨C_s, Finset.sum_nonneg fun i _ =>
+      mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _), fun t ht j hj => ?_⟩
+    have h_bd : 0 ≤ C_s * (1 + t) ^ k :=
+      mul_nonneg (Finset.sum_nonneg fun i _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _))
+        (pow_nonneg (by linarith) _)
+    refine SchwartzMap.seminorm_le_bound ℂ j 0 (concreteShiftPos t n f).1 h_bd fun x => ?_
+    have hfx : (concreteShiftPos t n f).1 x = f.1 (x - timeShiftVec n t) := by
+      simp only [concreteShiftPos, dif_pos ht, LinearMap.coe_mk, AddHom.coe_mk,
+        ConcreteSchwartzShiftAndReflect.shiftPos]
+      exact congrArg f.1 (by abel)
+    rw [norm_iteratedFDeriv_zero, hfx]
+    have hnx : ‖x‖ ^ j ≤ ∑ i ∈ Finset.range (j + 1),
+        (j.choose i : ℝ) * ‖x - timeShiftVec n t‖ ^ i * ‖timeShiftVec n t‖ ^ (j - i) := by
+      have htri : ‖x‖ ≤ ‖x - timeShiftVec n t‖ + ‖timeShiftVec n t‖ := by
+        simpa [sub_add_cancel] using norm_add_le (x - timeShiftVec n t) (timeShiftVec n t)
+      calc ‖x‖ ^ j ≤ (‖x - timeShiftVec n t‖ + ‖timeShiftVec n t‖) ^ j :=
+            pow_le_pow_left₀ (norm_nonneg _) htri j
+        _ = ∑ i ∈ Finset.range (j + 1),
+              (j.choose i : ℝ) * ‖x - timeShiftVec n t‖ ^ i * ‖timeShiftVec n t‖ ^ (j - i) := by
+            rw [add_pow]; refine Finset.sum_congr rfl fun i _ => ?_; ring
+    calc ‖x‖ ^ j * ‖f.1 (x - timeShiftVec n t)‖
+        ≤ (∑ i ∈ Finset.range (j + 1),
+              (j.choose i : ℝ) * ‖x - timeShiftVec n t‖ ^ i * ‖timeShiftVec n t‖ ^ (j - i)) *
+            ‖f.1 (x - timeShiftVec n t)‖ :=
+          mul_le_mul_of_nonneg_right hnx (norm_nonneg _)
+      _ = ∑ i ∈ Finset.range (j + 1),
+            (j.choose i : ℝ) * ‖timeShiftVec n t‖ ^ (j - i) *
+              (‖x - timeShiftVec n t‖ ^ i * ‖f.1 (x - timeShiftVec n t)‖) := by
+          rw [Finset.sum_mul]; refine Finset.sum_congr rfl fun i _ => ?_; ring
+      _ ≤ ∑ i ∈ Finset.range (j + 1),
+            (k.choose i : ℝ) * (1 + t) ^ k * SchwartzMap.seminorm ℂ i 0 f.1 := by
+          refine Finset.sum_le_sum fun i _ => ?_
+          have h_ch : (j.choose i : ℝ) ≤ (k.choose i : ℝ) :=
+            Nat.cast_le.mpr (Nat.choose_le_choose i hj)
+          have h_tv : ‖timeShiftVec n t‖ ^ (j - i) ≤ (1 + t) ^ k := by
+            have hle1 : ‖timeShiftVec n t‖ ≤ 1 + t := le_trans (timeShiftVec_norm_le n ht) (by linarith)
+            have hle2 : ‖timeShiftVec n t‖ ^ (j - i) ≤ (1 + t) ^ (j - i) :=
+              pow_le_pow_left₀ (norm_nonneg _) hle1 (j - i)
+            have h1t : 1 ≤ 1 + t := by linarith
+            have hexp : j - i ≤ k := le_trans (Nat.sub_le j i) hj
+            exact le_trans hle2 (pow_le_pow_right₀ h1t hexp)
+          have h_sf : ‖x - timeShiftVec n t‖ ^ i * ‖f.1 (x - timeShiftVec n t)‖ ≤
+              SchwartzMap.seminorm ℂ i 0 f.1 := by
+            simpa [norm_iteratedFDeriv_zero] using
+              SchwartzMap.le_seminorm ℂ i 0 f.1 (x - timeShiftVec n t)
+          exact mul_le_mul (mul_le_mul h_ch h_tv (by positivity) (Nat.cast_nonneg _)) h_sf
+            (by positivity) (by positivity)
+      _ ≤ ∑ i ∈ Finset.range (k + 1),
+            (k.choose i : ℝ) * (1 + t) ^ k * SchwartzMap.seminorm ℂ i 0 f.1 := by
+          refine Finset.sum_le_sum_of_subset_of_nonneg
+            (Finset.range_mono (Nat.add_le_add_right hj 1)) ?_
+          intro i _ _
+          exact mul_nonneg (mul_nonneg (Nat.cast_nonneg _) (pow_nonneg (by linarith) _))
+            (apply_nonneg _ _)
+      _ = C_s * (1 + t) ^ k := by
+          dsimp [C_s]; rw [Finset.sum_mul]; refine Finset.sum_congr rfl fun i _ => ?_; ring
 
-    end Imscribing.YangMills.ConcreteTensorSchwartz
+end Imscribing.YangMills.ConcreteTensorSchwartz

@@ -39,8 +39,8 @@ private def gaugeGroupTopGrp (N : ℕ) : IsTopologicalGroup (GaugeGroup N) where
   continuous_inv := by
     refine Continuous.subtype_mk ?_ _
     have h_eq : (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)) =
-        fun A => star (A : Matrix (Fin N) (Fin N) ℂ) := funext gaugeGroup_coe_inv_star'
-    rw [h_eq]
+        fun (A : GaugeGroup N) => star (A : Matrix (Fin N) (Fin N) ℂ) := funext gaugeGroup_coe_inv_star'
+    try rw [h_eq]
     exact continuous_star.comp continuous_subtype_val
 
 /-- Canonical product Haar probability measure on cut-splitting variables `Lat4 (2 * M) → SU(N)`. -/
@@ -51,9 +51,22 @@ noncomputable def cutAuxHaarMeasure (N M : ℕ) [NeZero M] :
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
   haveI : CompactSpace (GaugeGroup N) := compactSpace_gaugeGroup N
   haveI : IsTopologicalGroup (GaugeGroup N) := gaugeGroupTopGrp N
-  Measure.pi (fun _ => Measure.haar)
+  Measure.pi (fun _ => (Measure.haarMeasure (⊤ : TopologicalSpace.PositiveCompacts (GaugeGroup N))))
 
 /-- Canonical product Haar probability measure on `HalfVar N M`. -/
+private instance instIsProbabilityMeasureCutAuxHaar (N M : ℕ) [NeZero M] :
+    IsProbabilityMeasure (cutAuxHaarMeasure N M) := by
+  letI := borel (GaugeGroup N)
+  haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) := by unfold Matrix; infer_instance
+  haveI : SecondCountableTopology (GaugeGroup N) := (⟨rfl⟩ : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ))).secondCountableTopology
+  haveI : IsTopologicalGroup (GaugeGroup N) := gaugeGroupTopGrp N
+  haveI : CompactSpace (GaugeGroup N) := compactSpace_gaugeGroup N
+  haveI : IsProbabilityMeasure (Measure.haarMeasure (⊤ : TopologicalSpace.PositiveCompacts (GaugeGroup N))) :=
+    ⟨by simpa using (Measure.haarMeasure_self : (Measure.haarMeasure (⊤ : TopologicalSpace.PositiveCompacts (GaugeGroup N))) (⊤ : TopologicalSpace.PositiveCompacts (GaugeGroup N)) = 1)⟩
+  unfold cutAuxHaarMeasure
+  infer_instance
+
 noncomputable def halfVarHaarMeasure (N M : ℕ) [NeZero M] :
     letI := borel (GaugeGroup N)
     Measure (HalfVar N M) :=
@@ -81,6 +94,8 @@ theorem haar_inv_mul_lintegral {G : Type*} [Group G] [TopologicalSpace G]
     intro W₁
     have hm : Measurable (fun W₂ : G => W₁⁻¹ * W₂) := measurable_const.mul measurable_id
     have hind : Measurable (s.indicator (fun _ : G => (1 : ENNReal))) := measurable_const.indicator hs
+    change (∫⁻ W₂ : G, s.indicator (fun _ => 1) (W₁⁻¹ * W₂) ∂ν) = ν s
+    change (∫⁻ W₂ : G, s.indicator (fun _ => 1) (W₁⁻¹ * W₂) ∂ν) = ν s
     rw [← lintegral_map hind hm, hL.map_mul_left_eq_self W₁⁻¹, lintegral_indicator hs]
     simp
   simp_rw [h_inner, lintegral_const, measure_univ, mul_one]
@@ -99,6 +114,24 @@ theorem canonical_smeared_magnetic_rp_nonneg
       (Real.exp (-wilsonAction N (2 * M) β (glueConfig p q)) : ℂ) ∂μ ∂μ).re := by
   letI := borel (GaugeGroup N)
   haveI : BorelSpace (GaugeGroup N) := ⟨rfl⟩
+  haveI : SecondCountableTopology (Matrix (Fin N) (Fin N) ℂ) := by unfold Matrix; infer_instance
+  haveI : SecondCountableTopology (GaugeGroup N) := by
+    have h_ind : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ)) := ⟨rfl⟩
+    exact h_ind.secondCountableTopology
+  haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
+  haveI : ContinuousInv (GaugeGroup N) := by
+    refine ⟨?_⟩
+    have h_ind : Topology.IsInducing (fun A : GaugeGroup N => (A : Matrix (Fin N) (Fin N) ℂ)) := ⟨rfl⟩
+    rw [h_ind.continuous_iff]
+    change Continuous (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ))
+    have h_eq : (fun A : GaugeGroup N => ((A⁻¹ : GaugeGroup N) : Matrix (Fin N) (Fin N) ℂ)) =
+        (fun A : GaugeGroup N => star (A : Matrix (Fin N) (Fin N) ℂ)) := by
+      funext A
+      first | rfl | rw [← Matrix.star_eq_inv, Matrix.specialUnitaryGroup.coe_star]
+    rw [h_eq]
+    exact continuous_pi fun i => continuous_pi fun j =>
+      continuous_star.comp ((continuous_apply i).comp ((continuous_apply j).comp continuous_subtype_val))
+  haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
   haveI : IsTopologicalGroup (GaugeGroup N) := gaugeGroupTopGrp N
   haveI : MeasurableMul₂ (GaugeGroup N) := ContinuousMul.measurableMul₂
   haveI : MeasurableInv (GaugeGroup N) := ContinuousInv.measurableInv
