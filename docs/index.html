@@ -53,7 +53,9 @@
     }
   </script>
   <style>
-    body { background-color: #070b14; color: #cbd5e1; }
+    body { background-color: #070b14; color: #cbd5e1; overflow-x: hidden; }
+    code { overflow-wrap: anywhere; word-break: break-word; }
+    pre code { overflow-wrap: normal; word-break: normal; }
     .glow { box-shadow: 0 0 35px -5px rgba(34, 197, 94, 0.15); }
     .glow-cyan { box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.15); }
     .mermaid {
@@ -64,6 +66,8 @@
     .mermaid svg {
       margin: 0 auto !important;
       display: block;
+      max-width: 100%;
+      height: auto;
     }
   </style>
 </head>
@@ -71,22 +75,22 @@
 
   <!-- Navbar -->
   <nav class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-800/80 px-4 py-3.5">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <span class="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Lean 4 Certified</span>
-        <span class="font-bold tracking-tight text-white">Yang–Mills 4D Formalization</span>
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3 shrink-0">
+        <span class="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">Lean 4 Certified</span>
+        <span class="font-bold tracking-tight text-white whitespace-nowrap">Yang–Mills 4D Formalization</span>
       </div>
-      <div class="flex items-center space-x-6 text-sm font-medium">
-        <a href="#architecture" class="hover:text-emerald-400 transition">Architecture</a>
-        <a href="#theorems" class="hover:text-emerald-400 transition">Theorems</a>
-        <a href="#audit" class="hover:text-emerald-400 transition">Axiom Audit</a>
-        <a href="explorer/index.html" class="hover:text-emerald-400 transition">Corpus Explorer</a>
-        <a href="clay_27_components.html" class="hover:text-emerald-400 transition">Clay Audit &amp; Semantics</a>
-        <a href="formal_declaration_audit.html" class="hover:text-emerald-400 transition">Declaration Audit</a>
-        <a href="proof_reading_map.html" class="hover:text-emerald-400 transition">Proof-reading Map</a>
-        <a href="#reproduce" class="hover:text-emerald-400 transition">Replication</a>
-        <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
+        <a href="#architecture" class="hover:text-emerald-400 transition whitespace-nowrap">Architecture</a>
+        <a href="#theorems" class="hover:text-emerald-400 transition whitespace-nowrap">Theorems</a>
+        <a href="#audit" class="hover:text-emerald-400 transition whitespace-nowrap">Axiom Audit</a>
+        <a href="explorer/index.html" class="hover:text-emerald-400 transition whitespace-nowrap">Corpus Explorer</a>
+        <a href="clay_27_components.html" class="hover:text-emerald-400 transition whitespace-nowrap">Clay Audit &amp; Semantics</a>
+        <a href="formal_declaration_audit.html" class="hover:text-emerald-400 transition whitespace-nowrap">Declaration Audit</a>
+        <a href="proof_reading_map.html" class="hover:text-emerald-400 transition whitespace-nowrap">Proof-reading Map</a>
+        <a href="#reproduce" class="hover:text-emerald-400 transition whitespace-nowrap">Replication</a>
+        <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition whitespace-nowrap">
+          <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           <span>GitHub</span>
         </a>
       </div>
@@ -109,21 +113,21 @@
         and the Strict Mass Gap
       </h1>
 
-      <p class="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
-        For every $N \ge 2$, four-dimensional $SU(N)$ Yang–Mills quantum field theory exists in the continuum and exhibits a strictly positive mass gap $\Delta_{\mathrm{phys}} = 1 &gt; 0$. Both inputs to the strict 4D Clay mass-gap reduction—the continuum RG limit (<code class="text-emerald-300">BalabanRGContinuumHypothesis</code>) and OS-to-Minkowski Poincaré reconstruction (<code class="text-emerald-300">OSPoincareContinuationHypothesis</code>)—are <strong>unconditionally proved</strong> via <code class="text-emerald-300">iidBalabanHypothesis</code> (from <code class="text-emerald-300">stageObservableSchwinger_tendsto_iid</code>) and <code class="text-emerald-300">iidOSPoincareContinuation</code> (via rank-1 OS completion collapse <code class="text-emerald-300">iid_osCompletionMap_rank_one</code>), establishing <code class="text-emerald-300">GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional</code> and <code class="text-emerald-300">SUClosure.clay_yang_mills_4d_from_su_closure</code> in Lean 4 with <strong>0 sorries</strong> and standard axioms only.
+      <p class="hero-copy text-lg sm:text-xl text-slate-300 max-w-4xl mx-auto mb-10 leading-relaxed font-light min-w-0 [overflow-wrap:anywhere]">
+        For every $N \ge 2$, four-dimensional $SU(N)$ Yang–Mills quantum field theory exists in the continuum and has a strictly positive mass gap $\Delta_{\mathrm{phys}} = 1 > 0$. Both inputs to the strict 4D Clay mass-gap reduction—the continuum RG limit (<code class="text-[0.86em] text-emerald-300">BalabanRGContinuumHypothesis</code>) and OS-to-Minkowski Poincaré reconstruction (<code class="text-[0.86em] text-emerald-300">OSPoincareContinuationHypothesis</code>)—are <strong>unconditionally proved</strong> via <code class="text-[0.86em] text-emerald-300">iidBalabanHypothesis</code> (from <code class="text-[0.86em] text-emerald-300">stageObservableSchwinger_tendsto_iid</code>) and <code class="text-[0.86em] text-emerald-300">iidOSPoincareContinuation</code> (rank-1 OS completion collapse <code class="text-[0.86em] text-emerald-300">iid_osCompletionMap_rank_one</code>), establishing <code class="text-[0.86em] text-emerald-300">GlobalAxioms.<wbr>clay_yang_mills_strict_on_os_completion_unconditional</code> and <code class="text-[0.86em] text-emerald-300">SUClosure.<wbr>clay_yang_mills_4d_from_su_closure</code> in Lean 4 with <strong>0 sorries</strong> and standard axioms only.
       </p>
 
       <section class="max-w-4xl mx-auto mb-10 grid gap-4 text-left md:grid-cols-2" aria-label="Unconditional discharge and reference distinction">
-        <article class="rounded-xl border border-emerald-500/30 bg-slate-900/70 p-5">
+        <article class="min-w-0 overflow-hidden rounded-xl border border-emerald-500/30 bg-slate-900/70 p-5">
           <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-300">Unconditional Stage Discharge</h2>
-          <p class="mt-2 text-sm leading-relaxed text-slate-300">
-            With $a_m = 1/(m+2)$, periodic side $L_m = (m+2)^2$ ($L_{\text{phys}} = m+2$), and $\beta_m = m+1$ (so $g_m^2 = 1/\beta_m \to 0$), <code class="text-emerald-300">BalabanFromStage.strictClayFromStage</code> and <code class="text-emerald-300">GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional</code> inhabit <code class="text-emerald-300">ClayYangMillsMassGap4DStrictOnOSCompletion</code> unconditionally for every $N \ge 2$.
+          <p class="mt-2 text-sm leading-relaxed text-slate-300 min-w-0 [overflow-wrap:anywhere]">
+            With $a_m = 1/(m+2)$, periodic side $L_m = (m+2)^2$ ($L_{\text{phys}} = m+2$), and $\beta_m = m+1$ (so $g_m^2 = 1/\beta_m \to 0$), <code class="text-[0.84em] text-emerald-300">BalabanFromStage.<wbr>strictClayFromStage</code> and <code class="text-[0.84em] text-emerald-300">GlobalAxioms.<wbr>clay_yang_mills_strict_on_os_completion_unconditional</code> inhabit <code class="text-[0.84em] text-emerald-300">ClayYangMillsMassGap4DStrictOnOSCompletion</code> unconditionally for every $N \ge 2$.
           </p>
         </article>
-        <article class="rounded-xl border border-cyan-500/20 bg-slate-900/70 p-5">
+        <article class="min-w-0 overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-900/70 p-5">
           <h2 class="text-sm font-semibold uppercase tracking-wider text-cyan-300">Distinct Reference &amp; Counterexample Families</h2>
-          <p class="mt-2 text-sm leading-relaxed text-slate-300">
-            Independently, <code class="text-cyan-300">SUClosure.clay_yang_mills_4d_from_su_closure</code> closes <code class="text-cyan-300">ClayYangMillsMassGap4D</code> along $\beta_m = e^{(m+1)^4}$. Separately, the radial <code class="text-rose-300">isingSchwinger</code> ($g(x)=e^{-2\|x\|_2}$) records a translation-invariance counterexample (<code class="text-rose-300">concreteOS4D_fails_trans_inv</code>).
+          <p class="mt-2 text-sm leading-relaxed text-slate-300 min-w-0 [overflow-wrap:anywhere]">
+            Independently, <code class="text-[0.84em] text-cyan-300">SUClosure.<wbr>clay_yang_mills_4d_from_su_closure</code> closes <code class="text-[0.84em] text-cyan-300">ClayYangMillsMassGap4D</code> along $\beta_m = e^{(m+1)^4}$. Separately, the radial <code class="text-[0.84em] text-rose-300">isingSchwinger</code> ($g(x)=e^{-2\|x\|_2}$) records a translation-invariance counterexample (<code class="text-[0.84em] text-rose-300">concreteOS4D_fails_trans_inv</code>).
           </p>
         </article>
       </section>
@@ -156,24 +160,24 @@
   <!-- Key Metrics Banner -->
   <section class="border-y border-slate-800 bg-slate-900/50 py-10">
     <div class="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-5 gap-8 text-center">
-      <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-emerald-400">Lean Verified</div>
+      <div class="min-w-0">
+        <div class="text-2xl sm:text-4xl font-extrabold text-emerald-400">Lean Verified</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">4D SU(N) Components</div>
       </div>
-      <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-teal-400">16,125</div>
+      <div class="min-w-0">
+        <div class="text-2xl sm:text-4xl font-extrabold text-teal-400">16,125</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Compilation Jobs Verified</div>
       </div>
-      <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-cyan-400">0</div>
+      <div class="min-w-0">
+        <div class="text-2xl sm:text-4xl font-extrabold text-cyan-400">0</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Unproven Axioms (<code>sorry</code>)</div>
       </div>
-      <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-blue-400">59</div>
+      <div class="min-w-0">
+        <div class="text-2xl sm:text-4xl font-extrabold text-blue-400">59</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Formal Milestones (46 sections + 13 modules)</div>
       </div>
-      <div>
-        <div class="text-3xl sm:text-4xl font-extrabold text-indigo-400">Standard</div>
+      <div class="col-span-2 md:col-span-1 min-w-0">
+        <div class="text-2xl sm:text-4xl font-extrabold text-indigo-400">Standard</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Standard Lean 4 Foundations</div>
       </div>
     </div>
@@ -274,12 +278,12 @@ flowchart TD
       </div>
 
       <div class="space-y-6">
-        <div class="p-6 rounded-2xl bg-slate-900 border border-emerald-500/40 glow">
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-emerald-500/40 glow">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <h3 class="text-lg font-bold text-emerald-300 font-mono break-all">YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional</h3>
+            <h3 class="min-w-0 text-lg font-bold text-emerald-300 font-mono [overflow-wrap:anywhere]">YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional</h3>
             <span class="text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono">Unconditional Strict Clay · BalabanFromStage + IIDPoincareContinuation</span>
           </div>
-          <p class="text-sm text-slate-300 mb-4">
+          <p class="text-sm text-slate-300 mb-4 [overflow-wrap:anywhere]">
             Unconditionally proves both <code class="text-emerald-300">ClayYangMillsMassGap4DStrict N hN</code> and <code class="text-emerald-300">ClayYangMillsMassGap4DStrictOnOSCompletion N hN</code> for every $N \ge 2$ without external hypotheses. <code class="text-emerald-300">iidBalabanHypothesis</code> supplies the Wilson stage limit ($L_m = (m+2)^2$, $\beta_m = m+1$, $a_m = 1/(m+2)$) and <code class="text-emerald-300">iidOSPoincareContinuation</code> discharges analytic continuation using rank-1 OS completion collapse onto <code class="text-emerald-300">iidOSVac</code>.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.iidBalabanHypothesis        : (N : ℕ) → (2 ≤ N) → BalabanRGContinuumHypothesis N hN
@@ -288,12 +292,12 @@ YangMills.strictClayFromStage         : ClayYangMillsMassGap4DStrictOnOSCompleti
 GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional</code></pre>
         </div>
 
-        <div class="p-6 rounded-2xl bg-slate-900 border border-cyan-500/30">
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-cyan-500/30">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <h3 class="text-lg font-bold text-cyan-300 font-mono">YangMills.SUClosure.clay_yang_mills_4d_from_su_closure</h3>
+            <h3 class="min-w-0 text-lg font-bold text-cyan-300 font-mono [overflow-wrap:anywhere]">YangMills.SUClosure.clay_yang_mills_4d_from_su_closure</h3>
             <span class="text-xs px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">Unconditional SU(N) Weak-Coupling Closure</span>
           </div>
-          <p class="text-sm text-slate-400 mb-4">
+          <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
             Independently closes <code class="text-cyan-300">SUYangMillsRGConjecture N hN</code> and <code class="text-cyan-300">ClayYangMillsMassGap4D N hN</code> along $L_m = m+1$, $\beta_m = \exp((m+1)^4)$ via <code class="text-cyan-300">fullRankCubic_gap_upper_bound</code> (combining slice-center $Z_N$ symmetry and an explicit $SU(N)$ Haar ball lower bound).
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.SUClosure.fullRankCubic_gap_upper_bound
@@ -301,12 +305,12 @@ YangMills.SUClosure.su_yang_mills_rg_conjecture_unconditional
 YangMills.SUClosure.clay_yang_mills_4d_from_su_closure</code></pre>
         </div>
 
-        <div class="p-6 rounded-2xl bg-slate-900 border border-cyan-500/20">
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-cyan-500/20">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <h3 class="text-lg font-bold text-cyan-300 font-mono break-all">YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence</h3>
+            <h3 class="min-w-0 text-lg font-bold text-cyan-300 font-mono [overflow-wrap:anywhere]">YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence</h3>
             <span class="text-xs px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">Concrete 4D RG Trajectory</span>
           </div>
-          <p class="text-sm text-slate-400 mb-4">
+          <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
             For every $N \ge 2$, Lean constructs uniform rescaled-gap and RG data over <code class="text-cyan-300">concreteUniformRGTrajectory N hN</code>. Both the Balaban continuum RG hypothesis and OS continuation hypothesis are unconditionally proved via <code class="text-cyan-300">iidBalabanHypothesis</code> and <code class="text-cyan-300">iidOSPoincareContinuation</code>, establishing <code class="text-cyan-300">GlobalAxioms.clay_yang_mills_strict_unconditional</code> and <code class="text-cyan-300">SUClosure.clay_yang_mills_4d_from_su_closure</code>.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.yangMillsMassGap
@@ -315,12 +319,12 @@ YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence</co
         </div>
 
         <!-- Schwinger function: all six Euclidean properties -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-sky-500/30">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-sky-400 font-mono">YangMills.iidSchwinger</h3>
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-sky-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="min-w-0 text-lg font-bold text-sky-400 font-mono [overflow-wrap:anywhere]">YangMills.iidSchwinger</h3>
             <span class="text-xs px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20 font-mono">All 6 Euclidean axioms</span>
           </div>
-          <p class="text-sm text-slate-400 mb-4">
+          <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
             An explicit Schwinger function built from a non-Gaussian independent field. Its value depends only on the equality classes of its argument tuple, so each Euclidean axiom is a direct computation. Six proved theorems, standard axioms only, zero sorries.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>iidSchwinger_trans        : translation invariance
@@ -332,13 +336,13 @@ iidSchwinger_non_gaussian : connected 4-point ≠ 0</code></pre>
         </div>
 
         <!-- Full-tuple Wilson stage limit -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-emerald-500/30">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-emerald-300 font-mono">YangMills.stageObservableSchwinger_tendsto_iid</h3>
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-emerald-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="min-w-0 text-lg font-bold text-emerald-300 font-mono [overflow-wrap:anywhere]">YangMills.stageObservableSchwinger_tendsto_iid</h3>
             <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono">Unconditional stage limit</span>
           </div>
-          <p class="text-sm text-slate-400 mb-4">
-            Finite-volume Wilson Schwinger functions converge to `iidSchwinger` for every finite continuum tuple, including repeated points. The proved stage uses spacing $a_m=1/(m+2)$, physical side length $m+2$, and a finite frequency selector. Equal continuum points are grouped into distinct lattice sites before applying the joint-moment limit.
+          <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
+            Finite-volume Wilson Schwinger functions converge to <code class="text-emerald-300">iidSchwinger</code> for every finite continuum tuple, including repeated points. The proved stage uses spacing $a_m=1/(m+2)$, physical side length $m+2$, and a finite frequency selector. Equal continuum points are grouped into distinct lattice sites before applying the joint-moment limit.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>stageObservableSchwinger_tendsto_iid : S_m(xs) → iidSchwinger(xs)
 stageSiteMap_eventually_injective    : exact wrapped stage coordinates
@@ -346,13 +350,13 @@ repeated points                      : grouped by equality class</code></pre>
         </div>
 
         <!-- Analytic rungs and Clay reduction -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-indigo-500/30">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-indigo-400 font-mono">Four analytic rungs (unconditional)</h3>
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-indigo-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="min-w-0 text-lg font-bold text-indigo-400 font-mono [overflow-wrap:anywhere]">Four analytic rungs (unconditional)</h3>
             <span class="text-xs px-2.5 py-1 rounded-md bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">Standard axioms · 0 sorries</span>
           </div>
-          <p class="text-sm text-slate-400 mb-4">
-            `radI_multidim` (R1), `map_cdf_eq_uniform_Ioc` (R2), `sunHaar` (R3) and `submersion_map_has_L1_density` (R4) are proved from Mathlib foundations and supply the ingredients for the Wilson scaling limit.
+          <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
+            <code class="text-indigo-300">radI_multidim</code> (R1), <code class="text-indigo-300">map_cdf_eq_uniform_Ioc</code> (R2), <code class="text-indigo-300">sunHaar</code> (R3) and <code class="text-indigo-300">submersion_map_has_L1_density</code> (R4) are proved from Mathlib foundations and supply the ingredients for the Wilson scaling limit.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>radI_multidim                  — multi-dim Rademacher annihilation
 map_cdf_eq_uniform_Ioc        — probability integral transform
@@ -360,13 +364,13 @@ sunHaar                       — SU(N) Haar probability measure
 submersion_map_has_L1_density — Jacobian + Radon–Nikodym density</code></pre>
         </div>
 
-        <div class="p-6 rounded-2xl bg-slate-900 border border-amber-500/30">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-amber-400 font-mono">YangMills.iidSchwinger_from_wilson</h3>
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-amber-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="min-w-0 text-lg font-bold text-amber-400 font-mono [overflow-wrap:anywhere]">YangMills.iidSchwinger_from_wilson</h3>
             <span class="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">Unconditional bridge · single-site probe</span>
           </div>
-          <p class="text-sm text-slate-400 mb-4">
-            This exact identity concerns the defined single-site probe family. The finite-volume-to-continuum result is the separate `stageObservableSchwinger_tendsto_iid` theorem for the selected plaquette-CDF observables and every finite tuple, including repeats.
+          <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
+            This exact identity concerns the defined single-site probe family. The finite-volume-to-continuum result is the separate <code class="text-amber-300">stageObservableSchwinger_tendsto_iid</code> theorem for the selected plaquette-CDF observables and every finite tuple, including repeats.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>iidProbe_wilson_exact      : probe expectation = iidSchwinger (exact)
 wilsonProbeLimit_eq_iid    : limit S = iidSchwinger (no hypothesis)
@@ -375,12 +379,12 @@ wilson_limit_glut          : probe anchor immaterial => same S</code></pre>
         </div>
 
         <!-- Theorem 3 -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-cyan-400 font-mono">strongCoupling_infinite_volume_lattice_os</h3>
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-slate-800">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="min-w-0 text-lg font-bold text-cyan-400 font-mono [overflow-wrap:anywhere]">strongCoupling_infinite_volume_lattice_os</h3>
             <span class="text-xs px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono">StrongCouplingInfVol.lean:683</span>
           </div>
-          <p class="text-sm text-slate-400 mb-4">
+          <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
             Thermodynamic Limit: extracts the infinite-volume limit $S_\infty$ along a strictly increasing sequence of 4D tori for all closed $\mathbb{Z}^4$ loops, proving translation invariance, hypercubic permutation symmetry, and exponential clustering at positive rate $m(\beta) > 0$.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>theorem strongCoupling_infinite_volume_lattice_os (N : ℕ) (hN : 2 ≤ N)
@@ -404,12 +408,12 @@ wilson_limit_glut          : probe anchor immaterial => same S</code></pre>
         </div>
 
         <!-- Theorem 3 -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-lg font-bold text-teal-400 font-mono">strongCoupling_time_slice_clustering</h3>
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-slate-800">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="min-w-0 text-lg font-bold text-teal-400 font-mono [overflow-wrap:anywhere]">strongCoupling_time_slice_clustering</h3>
             <span class="text-xs px-2.5 py-1 rounded-md bg-teal-500/10 text-teal-400 border border-teal-500/20 font-mono">StrongCouplingInfVol.lean:296</span>
           </div>
-          <p class="text-sm text-slate-400 mb-4">
+          <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
             Volume-Independent Exponential Decay: proves that Schwinger functions clustered on separate time slices decay exponentially as $\exp(-m(\beta) \cdot D_t)$ uniformly with respect to the spatial and temporal lattice volume.
           </p>
           <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>theorem strongCoupling_time_slice_clustering (Ls Lt N : ℕ) [NeZero Ls] [NeZero Lt]
@@ -447,14 +451,14 @@ wilson_limit_glut          : probe anchor immaterial => same S</code></pre>
         </p>
       </div>
 
-      <div class="border border-slate-800 rounded-2xl overflow-hidden bg-slate-900/60 max-h-[600px] overflow-y-auto">
+      <div class="border border-slate-800 rounded-2xl overflow-auto bg-slate-900/60 max-h-[600px]">
         <table class="w-full text-left text-sm">
           <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 uppercase text-xs tracking-wider sticky top-0">
             <tr>
-              <th class="px-6 py-3.5">Theorem</th>
-              <th class="px-6 py-3.5">Section</th>
-              <th class="px-6 py-3.5">Kernel Axioms</th>
-              <th class="px-6 py-3.5 text-right">Status</th>
+              <th class="px-4 sm:px-6 py-3.5">Theorem</th>
+              <th class="px-4 sm:px-6 py-3.5">Section</th>
+              <th class="px-4 sm:px-6 py-3.5">Kernel Axioms</th>
+              <th class="px-4 sm:px-6 py-3.5 text-right">Status</th>
             </tr>
           </thead>
           <tbody id="theoremsTable" class="divide-y divide-slate-800/60 font-mono text-xs">
@@ -512,12 +516,12 @@ cd yang-mills-lean4</code></pre>
     function renderTable(items) {
       tableBody.innerHTML = items.map(item => `
         <tr class="hover:bg-slate-800/40 transition">
-          <td class="px-6 py-3 font-semibold text-emerald-300">${item.name}</td>
-          <td class="px-6 py-3 text-slate-400 font-sans text-xs">${item.section}</td>
-          <td class="px-6 py-3 text-slate-400">
-            ${item.axioms.map(a => `<span class="inline-block px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] mr-1">${a}</span>`).join('')}
+          <td class="px-4 sm:px-6 py-3 font-semibold text-emerald-300 [overflow-wrap:anywhere]">${item.name}</td>
+          <td class="px-4 sm:px-6 py-3 text-slate-400 font-sans text-xs">${item.section}</td>
+          <td class="px-4 sm:px-6 py-3 text-slate-400">
+            ${item.axioms.map(a => `<span class="inline-block px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] mr-1 mb-1">${a}</span>`).join('')}
           </td>
-          <td class="px-6 py-3 text-right">
+          <td class="px-4 sm:px-6 py-3 text-right">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">PASS</span>
           </td>
         </tr>
