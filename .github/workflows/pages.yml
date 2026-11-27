@@ -29,19 +29,11 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Build site
+      - name: Install explorer dependencies
+        run: npm ci
+
+      - name: Build site and corpus explorer
         run: python3 scripts/build_site.py
-
-      - name: Build corpus explorer
-        working-directory: explorer
-        run: |
-          npm install
-          npm run build
-
-      - name: Place explorer under docs/explorer
-        run: |
-          mkdir -p docs/explorer
-          cp -r explorer/dist/. docs/explorer/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

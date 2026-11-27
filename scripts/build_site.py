@@ -1,5 +1,8 @@
+import argparse
 import json
 import os
+import shutil
+import subprocess
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 theorems_file = os.path.join(ROOT_DIR, 'scripts', 'theorems.json')
@@ -202,8 +205,8 @@ html_content = """<!DOCTYPE html>
     <div class="max-w-6xl mx-auto px-4">
       <a href="explorer/index.html" class="group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl border border-emerald-500/30 bg-slate-900 hover:border-emerald-400/60 transition">
         <div>
-          <div class="text-lg font-bold text-emerald-400 group-hover:text-emerald-300">Yang–Mills 4D Corpus Explorer</div>
-          <p class="text-sm text-slate-400 mt-1">Interactive labs: Dobrushin wave, SU(N) loop &amp; witness, time slices &amp; Ising, 4D tesseract &amp; flow, and the bridge/source reader over the Lean corpus.</p>
+          <div class="text-lg font-bold text-emerald-400 group-hover:text-emerald-300">Yang–Mills 4D Observatory &amp; Corpus Explorer</div>
+          <p class="text-sm text-slate-400 mt-1">Interactive workbench: Contention Defense (C1–C8), Elegant Proofs showcase (E1–E8), 4D Dobrushin/Witness/Time-Slice/Tesseract labs, 27-Component Audit, and 106-module Lean source explorer.</p>
         </div>
         <span class="shrink-0 px-4 py-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-sm font-semibold">Open explorer →</span>
       </a>
@@ -762,6 +765,60 @@ for _title, _md, _out in _decomp_specs:
         with open(os.path.join(docs_dir, _out), 'w') as f:
             f.write(_decomp_page(_title, _md_path, _out))
 
+_parser = argparse.ArgumentParser(description="Build the static Yang–Mills documentation site and explorer.")
+_parser.add_argument(
+    "--skip-explorer",
+    action="store_true",
+    help="Only generate docs/*.html without rebuilding docs/explorer/.",
+)
+_args, _ = _parser.parse_known_args()
+
+
+def _build_explorer():
+    pkg_json = os.path.join(ROOT_DIR, "package.json")
+    node_modules = os.path.join(ROOT_DIR, "node_modules")
+    explorer_dir = os.path.join(docs_dir, "explorer")
+    dist_dir = os.path.join(ROOT_DIR, "dist")
+
+    if not os.path.exists(pkg_json):
+        raise RuntimeError("Missing root package.json for explorer build")
+
+    if not os.path.exists(node_modules):
+        subprocess.run(["npm", "ci"], cwd=ROOT_DIR, check=True)
+
+    subprocess.run(["npm", "run", "build"], cwd=ROOT_DIR, check=True)
+
+    os.makedirs(explorer_dir, exist_ok=True)
+    for item in os.listdir(explorer_dir):
+        target = os.path.join(explorer_dir, item)
+        if os.path.isdir(target):
+            shutil.rmtree(target)
+        else:
+            os.remove(target)
+
+    for item in os.listdir(dist_dir):
+        src_item = os.path.join(dist_dir, item)
+        dst_item = os.path.join(explorer_dir, item)
+        if item == "assets" and os.path.isdir(src_item):
+            os.makedirs(dst_item, exist_ok=True)
+            for asset_name in os.listdir(src_item):
+                if asset_name == "aistudio":
+                    continue
+                asset_src = os.path.join(src_item, asset_name)
+                asset_dst = os.path.join(dst_item, asset_name)
+                if os.path.isdir(asset_src):
+                    shutil.copytree(asset_src, asset_dst, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(asset_src, asset_dst)
+        elif os.path.isdir(src_item):
+            shutil.copytree(src_item, dst_item, dirs_exist_ok=True)
+        else:
+            shutil.copy2(src_item, dst_item)
+
+
+if not _args.skip_explorer:
+    _build_explorer()
+
 # ── End-of-build printout: everything produced, in one place ──
 print("=" * 72)
 print("BUILD COMPLETE — Yang–Mills Mass Gap site")
@@ -769,7 +826,14 @@ print("=" * 72)
 print(f"ROOT: {ROOT_DIR}")
 print()
 print("PAGES GENERATED")
-for name in ["index.html", "statement_decomposition.html", "semantic_decomposition.html", "formal_declaration_audit.html"]:
+for name in [
+    "index.html",
+    "statement_decomposition.html",
+    "semantic_decomposition.html",
+    "clay_27_components.html",
+    "formal_declaration_audit.html",
+    "proof_reading_map.html",
+]:
     path = os.path.join(docs_dir, name)
     status = f"{os.path.getsize(path):,} bytes" if os.path.exists(path) else "MISSING"
     print(f"  docs/{name:<34} {status}")
