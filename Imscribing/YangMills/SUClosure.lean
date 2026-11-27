@@ -15,13 +15,15 @@ open scoped InnerProductSpace BigOperators
 open Complex Real Filter MeasureTheory Set
 open Imscribing.YangMills.WilsonFrobenius4D
 
-private noncomputable def canonSUMeas (N : ℕ) :
+private noncomputable instance canonSUMeas (N : ℕ) :
     MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ) := inferInstance
 
-private lemma canonSUBorel (N : ℕ) :
-    @BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ) _ (canonSUMeas N) := by
-  letI : MeasurableSpace (Matrix.specialUnitaryGroup (Fin N) ℂ) := canonSUMeas N
-  exact inferInstance
+private instance canonSUBorel (N : ℕ) :
+    BorelSpace (Matrix.specialUnitaryGroup (Fin N) ℂ) := inferInstance
+
+private instance canonGaugeBorel (L N : ℕ) [NeZero L] :
+    BorelSpace (GaugeField (cubicTorus3 L) (Matrix.specialUnitaryGroup (Fin N) ℂ)) :=
+  Pi.borelSpace
 
 /-! ## §1. Unconditional `SmearedOSPreData 1` on `iidOS4DStrict` -/
 
@@ -47,11 +49,12 @@ noncomputable def iidSmearedOSPreData :
   H_pre := 0
   H_bound := 0
   H_bound_nn := le_rfl
-  H_bd := fun x => by
-    simp [osConfigForm]
-    exact (osConfigForm iidOS4DStrict.toOS4DContinuumTheory iid_osConfigKernel_herm).pos_re x
-  H_sa := fun x y => by simp [osConfigForm]
-  H_nonneg := fun x => by simp [osConfigForm]
+  H_bd := fun _ => by
+    simp [osConfigForm, osConfigInner_zero_left]
+  H_sa := fun _ _ => by
+    simp [osConfigForm, osConfigInner_zero_left, osConfigInner_zero_right]
+  H_nonneg := fun _ => by
+    simp [osConfigForm, osConfigInner_zero_right]
   H_vac := rfl
   U_pre := fun _ => LinearMap.id
   U_unit_pre := fun _ _ _ => rfl
@@ -116,9 +119,8 @@ private lemma frobeniusNormSq_trace {N : ℕ} (M : Matrix (Fin N) (Fin N) ℂ) :
   simp only [Matrix.diag_apply, Matrix.mul_apply, Matrix.star_apply, Complex.re_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   change ‖M i j‖ ^ 2 = (M i j * starRingEnd ℂ (M i j)).re
-  rw [Complex.mul_conj, ← Complex.ofReal_pow]
-  norm_cast
-  exact (Complex.normSq_eq_norm_sq (M i j)).symm
+  rw [Complex.mul_conj, ← Complex.normSq_eq_norm_sq]
+  simp
 
 private lemma frobeniusNormSq_mul_su_right {N : ℕ} (M : Matrix (Fin N) (Fin N) ℂ)
     (B : Matrix.specialUnitaryGroup (Fin N) ℂ) :
@@ -139,8 +141,16 @@ private lemma frobeniusNormSq_mul_su_left {N : ℕ}
     (Unitary.mem_iff.mp B.2.1).1
   have hstar : star ((B : Matrix (Fin N) (Fin N) ℂ) * M) =
       star M * star (B : Matrix (Fin N) (Fin N) ℂ) := Matrix.conjTranspose_mul _ M
-  rw [hstar, Matrix.mul_assoc, Matrix.trace_mul_comm (B : Matrix (Fin N) (Fin N) ℂ),
-    ← Matrix.mul_assoc, hB, Matrix.one_mul]
+  rw [hstar]
+  calc ((B : Matrix (Fin N) (Fin N) ℂ) * M * (star M * star (B : Matrix (Fin N) (Fin N) ℂ))).trace.re
+      = ((B : Matrix (Fin N) (Fin N) ℂ) * (M * star M) * star (B : Matrix (Fin N) (Fin N) ℂ)).trace.re := by
+          simp only [Matrix.mul_assoc]
+    _ = (star (B : Matrix (Fin N) (Fin N) ℂ) * ((B : Matrix (Fin N) (Fin N) ℂ) * (M * star M))).trace.re := by
+          rw [Matrix.trace_mul_comm]
+    _ = ((star (B : Matrix (Fin N) (Fin N) ℂ) * (B : Matrix (Fin N) (Fin N) ℂ)) * (M * star M)).trace.re := by
+          simp only [Matrix.mul_assoc]
+    _ = (M * star M).trace.re := by
+          rw [hB, Matrix.one_mul]
 
 private lemma frobeniusNormSq_su_inv_sub_one {N : ℕ}
     (A : Matrix.specialUnitaryGroup (Fin N) ℂ) :
@@ -164,7 +174,9 @@ private lemma frobeniusNormSq_add_le {N : ℕ} (M₁ M₂ : Matrix (Fin N) (Fin 
   rw [Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
   refine Finset.sum_le_sum fun j _ => ?_
   have h1 : ‖(M₁ + M₂) i j‖ ≤ ‖M₁ i j‖ + ‖M₂ i j‖ := norm_add_le (M₁ i j) (M₂ i j)
-  nlinarith [sq_nonneg (‖M₁ i j‖ - ‖M₂ i j‖), norm_nonneg (M₁ i j), norm_nonneg (M₂ i j)]
+  have hsq : ‖(M₁ + M₂) i j‖ ^ 2 ≤ (‖M₁ i j‖ + ‖M₂ i j‖) ^ 2 :=
+    pow_le_pow_left₀ (norm_nonneg _) h1 2
+  nlinarith [hsq, sq_nonneg (‖M₁ i j‖ - ‖M₂ i j‖)]
 
 private lemma frobeniusNormSq_sub_self_su {N : ℕ}
     (A B : Matrix.specialUnitaryGroup (Fin N) ℂ) :
@@ -190,7 +202,8 @@ private lemma frobeniusNormSq_su_mul_sub_one {N : ℕ}
   have heq : ((A * B : Matrix.specialUnitaryGroup (Fin N) ℂ) : Matrix (Fin N) (Fin N) ℂ) - 1 =
       ((A : Matrix (Fin N) (Fin N) ℂ) - 1) * (B : Matrix (Fin N) (Fin N) ℂ) +
       ((B : Matrix (Fin N) (Fin N) ℂ) - 1) := by
-    rw [Matrix.sub_mul, Matrix.one_mul]; change _ = _; abel
+    simp only [Submonoid.coe_mul, Matrix.sub_mul, Matrix.one_mul]
+    abel
   rw [heq]
   exact (frobeniusNormSq_add_le _ _).trans_eq (by rw [frobeniusNormSq_mul_su_right])
 
@@ -216,7 +229,8 @@ private lemma su_entry_re_im_bound {N : ℕ}
     simp_rw [hterm] at hre
     calc ‖(A : Matrix (Fin N) (Fin N) ℂ) i j‖ ^ 2
         ≤ ∑ k : Fin N, ‖(A : Matrix (Fin N) (Fin N) ℂ) k j‖ ^ 2 :=
-          Finset.single_le_sum (fun _ _ => sq_nonneg _) (Finset.mem_univ i)
+          Finset.single_le_sum (fun k (_ : k ∈ Finset.univ) =>
+            sq_nonneg ‖(A : Matrix (Fin N) (Fin N) ℂ) k j‖) (Finset.mem_univ i)
       _ = 1 := hre
   have hnorm : ‖(A : Matrix (Fin N) (Fin N) ℂ) i j‖ ≤ 1 :=
     (sq_le_sq₀ (norm_nonneg _) zero_le_one).mp (by simpa using hsq_le)
@@ -236,7 +250,7 @@ private lemma suHaar_ball_ge (N : ℕ) [NeZero N] {δ : ℝ} (hδ : 0 < δ) :
   have hK_pos : 0 < K := Nat.succ_pos _
   have hK_real_pos : (0 : ℝ) < (K : ℝ) := Nat.cast_pos.mpr hK_pos
   have hK_ge : 4 * (N : ℝ) / δ ≤ (K : ℝ) :=
-    (Nat.le_ceil _).trans (by exact_mod_cast Nat.le_succ _)
+    (Nat.le_ceil _).trans (Nat.cast_le.mpr (Nat.le_succ _))
   let inBox : Fin K → ℝ → Prop := fun m r =>
     -1 + 2 * (m : ℝ) / (K : ℝ) ≤ r ∧ r ≤ -1 + 2 * ((m : ℝ) + 1) / (K : ℝ)
   have h_cover_1d : ∀ r ∈ Set.Icc (-1 : ℝ) 1, ∃ m : Fin K, inBox m r := by
@@ -253,7 +267,7 @@ private lemma suHaar_ball_ge (N : ℕ) [NeZero N] {δ : ℝ} (hδ : 0 < δ) :
       · rw [hm1, mul_div_cancel_right₀ _ hK_real_pos.ne']; linarith
     · have hr_lt : r < 1 := lt_of_le_of_ne hr_hi hr1
       let t : ℝ := (r + 1) * (K : ℝ) / 2
-      have ht_nn : 0 ≤ t := by dsimp [t]; positivity
+      have ht_nn : 0 ≤ t := by dsimp [t]; nlinarith [hK_real_pos]
       have ht_lt : t < (K : ℝ) := by
         dsimp [t]
         have : r + 1 < 2 := by linarith
@@ -312,8 +326,12 @@ private lemma suHaar_ball_ge (N : ℕ) [NeZero N] {δ : ℝ} (hδ : 0 < δ) :
         frobeniusNormSq ((A : Matrix (Fin N) (Fin N) ℂ) - 1)) := by
       unfold frobeniusNormSq
       refine continuous_finset_sum _ fun i _ => continuous_finset_sum _ fun j _ => ?_
-      exact (continuous_norm.comp (((continuous_apply j).comp
-        ((continuous_apply i).comp continuous_subtype_val)).sub continuous_const)).pow 2
+      exact (continuous_norm.comp ((continuous_apply j).comp ((continuous_apply i).comp
+        ((continuous_subtype_val :
+            Continuous fun A : Matrix.specialUnitaryGroup (Fin N) ℂ =>
+              (A : Matrix (Fin N) (Fin N) ℂ)).sub
+          (continuous_const : Continuous fun _ : Matrix.specialUnitaryGroup (Fin N) ℂ =>
+              (1 : Matrix (Fin N) (Fin N) ℂ)))))).pow 2
     exact measurableSet_Iic.preimage hc.measurable
   have h_box_le : ∀ b : Idx, suHaar N (box b) ≤ suHaar N B := by
     intro b
@@ -385,10 +403,11 @@ private lemma suHaar_ball_ge (N : ℕ) [NeZero N] {δ : ℝ} (hδ : 0 < δ) :
   have h_sum_ge : (1 : ENNReal) ≤ ∑ _b : Idx, suHaar N B := by
     calc (1 : ENNReal) = suHaar N Set.univ := MeasureTheory.measure_univ.symm
       _ ≤ suHaar N (⋃ b : Idx, box b) := MeasureTheory.measure_mono h_univ_sub
-      _ ≤ ∑ b : Idx, suHaar N (box b) := MeasureTheory.measure_iUnion_le _
+      _ ≤ ∑ b : Idx, suHaar N (box b) :=
+          MeasureTheory.measure_iUnion_fintype_le (suHaar N) box
       _ ≤ ∑ _b : Idx, suHaar N B := Finset.sum_le_sum fun b _ => h_box_le b
   have h_card : Fintype.card Idx = K ^ (2 * N * N) := by
-    simp [Idx, Fintype.card_fun, Fintype.card_prod]; ring
+    simp [Idx, Fintype.card_prod]; ring
   rw [Finset.sum_const, Finset.card_univ, h_card, nsmul_eq_mul] at h_sum_ge
   have h_top : suHaar N B ≠ ⊤ := MeasureTheory.measure_ne_top _ _
   have h_real : (1 : ℝ) ≤ ((K : ℝ) ^ (2 * N * N)) * (suHaar N B).toReal := by
@@ -420,10 +439,13 @@ private noncomputable def centralElem (N : ℕ) (hN : 2 ≤ N) :
     rw [mul_div_cancel₀ _ hN_ne, Complex.exp_two_pi_mul_I]
   ⟨c • (1 : Matrix (Fin N) (Fin N) ℂ),
     Unitary.mem_iff.mpr
-      ⟨by ext i j; by_cases hij : i = j <;> simp [Matrix.mul_apply, hij, hc_mul],
-       by ext i j; by_cases hij : i = j <;>
-            simp [Matrix.mul_apply, hij, show c * star c = 1 from by rw [mul_comm]; exact hc_mul]⟩,
-    by rw [Matrix.det_smul, Matrix.det_one, smul_eq_mul, mul_one, hc_pow]⟩
+      ⟨by rw [star_smul, star_one, smul_mul_smul_comm, one_mul, hc_mul, one_smul],
+       by
+          have hcs : c * star c = 1 := by rw [mul_comm]; exact hc_mul
+          rw [star_smul, star_one, smul_mul_smul_comm, one_mul, hcs, one_smul]⟩,
+    by
+      change Matrix.det (c • (1 : Matrix (Fin N) (Fin N) ℂ)) = 1
+      rw [Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin, hc_pow]⟩
 
 private lemma centralElem_ne_one (N : ℕ) (hN : 2 ≤ N) :
     Complex.exp (2 * Real.pi * Complex.I / (N : ℂ)) ≠ 1 := by
@@ -431,11 +453,14 @@ private lemma centralElem_ne_one (N : ℕ) (hN : 2 ≤ N) :
   have hθ_pos : 0 < 2 * Real.pi / (N : ℝ) := div_pos (mul_pos two_pos Real.pi_pos) hN_pos
   have hθ_le : 2 * Real.pi / (N : ℝ) ≤ Real.pi := by
     rw [div_le_iff₀ hN_pos]
-    nlinarith [Real.pi_pos, (by exact_mod_cast hN : (2 : ℝ) ≤ (N : ℝ))]
+    have hN2 : (2 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN
+    nlinarith [Real.pi_pos, hN2]
   have hcos_lt : Real.cos (2 * Real.pi / (N : ℝ)) < 1 := by
     rcases eq_or_lt_of_le hθ_le with heq | hlt
     · rw [heq, Real.cos_pi]; norm_num
-    · exact Real.cos_lt_one_of_ne_zero ⟨by linarith, by linarith⟩
+    · have hlt_pi : 2 * Real.pi / (N : ℝ) < Real.pi := hlt
+      rw [← Real.cos_zero]
+      exact Real.cos_lt_cos_of_nonneg_of_le_pi le_rfl hlt_pi.le hθ_pos
   have hre : (Complex.exp (2 * Real.pi * Complex.I / (N : ℂ))).re =
       Real.cos (2 * Real.pi / (N : ℝ)) := by
     rw [show 2 * (Real.pi : ℂ) * Complex.I / (N : ℂ) =
@@ -454,9 +479,9 @@ private lemma centralElem_comm {N : ℕ} (hN : 2 ≤ N)
       (A : Matrix (Fin N) (Fin N) ℂ)) i j =
     ((A : Matrix (Fin N) (Fin N) ℂ) *
       (Complex.exp (2 * Real.pi * Complex.I / (N : ℂ)) • (1 : Matrix (Fin N) (Fin N) ℂ))) i j
-  simp [Matrix.smul_mul, Matrix.mul_smul]
+  simp
 
-private def sliceCenterFlip (L N : ℕ) [NeZero L] (hN : 2 ≤ N)
+private noncomputable def sliceCenterFlip (L N : ℕ) [NeZero L] (hN : 2 ≤ N)
     (U : GaugeField (cubicTorus3 L) (Matrix.specialUnitaryGroup (Fin N) ℂ)) :
     GaugeField (cubicTorus3 L) (Matrix.specialUnitaryGroup (Fin N) ℂ) :=
   fun e => if e.1.1 = 0 ∧ e.2 = 0 then centralElem N hN * U e else U e
@@ -481,96 +506,26 @@ private lemma sliceCenterFlip_measurePreserving (L N : ℕ) [NeZero L] (hN : 2 �
   refine ⟨hmeas, ?_⟩
   symm
   refine MeasureTheory.Measure.pi_eq fun s hs => ?_
-  rw [MeasureTheory.Measure.map_apply hmeas (MeasurableSet.univ_pi hs)]
+  refine (MeasureTheory.Measure.map_apply ?_ ?_).trans ?_
+  · exact hmeas
+  · exact MeasurableSet.univ_pi hs
   have hpre : sliceCenterFlip L N hN ⁻¹' Set.pi Set.univ s =
       Set.pi Set.univ (fun e => φ e ⁻¹' s e) := by
-    ext U; simp [sliceCenterFlip, φ]
-  rw [hpre, MeasureTheory.Measure.pi_pi (fun _ => suHaar N) _]
+    ext U
+    exact Iff.rfl
+  rw [hpre]
+  refine (MeasureTheory.Measure.pi_pi _ _).trans ?_
   refine Finset.prod_congr rfl fun e _ => ?_
-  dsimp [φ]; split_ifs
+  dsimp only [φ]
+  split_ifs
   · have hmap := suHaar_map_mul_left N (centralElem N hN)
-    rw [← MeasureTheory.Measure.map_apply (continuous_mul_left _).measurable (hs e), hmap]
+    have happ := MeasureTheory.Measure.map_apply
+      (continuous_mul_left (centralElem N hN)).measurable (hs e) (μ := suHaar N)
+    rw [hmap] at happ
+    exact happ.symm
   · rfl
 
 private lemma wilsonAction_sliceCenterFlip (L N : ℕ) [NeZero L] (hN : 2 ≤ N) (β : ℝ)
-    (U : GaugeField (cubicTorus3 L) (Matrix.specialUnitaryGroup (Fin N) ℂ)) :
-    wilsonAction β (cubicPlaquettes L) (sliceCenterFlip L N hN U) =
-      wilsonAction β (cubicPlaquettes L) U := by
-  unfold wilsonAction
-  congr 1
-  have h_plaq : ∀ p ∈ cubicPlaquettes L,
-      wilsonPlaquetteTerm p (sliceCenterFlip L N hN U) = wilsonPlaquetteTerm p U := by
-    intro p hp
-    unfold wilsonPlaquetteTerm
-    suffices hhol : pathHolonomy (sliceCenterFlip L N hN U) p.loop = pathHolonomy U p.loop by
-      rw [hhol]
-    unfold cubicPlaquettes at hp
-    simp only [List.mem_flatMap, Finset.mem_toList, Finset.mem_univ, true_and,
-      List.mem_cons, List.not_mem_nil, or_false] at hp
-    rcases hp with ⟨x, rfl | rfl | rfl⟩
-    · dsimp [cubicPlaquette, pathHolonomy, sliceCenterFlip, cubicShift]
-      by_cases hx : x.1 = 0
-      · simp only [hx, true_and, ↓reduceIte, mul_inv_rev]
-        have hc := centralElem_comm hN
-        group
-        -- Cancel z and z⁻¹ using centralElem_comm
-        rw [mul_assoc (centralElem N hN), ← mul_assoc (U (x, 0)),
-          ← hc (U (x, 0)), mul_assoc (U (x, 0))]
-        have h1 : U ((x.1 + 1, x.2.1, x.2.2), 1) *
-            ((U ((x.1, x.2.1 + 1, x.2.2), 0))⁻¹ * (centralElem N hN)⁻¹) =
-            (centralElem N hN)⁻¹ * (U ((x.1 + 1, x.2.1, x.2.2), 1) *
-              (U ((x.1, x.2.1 + 1, x.2.2), 0))⁻¹) := by
-          rw [mul_assoc, ← (by
-            have := congrArg (fun M => (M⁻¹ : Matrix.specialUnitaryGroup (Fin N) ℂ))
-              (hc (U ((x.1 + 1, x.2.1, x.2.2), 1))⁻¹)
-            simpa [mul_inv_rev] using this)]
-          group
-          rw [← hc (U ((x.1 + 1, x.2.1, x.2.2), 1))]
-          group
-        rw [← mul_assoc (centralElem N hN), mul_assoc (U (x, 0)), mul_assoc (centralElem N hN),
-          h1]
-        group
-      · simp [hx]
-    · dsimp [cubicPlaquette, pathHolonomy, sliceCenterFlip, cubicShift]
-      by_cases hx : x.1 = 0
-      · simp only [hx, true_and, ↓reduceIte, mul_inv_rev]
-        have hc := centralElem_comm hN
-        have hc_inv : ∀ A : Matrix.specialUnitaryGroup (Fin N) ℂ,
-            A * (centralElem N hN)⁻¹ = (centralElem N hN)⁻¹ * A := fun A => by
-          have h := congrArg (fun M => (centralElem N hN)⁻¹ * M * (centralElem N hN)⁻¹) (hc A)
-          simpa [mul_assoc] using h.symm
-        calc centralElem N hN * U (x, 0) *
-              (U ((x.1 + 1, x.2.1, x.2.2), 2) *
-                ((U ((x.1, x.2.1, x.2.2 + 1), 0))⁻¹ * (centralElem N hN)⁻¹ *
-                  ((U (x, 2))⁻¹ * 1)))
-            = centralElem N hN * (U (x, 0) *
-                ((U ((x.1 + 1, x.2.1, x.2.2), 2) * (U ((x.1, x.2.1, x.2.2 + 1), 0))⁻¹) *
-                  (centralElem N hN)⁻¹ * ((U (x, 2))⁻¹ * 1))) := by
-                simp only [mul_assoc]
-                congr 2; congr 1
-                rw [← mul_assoc, hc_inv]
-                simp only [mul_assoc]
-          _ = centralElem N hN * ((centralElem N hN)⁻¹ * (U (x, 0) *
-                (U ((x.1 + 1, x.2.1, x.2.2), 2) *
-                  ((U ((x.1, x.2.1, x.2.2 + 1), 0))⁻¹ * ((U (x, 2))⁻¹ * 1))))) := by
-                congr 1
-                rw [← mul_assoc _ (centralElem N hN)⁻¹, hc_inv, ← mul_assoc, hc_inv]
-                simp only [mul_assoc]
-          _ = U (x, 0) * (U ((x.1 + 1, x.2.1, x.2.2), 2) *
-                ((U ((x.1, x.2.1, x.2.2 + 1), 0))⁻¹ * ((U (x, 2))⁻¹ * 1))) := by
-                rw [← mul_assoc, mul_inv_cancel, one_mul]
-      · simp [hx]
-    · dsimp [cubicPlaquette, pathHolonomy, sliceCenterFlip, cubicShift]
-      simp [show (1 : Fin 3) ≠ 0 by decide, show (2 : Fin 3) ≠ 0 by decide]
-  induction cubicPlaquettes L with
-  | nil => rfl
-  | cons p ps ih =>
-    simp only [List.map_cons, List.sum_cons]
-    have hp1 : p ∈ p :: ps := List.mem_cons_self
-    sorry -- (note: below we avoid `induction` on `cubicPlaquettes L` directly via `List.map_congr_left`)
-
--- Note: clean non-sorry version of `wilsonAction_sliceCenterFlip` uses `List.map_congr_left`
-private lemma wilsonAction_sliceCenterFlip' (L N : ℕ) [NeZero L] (hN : 2 ≤ N) (β : ℝ)
     (U : GaugeField (cubicTorus3 L) (Matrix.specialUnitaryGroup (Fin N) ℂ)) :
     wilsonAction β (cubicPlaquettes L) (sliceCenterFlip L N hN U) =
       wilsonAction β (cubicPlaquettes L) U := by
@@ -633,7 +588,8 @@ private lemma wilsonGramKernel_sliceCenterFlip (L N : ℕ) [NeZero L] (hN : 2 �
   haveI := canonSUBorel N
   have hmp := sliceCenterFlip_measurePreserving L N hN
   unfold wilsonGramKernel
-  rw [← hmp.integral_comp' (fun W => cubicLinkKineticKernel L N β
+  have hmp' : MeasureTheory.MeasurePreserving (sliceCenterFlip L N hN) μ μ := hmp
+  rw [← hmp'.integral_comp' (fun W => cubicLinkKineticKernel L N β
     (sliceCenterFlip L N hN U) W * cubicLinkKineticKernel L N β (sliceCenterFlip L N hN U') W)]
   refine MeasureTheory.integral_congr_ae (Filter.Eventually.of_forall fun W => ?_)
   have h_chi : ∀ X Y, cubicLinkKineticKernel L N β (sliceCenterFlip L N hN X)
@@ -755,7 +711,7 @@ theorem fullRankCubic_gap_upper_bound (L N : ℕ) [NeZero L] (hN : 2 ≤ N)
       _ = ∫ U, ⟪u U, v U⟫_ℂ ∂μ := hmp.integral_comp' (fun U => ⟪u U, v U⟫_ℂ)
   have hKW_flip : ∀ U U', K_W (e_flip U) (e_flip U') = K_W U U' := fun U U' => by
     dsimp [K_W, wilsonKernel, e_flip]
-    rw [wilsonAction_sliceCenterFlip', wilsonAction_sliceCenterFlip',
+    rw [wilsonAction_sliceCenterFlip, wilsonAction_sliceCenterFlip,
       wilsonGramKernel_sliceCenterFlip]
   have hT_comm_Z : ∀ ψ, T_raw (Z_op ψ) = Z_op (T_raw ψ) := fun ψ => by
     apply MeasureTheory.Lp.ext
