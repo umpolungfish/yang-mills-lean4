@@ -386,4 +386,28 @@ noncomputable def concreteReflectTensorData : ReflectTensorData where
       _ = C_s * (1 + t) ^ k := by
           dsimp [C_s]; rw [Finset.sum_mul]; refine Finset.sum_congr rfl fun i _ => ?_; ring
 
+theorem concreteReflectTensorData_shiftPos_zero (n : ℕ) (f : PosSchwartzSubmodule n) :
+    concreteReflectTensorData.shiftPos 0 n f = f := by
+  refine Subtype.ext (DFunLike.ext _ _ fun x => ?_)
+  have h0 : timeShiftVec n 0 = 0 := by ext k μ; simp [timeShiftVec]
+  have hfx : (concreteShiftPos 0 n f).1 x = f.1 (x - timeShiftVec n 0) := by
+    simp only [concreteShiftPos, dif_pos le_rfl, LinearMap.coe_mk, AddHom.coe_mk,
+      ConcreteSchwartzShiftAndReflect.shiftPos]
+    rfl
+  change (concreteShiftPos 0 n f).1 x = f.1 x
+  rw [hfx, h0, sub_zero]
+
+theorem concreteReflectTensorData_shiftPos_coe {t : ℝ} (ht : 0 ≤ t) (n : ℕ)
+    (f : PosSchwartzSubmodule n) :
+    (concreteReflectTensorData.shiftPos t n f).1 =
+      ConcreteSchwartzShiftAndReflect.shiftPos (fun _ => t • stdBasis4 0) f.1 := by
+  ext x
+  have hfx : (concreteShiftPos t n f).1 x = f.1 (x - timeShiftVec n t) := by
+    simp only [concreteShiftPos, dif_pos ht, LinearMap.coe_mk, AddHom.coe_mk,
+      ConcreteSchwartzShiftAndReflect.shiftPos]
+    rfl
+  change (concreteShiftPos t n f).1 x = f.1 (x - fun _ => t • stdBasis4 0)
+  rw [hfx]
+  rfl
+
 end Imscribing.YangMills.ConcreteTensorSchwartz

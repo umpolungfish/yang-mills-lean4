@@ -99,6 +99,159 @@ noncomputable def quotInnerCore (pre : EuclideanPreData E) :
     induction y using Submodule.Quotient.induction_on
     exact pre.B_smul_left _ _ _
 
+private lemma B_null_theta (pre : EuclideanPreData E) (t : ℝ) (ht : 0 ≤ t) {x : E}
+    (hx : x ∈ nullSubmodule pre) : pre.θ t x ∈ nullSubmodule pre := by
+  change (pre.B (pre.θ t x) (pre.θ t x)).re = 0
+  rw [pre.θ_symm t ht (pre.θ t x) x]
+  have hcs := sesquilinear_cauchy_schwarz pre.B pre.B_add_left pre.B_smul_left
+    pre.B_add_right pre.B_smul_right pre.B_herm pre.B_nonneg
+    (pre.θ t (pre.θ t x)) x
+  have hx0 : (pre.B x x).re = 0 := hx
+  rw [hx0, mul_zero] at hcs
+  have h0 : pre.B (pre.θ t (pre.θ t x)) x = 0 :=
+    norm_eq_zero.mp (by nlinarith [norm_nonneg (pre.B (pre.θ t (pre.θ t x)) x)])
+  rw [h0, Complex.zero_re]
+
+/-- Pre-Hilbert Euclidean time-shift semigroup `T₀` on `E ⧸ nullSubmodule pre`. -/
+noncomputable def osBorchersPreSemigroup (pre : EuclideanPreData E) :
+    ℝ → (E ⧸ nullSubmodule pre) →ₗ[ℂ] (E ⧸ nullSubmodule pre) := fun t =>
+  if ht : 0 ≤ t then
+    { toFun := fun q => Quotient.liftOn q
+        (fun x => (Submodule.Quotient.mk (pre.θ t x) : E ⧸ nullSubmodule pre))
+        (fun x y hxy => by
+          apply Quotient.sound
+          change (Submodule.quotientRel (nullSubmodule pre)).r x y at hxy
+          change (Submodule.quotientRel (nullSubmodule pre)).r (pre.θ t x) (pre.θ t y)
+          rw [Submodule.quotientRel_def] at hxy ⊢
+          rw [← map_sub]
+          exact B_null_theta pre t ht hxy)
+      map_add' := fun x y => by
+        induction x using Submodule.Quotient.induction_on
+        induction y using Submodule.Quotient.induction_on
+        change (Submodule.Quotient.mk (pre.θ t (_ + _)) : E ⧸ nullSubmodule pre) =
+          Submodule.Quotient.mk (pre.θ t _) + Submodule.Quotient.mk (pre.θ t _)
+        rw [map_add]; rfl
+      map_smul' := fun c x => by
+        induction x using Submodule.Quotient.induction_on
+        change (Submodule.Quotient.mk (pre.θ t (c • _)) : E ⧸ nullSubmodule pre) =
+          c • Submodule.Quotient.mk (pre.θ t _)
+        rw [map_smul]; rfl }
+  else LinearMap.id
+
+theorem osBorchersPreSemigroup_mk (pre : EuclideanPreData E) (t : ℝ) (ht : 0 ≤ t) (x : E) :
+    osBorchersPreSemigroup pre t (Submodule.Quotient.mk x) =
+      Submodule.Quotient.mk (pre.θ t x) := by
+  dsimp [osBorchersPreSemigroup]
+  rw [dif_pos ht]
+  rfl
+
+theorem osBorchersPreSemigroup_vac (pre : EuclideanPreData E) (t : ℝ) (ht : 0 ≤ t) :
+    osBorchersPreSemigroup pre t (Submodule.Quotient.mk pre.e₀) =
+      Submodule.Quotient.mk pre.e₀ := by
+  rw [osBorchersPreSemigroup_mk pre t ht pre.e₀, pre.θ_vac t ht]
+
+theorem osBorchersPreSemigroup_add (pre : EuclideanPreData E) (s t : ℝ) (hs : 0 ≤ s) (ht : 0 ≤ t)
+    (x : E ⧸ nullSubmodule pre) :
+    osBorchersPreSemigroup pre (s + t) x =
+      osBorchersPreSemigroup pre s (osBorchersPreSemigroup pre t x) := by
+  induction x using Submodule.Quotient.induction_on
+  rw [osBorchersPreSemigroup_mk pre (s + t) (add_nonneg hs ht) _,
+    osBorchersPreSemigroup_mk pre t ht _, osBorchersPreSemigroup_mk pre s hs _,
+    pre.θ_add s t hs ht _]
+
+theorem osBorchersPreSemigroup_symm (pre : EuclideanPreData E) :
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (E ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (E ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+    ∀ t : ℝ, 0 ≤ t → ∀ x y : E ⧸ nullSubmodule pre,
+      ⟪x, osBorchersPreSemigroup pre t y⟫_ℂ = ⟪osBorchersPreSemigroup pre t x, y⟫_ℂ := by
+  intro core
+  letI : NormedAddCommGroup (E ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+  letI : InnerProductSpace ℂ (E ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+  intro t ht x y
+  induction x using Submodule.Quotient.induction_on
+  induction y using Submodule.Quotient.induction_on
+  rw [osBorchersPreSemigroup_mk pre t ht _, osBorchersPreSemigroup_mk pre t ht _]
+  exact pre.θ_symm t ht _ _
+
+theorem osBorchersPreSemigroup_poly (pre : EuclideanPreData E) :
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (E ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (E ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+    ∀ x : E ⧸ nullSubmodule pre,
+      ∃ C r : ℝ, 0 < C ∧ 0 ≤ r ∧ ∀ t ≥ 0, ‖osBorchersPreSemigroup pre t x‖ ≤ C * (1 + t) ^ r := by
+  intro core
+  letI : NormedAddCommGroup (E ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+  letI : InnerProductSpace ℂ (E ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+  intro x
+  induction x using Submodule.Quotient.induction_on with
+  | _ F =>
+    obtain ⟨C, r, hC, hr, hpoly⟩ := pre.θ_poly F
+    refine ⟨C, r, hC, hr, fun t ht => ?_⟩
+    have hsq : ‖osBorchersPreSemigroup pre t (Submodule.Quotient.mk F)‖ ^ 2 ≤
+        (C * (1 + t) ^ r) ^ 2 := by
+      have h1 : (⟪osBorchersPreSemigroup pre t (Submodule.Quotient.mk F),
+            osBorchersPreSemigroup pre t (Submodule.Quotient.mk F)⟫_ℂ).re =
+          ‖osBorchersPreSemigroup pre t (Submodule.Quotient.mk F)‖ ^ 2 := by
+        rw [inner_self_eq_norm_sq_to_K]; norm_cast
+      rw [← h1, osBorchersPreSemigroup_mk pre t ht F]
+      have h2 : (C * (1 + t) ^ r) ^ 2 = C ^ 2 * (1 + t) ^ (2 * r) := by
+        rw [mul_pow, ← Real.rpow_natCast ((1 + t) ^ r) 2, ← Real.rpow_mul (by linarith)]
+        congr 2; ring
+      rw [h2]
+      exact hpoly t ht
+    have h_rhs_nn : 0 ≤ C * (1 + t) ^ r := mul_nonneg hC.le (Real.rpow_nonneg (by linarith) r)
+    nlinarith [norm_nonneg (osBorchersPreSemigroup pre t (Submodule.Quotient.mk F))]
+
+theorem osBorchersPreSemigroup_contr (pre : EuclideanPreData E) :
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (E ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (E ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+    ∀ t : ℝ, 0 ≤ t → ∀ x : E ⧸ nullSubmodule pre,
+      ‖osBorchersPreSemigroup pre t x‖ ≤ ‖x‖ := by
+  intro core
+  letI : NormedAddCommGroup (E ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+  letI : InnerProductSpace ℂ (E ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+  have h_symm := osBorchersPreSemigroup_symm pre
+  have h_poly := osBorchersPreSemigroup_poly pre
+  dsimp only at h_symm h_poly
+  exact OSGenerator.os_repeated_squaring_contraction (osBorchersPreSemigroup pre)
+    h_symm (osBorchersPreSemigroup_add pre) h_poly
+
+theorem osBorchersPreSemigroup_decay (pre : EuclideanPreData E) :
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (E ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (E ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+    ∀ t : ℝ, 0 ≤ t → ∀ φ : E ⧸ nullSubmodule pre,
+      ⟪(Submodule.Quotient.mk pre.e₀ : E ⧸ nullSubmodule pre), φ⟫_ℂ = 0 →
+      ‖osBorchersPreSemigroup pre t φ‖ ≤ Real.exp (-pre.Δ * t) * ‖φ‖ := by
+  intro core
+  letI : NormedAddCommGroup (E ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+  letI : InnerProductSpace ℂ (E ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+  intro t ht φ hφ
+  induction φ using Submodule.Quotient.induction_on with
+  | _ F =>
+    have h_orth : pre.B pre.e₀ F = 0 := hφ
+    have hdec := pre.θ_decay t ht F h_orth
+    have hsq : ‖osBorchersPreSemigroup pre t (Submodule.Quotient.mk F)‖ ^ 2 ≤
+        (Real.exp (-pre.Δ * t) * ‖(Submodule.Quotient.mk F : E ⧸ nullSubmodule pre)‖) ^ 2 := by
+      have h1 : (⟪osBorchersPreSemigroup pre t (Submodule.Quotient.mk F),
+            osBorchersPreSemigroup pre t (Submodule.Quotient.mk F)⟫_ℂ).re =
+          ‖osBorchersPreSemigroup pre t (Submodule.Quotient.mk F)‖ ^ 2 := by
+        rw [inner_self_eq_norm_sq_to_K]; norm_cast
+      have h2 : (⟪(Submodule.Quotient.mk F : E ⧸ nullSubmodule pre), Submodule.Quotient.mk F⟫_ℂ).re =
+          ‖(Submodule.Quotient.mk F : E ⧸ nullSubmodule pre)‖ ^ 2 := by
+        rw [inner_self_eq_norm_sq_to_K]; norm_cast
+      rw [← h1, osBorchersPreSemigroup_mk pre t ht F, mul_pow, ← h2]
+      have hexp : Real.exp (-pre.Δ * t) ^ 2 = Real.exp (-2 * pre.Δ * t) := by
+        rw [sq, ← Real.exp_add]
+        congr 1; ring
+      rw [hexp]
+      exact hdec
+    have h_rhs_nn : 0 ≤ Real.exp (-pre.Δ * t) * ‖(Submodule.Quotient.mk F : E ⧸ nullSubmodule pre)‖ :=
+      mul_nonneg (Real.exp_pos _).le (norm_nonneg _)
+    nlinarith [norm_nonneg (osBorchersPreSemigroup pre t (Submodule.Quotient.mk F))]
+
 /-- **OS Completion Theorem on `E ⧸ nullSubmodule pre`.** -/
 theorem os_borchers_to_completion (pre : EuclideanPreData E) :
     let core := quotInnerCore pre
@@ -126,104 +279,13 @@ theorem os_borchers_to_completion (pre : EuclideanPreData E) :
       change (pre.B pre.e₀ pre.e₀).re = 1
       rw [pre.B_vac, Complex.one_re]
     nlinarith [norm_nonneg Ω₀]
-  have h_null_θ : ∀ t : ℝ, 0 ≤ t → ∀ {x : E},
-      x ∈ nullSubmodule pre → pre.θ t x ∈ nullSubmodule pre := by
-    intro t ht x hx
-    change (pre.B (pre.θ t x) (pre.θ t x)).re = 0
-    rw [pre.θ_symm t ht (pre.θ t x) x]
-    have hcs := sesquilinear_cauchy_schwarz pre.B pre.B_add_left pre.B_smul_left
-      pre.B_add_right pre.B_smul_right pre.B_herm pre.B_nonneg
-      (pre.θ t (pre.θ t x)) x
-    have hx0 : (pre.B x x).re = 0 := hx
-    rw [hx0, mul_zero] at hcs
-    have h0 : pre.B (pre.θ t (pre.θ t x)) x = 0 :=
-      norm_eq_zero.mp (by nlinarith [norm_nonneg (pre.B (pre.θ t (pre.θ t x)) x)])
-    rw [h0, Complex.zero_re]
-  let T₀ : ℝ → (E ⧸ nullSubmodule pre) →ₗ[ℂ] (E ⧸ nullSubmodule pre) := fun t =>
-    if ht : 0 ≤ t then
-      { toFun := fun q => Quotient.liftOn q
-          (fun x => (Submodule.Quotient.mk (pre.θ t x) : E ⧸ nullSubmodule pre))
-          (fun x y hxy => by
-            apply Quotient.sound
-            change (Submodule.quotientRel (nullSubmodule pre)).r x y at hxy
-            change (Submodule.quotientRel (nullSubmodule pre)).r (pre.θ t x) (pre.θ t y)
-            rw [Submodule.quotientRel_def] at hxy ⊢
-            rw [← map_sub]
-            exact h_null_θ t ht hxy)
-        map_add' := fun x y => by
-          induction x using Submodule.Quotient.induction_on
-          induction y using Submodule.Quotient.induction_on
-          change (Submodule.Quotient.mk (pre.θ t (_ + _)) : E ⧸ nullSubmodule pre) =
-            Submodule.Quotient.mk (pre.θ t _) + Submodule.Quotient.mk (pre.θ t _)
-          rw [map_add]; rfl
-        map_smul' := fun c x => by
-          induction x using Submodule.Quotient.induction_on
-          change (Submodule.Quotient.mk (pre.θ t (c • _)) : E ⧸ nullSubmodule pre) =
-            c • Submodule.Quotient.mk (pre.θ t _)
-          rw [map_smul]; rfl }
-    else LinearMap.id
-  have hT₀_mk : ∀ t : ℝ, 0 ≤ t → ∀ x : E,
-      T₀ t (Submodule.Quotient.mk x) = Submodule.Quotient.mk (pre.θ t x) := by
-    intro t ht x
-    dsimp [T₀]
-    rw [dif_pos ht]
-    rfl
-  have hT₀_vac : ∀ t : ℝ, 0 ≤ t → T₀ t Ω₀ = Ω₀ := by
-    intro t ht
-    rw [hT₀_mk t ht pre.e₀, pre.θ_vac t ht]
-  have hT₀_symm : ∀ t : ℝ, 0 ≤ t → ∀ x y : E ⧸ nullSubmodule pre, ⟪x, T₀ t y⟫_ℂ = ⟪T₀ t x, y⟫_ℂ := by
-    intro t ht x y
-    induction x using Submodule.Quotient.induction_on
-    induction y using Submodule.Quotient.induction_on
-    rw [hT₀_mk t ht _, hT₀_mk t ht _]
-    exact pre.θ_symm t ht _ _
-  have hT₀_add : ∀ s t : ℝ, 0 ≤ s → 0 ≤ t → ∀ x : E ⧸ nullSubmodule pre, T₀ (s + t) x = T₀ s (T₀ t x) := by
-    intro s t hs ht x
-    induction x using Submodule.Quotient.induction_on
-    rw [hT₀_mk (s + t) (add_nonneg hs ht) _, hT₀_mk t ht _, hT₀_mk s hs _, pre.θ_add s t hs ht _]
-  have hT₀_poly : ∀ x : E ⧸ nullSubmodule pre, ∃ C r : ℝ, 0 < C ∧ 0 ≤ r ∧ ∀ t ≥ 0, ‖T₀ t x‖ ≤ C * (1 + t) ^ r := by
-    intro x
-    induction x using Submodule.Quotient.induction_on with
-    | _ F =>
-      obtain ⟨C, r, hC, hr, hpoly⟩ := pre.θ_poly F
-      refine ⟨C, r, hC, hr, fun t ht => ?_⟩
-      have hsq : ‖T₀ t (Submodule.Quotient.mk F)‖ ^ 2 ≤ (C * (1 + t) ^ r) ^ 2 := by
-        have h1 : (⟪T₀ t (Submodule.Quotient.mk F), T₀ t (Submodule.Quotient.mk F)⟫_ℂ).re =
-            ‖T₀ t (Submodule.Quotient.mk F)‖ ^ 2 := by
-          rw [inner_self_eq_norm_sq_to_K]; norm_cast
-        rw [← h1, hT₀_mk t ht F]
-        have h2 : (C * (1 + t) ^ r) ^ 2 = C ^ 2 * (1 + t) ^ (2 * r) := by
-          rw [mul_pow, ← Real.rpow_natCast ((1 + t) ^ r) 2, ← Real.rpow_mul (by linarith)]
-          congr 2; ring
-        rw [h2]
-        exact hpoly t ht
-      have h_rhs_nn : 0 ≤ C * (1 + t) ^ r := mul_nonneg hC.le (Real.rpow_nonneg (by linarith) r)
-      nlinarith [norm_nonneg (T₀ t (Submodule.Quotient.mk F))]
-  have hT₀_decay : ∀ t : ℝ, 0 ≤ t → ∀ φ : E ⧸ nullSubmodule pre, ⟪Ω₀, φ⟫_ℂ = 0 →
-      ‖T₀ t φ‖ ≤ Real.exp (-pre.Δ * t) * ‖φ‖ := by
-    intro t ht φ hφ
-    induction φ using Submodule.Quotient.induction_on with
-    | _ F =>
-      have h_orth : pre.B pre.e₀ F = 0 := hφ
-      have hdec := pre.θ_decay t ht F h_orth
-      have hsq : ‖T₀ t (Submodule.Quotient.mk F)‖ ^ 2 ≤
-          (Real.exp (-pre.Δ * t) * ‖(Submodule.Quotient.mk F : E ⧸ nullSubmodule pre)‖) ^ 2 := by
-        have h1 : (⟪T₀ t (Submodule.Quotient.mk F), T₀ t (Submodule.Quotient.mk F)⟫_ℂ).re =
-            ‖T₀ t (Submodule.Quotient.mk F)‖ ^ 2 := by
-          rw [inner_self_eq_norm_sq_to_K]; norm_cast
-        have h2 : (⟪(Submodule.Quotient.mk F : E ⧸ nullSubmodule pre), Submodule.Quotient.mk F⟫_ℂ).re =
-            ‖(Submodule.Quotient.mk F : E ⧸ nullSubmodule pre)‖ ^ 2 := by
-          rw [inner_self_eq_norm_sq_to_K]; norm_cast
-        rw [← h1, hT₀_mk t ht F, mul_pow, ← h2]
-        have hexp : Real.exp (-pre.Δ * t) ^ 2 = Real.exp (-2 * pre.Δ * t) := by
-          rw [sq, ← Real.exp_add]
-          congr 1; ring
-        rw [hexp]
-        exact hdec
-      have h_rhs_nn : 0 ≤ Real.exp (-pre.Δ * t) * ‖(Submodule.Quotient.mk F : E ⧸ nullSubmodule pre)‖ :=
-        mul_nonneg (Real.exp_pos _).le (norm_nonneg _)
-      nlinarith [norm_nonneg (T₀ t (Submodule.Quotient.mk F))]
-  exact os_completion_semigroup_bridge Ω₀ hΩ₀ T₀ hT₀_vac hT₀_symm hT₀_add hT₀_poly pre.Δ hT₀_decay
+  have h_symm := osBorchersPreSemigroup_symm pre
+  have h_poly := osBorchersPreSemigroup_poly pre
+  have h_decay := osBorchersPreSemigroup_decay pre
+  dsimp only at h_symm h_poly h_decay
+  exact os_completion_semigroup_bridge Ω₀ hΩ₀ (osBorchersPreSemigroup pre)
+    (osBorchersPreSemigroup_vac pre) h_symm
+    (osBorchersPreSemigroup_add pre) h_poly pre.Δ h_decay
 
 /-- Strict variance on `E` descends to ‖⟪Ω, x⟫‖ < ‖x‖ in `Completion (E ⧸ N₀)`. -/
 theorem strict_variance_in_completion (pre : EuclideanPreData E) {x : E}

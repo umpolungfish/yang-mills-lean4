@@ -32,6 +32,13 @@ noncomputable def concreteBorchersForm (C : ContinuumSchwingerOS) :
 noncomputable def concreteBorchersShift (t : ℝ) : BorchersPos →ₗ[ℂ] BorchersPos :=
   borchersShift concreteReflectTensorData t
 
+theorem concreteBorchersShift_zero (F : BorchersPos) :
+    concreteBorchersShift 0 F = F := by
+  unfold concreteBorchersShift borchersShift
+  ext n x
+  simp only [DFinsupp.mapRange.linearMap_apply, DFinsupp.mapRange_apply]
+  rw [concreteReflectTensorData_shiftPos_zero n (F n)]
+
 /-- Balaban RG continuum limit target with `R` permanently fixed to `concreteReflectTensorData`. -/
 structure ConcreteBalabanTarget (N : ℕ) (hN : 2 ≤ N) where
   C : ContinuumSchwingerOS

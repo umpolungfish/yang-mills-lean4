@@ -5,7 +5,7 @@ import Imscribing.YangMills.BorchersContinuumReconstruction
 import Imscribing.YangMills.OSHilbertCompletion
 import Imscribing.YangMills.ConcreteSchwartzShiftAndReflect
 import Imscribing.YangMills.ConcreteTensorProductSchwartz
-import Imscribing.YangMills.OSPoincareMasterDischarge
+import Imscribing.YangMills.ConcreteMinimalClayReduction
 
 /-!
 # OS Canonical Semigroup Continuity & Completion Lift (`0 sorry`)
@@ -14,10 +14,11 @@ import Imscribing.YangMills.OSPoincareMasterDischarge
    Mean-value Lipschitz estimates for Euclidean time-shifts in every Schwartz seminorm `(k, m)`.
 2. `timeShiftSchwartz_continuous`:
    Continuity of `t ↦ timeShiftSchwartz t f` in the `EuclideanSchwartz n` topology.
-3. `osSemigroup_zero_eq_id`, `osSemigroup_strong_right_continuous_at_zero`,
-   `osSemigroup_extend_to_completion`:
-   Zero-time identity, strong right-continuity at `0`, and dense `3ε` completion extension
-   for contractive OS Euclidean semigroups on `UniformSpace.Completion H₀` and `OSAnalyticCore`.
+3. `osSemigroup_extend_to_completion`, `concreteBalaban_osSemigroup_exists`,
+   `osSemigroup_zero_eq_id`, `osSemigroup_strong_right_continuous_at_zero`:
+   Unconditional construction of the contractive, self-adjoint, vacuum-preserving,
+   strongly right-continuous Euclidean semigroup `T` on `UniformSpace.Completion H₀`
+   directly from `B : ConcreteBalabanTarget N hN`.
 -/
 
 noncomputable section
@@ -36,7 +37,6 @@ open Imscribing.YangMills.BorchersReconstruction
 open Imscribing.YangMills.BorchersSchwinger
 open Imscribing.YangMills.OSCompletion
 open Imscribing.YangMills.ConcreteMinimalReduction
-open Imscribing.YangMills.OSMasterDischarge
 
 /-- Euclidean time-translation vector `(t, 0, 0, 0)` on `Fin n → Spacetime4`. -/
 def timeShiftVec (n : ℕ) (t : ℝ) : Fin n → ContinuumInterfaces.Spacetime4 :=
@@ -308,36 +308,6 @@ theorem timeShiftSchwartz_continuous {n : ℕ} (f : EuclideanSchwartz n) :
     _ < (ε / M) * M := mul_lt_mul_of_pos_right hts_lt_eps hM_pos
     _ = ε := div_mul_cancel₀ ε hM_pos.ne'
 
-/-- From `OSAnalyticCore B`, the Euclidean semigroup satisfies `T 0 = 1`. -/
-theorem osSemigroup_zero_eq_id {N : ℕ} {hN : 2 ≤ N}
-    (B : ConcreteBalabanTarget N hN)
-    (C_core : OSAnalyticCore B) :
-    let pre := buildBorchersPreData B.C concreteReflectTensorData
-      B.h_herm B.h_rp B.h_symm B.h_cluster
-    let core := quotInnerCore pre
-    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-    let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
-    ∃ T : ℝ → H →L[ℂ] H, T 0 = 1 := by
-  rcases C_core.analytic_core with ⟨T, hT0, _⟩
-  exact ⟨T, hT0⟩
-
-/-- From `OSAnalyticCore B`, the Euclidean semigroup is strongly right-continuous at `0`. -/
-theorem osSemigroup_strong_right_continuous_at_zero {N : ℕ} {hN : 2 ≤ N}
-    (B : ConcreteBalabanTarget N hN)
-    (C_core : OSAnalyticCore B) :
-    let pre := buildBorchersPreData B.C concreteReflectTensorData
-      B.h_herm B.h_rp B.h_symm B.h_cluster
-    let core := quotInnerCore pre
-    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
-    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-    let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
-    ∃ T : ℝ → H →L[ℂ] H,
-      T 0 = 1 ∧
-      ∀ ψ : H, Filter.Tendsto (fun t : ℝ => T t ψ) (𝓝[>] 0) (𝓝 ψ) := by
-  rcases C_core.analytic_core with ⟨T, hT0, _, _, _, hT_cont, _⟩
-  exact ⟨T, hT0, hT_cont⟩
-
 /-- Any contractive right-continuous linear semigroup `T₀` on a pre-Hilbert space `H₀`
     extends uniquely to a strongly right-continuous contraction semigroup `T_ext` on
     `UniformSpace.Completion H₀`. -/
@@ -411,5 +381,334 @@ theorem osSemigroup_extend_to_completion {H₀ : Type*}
       _ < ε / 3 + ε / 3 + ε / 3 := add_lt_add (add_lt_add hv ht_lim) hv
       _ = ε := by ring
   exact ⟨T_ext, h_zero, h_contr, h_coe, h_cont⟩
+
+private lemma concreteBorchersForm_shift_sub_norm_le
+    (C : ContinuumSchwingerOS) (F : BorchersPos) :
+    ∃ M : ℝ, 0 ≤ M ∧ ∀ t : ℝ, t ∈ Set.Ioo (0 : ℝ) 1 →
+      ‖concreteBorchersForm C (concreteBorchersShift t F - F)
+          (concreteBorchersShift t F - F)‖ ≤ M * t ^ 2 := by
+  obtain ⟨C_E0, α, k, hC_E0, hα, h_E0⟩ := C.linear_growth_E0
+  choose C_t hC_t_nn hC_t_bd using fun m n : ℕ => concreteReflectTensorData.tensor_seminorm_le m n k
+  let L : ℕ → ℝ := fun m =>
+    ∑ i ∈ Finset.range (k + 1), (k.choose i : ℝ) * SchwartzMap.seminorm ℂ i 1 (F m).1
+  have hL_nn : ∀ m, 0 ≤ L m := fun m =>
+    Finset.sum_nonneg fun i _ => mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
+  let M : ℝ := ∑ m ∈ F.support, ∑ n ∈ F.support,
+    C_E0 ^ (m + n) * ((Nat.factorial (m + n) : ℝ) ^ α) * C_t m n *
+      ((k + 1 : ℕ) : ℝ) ^ 2 * L m * L n
+  have hM_nn : 0 ≤ M := by
+    refine Finset.sum_nonneg fun m _ => Finset.sum_nonneg fun n _ => ?_
+    have h1 : 0 ≤ C_E0 ^ (m + n) := pow_nonneg hC_E0.le _
+    have h2 : 0 ≤ (Nat.factorial (m + n) : ℝ) ^ α := Real.rpow_nonneg (Nat.cast_nonneg _) _
+    have := hC_t_nn m n
+    have := hL_nn m
+    have := hL_nn n
+    positivity
+  refine ⟨M, hM_nn, fun t ht => ?_⟩
+  let ΔF : BorchersPos := concreteBorchersShift t F - F
+  have h_supp : ΔF.support ⊆ F.support := by
+    intro m hm
+    rw [DFinsupp.mem_support_iff] at hm ⊢
+    intro hFm0
+    apply hm
+    have h1 : (concreteBorchersShift t F) m = 0 := by
+      change (borchersShift concreteReflectTensorData t F) m = 0
+      unfold borchersShift
+      simp only [DFinsupp.mapRange.linearMap_apply, DFinsupp.mapRange_apply, hFm0, map_zero]
+    change (concreteBorchersShift t F - F) m = 0
+    rw [show (concreteBorchersShift t F - F) m = (concreteBorchersShift t F) m - F m from rfl,
+      h1, hFm0, sub_zero]
+  have h_refl_zero : ∀ m, concreteReflectTensorData.reflectConj m (0 : EuclideanSchwartz m) = 0 := by
+    intro m
+    have h0 : (0 : EuclideanSchwartz m) = (0 : ℂ) • (0 : EuclideanSchwartz m) := by simp
+    rw [h0, concreteReflectTensorData.reflectConj_smul]; simp
+  have h_ten_zero_left : ∀ m n (g : EuclideanSchwartz n),
+      concreteReflectTensorData.tensor m n 0 g = 0 := by
+    intro m n g
+    have h0 : (0 : EuclideanSchwartz m) = (0 : ℂ) • (0 : EuclideanSchwartz m) := by simp
+    rw [h0, concreteReflectTensorData.tensor_smul_left]; simp
+  have h_ten_zero_right : ∀ m n (f : EuclideanSchwartz m),
+      concreteReflectTensorData.tensor m n f 0 = 0 := by
+    intro m n f
+    have h0 : (0 : EuclideanSchwartz n) = (0 : ℂ) • (0 : EuclideanSchwartz n) := by simp
+    rw [h0, concreteReflectTensorData.tensor_smul_right]; simp
+  have h_form_eq : concreteBorchersForm C ΔF ΔF =
+      ∑ m ∈ F.support, ∑ n ∈ F.support,
+        C.S (m + n) (concreteReflectTensorData.tensor m n
+          (concreteReflectTensorData.reflectConj m (ΔF m).1) (ΔF n).1) := by
+    have h_def : concreteBorchersForm C ΔF ΔF =
+        ∑ m ∈ ΔF.support, ∑ n ∈ ΔF.support,
+          C.S (m + n) (concreteReflectTensorData.tensor m n
+            (concreteReflectTensorData.reflectConj m (ΔF m).1) (ΔF n).1) := by
+      change borchersForm C concreteReflectTensorData ΔF ΔF = _
+      unfold borchersForm
+      simp only [DFinsupp.sum]
+      rfl
+    rw [h_def, Finset.sum_subset h_supp]
+    · refine Finset.sum_congr rfl fun m _ => ?_
+      refine Finset.sum_subset h_supp fun n _ hn => ?_
+      have hn0 : ΔF n = 0 := DFinsupp.notMem_support_iff.mp hn
+      rw [hn0, show (0 : PosSchwartzSubmodule n).1 = 0 from rfl, h_ten_zero_right, map_zero]
+    · intro m _ hm
+      have hm0 : ΔF m = 0 := DFinsupp.notMem_support_iff.mp hm
+      refine Finset.sum_eq_zero fun n _ => ?_
+      rw [hm0, show (0 : PosSchwartzSubmodule m).1 = 0 from rfl, h_refl_zero,
+        h_ten_zero_left, map_zero]
+  have h_delta_eq : ∀ m, (ΔF m).1 =
+      timeShiftSchwartz t (F m).1 - timeShiftSchwartz 0 (F m).1 := by
+    intro m
+    have h1 : (concreteReflectTensorData.shiftPos t m (F m)).1 =
+        timeShiftSchwartz t (F m).1 :=
+      concreteReflectTensorData_shiftPos_coe ht.1.le m (F m)
+    have h2 : (F m).1 = timeShiftSchwartz 0 (F m).1 := by
+      have h0 := concreteReflectTensorData_shiftPos_coe le_rfl m (F m)
+      rw [concreteReflectTensorData_shiftPos_zero m (F m)] at h0
+      exact h0
+    change (concreteReflectTensorData.shiftPos t m (F m) - F m).1 = _
+    rw [Submodule.coe_sub, h1]
+    exact congrArg (timeShiftSchwartz t (F m).1 - ·) h2
+  have h_semi_delta : ∀ m, ∀ j ≤ k,
+      SchwartzMap.seminorm ℂ j 0 (ΔF m).1 ≤ L m * t := by
+    intro m j hj
+    rw [h_delta_eq m]
+    have hsub := timeShiftSchwartz_seminorm_sub_le (F m).1 t 0 j 0
+    have ht_abs : |t - 0| = t := by rw [sub_zero, abs_of_pos ht.1]
+    have hmax : max |t| |(0 : ℝ)| = t := by
+      rw [abs_zero, abs_of_pos ht.1, max_eq_left ht.1.le]
+    rw [ht_abs, hmax] at hsub
+    have hsum_le :
+        (∑ i ∈ Finset.range (j + 1),
+          (j.choose i : ℝ) * t ^ (j - i) * SchwartzMap.seminorm ℂ i 1 (F m).1) ≤ L m := by
+      calc (∑ i ∈ Finset.range (j + 1),
+            (j.choose i : ℝ) * t ^ (j - i) * SchwartzMap.seminorm ℂ i 1 (F m).1)
+          ≤ ∑ i ∈ Finset.range (j + 1),
+              (k.choose i : ℝ) * 1 * SchwartzMap.seminorm ℂ i 1 (F m).1 := by
+            refine Finset.sum_le_sum fun i _ => ?_
+            refine mul_le_mul_of_nonneg_right (mul_le_mul
+              (Nat.cast_le.mpr (Nat.choose_le_choose i hj))
+              (pow_le_one₀ ht.1.le ht.2.le)
+              (pow_nonneg ht.1.le _) (Nat.cast_nonneg _)) (apply_nonneg _ _)
+        _ = ∑ i ∈ Finset.range (j + 1),
+              (k.choose i : ℝ) * SchwartzMap.seminorm ℂ i 1 (F m).1 := by
+            refine Finset.sum_congr rfl fun i _ => by ring
+        _ ≤ L m := by
+            refine Finset.sum_le_sum_of_subset_of_nonneg
+              (Finset.range_mono (Nat.add_le_add_right hj 1)) ?_
+            intro i _ _
+            exact mul_nonneg (Nat.cast_nonneg _) (apply_nonneg _ _)
+    calc SchwartzMap.seminorm ℂ j 0 (timeShiftSchwartz t (F m).1 - timeShiftSchwartz 0 (F m).1)
+        ≤ t * ∑ i ∈ Finset.range (j + 1),
+            (j.choose i : ℝ) * t ^ (j - i) * SchwartzMap.seminorm ℂ i 1 (F m).1 := hsub
+      _ ≤ t * L m := mul_le_mul_of_nonneg_left hsum_le ht.1.le
+      _ = L m * t := mul_comm _ _
+  change ‖concreteBorchersForm C ΔF ΔF‖ ≤ M * t ^ 2
+  rw [h_form_eq]
+  refine le_trans (norm_sum_le _ _) ?_
+  rw [Finset.sum_mul]
+  refine Finset.sum_le_sum fun m _ => ?_
+  refine le_trans (norm_sum_le _ _) ?_
+  rw [Finset.sum_mul]
+  refine Finset.sum_le_sum fun n _ => ?_
+  have h1 := h_E0 (m + n) (concreteReflectTensorData.tensor m n
+    (concreteReflectTensorData.reflectConj m (ΔF m).1) (ΔF n).1)
+  have h2 := hC_t_bd m n (concreteReflectTensorData.reflectConj m (ΔF m).1) (ΔF n).1
+  have h_sum_refl :
+      (∑ j ∈ Finset.range (k + 1),
+        SchwartzMap.seminorm ℂ j 0 (concreteReflectTensorData.reflectConj m (ΔF m).1)) ≤
+      ((k + 1 : ℕ) : ℝ) * L m * t := by
+    calc (∑ j ∈ Finset.range (k + 1),
+          SchwartzMap.seminorm ℂ j 0 (concreteReflectTensorData.reflectConj m (ΔF m).1))
+        ≤ ∑ j ∈ Finset.range (k + 1), SchwartzMap.seminorm ℂ j 0 (ΔF m).1 :=
+          Finset.sum_le_sum fun j _ => concreteReflectTensorData.reflectConj_seminorm_le m j _
+      _ ≤ ∑ _j ∈ Finset.range (k + 1), L m * t :=
+          Finset.sum_le_sum fun j hj =>
+            h_semi_delta m j (Nat.lt_succ_iff.mp (Finset.mem_range.mp hj))
+      _ = ((k + 1 : ℕ) : ℝ) * L m * t := by simp [Finset.sum_const]; ring
+  have h_sum_g :
+      (∑ j ∈ Finset.range (k + 1), SchwartzMap.seminorm ℂ j 0 (ΔF n).1) ≤
+      ((k + 1 : ℕ) : ℝ) * L n * t := by
+    calc (∑ j ∈ Finset.range (k + 1), SchwartzMap.seminorm ℂ j 0 (ΔF n).1)
+        ≤ ∑ _j ∈ Finset.range (k + 1), L n * t :=
+          Finset.sum_le_sum fun j hj =>
+            h_semi_delta n j (Nat.lt_succ_iff.mp (Finset.mem_range.mp hj))
+      _ = ((k + 1 : ℕ) : ℝ) * L n * t := by simp [Finset.sum_const]; ring
+  have h_fac_nn : 0 ≤ C_E0 ^ (m + n) * ((Nat.factorial (m + n) : ℝ) ^ α) :=
+    mul_nonneg (pow_nonneg hC_E0.le _) (Real.rpow_nonneg (Nat.cast_nonneg _) _)
+  calc ‖C.S (m + n) (concreteReflectTensorData.tensor m n
+          (concreteReflectTensorData.reflectConj m (ΔF m).1) (ΔF n).1)‖
+      ≤ C_E0 ^ (m + n) * ((Nat.factorial (m + n) : ℝ) ^ α) *
+          SchwartzMap.seminorm ℂ k 0 (concreteReflectTensorData.tensor m n
+            (concreteReflectTensorData.reflectConj m (ΔF m).1) (ΔF n).1) := h1
+    _ ≤ C_E0 ^ (m + n) * ((Nat.factorial (m + n) : ℝ) ^ α) *
+          (C_t m n *
+            (∑ j ∈ Finset.range (k + 1),
+              SchwartzMap.seminorm ℂ j 0 (concreteReflectTensorData.reflectConj m (ΔF m).1)) *
+            (∑ j ∈ Finset.range (k + 1), SchwartzMap.seminorm ℂ j 0 (ΔF n).1)) :=
+        mul_le_mul_of_nonneg_left h2 h_fac_nn
+    _ ≤ C_E0 ^ (m + n) * ((Nat.factorial (m + n) : ℝ) ^ α) *
+          (C_t m n * (((k + 1 : ℕ) : ℝ) * L m * t) * (((k + 1 : ℕ) : ℝ) * L n * t)) := by
+        refine mul_le_mul_of_nonneg_left ?_ h_fac_nn
+        refine mul_le_mul (mul_le_mul_of_nonneg_left h_sum_refl (hC_t_nn m n))
+          h_sum_g (Finset.sum_nonneg fun _ _ => apply_nonneg _ _)
+          (mul_nonneg (hC_t_nn m n) (mul_nonneg (mul_nonneg (Nat.cast_nonneg _) (hL_nn m)) ht.1.le))
+    _ = (C_E0 ^ (m + n) * ((Nat.factorial (m + n) : ℝ) ^ α) * C_t m n *
+          ((k + 1 : ℕ) : ℝ) ^ 2 * L m * L n) * t ^ 2 := by
+        ring
+
+/-- **Unconditional Euclidean Semigroup Existence & Strong Right Continuity:**
+    Constructs the Euclidean contraction semigroup `T` directly from `B : ConcreteBalabanTarget N hN`
+    and proves `T 0 = 1`, the semigroup law, self-adjointness, contractivity, strong right
+    continuity at `0`, and vacuum invariance (`0 sorry`). -/
+theorem concreteBalaban_osSemigroup_exists {N : ℕ} {hN : 2 ≤ N}
+    (B : ConcreteBalabanTarget N hN) :
+    let pre := buildBorchersPreData B.C concreteReflectTensorData
+      B.h_herm B.h_rp B.h_symm B.h_cluster
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+    let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
+    let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ nullSubmodule pre) : H)
+    ∃ T : ℝ → H →L[ℂ] H,
+      T 0 = 1 ∧
+      (∀ s t : ℝ, 0 ≤ s → 0 ≤ t → T (s + t) = T s * T t) ∧
+      (∀ t : ℝ, 0 ≤ t → ∀ x y : H, ⟪x, T t y⟫_ℂ = ⟪T t x, y⟫_ℂ) ∧
+      (∀ t : ℝ, 0 ≤ t → ∀ x : H, ‖T t x‖ ≤ ‖x‖) ∧
+      (∀ x : H, Filter.Tendsto (fun t : ℝ => T t x) (𝓝[>] 0) (𝓝 x)) ∧
+      (∀ t : ℝ, 0 ≤ t → T t Ω = Ω) := by
+  dsimp only
+  let pre := buildBorchersPreData B.C concreteReflectTensorData
+    B.h_herm B.h_rp B.h_symm B.h_cluster
+  let core := quotInnerCore pre
+  letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+  letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+  let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
+  let Ω₀ : BorchersPos ⧸ nullSubmodule pre := Submodule.Quotient.mk borchersVac
+  let T₀ := osBorchersPreSemigroup pre
+  have hT₀_zero : T₀ 0 = LinearMap.id := by
+    apply LinearMap.ext
+    intro x
+    induction x using Submodule.Quotient.induction_on with
+    | _ F =>
+      rw [osBorchersPreSemigroup_mk pre 0 le_rfl F]
+      change (Submodule.Quotient.mk (concreteBorchersShift 0 F) : BorchersPos ⧸ nullSubmodule pre) =
+        Submodule.Quotient.mk F
+      rw [concreteBorchersShift_zero F]
+  have hT₀_contr : ∀ t : ℝ, 0 ≤ t → ∀ v : BorchersPos ⧸ nullSubmodule pre,
+      ‖T₀ t v‖ ≤ ‖v‖ := by
+    have h := osBorchersPreSemigroup_contr pre
+    dsimp only at h
+    exact h
+  have hT₀_symm : ∀ t : ℝ, 0 ≤ t → ∀ x y : BorchersPos ⧸ nullSubmodule pre,
+      ⟪x, T₀ t y⟫_ℂ = ⟪T₀ t x, y⟫_ℂ := by
+    have h := osBorchersPreSemigroup_symm pre
+    dsimp only at h
+    exact h
+  have hT₀_cont : ∀ v : BorchersPos ⧸ nullSubmodule pre,
+      Filter.Tendsto (fun t : ℝ => (T₀ t v : H)) (𝓝[>] 0) (𝓝 (v : H)) := by
+    intro v
+    induction v using Submodule.Quotient.induction_on with
+    | _ F =>
+      rw [tendsto_iff_norm_sub_tendsto_zero]
+      obtain ⟨M, hM_nn, hM_bd⟩ := concreteBorchersForm_shift_sub_norm_le B.C F
+      have h_le : ∀ᶠ t : ℝ in 𝓝[>] 0,
+          ‖(T₀ t (Submodule.Quotient.mk F) : H) -
+              ((Submodule.Quotient.mk F : BorchersPos ⧸ nullSubmodule pre) : H)‖ ≤
+            Real.sqrt M * t := by
+        filter_upwards [Ioo_mem_nhdsGT one_pos] with t ht
+        have hsq : ‖(T₀ t (Submodule.Quotient.mk F) : H) -
+              ((Submodule.Quotient.mk F : BorchersPos ⧸ nullSubmodule pre) : H)‖ ^ 2 ≤
+            (Real.sqrt M * t) ^ 2 := by
+          have hmk : T₀ t (Submodule.Quotient.mk F) = Submodule.Quotient.mk (pre.θ t F) :=
+            osBorchersPreSemigroup_mk pre t ht.1.le F
+          have hsub :
+              (T₀ t (Submodule.Quotient.mk F) : H) -
+                ((Submodule.Quotient.mk F : BorchersPos ⧸ nullSubmodule pre) : H) =
+              ((Submodule.Quotient.mk (pre.θ t F - F) : BorchersPos ⧸ nullSubmodule pre) : H) := by
+            rw [hmk, ← UniformSpace.Completion.coe_sub]
+            congr 1
+          rw [hsub, UniformSpace.Completion.norm_coe]
+          have h_inner_sq :
+              (⟪(Submodule.Quotient.mk (pre.θ t F - F) : BorchersPos ⧸ nullSubmodule pre),
+                  Submodule.Quotient.mk (pre.θ t F - F)⟫_ℂ).re =
+                ‖(Submodule.Quotient.mk (pre.θ t F - F) : BorchersPos ⧸ nullSubmodule pre)‖ ^ 2 := by
+            rw [inner_self_eq_norm_sq_to_K]; norm_cast
+          rw [← h_inner_sq]
+          have h_re :
+              (⟪(Submodule.Quotient.mk (pre.θ t F - F) : BorchersPos ⧸ nullSubmodule pre),
+                  Submodule.Quotient.mk (pre.θ t F - F)⟫_ℂ).re ≤
+                ‖concreteBorchersForm B.C (concreteBorchersShift t F - F)
+                  (concreteBorchersShift t F - F)‖ :=
+            Complex.re_le_norm _
+          have h_mul_sq : (Real.sqrt M * t) ^ 2 = M * t ^ 2 := by
+            rw [mul_pow, Real.sq_sqrt hM_nn]
+          rw [h_mul_sq]
+          exact le_trans h_re (hM_bd t ht)
+        have h_rhs_nn : 0 ≤ Real.sqrt M * t := mul_nonneg (Real.sqrt_nonneg _) ht.1.le
+        nlinarith [norm_nonneg ((T₀ t (Submodule.Quotient.mk F) : H) -
+          ((Submodule.Quotient.mk F : BorchersPos ⧸ nullSubmodule pre) : H))]
+      have h_lim : Filter.Tendsto (fun t : ℝ => Real.sqrt M * t) (𝓝[>] 0) (𝓝 0) := by
+        have h0 : Filter.Tendsto (fun t : ℝ => Real.sqrt M * t) (𝓝 0) (𝓝 (Real.sqrt M * 0)) :=
+          (continuous_const.mul continuous_id).continuousAt.tendsto
+        rw [mul_zero] at h0
+        exact h0.mono_left nhdsWithin_le_nhds
+      exact squeeze_zero' (Filter.Eventually.of_forall fun _ => norm_nonneg _) h_le h_lim
+  obtain ⟨T_ext, h_zero, h_contr, h_coe, h_cont⟩ :=
+    osSemigroup_extend_to_completion T₀ hT₀_zero hT₀_contr hT₀_cont
+  have h_add : ∀ s t : ℝ, 0 ≤ s → 0 ≤ t → T_ext (s + t) = T_ext s * T_ext t := by
+    intro s t hs ht
+    ext ψ
+    induction ψ using UniformSpace.Completion.induction_on with
+    | hp => exact isClosed_eq (T_ext (s + t)).continuous ((T_ext s * T_ext t).continuous)
+    | ih v =>
+      change T_ext (s + t) (v : H) = T_ext s (T_ext t (v : H))
+      rw [h_coe v (s + t) (add_nonneg hs ht), h_coe v t ht, h_coe (T₀ t v) s hs,
+        osBorchersPreSemigroup_add pre s t hs ht v]
+  have h_symm : ∀ t : ℝ, 0 ≤ t → ∀ x y : H, ⟪x, T_ext t y⟫_ℂ = ⟪T_ext t x, y⟫_ℂ := by
+    intro t ht x y
+    induction x, y using UniformSpace.Completion.induction_on₂ with
+    | hp =>
+      exact isClosed_eq
+        (continuous_fst.inner ((T_ext t).continuous.comp continuous_snd))
+        (((T_ext t).continuous.comp continuous_fst).inner continuous_snd)
+    | ih x y =>
+      rw [h_coe x t ht, h_coe y t ht,
+        UniformSpace.Completion.inner_coe, UniformSpace.Completion.inner_coe,
+        hT₀_symm t ht x y]
+  have h_vac : ∀ t : ℝ, 0 ≤ t → T_ext t (Ω₀ : H) = (Ω₀ : H) := by
+    intro t ht
+    rw [h_coe Ω₀ t ht]
+    change ((osBorchersPreSemigroup pre t (Submodule.Quotient.mk pre.e₀) :
+        BorchersPos ⧸ nullSubmodule pre) : H) =
+      ((Submodule.Quotient.mk pre.e₀ : BorchersPos ⧸ nullSubmodule pre) : H)
+    rw [osBorchersPreSemigroup_vac pre t ht]
+  exact ⟨T_ext, h_zero, h_add, h_symm, h_contr, h_cont, h_vac⟩
+
+/-- From `B : ConcreteBalabanTarget N hN`, the Euclidean semigroup satisfies `T 0 = 1`. -/
+theorem osSemigroup_zero_eq_id {N : ℕ} {hN : 2 ≤ N}
+    (B : ConcreteBalabanTarget N hN) :
+    let pre := buildBorchersPreData B.C concreteReflectTensorData
+      B.h_herm B.h_rp B.h_symm B.h_cluster
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+    let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
+    ∃ T : ℝ → H →L[ℂ] H, T 0 = 1 := by
+  rcases concreteBalaban_osSemigroup_exists B with ⟨T, hT0, _⟩
+  exact ⟨T, hT0⟩
+
+/-- From `B : ConcreteBalabanTarget N hN`, the Euclidean semigroup is strongly right-continuous at `0`. -/
+theorem osSemigroup_strong_right_continuous_at_zero {N : ℕ} {hN : 2 ≤ N}
+    (B : ConcreteBalabanTarget N hN) :
+    let pre := buildBorchersPreData B.C concreteReflectTensorData
+      B.h_herm B.h_rp B.h_symm B.h_cluster
+    let core := quotInnerCore pre
+    letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
+    letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
+    let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
+    ∃ T : ℝ → H →L[ℂ] H,
+      T 0 = 1 ∧
+      ∀ ψ : H, Filter.Tendsto (fun t : ℝ => T t ψ) (𝓝[>] 0) (𝓝 ψ) := by
+  rcases concreteBalaban_osSemigroup_exists B with ⟨T, hT0, _, _, _, hT_cont, _⟩
+  exact ⟨T, hT0, hT_cont⟩
 
 end Imscribing.YangMills.OSCanonicalSemigroupContinuity

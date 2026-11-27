@@ -1,6 +1,7 @@
 import Imscribing.YangMills.SpatialISO3UnitariesOnOS
 import Imscribing.YangMills.SemigroupToUnitaryGroupCFC
 import Imscribing.YangMills.ConcreteMinimalClayReduction
+import Imscribing.YangMills.OSCanonicalSemigroupContinuity
 import Imscribing.YangMills.IBPBoundaryToWightman
 import Imscribing.YangMills.DimensionalTransmutationAndBoundary
 import Imscribing.YangMills.LorentzBoostAndMinkowskiFields
@@ -11,6 +12,9 @@ import Imscribing.YangMills.LorentzBoostAndMinkowskiFields
 Given `B : ConcreteBalabanTarget N hN` and the strictly irreducible analytic-continuation
 core `OSAnalyticCore B`, synthesizes `ConcreteOSTarget B` and proves
 `HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.C.cluster_rate` (`0 sorry`).
+The Euclidean semigroup `T` and all six semigroup properties (`T 0 = 1`, semigroup law,
+self-adjointness, contractivity, strong right continuity at `0`, and vacuum invariance)
+are proved unconditionally from `B` via `concreteBalaban_osSemigroup_exists`.
 -/
 
 namespace Imscribing.YangMills.OSMasterDischarge
@@ -30,11 +34,14 @@ open Imscribing.YangMills.SemigroupCFC
 open Imscribing.YangMills.OSIBPBoundary
 open Imscribing.YangMills.DimTransAndBoundary
 open Imscribing.YangMills.ConcreteMinimalReduction
+open Imscribing.YangMills.OSCanonicalSemigroupContinuity
 
 /-- Strictly irreducible analytic-continuation core on top of `B : ConcreteBalabanTarget N hN`.
-    All time-translation unitaries `U₀`, spatial-translation unitaries `U_space`,
-    Euclidean semigroup `T`, Hamiltonian `H_op`, vacuum uniqueness, spectral gap,
-    `M`-step IBP boundary temperedness, and operator microcausality are derived automatically. -/
+    All Euclidean semigroup properties (`T`, `T 0 = 1`, semigroup law, self-adjointness,
+    contractivity, strong right continuity at `0`, vacuum invariance), time-translation
+    unitaries `U₀`, spatial-translation unitaries `U_space`, Hamiltonian `H_op`, vacuum
+    uniqueness, spectral gap, `M`-step IBP boundary temperedness, and operator
+    microcausality are derived automatically. -/
 structure OSAnalyticCore {N : ℕ} {hN : 2 ≤ N} (B : ConcreteBalabanTarget N hN) where
   h_space_inv : ∀ (v : Fin 3 → ℝ) (F G : BorchersPos),
     concreteBorchersForm B.C (borchersSpaceShift v F) (borchersSpaceShift v G) =
@@ -47,13 +54,6 @@ structure OSAnalyticCore {N : ℕ} {hN : 2 ≤ N} (B : ConcreteBalabanTarget N h
     letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
     let H := UniformSpace.Completion (BorchersPos ⧸ nullSubmodule pre)
     let Ω : H := ((Submodule.Quotient.mk borchersVac : BorchersPos ⧸ nullSubmodule pre) : H)
-    ∃ (T : ℝ → H →L[ℂ] H),
-      T 0 = 1 ∧
-      (∀ s t : ℝ, 0 ≤ s → 0 ≤ t → T (s + t) = T s * T t) ∧
-      (∀ t : ℝ, 0 ≤ t → ∀ x y : H, ⟪x, T t y⟫_ℂ = ⟪T t x, y⟫_ℂ) ∧
-      (∀ t : ℝ, 0 ≤ t → ∀ x : H, ‖T t x‖ ≤ ‖x‖) ∧
-      (∀ x : H, Filter.Tendsto (fun t : ℝ => T t x) (𝓝[>] 0) (𝓝 x)) ∧
-      (∀ t : ℝ, 0 ≤ t → T t Ω = Ω) ∧
     ∃ (U_lor : Lorentz4 → H →ₗᵢ[ℂ] H)
       (fieldDomain : Submodule ℂ H)
       (field : TestFn4 → ↥fieldDomain →ₗ[ℂ] H),
@@ -96,8 +96,9 @@ theorem os_continuation_master_discharge
   let core := quotInnerCore pre
   letI : NormedAddCommGroup (BorchersPos ⧸ nullSubmodule pre) := core.toNormedAddCommGroup
   letI : InnerProductSpace ℂ (BorchersPos ⧸ nullSubmodule pre) := InnerProductSpace.ofCore core.toCore
-  obtain ⟨T, hT_zero, hT_add, hT_symm, hT_contr, hT_cont, hT_vac,
-    U_lor, fieldDomain, field, hU_lor_one, hU_lor_vac, h_dense, hΩ_dom,
+  obtain ⟨T, hT_zero, hT_add, hT_symm, hT_contr, hT_cont, hT_vac⟩ :=
+    concreteBalaban_osSemigroup_exists B
+  obtain ⟨U_lor, fieldDomain, field, hU_lor_one, hU_lor_vac, h_dense, hΩ_dom,
     h_maps, h_weak_loc, f₀, g₀, W_reg, D_ibp, M, p, hp_nn, h_deriv, h_cont,
     h_blowup, h_disj, h_2pt⟩ := C_core.analytic_core
   let P_pack := poincare_from_semigroup_and_iso3 pre C_core.h_space_inv
