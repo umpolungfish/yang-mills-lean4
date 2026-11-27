@@ -133,5 +133,6 @@ globs = [
   "Imscribing.YangMills.WilsonActionBounds4D",
   "Imscribing.YangMills.OSCanonicalSemigroupContinuity",
   "Imscribing.YangMills.BalabanFromStage",
-  "Imscribing.YangMills.GapFillingAttempt"
+  "Imscribing.YangMills.GapFillingAttempt",
+  "Imscribing.YangMills.SUClosure"
 ]
