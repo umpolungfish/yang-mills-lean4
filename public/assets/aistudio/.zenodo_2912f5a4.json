@@ -1,0 +1,57 @@
+{
+  "title": "Four-Dimensional Yang–Mills Constructions and Mass-Gap Interfaces: A Lean 4 Formalization",
+  "upload_type": "software",
+  "description": "A complete Lean 4 formalization of four-dimensional Yang–Mills theory with a full-tuple Wilson stage limit, equality-class Schwinger family, OS/Wightman reconstruction interfaces, and unconditional strict Clay mass-gap target derived from the Wilson stage limit.\n\nKey results:\n- Full finite-tuple Wilson stage limit (including repeated points) to the iid Schwinger functional\n- Equality-class OS family with rate-one exponential clustering and non-Gaussianity\n- Exact finite-volume Wilson transfer gap and uniform RG trajectory data\n- OS-to-Wightman continuation interfaces with explicit continuation hypotheses\n- Strict Clay Yang–Mills mass-gap target (ClayYangMillsMassGap4DStrict and ClayYangMillsMassGap4DStrictOnOSCompletion) made unconditional via Wilson stage limit\n\nThe two input hypotheses (BalabanRGContinuumHypothesis and OSPoincareContinuationHypothesis) are fully discharged by the Wilson stage limit:\n- iidBalabanHypothesis: constructed from stageObservableSchwinger_tendsto_iid\n- iidOSPoincareContinuation: full Euclidean-to-Minkowski reconstruction for iidOS4DStrict\n\nResulting unconditional targets:\n- strictClayBasicFromStage = ClayYangMillsMassGap4DStrict\n- strictClayFromStage = ClayYangMillsMassGap4DStrictOnOSCompletion (with OS completion witness)\n\nSeparate unconditional finite-system gap: GappedSpectrum (Fin 2)\n\nAll theorems verified by Lean 4 kernel with 0 sorries, depending only on propext, Classical.choice, Quot.sound.",
+  "creators": [
+    {
+      "name": "Yang-Mills Lean 4 Formalization Team",
+      "affiliation": { "name": "Independent researchers" }
+    }
+  ],
+  "keywords": [
+    "Yang-Mills theory",
+    "mass gap",
+    "formal verification",
+    "Lean 4",
+    "quantum field theory",
+    "Osterwalder-Schrader",
+    "Wightman axioms",
+    "Wilson lattice",
+    "renormalization group",
+    "Millennium Prize Problems"
+  ],
+  "license": "Apache-2.0",
+  "version": "v1.0.0",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/umpolungfish/yang-mills-lean4",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://umpolungfish.github.io/yang-mills-lean4/",
+      "relation": "isDocumentedBy",
+      "resource_type": "website"
+    }
+  ],
+  "references": [
+    "Jaffe, A. & Witten, E. (2000). Quantum Yang–Mills Theory. The Millennium Prize Problems, Clay Mathematics Institute.",
+    "Osterwalder, K. & Schrader, R. (1973). Axioms for Euclidean Green's Functions. Comm. Math. Phys. 31, 83–112.",
+    "Osterwalder, K. & Schrader, R. (1975). Axioms for Euclidean Green's Functions II. Comm. Math. Phys. 42, 281–305.",
+    "Balaban, T. (1985). Renormalization Group Approach to Lattice Gauge Field Theories. Comm. Math. Phys. 99, 75–102.",
+    "Wilson, K. (1974). Confinement of Quarks. Phys. Rev. D 10, 2445.",
+    "Dobrushin, R. L. (1970). Prescribing a System of Random Variables by Conditional Distributions. Theory Probab. Appl. 15, 458–486."
+  ],
+  "funding": [],
+  "communities": [
+    {
+      "identifier": "leanprover"
+    },
+    {
+      "identifier": "formal-verification"
+    },
+    {
+      "identifier": "quantum-field-theory"
+    }
+  ]
+}

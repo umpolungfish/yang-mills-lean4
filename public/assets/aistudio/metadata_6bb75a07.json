@@ -1,0 +1,7 @@
+{
+  "name": "yang-mills-lean4",
+  "description": "Imported from GitHub: umpolungfish/yang-mills-lean4",
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

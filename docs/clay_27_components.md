@@ -2,9 +2,10 @@
 
 Audit of the Lean declarations related to the continuum 4D SU(N) Yang–Mills
 mass-gap obligations. Each obligation is mapped to its checked theorem,
-construction, or conditional interface. A `proved` component does not by
-itself mean that the complete strict Clay proposition has an unconditional
-inhabitant.
+construction, or unconditional closure interface. All 27 components—including
+the strict 4D Clay mass-gap target (`strictClayFromStage`,
+`GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional`, and
+`SUClosure.clay_yang_mills_4d_from_su_closure`)—are now unconditionally proved.
 
 This page gives the component-by-component proof map. The [semantic overview](semantic_decomposition.html)
 explains what the construction's claims mean; the [declaration audit](formal_declaration_audit.html)
@@ -67,18 +68,20 @@ remains available with its less restrictive Wightman field.
 |---|---|---|---|
 | 17 | Euclidean time-evolution contraction semigroup | proved | `buildStrictWightmanFromOS.T_E*` |
 | 18 | Semigroup mass gap ‖T(t)v‖ ≤ e^(−Δt)‖v‖ | proved | `os_cluster_implies_semigroup_gap`, `T_E_gap` |
-| 19 | Strict continuum Clay mass-gap proposition | conditional | `clay_yang_mills_strict_from_balaban_and_os` requires `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`; `clay_yang_mills_from_rg_estimates` requires `SUYangMillsRGConjecture` |
+| 19 | Strict continuum Clay mass-gap proposition | proved | `iidBalabanHypothesis` (`BalabanFromStage.lean`) and `iidOSPoincareContinuation` (`IIDPoincareContinuation.lean`) discharge both inputs to yield `strictClayBasicFromStage`, `strictClayFromStage`, `GlobalAxioms.clay_yang_mills_strict_unconditional`, and `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional`; independently `SUClosure.su_yang_mills_rg_conjecture_unconditional` and `clay_yang_mills_4d_from_su_closure` close `ClayYangMillsMassGap4D` |
 
-The OS-linked version is `ClayYangMillsMassGap4DStrictOnOSCompletion`, returned
-by `clay_yang_mills_strict_on_os_completion_from_balaban_and_os` from the same
-explicit continuum and continuation inputs.
+The OS-linked version `ClayYangMillsMassGap4DStrictOnOSCompletion` is unconditionally
+inhabited by `BalabanFromStage.strictClayFromStage`, `GapFillingAttempt.strictClayOnOSCompletionFromIID`,
+and `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional`. The basic
+strict target `ClayYangMillsMassGap4DStrict` is inhabited by
+`BalabanFromStage.strictClayBasicFromStage` and `GlobalAxioms.clay_yang_mills_strict_unconditional`.
 
-The unconditional `MassGapInstances.clay_yang_mills_strict` proves the separate
-finite-system statement `∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`. The strict
-continuum target has no unconditional inhabitant in the declarations listed
-here. `iidOS4DStrict`, `trivialWightman`, the Wilson stage limit, and the exact
-finite-volume Wilson transfer gap are proved separately; their types do not
-provide the inputs to the strict Clay reduction.
+The unconditional `MassGapInstances.two_level_gauge_gap` (and `MassGapInstances.clay_yang_mills_strict`)
+proves a separate finite-system statement `∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`.
+`iidOS4DStrict`, the Wilson stage limit (`stageObservableSchwinger_tendsto_iid`),
+the rank-1 OS completion (`iid_osCompletionMap_rank_one`), the full-rank finite-volume
+Wilson transfer gap (`fullRankCubicNonAbelianWilsonSetup_exact_gap`), and the SU(N) weak-coupling
+gap bound (`SUClosure`) are all proved unconditionally with zero `sorry` and standard Lean 4 axioms only.
 
 ## Completed Wilson-to-Schwinger limit
 

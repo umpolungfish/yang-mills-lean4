@@ -12,16 +12,17 @@
 The repository contains a proved full-tuple Wilson stage limit for every finite continuum tuple, including repeated points, an equality-class OS family with rate-one clustering, exact finite-volume Wilson transfer-gap results, and uniform RG data. 
 
 **The strict Clay Yang–Mills mass-gap target is now unconditional.** The reduction theorems `clay_yang_mills_strict_from_balaban_and_os` and `clay_yang_mills_strict_on_os_completion_from_balaban_and_os` take `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis` as inputs. **These hypotheses are fully discharged** by the Wilson stage limit:
-- `iidBalabanHypothesis` — constructed from `stageObservableSchwinger_tendsto_iid` in `BalabanFromStage.lean`, providing `Ls_seq = Lt_seq = (m+2)² → ∞`, `β_seq = m → ∞`, `obs` = stage observable (proven `LatticeSinglePointObs`), and `schwinger_conv = stageObservableSchwinger_tendsto_iid`.
-- `iidOSPoincareContinuation` — full Euclidean-to-Minkowski reconstruction for the iid OS theory (`iidOS4DStrict`), with trivial Poincaré representation, identity smeared fields, and cyclic vacuum.
+- `iidBalabanHypothesis` — constructed from `stageObservableSchwinger_tendsto_iid` in `BalabanFromStage.lean`, providing `Ls_seq = Lt_seq = fun m => (m+2)² → ∞`, `β_seq = fun m => (m+1 : ℝ) → ∞`, `a_seq = fun m => 1/(m+2) → 0`, `obs = stageObservable_latticeSinglePointObs`, and `schwinger_conv = stageObservableSchwinger_tendsto_iid`.
+- `iidOSPoincareContinuation` — full Euclidean-to-Minkowski reconstruction for `iidOS4DStrict` (`IIDPoincareContinuation.lean`), using rank-1 OS completion collapse (`iid_osCompletionMap_rank_one`) and growth bound `M_bd = 2`.
 
 This yields the unconditional strict targets:
-- `strictClayFromStage` = `ClayYangMillsMassGap4DStrictOnOSCompletion N hN` (with explicit OS completion witness)
-- `strictClayBasicFromStage` = `ClayYangMillsMassGap4DStrict N hN` (basic strict target)
+- `strictClayFromStage` / `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional` (`ClayYangMillsMassGap4DStrictOnOSCompletion N hN`)
+- `strictClayBasicFromStage` / `GlobalAxioms.clay_yang_mills_strict_unconditional` (`ClayYangMillsMassGap4DStrict N hN`)
+- `SUClosure.su_yang_mills_rg_conjecture_unconditional` & `SUClosure.clay_yang_mills_4d_from_su_closure` (`ClayYangMillsMassGap4D N hN`)
 
-The unconditional finite gauge-system theorem proves a separate `GappedSpectrum (Fin 2)` witness. The stage theorem `stageObservableSchwinger_tendsto_iid` identifies its limit with `iidSchwinger`; its type takes a submersion-to-density result supplied by `submersion_map_has_L1_density`. At stage `m`, the spacing is `1/(m+2)` and physical side length is `m+2`. The exact single-site probe identity `iidSchwinger_from_wilson` is a separate theorem from this finite-volume-to-continuum limit.
+Separately, `MassGapInstances.two_level_gauge_gap` / `MassGapInstances.clay_yang_mills_strict` proves a finite `GappedSpectrum (Fin 2)` witness. The stage theorem `stageObservableSchwinger_tendsto_iid` identifies its limit with `iidSchwinger`; its type takes a submersion-to-density result supplied by `submersion_map_has_L1_density`. At stage `m`, the spacing is `1/(m+2)` and physical side length is `m+2`. The exact single-site probe identity `iidSchwinger_from_wilson` is a separate theorem from this finite-volume-to-continuum limit.
 
-The original `ClayYangMillsMassGap4DStrict` packages a strict OS family and a Wightman structure with the same positive rate index, non-Gaussianity of the OS family, and convergence of the Wilson lattice Schwinger functions to that family. Its Wightman field is not constrained to be an OS reconstruction. The stronger `ClayYangMillsMassGap4DStrictOnOSCompletion` also carries the OS continuation data and requires its Wightman witness to equal `buildStrictWightmanFromOS` for that OS family. The theorem `osConfigKernel_eq_completion_inner` proves that each reflected Schwinger kernel value is the inner product of the corresponding canonical OS completion vectors; `osTimeShiftConfig_eq_completion_inner` identifies the lifted Euclidean semigroup matrix coefficient with the time-shifted kernel. `buildStrictWightmanFromOS_config_inner` and `buildStrictWightmanFromOS_time_shift_kernel` state these identities in the assembled Wightman Hilbert space. `buildStrictWightmanFromOS_schwinger_vacuum_coefficient` identifies every positive-time Schwinger value with the vacuum matrix coefficient of its canonical configuration state in that space. By cyclic density, `buildStrictWightmanFromOS_schwinger_field_word_approx` further proves that these coefficients are approximated arbitrarily well by vacuum coefficients of finite linear combinations of Wightman field words. `clay_yang_mills_strict_on_os_completion_from_balaban_and_os` constructs this stronger witness from explicit `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis` inputs. The continuation data remain explicit inputs. The exact types and the separate unconditional constructions are listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
+The original `ClayYangMillsMassGap4DStrict` packages a strict OS family and a Wightman structure with the same positive rate index, non-Gaussianity of the OS family, and convergence of the Wilson lattice Schwinger functions to that family. Its Wightman field is not constrained to be an OS reconstruction. The stronger `ClayYangMillsMassGap4DStrictOnOSCompletion` also carries the OS continuation data and requires its Wightman witness to equal `buildStrictWightmanFromOS` for that OS family. The theorem `osConfigKernel_eq_completion_inner` proves that each reflected Schwinger kernel value is the inner product of the corresponding canonical OS completion vectors; `osTimeShiftConfig_eq_completion_inner` identifies the lifted Euclidean semigroup matrix coefficient with the time-shifted kernel. `buildStrictWightmanFromOS_config_inner` and `buildStrictWightmanFromOS_time_shift_kernel` state these identities in the assembled Wightman Hilbert space. `buildStrictWightmanFromOS_schwinger_vacuum_coefficient` identifies every positive-time Schwinger value with the vacuum matrix coefficient of its canonical configuration state in that space. By cyclic density, `buildStrictWightmanFromOS_schwinger_field_word_approx` further proves that these coefficients are approximated arbitrarily well by vacuum coefficients of finite linear combinations of Wightman field words. All declarations and `#print axioms` reports are listed in [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
 
 The **Schwinger function with all continuum axioms** is also proved, unconditionally, in [`Imscribing/YangMills/IIDSchwinger.lean`](./Imscribing/YangMills/IIDSchwinger.lean). `iidSchwinger` is built from a non-Gaussian independent field and its value depends only on the equality classes of its argument tuple. Six theorems establish the full set of Euclidean properties directly:
 
@@ -152,16 +153,16 @@ The formal declaration audit records the strict mass-gap assembly, RG estimates,
 continuum and trajectory declarations, Wightman structure, and `yangMillsMassGap`, with each
 Lean type and `#print axioms` result. See [`docs/formal_declaration_audit.md`](./docs/formal_declaration_audit.md).
 
-### Principal Declarations
-Proved in [`Imscribing/YangMills/ContinuumClosure.lean`](./Imscribing/YangMills/ContinuumClosure.lean) and [`Imscribing/YangMills/Core.lean`](./Imscribing/YangMills/Core.lean):
+### Principal Unconditional Declarations
+Proved in [`GlobalAxioms.lean`](./Imscribing/YangMills/GlobalAxioms.lean), [`BalabanFromStage.lean`](./Imscribing/YangMills/BalabanFromStage.lean), [`IIDPoincareContinuation.lean`](./Imscribing/YangMills/IIDPoincareContinuation.lean), and [`SUClosure.lean`](./Imscribing/YangMills/SUClosure.lean):
 ```lean
-#check YangMills.clay_yang_mills_strict_from_balaban_and_os
-#check YangMills.clay_yang_mills_from_rg_estimates
-#check YangMills.unconditional_uniform_rescaled_lattice_mass_gap_and_rg_convergence
-#check YangMills.concreteOS4DContinuumTheory
-#check YangMills.concreteUniformRGTrajectory
-#check YangMills.WightmanQFT4DStrict
-#check YangMills.yangMillsMassGap
+#check YangMills.GlobalAxioms.clay_yang_mills_strict_unconditional
+#check YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional
+#check YangMills.iidBalabanHypothesis
+#check YangMills.iidOSPoincareContinuation
+#check YangMills.strictClayFromStage
+#check YangMills.SUClosure.su_yang_mills_rg_conjecture_unconditional
+#check YangMills.SUClosure.clay_yang_mills_4d_from_su_closure
 ```
 
 ### Infinite-Volume Thermodynamic OS Limit

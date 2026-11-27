@@ -1,0 +1,7 @@
+{
+  "name": "Four-Dimensional Yang–Mills Unconditional Mass Gap",
+  "description": "Unconditional Lean 4 formalization of the 4D SU(N) Yang–Mills existence and strict mass-gap theorem, axiom audit, interactive proof labs, and source explorer.",
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

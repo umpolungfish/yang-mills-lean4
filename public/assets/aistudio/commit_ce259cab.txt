@@ -1,0 +1,1 @@
+I prove that every positive-time Schwinger value is the vacuum matrix coefficient of its canonical configuration state in the OS-completion Wightman Hilbert space. I add the theorem to the kernel audit, repository guide, site, and paper.

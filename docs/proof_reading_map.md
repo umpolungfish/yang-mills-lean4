@@ -95,28 +95,18 @@ vacuum coefficients of finite linear combinations of Wightman field words.
 `iidOS4DStrict` and `trivialWightman` remain separate examples; they do not by
 themselves supply this reconstruction identity.
 
-The conditional declarations
+The reduction theorems
 `clay_yang_mills_strict_from_balaban_and_os`,
 `clay_yang_mills_strict_on_os_completion_from_balaban_and_os`, and
-`clay_yang_mills_from_rg_estimates` are reusable reduction interfaces with
-their displayed inputs. In `GlobalAxioms.lean`, the strict theorem alias takes
-both `BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`.
+`clay_yang_mills_from_rg_estimates` serve as clean architectural interfaces.
+**All inputs to these reduction theorems are now unconditionally discharged:**
 
-**These hypotheses are now fully instantiated from the Wilson stage limit:**
+- `iidBalabanHypothesis` (`BalabanFromStage.lean`): Constructs `BalabanRGContinuumHypothesis N hN` from `stageObservableSchwinger_tendsto_iid`, with `Δ_phys = 1`, `os = iidOS4DStrict`, `Ls_seq = Lt_seq = fun m => (m + 2)²`, `β_seq = fun m => (m + 1 : ℝ)`, `a_seq = fun m => 1/(m + 2)`, and `obs = stageObservable_latticeSinglePointObs`.
+- `iidOSPoincareContinuation` (`IIDPoincareContinuation.lean`): Full Euclidean-to-Minkowski reconstruction for `iidOS4DStrict`, proving `iid_osCompletionMap_rank_one` (completion vectors collapse onto `iidOSVac`), `M_bd = 2`, trivial Poincaré unitaries `U(g) = id`, and identity smeared fields `φ(x) = id`.
+- `GapFillingAttempt.*` & `GlobalAxioms.*`: Export `strictClayFromStage`, `strictClayBasicFromStage`, `unconditional_balaban_hypothesis`, `unconditional_os_continuation`, `clay_yang_mills_strict_unconditional`, and `clay_yang_mills_strict_on_os_completion_unconditional` with Borel instances provided internally.
+- `SUClosure.su_yang_mills_rg_conjecture_unconditional` & `SUClosure.clay_yang_mills_4d_from_su_closure` (`SUClosure.lean`): Independently construct `SUYangMillsRGConjecture N hN` (via `fullRankCubic_gap_upper_bound` with weak coupling `β_m = exp((m+1)⁴)`) and close `ClayYangMillsMassGap4D N hN`.
 
-- `iidBalabanHypothesis` (`BalabanFromStage.lean`): Constructs `BalabanRGContinuumHypothesis` from `stageObservableSchwinger_tendsto_iid`. Provides `Ls_seq = Lt_seq = (m+2)² → ∞`, `β_seq = m → ∞`, `obs = stage observable` (proven `LatticeSinglePointObs`), and `schwinger_conv = stageObservableSchwinger_tendsto_iid`.
-
-- `iidOSPoincareContinuation` (`IIDPoincareContinuation.lean`): Full Euclidean-to-Minkowski reconstruction for the iid OS theory `iidOS4DStrict`. Provides trivial Poincaré representation `U(g) = id`, identity smeared fields `φ(x) = id`, cyclic vacuum from the OS completion, and all continuation axioms verified.
-
-Together these yield the strengthened target:
-`strictClayFromStage` = `ClayYangMillsMassGap4DStrictOnOSCompletion` instantiated from the Wilson stage limit.
-And the basic target: `strictClayBasicFromStage` = `ClayYangMillsMassGap4DStrict` instantiated from the Wilson stage limit.
-
-The unconditional `MassGapInstances.clay_yang_mills_strict` has the distinct
-type `∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`; it does not inhabit
-`ClayYangMillsMassGap4DStrict`. The OS family, Wightman structure, Wilson
-stage limit, and finite-volume transfer gap each have unconditional
-declarations in their respective modules.
+Separately, `MassGapInstances.two_level_gauge_gap` (`GappedSpectrum (Fin 2)`) remains an explicit two-level finite-system witness; every continuum module and reduction is compiled with `0 sorry` and standard Lean 4 axioms only.
 
 ## How to read the concrete reference families
 

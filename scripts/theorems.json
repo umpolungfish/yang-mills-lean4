@@ -2398,5 +2398,215 @@
       "propext"
     ],
     "status": "PASS"
+  },
+  {
+    "section": "§48. Unconditional Balaban RG hypothesis from Wilson stage limit",
+    "name": "YangMills.submersion_1d_absolutely_continuous",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§48. Unconditional Balaban RG hypothesis from Wilson stage limit",
+    "name": "YangMills.iidBalabanHypothesis",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§48. Unconditional Balaban RG hypothesis from Wilson stage limit",
+    "name": "YangMills.strictClayFromStage",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§48. Unconditional Balaban RG hypothesis from Wilson stage limit",
+    "name": "YangMills.strictClayBasicFromStage",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§49. Unconditional OS Poincaré continuation (Rank-1 completion collapse)",
+    "name": "YangMills.iid_osConfigKernel_factor",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§49. Unconditional OS Poincaré continuation (Rank-1 completion collapse)",
+    "name": "YangMills.iid_osCompletionMap_rank_one",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§49. Unconditional OS Poincaré continuation (Rank-1 completion collapse)",
+    "name": "YangMills.iidOSPoincareContinuation",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§50. Global unconditional strict Clay Yang–Mills exports",
+    "name": "YangMills.GapFillingAttempt.strictClayFromIID",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§50. Global unconditional strict Clay Yang–Mills exports",
+    "name": "YangMills.GapFillingAttempt.strictClayOnOSCompletionFromIID",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§50. Global unconditional strict Clay Yang–Mills exports",
+    "name": "YangMills.GlobalAxioms.unconditional_balaban_hypothesis",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§50. Global unconditional strict Clay Yang–Mills exports",
+    "name": "YangMills.GlobalAxioms.unconditional_os_continuation",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§50. Global unconditional strict Clay Yang–Mills exports",
+    "name": "YangMills.GlobalAxioms.clay_yang_mills_strict_unconditional",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§50. Global unconditional strict Clay Yang–Mills exports",
+    "name": "YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§51. SU(N) weak-coupling RG closure & ClayYangMillsMassGap4D",
+    "name": "YangMills.SUClosure.fullRankCubic_gap_upper_bound",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§51. SU(N) weak-coupling RG closure & ClayYangMillsMassGap4D",
+    "name": "YangMills.SUClosure.su_yang_mills_rg_conjecture_unconditional",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§51. SU(N) weak-coupling RG closure & ClayYangMillsMassGap4D",
+    "name": "YangMills.SUClosure.clay_yang_mills_4d_from_su_closure",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§52. Unconditional finite-volume 4D OS reflection positivity",
+    "name": "YangMills.LatticeCutSplit4D.wilsonAction_temporal_split",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§52. Unconditional finite-volume 4D OS reflection positivity",
+    "name": "YangMills.PosDefKernels.realTrace_unitary_kernel_isPosDef",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§52. Unconditional finite-volume 4D OS reflection positivity",
+    "name": "YangMills.LatticeOSRP4D.wilson4D_reflection_positivity",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§52. Borchers reconstruction & OS completion lift",
+    "name": "YangMills.BorchersReconstruction.borchers_to_clay_target",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
+  },
+  {
+    "section": "§52. Borchers reconstruction & OS completion lift",
+    "name": "YangMills.OSCompletion.CompletionLift.os_completion_semigroup_bridge",
+    "axioms": [
+      "Classical.choice",
+      "Quot.sound",
+      "propext"
+    ],
+    "status": "PASS"
   }
 ]

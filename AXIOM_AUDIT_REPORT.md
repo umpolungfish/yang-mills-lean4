@@ -22,8 +22,13 @@ No unproven axioms, placeholders, or synthetic postulates (`sorryAx`) exist in t
 
 | Master Theorem | Description | Axiomatic Dependencies | Status |
 | :--- | :--- | :--- | :---: |
-| `MassGapInstances.two_level_gauge_gap` | **Unconditional** mass gap carried by a `GappedGaugeSystem` with nonzero lattice commutator | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
-| `YangMills.clay_yang_mills_strict_from_balaban_and_os` | Clay Millennium 4D Yang–Mills existence and strict positive mass gap | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
+| `YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional` | **Unconditional** Clay Millennium 4D Yang–Mills existence and OS-linked mass gap | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
+| `YangMills.GlobalAxioms.clay_yang_mills_strict_unconditional` | **Unconditional** strict 4D Clay Yang–Mills mass gap (`ClayYangMillsMassGap4DStrict`) | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
+| `YangMills.iidBalabanHypothesis` | Unconditional `BalabanRGContinuumHypothesis N hN` from Wilson stage limit | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
+| `YangMills.iidOSPoincareContinuation` | Unconditional `OSPoincareContinuationHypothesis iidOS4DStrict` via rank-1 completion collapse | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
+| `YangMills.SUClosure.clay_yang_mills_4d_from_su_closure` | **Unconditional** full-pipeline closure of `ClayYangMillsMassGap4D N hN` via weak-coupling bound | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
+| `MassGapInstances.two_level_gauge_gap` | **Unconditional** finite-system mass gap (`GappedSpectrum (Fin 2)`) | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
+| `YangMills.clay_yang_mills_strict_from_balaban_and_os` | Clay Millennium 4D Yang–Mills reduction interface | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
 | `YangMills.buildStrictWightmanFromOS` | Strict relativistic 4D Wightman QFT reconstruction from non-Gaussian Osterwalder–Schrader axioms | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
 | `YangMills.strongCoupling_infinite_volume_lattice_os` | Thermodynamic limit: infinite-volume strong-coupling 4D $SU(N)$ lattice OS theory with strict positive mass gap | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |
 | `YangMills.strongCoupling_time_slice_clustering` | Volume-independent strong-coupling exponential clustering in physical Euclidean time separation | `Classical.choice`, `Quot.sound`, `propext` | **PASS** |

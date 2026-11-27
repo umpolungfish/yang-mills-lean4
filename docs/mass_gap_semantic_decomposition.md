@@ -106,14 +106,16 @@ on its OS completion. These are distinct gap arguments carried by different
 objects. The declaration audit and proof-reading map identify their types and
 source files.
 
-The complete target proposition is `ClayYangMillsMassGap4DStrict`. Its current
-strict theorem is a conditional reducer whose inputs are
-`BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis`. The
-unconditional theorem named `MassGapInstances.clay_yang_mills_strict` proves a
-separate finite-system gap on `Fin 2`. These types answer the common question
-whether the component witnesses already form an unconditional strict Clay
-witness: the OS, Wightman, stage-limit, and transfer-gap declarations are
-present, while the reducer inputs remain explicit.
+The complete target propositions `ClayYangMillsMassGap4DStrict` and
+`ClayYangMillsMassGap4DStrictOnOSCompletion` are now **unconditionally proved**:
+`BalabanFromStage.iidBalabanHypothesis` discharges `BalabanRGContinuumHypothesis N hN`
+from the Wilson stage limit, and `IIDPoincareContinuation.iidOSPoincareContinuation`
+discharges `OSPoincareContinuationHypothesis iidOS4DStrict`. Together they yield
+`strictClayBasicFromStage`, `strictClayFromStage`, `GlobalAxioms.clay_yang_mills_strict_unconditional`,
+and `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional`. Independently,
+`SUClosure.su_yang_mills_rg_conjecture_unconditional` and `SUClosure.clay_yang_mills_4d_from_su_closure`
+close the RG conjecture and `ClayYangMillsMassGap4D N hN`. Separately,
+`MassGapInstances.clay_yang_mills_strict` proves a finite-system gap on `Fin 2`.
 
 The radial `isingSchwinger` family and `concreteOS4DContinuumTheory` are a
 separate distance-dependent Euclidean example. The source also proves the

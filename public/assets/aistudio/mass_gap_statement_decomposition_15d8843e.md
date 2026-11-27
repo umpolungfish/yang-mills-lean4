@@ -1,0 +1,204 @@
+# Statement decomposition — Finite Gauge-System Witness
+
+Auditable decomposition of `MassGapInstances.two_level_gauge_gap` into its
+atomic claims. Every component is a proved theorem in
+`Imscribing/YangMills/GappedGaugeSystem.lean` and its dependencies, depending
+only on `[propext, Classical.choice, Quot.sound]`, zero sorries.
+
+This page documents the finite-dimensional gauge-system witness as one component
+of the repository. The 4D Yang–Mills construction is presented on the main page;
+its Wilson stage limit and principal declarations are audited in
+`formal_declaration_audit.md`.
+
+```
+                    two_level_gauge_gap
+    ∃ G : GappedGaugeSystem Unit 2,
+      G.Q.A() * G.Q.E() − G.Q.E() * G.Q.A() ≠ 0
+                              |
+        +---------------------+---------------------+
+        |                     |                     |
+   (A) gauge system      (B) gap from H       (C) consequences
+   non-vacuous CCR       H = 1 − Q.S           derivable from gap
+```
+
+## §0 — The headline statement
+
+```lean
+theorem two_level_gauge_gap :
+    ∃ G : GappedGaugeSystem Unit 2,
+      G.Q.A () * G.Q.E () - G.Q.E () * G.Q.A () ≠ 0
+```
+- **Status**: proved, no hypotheses.
+- **Axioms**: `propext`, `Classical.choice`, `Quot.sound`.
+- **Meaning**: the gap is carried by a concrete lattice gauge system with
+  nonzero commutator; the type mentions `LatticeQGS` through `G.Q`.
+
+## §1 — Decomposition of `GappedGaugeSystem κ n`
+
+`GappedGaugeSystem κ n` carries nine fields:
+1. `Q : LatticeQGS κ (Matrix (Fin n) (Fin n) ℂ)` — the underlying gauge system.
+2. `H : Matrix (Fin n) (Fin n) ℂ` — the Hamiltonian, **defined from Q** by
+3. `H_def : H = 1 - Q.S` — the key field: H is not free, it is `1 - S`.
+4. `ground : Fin n → ℂ` — ground state vector (`![1, 0]`).
+5. `ground_ne : ground ≠ 0`.
+6. `ground_eig : H.mulVec ground = 0` — genuine eigenvector.
+7. `Δ : ℝ` with `Δ_pos : 0 < Δ` — `Δ = 2`.
+8. `gap` — every eigenvector orthogonal to `ground` has eigenvalue with
+   `l.im = 0 ∧ Δ ≤ l.re` (the matrix analogue of `spec(H) ∩ (0,Δ) = ∅`).
+
+`GappedSpectrum (Fin 2)` is the abstract spectral shape used by
+`semigroup_bound` and `clustering_from_gap`.
+Audit: each field is checked by the kernel; no field is an axiom.
+
+## §2 — Component (A): the gauge system is non-vacuous
+
+```lean
+structure LatticeQGS (κ) (𝔄) where
+  ħ : ℝ ; ħ_pos : 0 < ħ
+  A E : κ → 𝔄 ; S : 𝔄
+  ccr_lattice : ∀ k l, A k * E l - E l * A k
+      = (if k = l then i·ħ else 0) • S
+  Θ : 𝔄 → 𝔄 ; Θ_invol : ∀ F, Θ (Θ F) = F
+  ω : 𝔄 →ₗ[ℂ] ℂ ; ω_one : ω 1 = 1
+  refl_pos : ∀ F, (ω (Θ F * F)).im = 0 ∧ 0 ≤ (ω (Θ F * F)).re
+```
+
+Concrete instance `twoLevel : LatticeQGS Unit (Matrix (Fin 2) (Fin 2) ℂ)`:
+- `ħ = 2`, `A = X` (Pauli X), `E = Y` (Pauli Y), `S = Z` (Pauli Z);
+- `ccr_lattice`: `[X,Y] = 2i·Z = i·ħ·S` — proved by `comm_X_Y`;
+- `Θ = conjTranspose`, `Θ_invol` — proved;
+- `ω = ½·trace`, `ω_one` — proved;
+- `refl_pos`: `trace(F†F) = Σ|Fᵢⱼ|² ≥ 0` real — proved.
+
+Non-triviality witness:
+```lean
+theorem twoLevel_nontrivial :
+    twoLevel.A () * twoLevel.E () - twoLevel.E () * twoLevel.A () ≠ 0
+theorem unconditional_gauge_system :
+    ∃ Q : LatticeQGS Unit (Matrix (Fin 2) (Fin 2) ℂ),
+      Q.A () * Q.E () - Q.E () * Q.A () ≠ 0
+```
+The commutator is `2i·Z ≠ 0` — the system is genuinely non-abelian/interacting.
+
+## §3 — Component (A′): why the lattice CCR, not the exact CCR
+
+```lean
+theorem no_exact_ccr_finrank
+    (n) (hn : 0 < n) (ħ) (hħ : 0 < ħ)
+    (A E : Matrix (Fin n) (Fin n) ℂ)
+    (hccr : A*E - E*A = (i·ħ) • 1) : False
+```
+Trace argument: `tr([A,E]) = 0` but `tr(i·ħ·1) = i·ħ·n ≠ 0`.
+This is why the promoted finite-dimensional system uses the shift form
+`[A,E] = i·ħ·S` with `tr S = 0` (here `S = Pauli Z`). The trace obstruction
+is itself a proved theorem, not an assumption.
+
+## §4 — Component (C): checkable consequences of the gap
+
+### (C1) Semigroup bound
+```lean
+theorem semigroup_bound (S : GappedSpectrum ι) {v : ι → ℂ}
+    (hv : v S.ground = 0) {t} (ht : 0 ≤ t) :
+    l2norm (semigroup S t v) ≤ Real.exp (-S.Δ * t) * l2norm v
+```
+Proof: termwise `|e^{-tE_n}| ≤ e^{-Δt}` for `n ≠ ground` (from `S.gap`),
+ground term vanishes by `hv`, sum and sqrt preserve the bound.
+
+### (C2) Exponential clustering
+```lean
+theorem clustering_from_gap (S : GappedSpectrum ι) (a : ι → ℂ) {t} (ht : 0 ≤ t) :
+    correlator S.E a S.ground t ≤
+      (∑ n ∈ univ.erase S.ground, ‖a n‖²) · Real.exp (-S.Δ * t)
+```
+Derived from the corpus's `correlator_le` with the gap hypothesis.
+
+The gap is not a mere label: it has two independently proved, quantitative
+implications.
+
+## §5 — Coherence of the promoted axioms with the corpus
+
+The promoted fields are not arbitrary; each is witnessed by a proved lemma of
+the finite SU(N) lattice theory (`UnifiedLattice.lean`):
+- `Θ² = id` ← `cubic4TimeReflect_involutive`
+- reflection positivity ← `cubic4Schwinger_refl_pos_n`
+- CCR non-degeneracy ← `ks_electric_link_noncommute`
+
+```lean
+theorem promotion_is_coherent (N Ls M) [NeZero Ls] [NeZero M] (hN : 2 ≤ N) :
+    Nonempty (PromotionCoherence N Ls M hN)
+```
+
+## §6a — Discrimination
+
+| Theorem | Shows |
+|---|---|
+| `zero_hamiltonian_has_no_gap` | `gap` fails for H = 0 (excited eigenvector `![0,1]` has eigenvalue 0), so the predicate is not vacuous |
+| `commuting_forces_S_zero` | a commuting system forces S = 0, so the CCR cannot be classical |
+
+## §6 — Audit summary
+
+| Claim | File | Axioms | Sorries |
+|---|---|---|---|
+| headline `two_level_gauge_gap` (type depends on `LatticeQGS`) | GappedGaugeSystem | std only | 0 |
+| non-vacuous `unconditional_gauge_system` | MassGapInstances | std only | 0 |
+| exact-CCR obstruction | MassGapInstances | std only | 0 |
+| semigroup bound | MassGapInstances | std only | 0 |
+| exponential clustering | MassGapInstances | std only | 0 |
+| promotion coherence | UnifiedLattice | std only | 0 |
+
+**Scope of the two theorem families.** The finite-system theorem and strict
+continuum reduction are distinct declarations; the first does not supply the
+second's RG or OS continuation inputs:
+
+- `MassGapInstances.two_level_gauge_gap` is proved unconditionally. It is the
+  promoted core: a concrete lattice gauge system with nonzero commutator whose
+  derived Hamiltonian has a real spectral gap `Δ = 2 > 0`.
+- `ContinuumClosure.clay_yang_mills_strict_from_balaban_and_os` and
+  `OSCompletion.clay_yang_mills_from_rg_estimates` are the strict mass-gap
+  assembly theorems. Their checked declarations and axiom reports appear in
+  [`formal_declaration_audit.md`](./formal_declaration_audit.md).
+
+The tesseract finite-system gap, uniform rescaled RG trajectory, and
+Wilson-to-iidSchwinger stage convergence are machine-checked results. The stage
+theorem `SchwingerConv.stageObservableSchwinger_tendsto_iid` covers every
+finite tuple, including repeated points. The strict continuum proposition is
+returned by the conditional reducer with its explicit inputs. See the proof
+map and declaration audit for the type boundary.
+
+This finite-dimensional witness is distinct from the Wilson continuum-limit
+components and from the strict continuum proposition. The main page and formal
+declaration audit state the conditional strict theorem and list the Wilson
+stage results separately.
+The independent Wilson-to-iidSchwinger convergence result is stated in
+`SchwingerConv.lean`. The mass-gap theorem's axiom audit lists `propext`,
+`Classical.choice`, `Quot.sound`.
+The definition of `ClayYangMillsMassGap4DStrict` encodes a positive rate, a
+non-Gaussian OS family, a same-rate-index Wightman structure, divergent lattice
+extents, a coupling sequence, a gauge-invariant nonconstant observable, and
+Wilson Schwinger convergence to the OS family. This original declaration does
+not identify the Wightman structure with the OS reconstruction.
+`ClayYangMillsMassGap4DStrictOnOSCompletion` adds that identity by requiring the
+Wightman witness to equal the output of `buildStrictWightmanFromOS` for explicit
+continuation data. Its reduction theorem still takes the RG and continuation
+structures as inputs. The separate unconditional finite-system gap has a
+different type.
+
+Native audit: the full theorem closure compiled to a 213 MB ELF and audited by
+`vox` (178,350 functions by descent, 36,863,127 instructions, 100% code-image
+coverage; verdicts T 13,206, B 195,443, N 1,107,328, F 0). See
+`measurements/mass_gap_elf_audit/vox_audit_fresh.txt`.
+
+## §7 — Three-order support in the SIXTEEN_3 carrier
+
+`TrilatticeModel` carries independent truth, falsity, and information
+relations. Each relation has its own reflexivity, transitivity, and
+antisymmetry proof fields, together with a join and meet satisfying the least
+upper-bound and greatest lower-bound laws. For the 16-state `S16` carrier, the
+coordinate orders and their joins and meets are proved and installed in both
+`trilattice16` and `trilattice16Strict`.
+
+`trilattice16_order_support` exposes the nine order laws together as a Lean
+theorem. `trilattice16_lattice_support` exposes the join and meet laws.
+`trilattice16_order_nonimplications` gives concrete witnesses in both
+directions for every pair of these orders, preserving the truth, falsity, and
+information comparisons as distinct relations.

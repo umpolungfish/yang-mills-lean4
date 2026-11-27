@@ -1,0 +1,82 @@
+cff-version: 1.2.0
+message: "If you use this formalization, please cite it as below."
+authors:
+  - family-names: "Yang-Mills Lean 4 Formalization Team"
+    affiliation: "Independent researchers"
+title: "Four-Dimensional Yang–Mills Constructions and Mass-Gap Interfaces: A Lean 4 Formalization"
+version: v1.0.0
+doi: "10.5281/zenodo.XXXXXXX"
+date-released: 2026-11-24
+url: "https://github.com/umpolungfish/yang-mills-lean4"
+license: "Apache-2.0"
+keywords:
+  - "Yang-Mills theory"
+  - "mass gap"
+  - "formal verification"
+  - "Lean 4"
+  - "quantum field theory"
+  - "Osterwalder-Schrader"
+  - "Wightman axioms"
+  - "Wilson lattice"
+  - "renormalization group"
+  - "Millennium Prize Problems"
+references:
+  - type: "article"
+    title: "Quantum Yang–Mills Theory"
+    authors:
+      - family-names: "Jaffe"
+        given-names: "Arthur"
+      - family-names: "Witten"
+        given-names: "Edward"
+    journal: "The Millennium Prize Problems"
+    publisher: "Clay Mathematics Institute"
+    year: 2000
+  - type: "article"
+    title: "Axioms for Euclidean Green's Functions"
+    authors:
+      - family-names: "Osterwalder"
+        given-names: "Konrad"
+      - family-names: "Schrader"
+        given-names: "Robert"
+    journal: "Comm. Math. Phys."
+    volume: 31
+    pages: "83–112"
+    year: 1973
+  - type: "article"
+    title: "Axioms for Euclidean Green's Functions II"
+    authors:
+      - family-names: "Osterwalder"
+        given-names: "Konrad"
+      - family-names: "Schrader"
+        given-names: "Robert"
+    journal: "Comm. Math. Phys."
+    volume: 42
+    pages: "281–305"
+    year: 1975
+  - type: "article"
+    title: "Renormalization Group Approach to Lattice Gauge Field Theories"
+    authors:
+      - family-names: "Balaban"
+        given-names: "Tibor"
+    journal: "Comm. Math. Phys."
+    volume: 99
+    pages: "75–102"
+    year: 1985
+  - type: "article"
+    title: "Confinement of Quarks"
+    authors:
+      - family-names: "Wilson"
+        given-names: "Kenneth"
+    journal: "Phys. Rev. D"
+    volume: 10
+    pages: 2445
+    year: 1974
+  - type: "article"
+    title: "Prescribing a System of Random Variables by Conditional Distributions"
+    authors:
+      - family-names: "Dobrushin"
+        given-names: "R. L."
+    journal: "Theory Probab. Appl."
+    volume: 15
+    pages: "458–486"
+    year: 1970

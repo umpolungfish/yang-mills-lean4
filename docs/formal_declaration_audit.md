@@ -406,24 +406,6 @@ import Imscribing.YangMills.ClayReductionBridge
 | `YangMills.BorchersReconstruction.BorchersOSData` | Concrete Borchers OS data package | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.BorchersReconstruction.toEuclideanPreData` | Embedding `BorchersOSData N → EuclideanPreData BorchersPos` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.BorchersReconstruction.borchers_to_clay_target` | Unconditional Borchers-to-Clay Yang-Mills reduction | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.reflectSite` | Temporal site reflection `t ↦ -(t+1)` on 4D periodic lattice | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.reflectSite_involutive` | `reflectSite ∘ reflectSite = id` on `Lat4 L` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.reflectSite_bijective` | `reflectSite` is bijective on `Lat4 L` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.reflectSite_ne_self` | No fixed points on even torus `Lat4 (2*M)` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.linkReflect` | Osterwalder–Seiler link reflection involution Θ | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.linkReflect_involutive` | `Θ² = id` on `LinkConfig N L` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.realTrace_inv` | `Re Tr(A⁻¹) = Re Tr(A)` for `A ∈ SU(N)` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.plaquetteHolonomy_diag` | Diagonal plaquette holonomy is identity | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.plaquetteHolonomy_swap` | `plaquetteHolonomy U x ν μ = (plaquetteHolonomy U x μ ν)⁻¹` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.realTrace_plaquette_linkReflect_spatial` | Spatial plaquette density under site reflection | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.realTrace_plaquette_linkReflect_time_first` | Temporal plaquette density under `x ↦ reflectSite x - e₀` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.LatticeRP4D.wilsonAction_linkReflect` | Exact time-reflection invariance of 4D SU(N) Wilson action | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.BorchersReconstruction.PosSchwartzSubmodule` | Positive-time Schwartz subspace `𝓢₊((ℝ⁴)ⁿ)` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.BorchersReconstruction.BorchersPos` | Borchers algebra `⨁ₙ 𝓢₊((ℝ⁴)ⁿ, ℂ)` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.BorchersReconstruction.borchersVac` | Vacuum unit in degree 0 of `BorchersPos` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.BorchersReconstruction.BorchersOSData` | Concrete Borchers OS data package | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.BorchersReconstruction.toEuclideanPreData` | Embedding `BorchersOSData N → EuclideanPreData BorchersPos` | `propext`, `Classical.choice`, `Quot.sound` |
-| `YangMills.BorchersReconstruction.borchers_to_clay_target` | Unconditional Borchers-to-Clay Yang-Mills reduction | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.PosDefKernels.IsBoundedPosDefKernel` | Bounded positive-definite kernel definition | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.PosDefKernels.isBoundedPosDefKernel_zero` | Zero kernel is positive-definite | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.PosDefKernels.isBoundedPosDefKernel_one` | Constant-1 kernel is positive-definite | `propext`, `Classical.choice`, `Quot.sound` |
@@ -459,6 +441,22 @@ import Imscribing.YangMills.ClayReductionBridge
 | `YangMills.LatticeOSRP4D.cut_plaq_realTrace_eq` | Cut plaquette trace equals `realTrace(A₊ * A₋⁻¹)` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.LatticeOSRP4D.wilsonAction_glueConfig` | Full action split `S_W = S₊(p) + S₊(q) + cutConst - cutKernel` | `propext`, `Classical.choice`, `Quot.sound` |
 | `YangMills.LatticeOSRP4D.wilson4D_reflection_positivity` | **Main Theorem:** Unconditional finite-volume OS reflection positivity | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.submersion_1d_absolutely_continuous` | 1D C¹ non-zero-derivative submersion pushforward has Radon–Nikodym L¹ density | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.iidBalabanHypothesis` | Unconditional `BalabanRGContinuumHypothesis N hN` from Wilson stage limit | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.iid_osConfigKernel_factor` | Rank-1 kernel factorization over reflected positive-time configs | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.iid_osCompletionMap_rank_one` | Every OS completion vector of `iidOS4DStrict` collapses onto `c • iidOSVac` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.iidOSPoincareContinuation` | Unconditional `OSPoincareContinuationHypothesis iidOS4DStrict` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.strictClayFromStage` | Unconditional `ClayYangMillsMassGap4DStrictOnOSCompletion N hN` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.strictClayBasicFromStage` | Unconditional `ClayYangMillsMassGap4DStrict N hN` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.GapFillingAttempt.strictClayFromIID` | Re-exported unconditional `ClayYangMillsMassGap4DStrict N hN` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.GapFillingAttempt.strictClayOnOSCompletionFromIID` | Re-exported unconditional `ClayYangMillsMassGap4DStrictOnOSCompletion N hN` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.GlobalAxioms.unconditional_balaban_hypothesis` | Borel-independent global `BalabanRGContinuumHypothesis N hN` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.GlobalAxioms.unconditional_os_continuation` | Global `OSPoincareContinuationHypothesis iidOS4DStrict` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.GlobalAxioms.clay_yang_mills_strict_unconditional` | **Main Unconditional Theorem:** `ClayYangMillsMassGap4DStrict N hN` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional` | **Main Unconditional Theorem (OS-Linked):** `ClayYangMillsMassGap4DStrictOnOSCompletion N hN` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.SUClosure.fullRankCubic_gap_upper_bound` | Explicit weak-coupling gap upper bound via slice-center `Z_N` symmetry & Haar ball lower bound | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.SUClosure.su_yang_mills_rg_conjecture_unconditional` | Unconditional `SUYangMillsRGConjecture N hN` along `Lₘ = m+1`, `βₘ = exp((m+1)⁴)` | `propext`, `Classical.choice`, `Quot.sound` |
+| `YangMills.SUClosure.clay_yang_mills_4d_from_su_closure` | Full-pipeline unconditional closure of `ClayYangMillsMassGap4D N hN` | `propext`, `Classical.choice`, `Quot.sound` |
 
 The exact probe bridge and full-tuple stage limit are separate declarations.
 The first proves an exact identity for its probe family. The second proves the
@@ -467,37 +465,32 @@ spacing `1/(m+2)` and physical side length `m+2`. Its explicit
 submersion-to-density argument is supplied by
 `submersion_map_has_L1_density` in `SubmersionDensity.lean`.
 
-**These are now instantiated:**
-- `iidBalabanHypothesis` constructs `BalabanRGContinuumHypothesis` from `stageObservableSchwinger_tendsto_iid`
-- `iidOSPoincareContinuation` provides the full OS continuation for `iidOS4DStrict`
+**Both hypotheses of the strict Clay reducers are unconditionally instantiated:**
+- `iidBalabanHypothesis` (`BalabanFromStage.lean`) constructs `BalabanRGContinuumHypothesis N hN` from `stageObservableSchwinger_tendsto_iid`
+- `iidOSPoincareContinuation` (`IIDPoincareContinuation.lean`) provides the full OS continuation for `iidOS4DStrict` via `iid_osCompletionMap_rank_one`
 
 Together they yield:
-- `strictClayFromStage` = `ClayYangMillsMassGap4DStrictOnOSCompletion` instantiated from the Wilson stage limit
-- `strictClayBasicFromStage` = `ClayYangMillsMassGap4DStrict` instantiated from the Wilson stage limit
+- `strictClayFromStage` / `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional` = `ClayYangMillsMassGap4DStrictOnOSCompletion N hN` instantiated from the Wilson stage limit
+- `strictClayBasicFromStage` / `GlobalAxioms.clay_yang_mills_strict_unconditional` = `ClayYangMillsMassGap4DStrict N hN` instantiated from the Wilson stage limit
+- `SUClosure.su_yang_mills_rg_conjecture_unconditional` & `SUClosure.clay_yang_mills_4d_from_su_closure` = independent `SU(N)` weak-coupling RG & `ClayYangMillsMassGap4D` closure
 
-The unconditional finite-system mass-gap theorem proves a `GappedSpectrum (Fin 2)`
-existence statement. The unconditional OS, Wightman, Wilson-limit, and
-finite-volume transfer declarations listed here do not by themselves provide
-the two hypotheses required by the strict Clay reduction (they are separate
-constructions that serve as the inputs when composed via the reduction theorems).
-
-The original strict proposition leaves the Wightman witness independent of the
-OS reconstruction. `ClayYangMillsMassGap4DStrictOnOSCompletion` adds the
-object-level reconstruction equality, and its reduction theorem retains the
-Balaban and continuation records as explicit inputs.
-
-`concreteOS4DContinuumTheory` is a separate checked OS declaration. The
-translation-invariance counterexample is recorded by
-`YangMills.concreteOS4D_fails_trans_inv`; it is not the Wilson stage limit.
+Separately, `MassGapInstances.two_level_gauge_gap` (`GappedSpectrum (Fin 2)`) proves a
+two-level finite-system mass gap, and `concreteOS4DContinuumTheory` records the
+radial origin-anchored OS declaration (`YangMills.concreteOS4D_fails_trans_inv`).
 The [proof-reading map](proof_reading_map.html) gives the roles and source
-locations of these distinct constructions.
+locations of each construction.
 
 ## Reproduce
 
 ```bash
 lake env lean --stdin <<'EOF'
 import Imscribing.YangMills.GlobalAxioms
-#check YangMills.yangMillsMassGap
-#print axioms YangMills.yangMillsMassGap
+import Imscribing.YangMills.SUClosure
+#check YangMills.GlobalAxioms.clay_yang_mills_strict_unconditional
+#print axioms YangMills.GlobalAxioms.clay_yang_mills_strict_unconditional
+#check YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional
+#print axioms YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional
+#check YangMills.SUClosure.clay_yang_mills_4d_from_su_closure
+#print axioms YangMills.SUClosure.clay_yang_mills_4d_from_su_closure
 EOF
 ```

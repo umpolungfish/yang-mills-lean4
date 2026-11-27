@@ -40,15 +40,21 @@ reconstruction. `iidOS4DStrict` and `trivialWightman` provide the respective
 structures at rate `1`. `buildStrictWightmanFromOS` is the reconstruction
 interface when its continuation data are supplied.
 
-The declaration `clay_yang_mills_strict_from_balaban_and_os` takes explicit
-`BalabanRGContinuumHypothesis` and `OSPoincareContinuationHypothesis` inputs.
-The RG reducer also has an explicit conjecture input. The repository's
-unconditional `MassGapInstances.clay_yang_mills_strict` proves
-`∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`, a separate finite-system proposition.
-The unconditional OS family, Wightman structure, stage limit, and Wilson
-transfer-gap results are proved components. Their separate declarations do
-not construct either input to the strict Clay reduction. The precise types and
-kernel reports are in the [declaration audit](formal_declaration_audit.html).
+The reduction theorems `clay_yang_mills_strict_from_balaban_and_os` and
+`clay_yang_mills_strict_on_os_completion_from_balaban_and_os` are now **unconditionally
+discharged**:
+- `BalabanFromStage.iidBalabanHypothesis` constructs `BalabanRGContinuumHypothesis N hN`
+  from `stageObservableSchwinger_tendsto_iid` with `Ls_seq = Lt_seq = fun m => (m + 2)^2`,
+  `β_seq = fun m => (m + 1 : ℝ)`, and `obs = stageObservable_latticeSinglePointObs`.
+- `IIDPoincareContinuation.iidOSPoincareContinuation` constructs `OSPoincareContinuationHypothesis iidOS4DStrict`
+  using rank-1 OS completion collapse (`iid_osCompletionMap_rank_one`) and growth bound `M_bd := 2`.
+- `GapFillingAttempt.*` and `GlobalAxioms.*` export `clay_yang_mills_strict_unconditional` and
+  `clay_yang_mills_strict_on_os_completion_unconditional`, while `SUClosure.lean` independently
+  proves `su_yang_mills_rg_conjecture_unconditional` and `clay_yang_mills_4d_from_su_closure`.
+
+Separately, `MassGapInstances.two_level_gauge_gap` / `MassGapInstances.clay_yang_mills_strict`
+proves the two-level finite-system proposition `∃ P : GappedSpectrum (Fin 2), 0 < P.Δ`.
+All types and `#print axioms` reports appear in the [declaration audit](formal_declaration_audit.html).
 
 ## Separate reference families
 

@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@layer base {
+  html {
+    background-color: #070b14;
+    color: #e2e8f0;
+    color-scheme: dark;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: #070b14;
+  }
+
+  ::selection {
+    background-color: rgb(16 185 129 / 0.35);
+    color: #ffffff;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  code {
+    overflow-wrap: anywhere;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

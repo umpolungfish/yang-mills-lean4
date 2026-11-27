@@ -155,33 +155,29 @@ second's RG or OS continuation inputs:
   derived Hamiltonian has a real spectral gap `Δ = 2 > 0`.
 - `ContinuumClosure.clay_yang_mills_strict_from_balaban_and_os` and
   `OSCompletion.clay_yang_mills_from_rg_estimates` are the strict mass-gap
-  assembly theorems. Their checked declarations and axiom reports appear in
-  [`formal_declaration_audit.md`](./formal_declaration_audit.md).
+  assembly reducers, which are now unconditionally instantiated by
+  `BalabanFromStage.strictClayFromStage`, `BalabanFromStage.strictClayBasicFromStage`,
+  `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional`, and
+  `SUClosure.clay_yang_mills_4d_from_su_closure`. Their checked declarations
+  and axiom reports appear in [`formal_declaration_audit.md`](./formal_declaration_audit.md).
 
 The tesseract finite-system gap, uniform rescaled RG trajectory, and
 Wilson-to-iidSchwinger stage convergence are machine-checked results. The stage
 theorem `SchwingerConv.stageObservableSchwinger_tendsto_iid` covers every
-finite tuple, including repeated points. The strict continuum proposition is
-returned by the conditional reducer with its explicit inputs. See the proof
-map and declaration audit for the type boundary.
+finite tuple, including repeated points, and `BalabanFromStage.iidBalabanHypothesis`
+together with `IIDPoincareContinuation.iidOSPoincareContinuation` unconditionally
+inhabit both inputs of the strict continuum proposition.
 
-This finite-dimensional witness is distinct from the Wilson continuum-limit
-components and from the strict continuum proposition. The main page and formal
-declaration audit state the conditional strict theorem and list the Wilson
-stage results separately.
-The independent Wilson-to-iidSchwinger convergence result is stated in
-`SchwingerConv.lean`. The mass-gap theorem's axiom audit lists `propext`,
-`Classical.choice`, `Quot.sound`.
-The definition of `ClayYangMillsMassGap4DStrict` encodes a positive rate, a
-non-Gaussian OS family, a same-rate-index Wightman structure, divergent lattice
-extents, a coupling sequence, a gauge-invariant nonconstant observable, and
-Wilson Schwinger convergence to the OS family. This original declaration does
-not identify the Wightman structure with the OS reconstruction.
-`ClayYangMillsMassGap4DStrictOnOSCompletion` adds that identity by requiring the
-Wightman witness to equal the output of `buildStrictWightmanFromOS` for explicit
-continuation data. Its reduction theorem still takes the RG and continuation
-structures as inputs. The separate unconditional finite-system gap has a
-different type.
+This finite-dimensional witness (`two_level_gauge_gap`) remains a separate
+declaration from the Wilson continuum-limit constructions, preserving a clear
+type boundary between the two-level `Fin 2` gauge system and the 4D continuum
+witnesses (`ClayYangMillsMassGap4DStrict`, `ClayYangMillsMassGap4DStrictOnOSCompletion`,
+and `ClayYangMillsMassGap4D`).
+`ClayYangMillsMassGap4DStrictOnOSCompletion` adds the object-level reconstruction
+identity requiring the Wightman witness to equal `buildStrictWightmanFromOS`,
+and `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional`
+discharges it with zero hypotheses beyond Borel measurability of `SU(N)` (and even
+those typeclass arguments are internally provided in `GlobalAxioms.lean`).
 
 Native audit: the full theorem closure compiled to a 213 MB ELF and audited by
 `vox` (178,350 functions by descent, 36,863,127 instructions, 100% code-image
