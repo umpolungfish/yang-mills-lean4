@@ -101,21 +101,21 @@ export function App() {
           </nav>
 
           {/* Zone 3: Main Site Link + Primary Action */}
-          <div className="hidden shrink-0 items-center gap-2 xl:flex">
+          <div className="flex shrink-0 items-center gap-2">
             <a
               href={
                 typeof window !== 'undefined' && window.location.pathname.includes('/explorer/')
                   ? '../index.html'
                   : '/docs/index.html'
               }
-              className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:border-slate-500 hover:text-white"
+              className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:border-emerald-500/50 hover:text-white"
             >
               Main Page
             </a>
             <button
               type="button"
               onClick={() => handleOpenSourceLine('GlobalAxioms', 64, 'clay_yang_mills_strict_on_os_completion_unconditional')}
-              className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-emerald-500/40 bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-500"
+              className="hidden items-center gap-1.5 whitespace-nowrap rounded-lg border border-emerald-500/40 bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-500 xl:inline-flex"
             >
               <Code2 className="h-3.5 w-3.5" />
               Inspect GlobalAxioms.lean
