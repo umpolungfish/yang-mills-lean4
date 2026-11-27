@@ -2413,3 +2413,8 @@ theorem clay_yang_mills_4d_from_su_closure (N : ℕ) (hN : 2 ≤ N) :
     (su_yang_mills_rg_conjecture_unconditional N hN)
 
 end YangMills.SUClosure
+
+#check YangMills.SUClosure.su_yang_mills_rg_conjecture_unconditional
+#print axioms YangMills.SUClosure.su_yang_mills_rg_conjecture_unconditional
+#check YangMills.SUClosure.clay_yang_mills_4d_from_su_closure
+#print axioms YangMills.SUClosure.clay_yang_mills_4d_from_su_closure
