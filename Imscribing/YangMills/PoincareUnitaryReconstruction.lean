@@ -271,13 +271,20 @@ theorem expSeries_group_law_small
           simpa [add_comm] using (summable_nat_add_iff N).mpr h_sum_j
         have h_bt_tail : Summable (fun j => M * b_t k * b_s (N + j)) := by
           simpa [add_comm] using ((summable_nat_add_iff N).mpr hbs_sum).mul_left (M * b_t k)
+        have h_norm_tail : Summable (fun j => ‖w (N + j) k‖) :=
+          Summable.of_nonneg_of_le (fun _ => norm_nonneg _)
+            (fun j => by
+              calc ‖w (N + j) k‖ ≤ M * b_s (N + j) * b_t k := hw_bound (N + j) k
+                _ = M * b_t k * b_s (N + j) := by ring)
+            h_bt_tail
         calc
           ‖∑' j : ℕ, w (N + j) k‖ ≤ ∑' j : ℕ, ‖w (N + j) k‖ :=
-              norm_tsum_le_tsum_norm h_sum_tail
-          _ ≤ ∑' j : ℕ, M * b_t k * b_s (N + j) := by
-              refine h_sum_tail.norm.tsum_le_tsum (fun j => ?_) h_bt_tail
-              calc ‖w (N + j) k‖ ≤ M * b_s (N + j) * b_t k := hw_bound (N + j) k
-                _ = M * b_t k * b_s (N + j) := by ring
+              norm_tsum_le_tsum_norm h_norm_tail
+          _ ≤ ∑' j : ℕ, M * b_t k * b_s (N + j) :=
+              Summable.tsum_le_tsum (fun j => by
+                calc ‖w (N + j) k‖ ≤ M * b_s (N + j) * b_t k := hw_bound (N + j) k
+                  _ = M * b_t k * b_s (N + j) := by ring)
+                h_norm_tail h_bt_tail
           _ = (M * b_t k) * (∑' j : ℕ, b_s (N + j)) := tsum_mul_left
       calc
         ∑ k ∈ Finset.range N, ‖_‖ ≤ ∑ k ∈ Finset.range N, (M * b_t k) * (∑' j, b_s (N + j)) :=
@@ -285,9 +292,11 @@ theorem expSeries_group_law_small
         _ = (M * ∑ k ∈ Finset.range N, b_t k) * (∑' j, b_s (N + j)) := by
             rw [← Finset.sum_mul, ← Finset.mul_sum]
         _ ≤ (M * ∑' k, b_t k) * (∑' j, b_s (N + j)) := by
-            gcongr
-            · exact tsum_nonneg fun _ => by dsimp [b_s]; positivity
-            · exact hbt_sum.sum_le_tsum (Finset.range N) fun _ _ => by dsimp [b_t]; positivity
+            refine mul_le_mul_of_nonneg_right
+              (mul_le_mul_of_nonneg_left
+                (hbt_sum.sum_le_tsum (Finset.range N) fun _ _ => by dsimp [b_t]; positivity)
+                hM)
+              (tsum_nonneg fun _ => by dsimp [b_s]; positivity)
     have h_tail_s0 : Filter.Tendsto (fun N : ℕ => ∑' j, b_s (N + j)) Filter.atTop (𝓝 0) := by
       have h_comm : (fun N : ℕ => ∑' j, b_s (N + j)) = fun N : ℕ => ∑' j, b_s (j + N) := by
         ext N; congr 1; ext j; rw [add_comm]
@@ -328,7 +337,7 @@ theorem expSeries_group_law_small
         have hch : (n.choose j : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.ne_of_gt (Nat.choose_pos hj_le))
         rw [h_ch]
         field_simp [hjf, hnjf, hnf, hch]
-        ring
+        try ring
       rw [Finset.sum_congr rfl h_eq, ← Finset.sum_smul, ← Finset.sum_div]
       congr 1
       have h_bin : (∑ j ∈ Finset.range (n + 1),
@@ -338,7 +347,7 @@ theorem expSeries_group_law_small
         refine Finset.sum_congr rfl fun j _ => by ring
       rw [h_bin]
       congr 1
-      push_cast; ring
+      push_cast; try ring
     simp_rw [h_row]
     exact (expSeries_summable D A hA (h_unif ψ) hst1).hasSum.tendsto_sum_nat
   have h_sq_tri_diff :
@@ -404,12 +413,13 @@ theorem expSeries_group_law_small
         · exact Or.inr ⟨hjN, ⟨by omega, hkN⟩⟩
       have h_le1 : ‖∑ p ∈ S_diff, w p.1 p.2‖ ≤ ∑ p ∈ S_diff, (M * b_s p.1 * b_t p.2) :=
         le_trans (norm_sum_le _ _) (Finset.sum_le_sum fun p _ => hw_bound p.1 p.2)
+      have h_nonneg : ∀ p : ℕ × ℕ, 0 ≤ M * b_s p.1 * b_t p.2 := fun p => by
+        dsimp [b_s, b_t]; positivity
       have h_le2 :
           (∑ p ∈ S_diff, (M * b_s p.1 * b_t p.2)) ≤
             (∑ p ∈ A_box, (M * b_s p.1 * b_t p.2)) +
             (∑ p ∈ B_box, (M * b_s p.1 * b_t p.2)) := by
-        have h_u1 := Finset.sum_le_sum_of_subset_of_nonneg h_sub
-          (fun _ _ _ => by dsimp [b_s, b_t]; positivity)
+        have h_u1 := Finset.sum_le_sum_of_subset_of_nonneg h_sub (fun p _ _ => h_nonneg p)
         have h_eqU : A_box ∪ B_box = A_box ∪ (B_box \ A_box) := by
           ext x; simp only [Finset.mem_union, Finset.mem_sdiff]; tauto
         have h_disjU : Disjoint A_box (B_box \ A_box) :=
@@ -419,29 +429,35 @@ theorem expSeries_group_law_small
             (∑ p ∈ A_box, (M * b_s p.1 * b_t p.2)) +
             (∑ p ∈ B_box, (M * b_s p.1 * b_t p.2)) := by
           rw [h_eqU, Finset.sum_union h_disjU]
-          exact add_le_add le_rfl (Finset.sum_le_sum_of_subset_of_nonneg Finset.sdiff_subset
-            (fun _ _ _ => by dsimp [b_s, b_t]; positivity))
+          exact add_le_add le_rfl
+            (Finset.sum_le_sum_of_subset_of_nonneg Finset.sdiff_subset (fun p _ _ => h_nonneg p))
         exact le_trans h_u1 h_u2
       have h_f1 :
           (∑ p ∈ A_box, (M * b_s p.1 * b_t p.2)) ≤
             M * ((∑ j ∈ Finset.Ico (N / 2) N, b_s j) * (∑' k, b_t k)) := by
-        dsimp only [A_box]
         rw [Finset.sum_product]
-        simp_rw [mul_assoc, ← Finset.mul_sum]
-        rw [← Finset.sum_mul, ← Finset.mul_sum]
-        gcongr
-        · exact Finset.sum_nonneg fun _ _ => by dsimp [b_s]; positivity
-        · exact hbt_sum.sum_le_tsum (Finset.range N) (fun _ _ => by dsimp [b_t]; positivity)
+        have h_eq1 : (∑ x ∈ Finset.Ico (N / 2) N, ∑ y ∈ Finset.range N, M * b_s x * b_t y) =
+            M * ((∑ j ∈ Finset.Ico (N / 2) N, b_s j) * (∑ k ∈ Finset.range N, b_t k)) := by
+          simp_rw [mul_assoc, ← Finset.mul_sum, ← Finset.sum_mul]
+        rw [h_eq1]
+        refine mul_le_mul_of_nonneg_left
+          (mul_le_mul_of_nonneg_left
+            (hbt_sum.sum_le_tsum (Finset.range N) (fun _ _ => by dsimp [b_t]; positivity))
+            (Finset.sum_nonneg fun _ _ => by dsimp [b_s]; positivity))
+          hM
       have h_f2 :
           (∑ p ∈ B_box, (M * b_s p.1 * b_t p.2)) ≤
             M * ((∑' j, b_s j) * (∑ k ∈ Finset.Ico (N / 2) N, b_t k)) := by
-        dsimp only [B_box]
         rw [Finset.sum_product]
-        simp_rw [mul_assoc, ← Finset.mul_sum]
-        rw [← Finset.sum_mul, ← Finset.mul_sum]
-        gcongr
-        · exact Finset.sum_nonneg fun _ _ => by dsimp [b_t]; positivity
-        · exact hbs_sum.sum_le_tsum (Finset.range N) (fun _ _ => by dsimp [b_s]; positivity)
+        have h_eq2 : (∑ x ∈ Finset.range N, ∑ y ∈ Finset.Ico (N / 2) N, M * b_s x * b_t y) =
+            M * ((∑ j ∈ Finset.range N, b_s j) * (∑ k ∈ Finset.Ico (N / 2) N, b_t k)) := by
+          simp_rw [mul_assoc, ← Finset.mul_sum, ← Finset.sum_mul]
+        rw [h_eq2]
+        refine mul_le_mul_of_nonneg_left
+          (mul_le_mul_of_nonneg_right
+            (hbs_sum.sum_le_tsum (Finset.range N) (fun _ _ => by dsimp [b_s]; positivity))
+            (Finset.sum_nonneg fun _ _ => by dsimp [b_t]; positivity))
+          hM
       calc
         ‖∑ p ∈ S_diff, w p.1 p.2‖
             ≤ ∑ p ∈ S_diff, (M * b_s p.1 * b_t p.2) := h_le1
