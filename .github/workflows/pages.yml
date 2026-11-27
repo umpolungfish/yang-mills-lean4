@@ -30,7 +30,12 @@ jobs:
           node-version: '22'
 
       - name: Install explorer dependencies
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --no-audit --no-fund
+          fi
 
       - name: Build site and corpus explorer
         run: python3 scripts/build_site.py

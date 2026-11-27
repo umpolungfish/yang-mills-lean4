@@ -1375,7 +1375,9 @@ def _build_explorer():
         raise RuntimeError("Missing root package.json for explorer build")
 
     if not os.path.exists(node_modules):
-        subprocess.run(["npm", "ci"], cwd=ROOT_DIR, check=True)
+        lockfile = os.path.join(ROOT_DIR, "package-lock.json")
+        install_cmd = ["npm", "ci"] if os.path.exists(lockfile) else ["npm", "install", "--no-audit", "--no-fund"]
+        subprocess.run(install_cmd, cwd=ROOT_DIR, check=True)
 
     subprocess.run(["npm", "run", "build"], cwd=ROOT_DIR, check=True)
 
