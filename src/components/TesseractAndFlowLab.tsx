@@ -393,23 +393,23 @@ export function TesseractAndFlowLab() {
               <span className="font-mono text-[11px] text-slate-400">● Unconditional · ✖ Counterexample</span>
             </div>
 
-            <svg viewBox="0 0 640 205" className="w-full" role="img" aria-label="Unconditional proof dependency graph">
+            <svg viewBox="0 0 720 210" className="w-full" role="img" aria-label="Unconditional proof dependency graph">
               <g stroke="#475569" strokeWidth="1.8" fill="none">
-                <line x1="115" y1="55" x2="150" y2="55" />
-                <line x1="255" y1="55" x2="295" y2="55" />
-                <line x1="415" y1="55" x2="450" y2="55" />
-                <line x1="535" y1="80" x2="535" y2="122" stroke="#10b981" />
-                <line x1="450" y1="150" x2="415" y2="150" stroke="#10b981" />
-                <line x1="295" y1="150" x2="260" y2="150" stroke="#10b981" />
-                <line x1="65" y1="80" x2="65" y2="122" stroke="#e11d48" strokeDasharray="3 3" />
+                <line x1="135" y1="55" x2="160" y2="55" />
+                <line x1="295" y1="55" x2="320" y2="55" />
+                <line x1="475" y1="55" x2="505" y2="55" />
+                <line x1="605" y1="80" x2="605" y2="122" stroke="#10b981" />
+                <line x1="505" y1="150" x2="475" y2="150" stroke="#10b981" />
+                <line x1="330" y1="150" x2="305" y2="150" stroke="#10b981" />
+                <line x1="80" y1="80" x2="80" y2="122" stroke="#e11d48" strokeDasharray="3 3" />
               </g>
 
               {[
                 {
                   id: 'CubicHaar4D',
-                  x: 15,
+                  x: 10,
                   y: 30,
-                  w: 100,
+                  w: 125,
                   label: 'Haar 4D + RP',
                   sub: 'SU(N) Lattice',
                   color: '#34d399',
@@ -417,9 +417,9 @@ export function TesseractAndFlowLab() {
                 },
                 {
                   id: 'SchwingerConv',
-                  x: 150,
+                  x: 160,
                   y: 30,
-                  w: 105,
+                  w: 135,
                   label: 'SchwingerConv',
                   sub: 'Full-tuple limit',
                   color: '#34d399',
@@ -427,9 +427,9 @@ export function TesseractAndFlowLab() {
                 },
                 {
                   id: 'BalabanFromStage',
-                  x: 295,
+                  x: 320,
                   y: 30,
-                  w: 120,
+                  w: 155,
                   label: 'BalabanFromStage',
                   sub: 'iidBalabanHypothesis',
                   color: '#34d399',
@@ -437,9 +437,9 @@ export function TesseractAndFlowLab() {
                 },
                 {
                   id: 'IIDPoincareContinuation',
-                  x: 450,
+                  x: 505,
                   y: 30,
-                  w: 175,
+                  w: 205,
                   label: 'IIDPoincareContinuation',
                   sub: 'Rank-1 OS Collapse',
                   color: '#34d399',
@@ -458,41 +458,41 @@ export function TesseractAndFlowLab() {
               ))}
 
               <g onClick={() => setDrawerModuleId('OSCompletion')} className="cursor-pointer">
-                <rect x="15" y="122" width="135" height="54" rx="6" fill="#4c0519" stroke="#fb7185" strokeWidth="1.5" />
-                <text x="82" y="144" textAnchor="middle" className="fill-rose-100 font-mono text-[10px] font-semibold">
+                <rect x="10" y="122" width="155" height="54" rx="6" fill="#4c0519" stroke="#fb7185" strokeWidth="1.5" />
+                <text x="87" y="144" textAnchor="middle" className="fill-rose-100 font-mono text-[10px] font-semibold">
                   Ising Counterexample
                 </text>
-                <text x="82" y="160" textAnchor="middle" className="fill-rose-300 font-mono text-[9px]">
+                <text x="87" y="160" textAnchor="middle" className="fill-rose-300 font-mono text-[9px]">
                   ✖ Fails trans_inv
                 </text>
               </g>
 
               <g onClick={() => setDrawerModuleId('GlobalAxioms')} className="cursor-pointer">
-                <rect x="450" y="122" width="175" height="54" rx="6" fill="#064e3b" stroke="#34d399" strokeWidth="1.8" />
-                <text x="537" y="144" textAnchor="middle" className="fill-white font-mono text-[10px] font-bold">
+                <rect x="505" y="122" width="205" height="54" rx="6" fill="#064e3b" stroke="#34d399" strokeWidth="1.8" />
+                <text x="607" y="144" textAnchor="middle" className="fill-white font-mono text-[10px] font-bold">
                   GlobalAxioms.lean
                 </text>
-                <text x="537" y="160" textAnchor="middle" className="fill-emerald-200 font-mono text-[9px]">
+                <text x="607" y="160" textAnchor="middle" className="fill-emerald-200 font-mono text-[9px]">
                   ● Unconditional Strict Clay
                 </text>
               </g>
 
               <g onClick={() => setDrawerModuleId('SUClosure')} className="cursor-pointer">
-                <rect x="295" y="122" width="120" height="54" rx="6" fill="#082f49" stroke="#38bdf8" strokeWidth="1.5" />
-                <text x="355" y="144" textAnchor="middle" className="fill-cyan-100 font-mono text-[10px] font-semibold">
+                <rect x="330" y="122" width="145" height="54" rx="6" fill="#082f49" stroke="#38bdf8" strokeWidth="1.5" />
+                <text x="402" y="144" textAnchor="middle" className="fill-cyan-100 font-mono text-[10px] font-semibold">
                   SUClosure.lean
                 </text>
-                <text x="355" y="160" textAnchor="middle" className="fill-cyan-300 font-mono text-[9px]">
+                <text x="402" y="160" textAnchor="middle" className="fill-cyan-300 font-mono text-[9px]">
                   ● Weak-Coupling RG
                 </text>
               </g>
 
               <g onClick={() => setDrawerModuleId('StrongCouplingInfVol')} className="cursor-pointer">
-                <rect x="165" y="122" width="95" height="54" rx="6" fill="#0c1a36" stroke="#60a5fa" strokeWidth="1.5" />
-                <text x="212" y="144" textAnchor="middle" className="fill-sky-100 font-mono text-[10px] font-semibold">
-                  Strong Coup.
+                <rect x="185" y="122" width="120" height="54" rx="6" fill="#0c1a36" stroke="#60a5fa" strokeWidth="1.5" />
+                <text x="245" y="144" textAnchor="middle" className="fill-sky-100 font-mono text-[10px] font-semibold">
+                  Strong Coupling
                 </text>
-                <text x="212" y="160" textAnchor="middle" className="fill-sky-300 font-mono text-[9px]">
+                <text x="245" y="160" textAnchor="middle" className="fill-sky-300 font-mono text-[9px]">
                   ● S_inf Limit
                 </text>
               </g>

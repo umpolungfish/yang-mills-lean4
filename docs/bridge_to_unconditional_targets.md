@@ -41,7 +41,7 @@ structures at rate `1`. `buildStrictWightmanFromOS` is the reconstruction
 interface when its continuation data are supplied.
 
 The reduction theorems `clay_yang_mills_strict_from_balaban_and_os` and
-`clay_yang_mills_strict_on_os_completion_from_balaban_and_os` are now **unconditionally
+`clay_yang_mills_strict_on_os_completion_from_balaban_and_os` are **unconditionally
 discharged**:
 - `BalabanFromStage.iidBalabanHypothesis` constructs `BalabanRGContinuumHypothesis N hN`
   from `stageObservableSchwinger_tendsto_iid` with `Ls_seq = Lt_seq = fun m => (m + 2)^2`,

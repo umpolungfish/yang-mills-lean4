@@ -99,7 +99,7 @@ The reduction theorems
 `clay_yang_mills_strict_from_balaban_and_os`,
 `clay_yang_mills_strict_on_os_completion_from_balaban_and_os`, and
 `clay_yang_mills_from_rg_estimates` serve as clean architectural interfaces.
-**All inputs to these reduction theorems are now unconditionally discharged:**
+**All inputs to these reduction theorems are unconditionally discharged:**
 
 - `iidBalabanHypothesis` (`BalabanFromStage.lean`): Constructs `BalabanRGContinuumHypothesis N hN` from `stageObservableSchwinger_tendsto_iid`, with `Δ_phys = 1`, `os = iidOS4DStrict`, `Ls_seq = Lt_seq = fun m => (m + 2)²`, `β_seq = fun m => (m + 1 : ℝ)`, `a_seq = fun m => 1/(m + 2)`, and `obs = stageObservable_latticeSinglePointObs`.
 - `iidOSPoincareContinuation` (`IIDPoincareContinuation.lean`): Full Euclidean-to-Minkowski reconstruction for `iidOS4DStrict`, proving `iid_osCompletionMap_rank_one` (completion vectors collapse onto `iidOSVac`), `M_bd = 2`, trivial Poincaré unitaries `U(g) = id`, and identity smeared fields `φ(x) = id`.

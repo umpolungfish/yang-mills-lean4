@@ -107,7 +107,7 @@ objects. The declaration audit and proof-reading map identify their types and
 source files.
 
 The complete target propositions `ClayYangMillsMassGap4DStrict` and
-`ClayYangMillsMassGap4DStrictOnOSCompletion` are now **unconditionally proved**:
+`ClayYangMillsMassGap4DStrictOnOSCompletion` are **unconditionally proved**:
 `BalabanFromStage.iidBalabanHypothesis` discharges `BalabanRGContinuumHypothesis N hN`
 from the Wilson stage limit, and `IIDPoincareContinuation.iidOSPoincareContinuation`
 discharges `OSPoincareContinuationHypothesis iidOS4DStrict`. Together they yield

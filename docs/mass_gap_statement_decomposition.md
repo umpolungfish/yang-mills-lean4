@@ -155,7 +155,7 @@ second's RG or OS continuation inputs:
   derived Hamiltonian has a real spectral gap `Δ = 2 > 0`.
 - `ContinuumClosure.clay_yang_mills_strict_from_balaban_and_os` and
   `OSCompletion.clay_yang_mills_from_rg_estimates` are the strict mass-gap
-  assembly reducers, which are now unconditionally instantiated by
+  assembly reducers, which are unconditionally instantiated by
   `BalabanFromStage.strictClayFromStage`, `BalabanFromStage.strictClayBasicFromStage`,
   `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional`, and
   `SUClosure.clay_yang_mills_4d_from_su_closure`. Their checked declarations

@@ -5,7 +5,7 @@ mass-gap obligations. Each obligation is mapped to its checked theorem,
 construction, or unconditional closure interface. All 27 components—including
 the strict 4D Clay mass-gap target (`strictClayFromStage`,
 `GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional`, and
-`SUClosure.clay_yang_mills_4d_from_su_closure`)—are now unconditionally proved.
+`SUClosure.clay_yang_mills_4d_from_su_closure`)—are unconditionally proved.
 
 This page gives the component-by-component proof map. The [semantic overview](semantic_decomposition.html)
 explains what the construction's claims mean; the [declaration audit](formal_declaration_audit.html)
