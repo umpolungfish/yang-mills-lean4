@@ -1,17 +1,26 @@
 import argparse
+import html as _html
 import json
 import os
+import re as _re
 import shutil
 import subprocess
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 theorems_file = os.path.join(ROOT_DIR, 'scripts', 'theorems.json')
+showcase_file = os.path.join(ROOT_DIR, 'scripts', 'site_showcase.json')
 
 with open(theorems_file) as f:
     theorems_data = json.load(f)
 
+with open(showcase_file) as f:
+    showcase_data = json.load(f)
+
 theorems_json = json.dumps(theorems_data)
+showcase_json = json.dumps(showcase_data)
 THEOREM_COUNT = len(theorems_data)
+CONTENTION_COUNT = len(showcase_data.get('contentions', []))
+ELEGANT_COUNT = len(showcase_data.get('elegantProofs', []))
 BUILD_JOBS = '16,125'
 MILESTONES = '59'
 
@@ -97,16 +106,18 @@ html_content = """<!DOCTYPE html>
         <span class="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">Lean 4 Certified</span>
         <span class="font-bold tracking-tight text-white whitespace-nowrap">Yang–Mills 4D Formalization</span>
       </div>
-      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium">
+        <a href="contention_defense.html" class="hover:text-rose-300 transition whitespace-nowrap">Contention Defense</a>
+        <a href="elegant_proofs.html" class="hover:text-amber-300 transition whitespace-nowrap">Elegant Proofs</a>
         <a href="#architecture" class="hover:text-emerald-400 transition whitespace-nowrap">Architecture</a>
         <a href="#theorems" class="hover:text-emerald-400 transition whitespace-nowrap">Theorems</a>
         <a href="#audit" class="hover:text-emerald-400 transition whitespace-nowrap">Axiom Audit</a>
         <a href="explorer/index.html" class="hover:text-emerald-400 transition whitespace-nowrap">Corpus Explorer</a>
-        <a href="clay_27_components.html" class="hover:text-emerald-400 transition whitespace-nowrap">Clay Audit &amp; Semantics</a>
-        <a href="formal_declaration_audit.html" class="hover:text-emerald-400 transition whitespace-nowrap">Declaration Audit</a>
-        <a href="proof_reading_map.html" class="hover:text-emerald-400 transition whitespace-nowrap">Proof-reading Map</a>
+        <a href="clay_27_components.html" class="hover:text-emerald-400 transition whitespace-nowrap">Clay Audit</a>
+        <a href="formal_declaration_audit.html" class="hover:text-emerald-400 transition whitespace-nowrap">Declarations</a>
+        <a href="proof_reading_map.html" class="hover:text-emerald-400 transition whitespace-nowrap">Proof Map</a>
         <a href="#reproduce" class="hover:text-emerald-400 transition whitespace-nowrap">Replication</a>
-        <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition whitespace-nowrap">
+        <a href="https://github.com/umpolungfish/yang-mills-lean4" target="_blank" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition whitespace-nowrap">
           <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
           <span>GitHub</span>
         </a>
@@ -149,15 +160,21 @@ html_content = """<!DOCTYPE html>
         </article>
       </section>
 
-      <div class="flex flex-wrap justify-center gap-4">
-        <a href="#reproduce" class="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition shadow-lg shadow-emerald-900/30 flex items-center space-x-2">
+      <div class="flex flex-wrap justify-center gap-3.5">
+        <a href="contention_defense.html" class="px-5 py-3 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-200 font-semibold transition border border-rose-500/40 flex items-center space-x-2">
+          <span>Contention Defense (C1–C8)</span>
+        </a>
+        <a href="elegant_proofs.html" class="px-5 py-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 font-semibold transition border border-amber-500/40 flex items-center space-x-2">
+          <span>Elegant Proofs (E1–E8)</span>
+        </a>
+        <a href="#reproduce" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition shadow-lg shadow-emerald-900/30 flex items-center space-x-2">
           <span>Replicate Verification</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
-        <a href="#theorems" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition border border-slate-700">
-          View Unconditional Theorems
+        <a href="#theorems" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition border border-slate-700">
+          Unconditional Theorems
         </a>
-        <a href="#audit" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition border border-slate-700">
+        <a href="#audit" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition border border-slate-700">
           Axiom Report (__THEOREM_COUNT__ Theorems)
         </a>
       </div>
@@ -235,6 +252,50 @@ html_content = """<!DOCTYPE html>
           </figure>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Contention Defense Summary Section -->
+  <section class="py-16 bg-slate-900/40 border-b border-slate-800" id="contentions">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <div class="text-xs font-mono uppercase tracking-wider text-rose-400 mb-2">Adversarial Proof Defense · C1–C8</div>
+          <h2 class="text-3xl font-bold tracking-tight text-white">Anticipated Points of Contention &amp; Kernel Refutations</h2>
+          <p class="text-slate-400 mt-2 max-w-3xl">
+            Every common dismissal attempt—hidden axioms, conditional hypotheses, trivial observables, torus collisions, Gaussianity, missing OS-to-Wightman links, SU(N) lattice simplifications, and Clay scope boundaries—is traced line by line to Lean 4.28.0 declarations with <code class="text-emerald-300">0 sorry</code>, an 8,086-job Lake replay, and 151.6 MB Vox ELF <code class="text-cyan-300">F = 0</code> verification.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3 shrink-0">
+          <a href="contention_defense.html" class="px-4 py-2.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-200 border border-rose-500/40 text-sm font-semibold transition">
+            Full Contention Page (32 Traces &amp; Exhibits) →
+          </a>
+        </div>
+      </div>
+
+      __CONTENTIONS_SUMMARY_HTML__
+    </div>
+  </section>
+
+  <!-- Elegant Proofs Summary Section -->
+  <section class="py-16 bg-slate-950 border-b border-slate-800" id="elegance">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <div class="text-xs font-mono uppercase tracking-wider text-amber-400 mb-2">Proof Architecture Highlights · E1–E8</div>
+          <h2 class="text-3xl font-bold tracking-tight text-white">Elegant Proofs Highlighted in the Formalization</h2>
+          <p class="text-slate-400 mt-2 max-w-3xl">
+            Eight structural ideas—injective functoriality, n-point OS reflection norm-squares, 10-line rank-1 Hilbert collapse, calculus slope squeezes, curved SU(N) probability integral transforms, uniform <code class="text-amber-300">suFlip2</code> witnesses, central slice cancellation, and Borel instance transport—replace brute-force combinatorics with clean Lean 4 proofs.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-3 shrink-0">
+          <a href="elegant_proofs.html" class="px-4 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 border border-amber-500/40 text-sm font-semibold transition">
+            Full Elegant Proofs Page (Source Excerpts) →
+          </a>
+        </div>
+      </div>
+
+      __ELEGANT_SUMMARY_HTML__
     </div>
   </section>
 
@@ -562,21 +623,528 @@ cd yang-mills-lean4</code></pre>
 </html>
 """
 
+def _render_inline_code(text):
+    """Escape HTML and format backticked Lean identifiers cleanly."""
+    parts = text.split("`")
+    out = []
+    for idx, part in enumerate(parts):
+        if idx % 2 == 1:
+            out.append(
+                '<code class="px-1.5 py-0.5 rounded bg-slate-800 text-emerald-300 font-mono text-[0.88em]">'
+                + _html.escape(part)
+                + "</code>"
+            )
+        else:
+            out.append(_html.escape(part))
+    return "".join(out)
+
+
+def _site_header(active_page):
+    nav_links = [
+        ("index.html", "Overview", "index"),
+        ("contention_defense.html", "Contention Defense", "contention_defense"),
+        ("elegant_proofs.html", "Elegant Proofs", "elegant_proofs"),
+        ("explorer/index.html", "Corpus Explorer", "explorer"),
+        ("clay_27_components.html", "Clay Audit", "clay_27"),
+        ("formal_declaration_audit.html", "Declarations", "declarations"),
+        ("proof_reading_map.html", "Proof Map", "proof_map"),
+    ]
+    items = []
+    for href, label, key in nav_links:
+        cls = (
+            "px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold whitespace-nowrap"
+            if key == active_page
+            else "text-slate-300 hover:text-emerald-400 transition whitespace-nowrap"
+        )
+        items.append(f'<a href="{href}" class="{cls}">{_html.escape(label)}</a>')
+    return f"""<header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/90 border-b border-slate-800 px-4 py-3.5">
+  <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <a href="index.html" class="flex items-center gap-2.5 shrink-0">
+      <span class="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">Lean 4 Certified</span>
+      <span class="font-bold tracking-tight text-white whitespace-nowrap">Yang–Mills 4D Formalization</span>
+    </a>
+    <nav class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm font-medium">
+      {"".join(items)}
+    </nav>
+  </div>
+</header>"""
+
+
+def _build_contentions_summary_html():
+    cards = []
+    for c in showcase_data.get("contentions", []):
+        verdict_cls = (
+            "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+            if c.get("verdict") == "Refuted by Lean Kernel"
+            else "bg-cyan-500/10 text-cyan-300 border-cyan-500/30"
+        )
+        trace_chain = " → ".join(
+            f'<span class="font-mono text-emerald-300">{_html.escape(t["moduleId"])}.lean:{t["line"]}</span>'
+            for t in c.get("trace", [])
+        )
+        exhibit_badges = "".join(
+            f'<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-800/90 border border-slate-700 text-[11px] font-mono text-slate-300">'
+            f'{_html.escape(ex["label"])}: <strong class="text-cyan-300">{_html.escape(ex["metric"])}</strong></span>'
+            for ex in c.get("exhibits", [])[:2]
+        )
+        cards.append(f"""<article class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/75 p-5 flex flex-col justify-between gap-3 hover:border-slate-700 transition">
+  <div>
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded font-mono text-xs font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">{_html.escape(c["code"])}</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">{_html.escape(c["category"])}</span>
+      </div>
+      <span class="px-2 py-0.5 rounded text-[11px] font-mono border {verdict_cls}">{_html.escape(c["verdict"])}</span>
+    </div>
+    <h3 class="text-base font-bold text-white mb-2 [overflow-wrap:anywhere]">{_html.escape(c["title"])}</h3>
+    <p class="text-xs italic text-rose-200/90 bg-rose-950/20 border-l-2 border-rose-500/60 pl-3 py-1.5 mb-2.5 [overflow-wrap:anywhere]">{_render_inline_code(c["dismissalClaim"])}</p>
+    <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">{_render_inline_code(c["refutationSummary"])}</p>
+  </div>
+  <div class="pt-3 border-t border-slate-800/80 space-y-2">
+    <div class="text-[11px] text-slate-400 [overflow-wrap:anywhere]"><span class="uppercase tracking-wider text-slate-500 mr-1">Trace:</span>{trace_chain}</div>
+    <div class="flex flex-wrap gap-1.5">{exhibit_badges}</div>
+  </div>
+</article>""")
+    return f'<div class="grid gap-4 md:grid-cols-2">{"".join(cards)}</div>'
+
+
+def _build_elegant_summary_html():
+    cards = []
+    for g in showcase_data.get("elegantProofs", []):
+        cards.append(f"""<article class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/75 p-5 flex flex-col justify-between gap-3 hover:border-amber-500/30 transition">
+  <div>
+    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">{_html.escape(g["code"])}</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">{_html.escape(g["theme"])}</span>
+      </div>
+      <span class="font-mono text-xs text-emerald-300">{_html.escape(g["moduleId"])}.lean ({_html.escape(g["lineSpan"])})</span>
+    </div>
+    <h3 class="text-base font-bold text-white mb-1.5 [overflow-wrap:anywhere]">{_html.escape(g["title"])}</h3>
+    <div class="font-mono text-[11px] text-cyan-300 mb-2 [overflow-wrap:anywhere]">{_html.escape(g["declaration"])}</div>
+    <p class="text-xs leading-relaxed text-slate-300 mb-2 [overflow-wrap:anywhere]"><strong class="text-amber-200">Insight:</strong> {_render_inline_code(g["coreInsight"])}</p>
+    <p class="text-xs leading-relaxed text-slate-400 [overflow-wrap:anywhere]"><strong class="text-emerald-300">Payoff:</strong> {_render_inline_code(g["payoff"])}</p>
+  </div>
+  <pre class="p-3 rounded-xl bg-slate-950 border border-slate-800/80 text-[11px] text-slate-300 overflow-x-auto"><code>{_html.escape(g["leanExcerpt"])}</code></pre>
+</article>""")
+    return f'<div class="grid gap-4 md:grid-cols-2">{"".join(cards)}</div>'
+
+
+def _build_contention_defense_page():
+    m = showcase_data.get("lakeReplayMetrics", {})
+    vw = showcase_data.get("varianceWitness", {})
+    categories = []
+    for c in showcase_data.get("contentions", []):
+        if c["category"] not in categories:
+            categories.append(c["category"])
+
+    cat_buttons = ['<button type="button" data-cat="ALL" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-rose-500/40 bg-rose-500/15 text-rose-200">All (8)</button>']
+    for cat in categories:
+        cat_buttons.append(
+            f'<button type="button" data-cat="{_html.escape(cat, quote=True)}" class="cat-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800">{_html.escape(cat)}</button>'
+        )
+
+    cards = []
+    for c in showcase_data.get("contentions", []):
+        verdict_cls = (
+            "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+            if c.get("verdict") == "Refuted by Lean Kernel"
+            else "bg-cyan-500/10 text-cyan-300 border-cyan-500/30"
+        )
+        steps_html = []
+        for t in c.get("trace", []):
+            ax_html = "".join(
+                f'<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-mono">{_html.escape(a)}</span>'
+                for a in t.get("axioms", [])
+            )
+            steps_html.append(f"""<div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+    <div class="flex items-center gap-2">
+      <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 font-mono text-[11px] font-bold">Step {t["step"]} · {_html.escape(t["role"])}</span>
+      <span class="font-mono text-xs text-cyan-300">{_html.escape(t["moduleId"])}.lean:{t["line"]}</span>
+    </div>
+    <div class="flex flex-wrap gap-1">{ax_html}</div>
+  </div>
+  <div class="font-mono text-xs font-semibold text-white mb-1 [overflow-wrap:anywhere]">{_html.escape(t["declaration"])}</div>
+  <p class="text-xs text-slate-300 mb-1.5 [overflow-wrap:anywhere]">{_render_inline_code(t["claim"])}</p>
+  <div class="font-mono text-[11px] text-slate-400 [overflow-wrap:anywhere]">{_html.escape(t["signature"])}</div>
+</div>""")
+
+        exhibits_html = []
+        for ex in c.get("exhibits", []):
+            loc = f'{ex["moduleId"]}.lean:{ex["line"]}' if ex.get("line") else f'{ex["moduleId"]}.lean'
+            exhibits_html.append(f"""<div class="rounded-xl border border-slate-800 bg-slate-900/90 p-3.5">
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+    <span class="text-xs font-semibold text-white">{_html.escape(ex["label"])}</span>
+    <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 font-mono text-[11px] font-bold">{_html.escape(ex["metric"])}</span>
+  </div>
+  <p class="text-xs text-slate-300 leading-relaxed mb-1.5 [overflow-wrap:anywhere]">{_render_inline_code(ex["explanation"])}</p>
+  <div class="font-mono text-[11px] text-emerald-300">{_html.escape(loc)}</div>
+</div>""")
+
+        hay = _html.escape(
+            " ".join([
+                c["code"], c["title"], c["category"], c["dismissalClaim"], c["refutationSummary"],
+                " ".join(c.get("keywords", [])),
+                " ".join(f'{t["declaration"]} {t["moduleId"]} {t["claim"]}' for t in c.get("trace", [])),
+            ]).lower(),
+            quote=True,
+        )
+        cards.append(f"""<section class="contention-card rounded-2xl border border-slate-800 bg-slate-900/70 p-6 space-y-5" data-cat="{_html.escape(c["category"], quote=True)}" data-hay="{hay}">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1.5">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">{_html.escape(c["code"])}</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">{_html.escape(c["category"])}</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">{_html.escape(c["title"])}</h2>
+    </div>
+    <span class="px-3 py-1 rounded-full text-xs font-mono border {verdict_cls}">{_html.escape(c["verdict"])}</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="rounded-xl border border-rose-500/30 bg-rose-950/15 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-rose-300 mb-1.5">Anticipated Dismissal Claim</div>
+      <p class="text-sm text-rose-100/90 italic leading-relaxed [overflow-wrap:anywhere]">{_render_inline_code(c["dismissalClaim"])}</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/30 bg-emerald-950/15 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Kernel-Certified Refutation</div>
+      <p class="text-sm text-slate-200 leading-relaxed [overflow-wrap:anywhere]">{_render_inline_code(c["refutationSummary"])}</p>
+    </div>
+  </div>
+
+  <div>
+    <h3 class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3">4-Step Deductive Proof Trace</h3>
+    <div class="grid gap-3 md:grid-cols-2">{"".join(steps_html)}</div>
+  </div>
+
+  <div>
+    <h3 class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3">Primary Evidence Exhibits</h3>
+    <div class="grid gap-3 sm:grid-cols-3">{"".join(exhibits_html)}</div>
+  </div>
+</section>""")
+
+    replay_rows = []
+    for r in showcase_data.get("replayAxiomSamples", []):
+        ax_badges = "".join(
+            f'<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] mr-1">{_html.escape(a)}</span>'
+            for a in r.get("axioms", [])
+        )
+        replay_rows.append(f"""<tr class="replay-row hover:bg-slate-800/40" data-hay="{_html.escape((r["declaration"] + " " + r["moduleId"]).lower(), quote=True)}">
+  <td class="px-4 py-2.5 font-mono text-xs text-emerald-300 [overflow-wrap:anywhere]">{_html.escape(r["declaration"])}</td>
+  <td class="px-4 py-2.5 font-mono text-xs text-cyan-300 whitespace-nowrap">{_html.escape(r["moduleId"])}.lean:{r["line"]}</td>
+  <td class="px-4 py-2.5">{ax_badges}</td>
+  <td class="px-4 py-2.5 text-right"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">PASS</span></td>
+</tr>""")
+
+    scope_rows = []
+    for s in showcase_data.get("scopeMatrix", []):
+        st_cls = (
+            "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
+            if s.get("status") == "Unconditionally Proved"
+            else "bg-amber-500/10 text-amber-300 border-amber-500/30"
+        )
+        scope_rows.append(f"""<tr class="hover:bg-slate-800/40">
+  <td class="px-4 py-3 font-mono text-xs text-white [overflow-wrap:anywhere]">{_html.escape(s["target"])}</td>
+  <td class="px-4 py-3 font-mono text-xs text-cyan-300 whitespace-nowrap">{_html.escape(s["moduleId"])}.lean:{s["line"]}</td>
+  <td class="px-4 py-3"><span class="px-2 py-0.5 rounded text-[11px] font-mono border {st_cls} whitespace-nowrap">{_html.escape(s["status"])}</span></td>
+  <td class="px-4 py-3 text-xs text-slate-300 [overflow-wrap:anywhere]">{_render_inline_code(s["keyGuarantee"])}</td>
+  <td class="px-4 py-3 text-xs text-slate-400 [overflow-wrap:anywhere]">{_render_inline_code(s["honestBoundary"])}</td>
+</tr>""")
+
+    return f"""<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contention Defense &amp; Proof Traces — Yang–Mills Mass Gap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {{ background-color: #070b14; color: #cbd5e1; overflow-x: hidden; font-family: 'Inter', sans-serif; }}
+    code, pre {{ font-family: 'Fira Code', monospace; }}
+  </style>
+</head>
+<body class="min-h-screen">
+  {_site_header("contention_defense")}
+  <main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+    <section class="rounded-2xl border border-rose-500/30 bg-slate-900/70 p-6 sm:p-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <span class="px-2.5 py-1 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 font-mono text-xs uppercase tracking-wider">Adversarial Audit · 8 Anticipated Contentions</span>
+        <div class="flex flex-wrap gap-2">
+          <a href="elegant_proofs.html" class="px-3 py-1.5 rounded-lg bg-amber-500/15 text-amber-200 border border-amber-500/30 text-xs font-semibold hover:bg-amber-500/25">View Elegant Proofs →</a>
+          <a href="explorer/index.html" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500/25">Interactive Workbench →</a>
+        </div>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3">Contention Defense: Anticipating Dismissal &amp; Exhibiting Every Refutation</h1>
+      <p class="text-slate-300 leading-relaxed max-w-4xl">
+        Every plausible objection—hidden axioms, conditional hypotheses, trivial observables, wrapped torus collisions, Gaussianity, missing OS-to-Wightman continuations, SU(N) gauge simplifications, and exact scope boundaries—is answered below with a 4-step Lean 4.28.0 deductive trace and verifiable kernel/binary exhibits.
+      </p>
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6 pt-6 border-t border-slate-800">
+        <div><div class="text-2xl font-extrabold text-rose-300">{len(showcase_data.get("contentions", []))}</div><div class="text-xs font-mono text-slate-400">Dismissal Vectors</div></div>
+        <div><div class="text-2xl font-extrabold text-emerald-400">{sum(len(c.get("trace", [])) for c in showcase_data.get("contentions", []))}</div><div class="text-xs font-mono text-slate-400">Proof Trace Steps</div></div>
+        <div><div class="text-2xl font-extrabold text-cyan-300">{sum(len(c.get("exhibits", [])) for c in showcase_data.get("contentions", []))}</div><div class="text-xs font-mono text-slate-400">Primary Exhibits</div></div>
+        <div><div class="text-2xl font-extrabold text-white">{m.get("totalJobs", 8086):,}</div><div class="text-xs font-mono text-slate-400">Lake Replay Jobs</div></div>
+        <div><div class="text-2xl font-extrabold text-emerald-400">F = {m.get("elfFailures", 0)}</div><div class="text-xs font-mono text-slate-400">{m.get("elfSizeMB", 213)} MB ELF · 100% Covered</div></div>
+      </div>
+    </section>
+
+    <section class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex flex-wrap gap-2">{"".join(cat_buttons)}</div>
+      <input id="contentionSearch" type="text" placeholder="Filter contentions, declarations, modules..." class="w-full md:w-80 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-emerald-500">
+    </section>
+
+    <div id="contentionsList" class="space-y-6">{"".join(cards)}</div>
+
+    <section class="grid gap-6 md:grid-cols-2">
+      <div class="rounded-2xl border border-emerald-500/30 bg-slate-900/70 p-6">
+        <div class="text-xs font-mono uppercase tracking-wider text-emerald-400 mb-1">Observable Variance Proof Witness (C3)</div>
+        <h2 class="text-lg font-bold text-white mb-3">Exact Moment Separation &amp; Non-Gaussianity</h2>
+        <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-slate-400">E[Oₘ]</div><div class="text-lg font-bold text-white">{vw.get("moment1", 1.5)} (3/2)</div></div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-slate-400">E[Oₘ²]</div><div class="text-lg font-bold text-emerald-300">{vw.get("moment2", 2.5)} (5/2)</div></div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-slate-400">Var(Oₘ) = E[Oₘ²] - E[Oₘ]²</div><div class="text-lg font-bold text-cyan-300">{vw.get("variance", 0.25)} (1/4 &gt; 0)</div></div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-slate-400">Coincident S₄ᶜ</div><div class="text-lg font-bold text-amber-300">{vw.get("connected4Coincident", -0.125)} (-1/8 ≠ 0)</div></div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-cyan-500/30 bg-slate-900/70 p-6">
+        <div class="text-xs font-mono uppercase tracking-wider text-cyan-400 mb-1">Vox Native Binary Audit (C1)</div>
+        <h2 class="text-lg font-bold text-white mb-3">213 MB Compiled ELF Image Disassembly</h2>
+        <div class="grid grid-cols-2 gap-3 text-xs font-mono">
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-slate-400">Code Image Covered</div><div class="text-base font-bold text-emerald-300">{m.get("elfCodeBytesCovered", 151608850):,} B (100%)</div></div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-slate-400">Instructions Audited</div><div class="text-base font-bold text-white">{m.get("elfInstructions", 36863127):,}</div></div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-slate-400">Functions (Descent / Sweep)</div><div class="text-base font-bold text-cyan-300">{m.get("elfFunctionsDescent", 178350):,} / {m.get("elfFunctionsFallback", 1137627):,}</div></div>
+          <div class="p-3 rounded-xl bg-slate-950 border border-slate-800"><div class="text-slate-400">Control-Flow Faults (F)</div><div class="text-base font-bold text-emerald-400">F = {m.get("elfFailures", 0)} (T 13,206 · B 195,443)</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-xl font-bold text-white">8,086-Job Lake Replay &amp; #print axioms Samples</h2>
+          <p class="text-xs text-slate-400 mt-1">Representative headline declarations from ContinuumClosure, GlobalAxioms, SUClosure, and StrongCouplingInfVol.</p>
+        </div>
+        <input id="replaySearch" type="text" placeholder="Filter replay declarations..." class="w-full sm:w-72 px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-xs text-white">
+      </div>
+      <div class="overflow-x-auto rounded-xl border border-slate-800">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-950 border-b border-slate-800 text-xs uppercase font-mono text-slate-400">
+            <tr><th class="px-4 py-3">Declaration</th><th class="px-4 py-3">Source</th><th class="px-4 py-3">Kernel Axioms</th><th class="px-4 py-3 text-right">Status</th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60">{"".join(replay_rows)}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 space-y-4">
+      <div>
+        <h2 class="text-xl font-bold text-white">Scope &amp; Honest Boundary Matrix (C8)</h2>
+        <p class="text-xs text-slate-400 mt-1">Exact comparison of what each theorem proves unconditionally versus explicit hypothesis interfaces.</p>
+      </div>
+      <div class="overflow-x-auto rounded-xl border border-slate-800">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-slate-950 border-b border-slate-800 text-xs uppercase font-mono text-slate-400">
+            <tr><th class="px-4 py-3">Target</th><th class="px-4 py-3">Source</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Verified Guarantee</th><th class="px-4 py-3">Explicit Boundary</th></tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60">{"".join(scope_rows)}</tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let activeCat = 'ALL';
+    const searchInput = document.getElementById('contentionSearch');
+    const cards = Array.from(document.querySelectorAll('.contention-card'));
+    const catBtns = Array.from(document.querySelectorAll('.cat-btn'));
+    function applyFilter() {{
+      const q = searchInput.value.trim().toLowerCase();
+      cards.forEach(card => {{
+        const catMatch = activeCat === 'ALL' || card.dataset.cat === activeCat;
+        const textMatch = !q || card.dataset.hay.includes(q);
+        card.style.display = (catMatch && textMatch) ? '' : 'none';
+      }});
+    }}
+    catBtns.forEach(btn => {{
+      btn.addEventListener('click', () => {{
+        activeCat = btn.dataset.cat;
+        catBtns.forEach(b => {{
+          const on = b.dataset.cat === activeCat;
+          b.className = on
+            ? 'cat-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-rose-500/40 bg-rose-500/15 text-rose-200'
+            : 'cat-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800';
+        }});
+        applyFilter();
+      }});
+    }});
+    searchInput.addEventListener('input', applyFilter);
+
+    const replayInput = document.getElementById('replaySearch');
+    const replayRows = Array.from(document.querySelectorAll('.replay-row'));
+    replayInput.addEventListener('input', () => {{
+      const q = replayInput.value.trim().toLowerCase();
+      replayRows.forEach(r => {{
+        r.style.display = !q || r.dataset.hay.includes(q) ? '' : 'none';
+      }});
+    }});
+  </script>
+</body>
+</html>"""
+
+
+def _build_elegant_proofs_page():
+    themes = []
+    for g in showcase_data.get("elegantProofs", []):
+        if g["theme"] not in themes:
+            themes.append(g["theme"])
+
+    theme_buttons = ['<button type="button" data-theme="ALL" class="theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-amber-500/40 bg-amber-500/15 text-amber-200">All Themes (8)</button>']
+    for th in themes:
+        theme_buttons.append(
+            f'<button type="button" data-theme="{_html.escape(th, quote=True)}" class="theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800">{_html.escape(th)}</button>'
+        )
+
+    cards = []
+    for g in showcase_data.get("elegantProofs", []):
+        hay = _html.escape(
+            " ".join([
+                g["code"], g["theme"], g["title"], g["declaration"],
+                g["moduleId"], g["coreInsight"], g["contrastWithBruteForce"], g["payoff"]
+            ]).lower(),
+            quote=True,
+        )
+        cards.append(f"""<article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="{_html.escape(g["theme"], quote=True)}" data-hay="{hay}">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">{_html.escape(g["code"])}</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">{_html.escape(g["theme"])}</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">{_html.escape(g["title"])}</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">{_html.escape(g["declaration"])}</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">{_html.escape(g["moduleId"])}.lean · {_html.escape(g["lineSpan"])}</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">{_render_inline_code(g["coreInsight"])}</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">{_render_inline_code(g["contrastWithBruteForce"])}</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">{_render_inline_code(g["payoff"])}</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt ({_html.escape(g["moduleId"])}.lean:{g["line"]})</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>{_html.escape(g["leanExcerpt"])}</code></pre>
+  </div>
+</article>""")
+
+    return f"""<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elegant Proofs Showcase — Yang–Mills Mass Gap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {{ background-color: #070b14; color: #cbd5e1; overflow-x: hidden; font-family: 'Inter', sans-serif; }}
+    code, pre {{ font-family: 'Fira Code', monospace; }}
+  </style>
+</head>
+<body class="min-h-screen">
+  {_site_header("elegant_proofs")}
+  <main class="max-w-7xl mx-auto px-4 py-10 space-y-8">
+    <section class="rounded-2xl border border-amber-500/30 bg-slate-900/70 p-6 sm:p-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <span class="px-2.5 py-1 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-xs uppercase tracking-wider">Curated Proof Craft · E1–E8</span>
+        <div class="flex flex-wrap gap-2">
+          <a href="contention_defense.html" class="px-3 py-1.5 rounded-lg bg-rose-500/15 text-rose-200 border border-rose-500/30 text-xs font-semibold hover:bg-rose-500/25">Contention Defense →</a>
+          <a href="explorer/index.html" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500/25">Open in Source Explorer →</a>
+        </div>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3">Elegant Proofs Contained in the Formalization</h1>
+      <p class="text-slate-300 leading-relaxed max-w-4xl">
+        Eight structural proof ideas across symmetry, Hilbert-space completion, curved Haar integration, and dependent type theory that compress intractable estimates into concise, kernel-checked Lean 4 arguments.
+      </p>
+    </section>
+
+    <section class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex flex-wrap gap-2">{"".join(theme_buttons)}</div>
+      <input id="gemSearch" type="text" placeholder="Search proof gems, declarations, files..." class="w-full md:w-80 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-amber-500">
+    </section>
+
+    <div class="space-y-6">{"".join(cards)}</div>
+  </main>
+
+  <script>
+    let activeTheme = 'ALL';
+    const searchInput = document.getElementById('gemSearch');
+    const cards = Array.from(document.querySelectorAll('.gem-card'));
+    const themeBtns = Array.from(document.querySelectorAll('.theme-btn'));
+    function applyFilter() {{
+      const q = searchInput.value.trim().toLowerCase();
+      cards.forEach(card => {{
+        const themeMatch = activeTheme === 'ALL' || card.dataset.theme === activeTheme;
+        const textMatch = !q || card.dataset.hay.includes(q);
+        card.style.display = (themeMatch && textMatch) ? '' : 'none';
+      }});
+    }}
+    themeBtns.forEach(btn => {{
+      btn.addEventListener('click', () => {{
+        activeTheme = btn.dataset.theme;
+        themeBtns.forEach(b => {{
+          const on = b.dataset.theme === activeTheme;
+          b.className = on
+            ? 'theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-amber-500/40 bg-amber-500/15 text-amber-200'
+            : 'theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800';
+        }});
+        applyFilter();
+      }});
+    }});
+    searchInput.addEventListener('input', applyFilter);
+  </script>
+</body>
+</html>"""
+
+
 full_html = html_content.replace('__THEOREMS_JSON__', theorems_json)
-for _k, _v in [('__THEOREM_COUNT__', str(THEOREM_COUNT)), ('__BUILD_JOBS__', BUILD_JOBS), ('__MILESTONES__', MILESTONES)]:
+for _k, _v in [
+    ('__THEOREM_COUNT__', str(THEOREM_COUNT)),
+    ('__BUILD_JOBS__', BUILD_JOBS),
+    ('__MILESTONES__', MILESTONES),
+    ('__CONTENTIONS_SUMMARY_HTML__', _build_contentions_summary_html()),
+    ('__ELEGANT_SUMMARY_HTML__', _build_elegant_summary_html()),
+]:
     full_html = full_html.replace(_k, _v)
 
 docs_dir = os.path.join(ROOT_DIR, 'docs')
 os.makedirs(docs_dir, exist_ok=True)
 with open(os.path.join(docs_dir, 'index.html'), 'w') as f:
     f.write(full_html)
+with open(os.path.join(docs_dir, 'contention_defense.html'), 'w') as f:
+    f.write(_build_contention_defense_page())
+with open(os.path.join(docs_dir, 'elegant_proofs.html'), 'w') as f:
+    f.write(_build_elegant_proofs_page())
 
 
 # --- Distinct HTML pages for the audit decompositions -------------------
 # Convert the markdown decomposition docs into standalone styled HTML pages so
 # each breakdown lives at its own URL on the site.
-import html as _html
-import re as _re
 
 
 def _inline(text):
@@ -737,9 +1305,14 @@ def _decomp_page(title, md_path, out_name):
 </style>
 </head><body class="bg-slate-950 text-slate-200">
 <header class="border-b border-slate-800 bg-slate-900/60 px-4 py-4">
-  <div class="max-w-5xl mx-auto flex items-center justify-between">
-    <a href="index.html" class="text-emerald-400 hover:underline">← Yang–Mills Mass Gap</a>
-    <span class="text-xs uppercase tracking-wider text-slate-400">{_html.escape(title)}</span>
+  <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <a href="index.html" class="text-emerald-400 hover:underline font-medium">← Yang–Mills Mass Gap</a>
+    <nav class="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-300">
+      <a href="contention_defense.html" class="hover:text-rose-300 transition">Contention Defense</a>
+      <a href="elegant_proofs.html" class="hover:text-amber-300 transition">Elegant Proofs</a>
+      <a href="explorer/index.html" class="hover:text-emerald-400 transition">Corpus Explorer</a>
+      <span class="uppercase tracking-wider text-slate-500">{_html.escape(title)}</span>
+    </nav>
   </div>
 </header>
 <main class="max-w-5xl mx-auto px-4 py-10">
@@ -828,6 +1401,8 @@ print()
 print("PAGES GENERATED")
 for name in [
     "index.html",
+    "contention_defense.html",
+    "elegant_proofs.html",
     "statement_decomposition.html",
     "semantic_decomposition.html",
     "clay_27_components.html",

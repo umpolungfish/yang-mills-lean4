@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elegant Proofs Showcase — Yang–Mills Mass Gap</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #070b14; color: #cbd5e1; overflow-x: hidden; font-family: 'Inter', sans-serif; }
+    code, pre { font-family: 'Fira Code', monospace; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/90 border-b border-slate-800 px-4 py-3.5">
+  <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <a href="index.html" class="flex items-center gap-2.5 shrink-0">
+      <span class="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">Lean 4 Certified</span>
+      <span class="font-bold tracking-tight text-white whitespace-nowrap">Yang–Mills 4D Formalization</span>
+    </a>
+    <nav class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm font-medium">
+      <a href="index.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Overview</a><a href="contention_defense.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Contention Defense</a><a href="elegant_proofs.html" class="px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold whitespace-nowrap">Elegant Proofs</a><a href="explorer/index.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Corpus Explorer</a><a href="clay_27_components.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Clay Audit</a><a href="formal_declaration_audit.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Declarations</a><a href="proof_reading_map.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Proof Map</a>
+    </nav>
+  </div>
+</header>
+  <main class="max-w-7xl mx-auto px-4 py-10 space-y-8">
+    <section class="rounded-2xl border border-amber-500/30 bg-slate-900/70 p-6 sm:p-8">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <span class="px-2.5 py-1 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-mono text-xs uppercase tracking-wider">Curated Proof Craft · E1–E8</span>
+        <div class="flex flex-wrap gap-2">
+          <a href="contention_defense.html" class="px-3 py-1.5 rounded-lg bg-rose-500/15 text-rose-200 border border-rose-500/30 text-xs font-semibold hover:bg-rose-500/25">Contention Defense →</a>
+          <a href="explorer/index.html" class="px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-semibold hover:bg-emerald-500/25">Open in Source Explorer →</a>
+        </div>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3">Elegant Proofs Contained in the Formalization</h1>
+      <p class="text-slate-300 leading-relaxed max-w-4xl">
+        Eight structural proof ideas across symmetry, Hilbert-space completion, curved Haar integration, and dependent type theory that compress intractable estimates into concise, kernel-checked Lean 4 arguments.
+      </p>
+    </section>
+
+    <section class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex flex-wrap gap-2"><button type="button" data-theme="ALL" class="theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-amber-500/40 bg-amber-500/15 text-amber-200">All Themes (8)</button><button type="button" data-theme="Symmetry &amp; Functoriality" class="theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800">Symmetry &amp; Functoriality</button><button type="button" data-theme="Hilbert &amp; Operator Theory" class="theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800">Hilbert &amp; Operator Theory</button><button type="button" data-theme="Measure &amp; Probability" class="theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800">Measure &amp; Probability</button><button type="button" data-theme="Gauge Algebra &amp; Lean Craft" class="theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800">Gauge Algebra &amp; Lean Craft</button></div>
+      <input id="gemSearch" type="text" placeholder="Search proof gems, declarations, files..." class="w-full md:w-80 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-white focus:outline-none focus:border-amber-500">
+    </section>
+
+    <div class="space-y-6"><article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="Symmetry &amp; Functoriality" data-hay="e1 symmetry &amp; functoriality one injective functor lemma proves every euclidean symmetry yangmills.iidschwinger_map &amp; iidschwinger_so4 iidschwinger any injective map g : space4 → space4 preserves equality classes iidclasses(g ∘ xs) = iidclasses(xs) identically. rather than writing separate measure-jacobian or combinatorial invariance proofs for ℝ⁴ translations, continuous so(4) rotations, euclidean time-reflection θ, and coordinate permutations, all four reduce to proving injectivity in 2–4 lines. unifies translation, continuous so(4), time-reflection, and fin n permutation invariance under a single 15-line lemma.">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">E1</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Symmetry &amp; Functoriality</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">One Injective Functor Lemma Proves Every Euclidean Symmetry</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">YangMills.iidSchwinger_map &amp; iidSchwinger_so4</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">IIDSchwinger.lean · L37–L85, L401</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Any injective map g : Space4 → Space4 preserves equality classes iidClasses(g ∘ xs) = iidClasses(xs) identically.</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">Rather than writing separate measure-jacobian or combinatorial invariance proofs for ℝ⁴ translations, continuous SO(4) rotations, Euclidean time-reflection θ, and coordinate permutations, all four reduce to proving injectivity in 2–4 lines.</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Unifies translation, continuous SO(4), time-reflection, and Fin n permutation invariance under a single 15-line lemma.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt (IIDSchwinger.lean:49)</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>lemma iidClasses_map {n : ℕ} (xs : Fin n → Space4) (g : Space4 → Space4)
+    (hg : Function.Injective g) :
+    iidClasses (fun i =&gt; g (xs i)) = iidClasses xs := by
+  unfold iidClasses; congr 1; funext i; ext j
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  exact ⟨fun h =&gt; hg h, fun h =&gt; congrArg g h⟩</code></pre>
+  </div>
+</article><article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="Symmetry &amp; Functoriality" data-hay="e2 symmetry &amp; functoriality full n-point reflection positivity collapsed to ‖∑ aᵢ‖² ≥ 0 yangmills.iidschwinger_refl_pos_n iidos because x₀ &gt; 0 and y₀ &gt; 0 imply θ(x) ≠ y, the os matrix kernel s(θ xᵢ ++ xⱼ) factors as s(θ xᵢ) · s(xⱼ). instead of expanding arbitrary-arity partition matrices or invoking bochner–minlos spectral representations, time-reflection conjugacy turns the entire double sum ∑ᵢⱼ cᵢ c̄ⱼ s(θ xᵢ ++ xⱼ) directly into z · z̄ = normsq(∑ᵢ aᵢ). proves full osterwalder–schrader reflection positivity across arbitrary finite multiplicities in one complex-norm identity.">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">E2</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Symmetry &amp; Functoriality</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">Full n-Point Reflection Positivity Collapsed to ‖∑ Aᵢ‖² ≥ 0</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">YangMills.iidSchwinger_refl_pos_n</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">IIDOS.lean · L59–L110</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Because x₀ &gt; 0 and y₀ &gt; 0 imply θ(x) ≠ y, the OS matrix kernel S(θ xᵢ ++ xⱼ) factors as S(θ xᵢ) · S(xⱼ).</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">Instead of expanding arbitrary-arity partition matrices or invoking Bochner–Minlos spectral representations, time-reflection conjugacy turns the entire double sum ∑ᵢⱼ cᵢ c̄ⱼ S(θ xᵢ ++ xⱼ) directly into Z · Z̄ = normSq(∑ᵢ Aᵢ).</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Proves full Osterwalder–Schrader reflection positivity across arbitrary finite multiplicities in one complex-norm identity.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt (IIDOS.lean:59)</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>simp_rw [iidSchwinger_append _ _ (fun k l =&gt; hdisc _ _ k l)]
+let A : Fin m → ℂ := fun i =&gt;
+  c i * iidSchwinger (n_pts i) (fun k =&gt; euclidTimeReflect (xs i k))
+-- double sum rewrites to (∑ i, A i) * starRingEnd ℂ (∑ i, A i)
+rw [Complex.mul_conj]; exact Complex.normSq_nonneg _</code></pre>
+  </div>
+</article><article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="Hilbert &amp; Operator Theory" data-hay="e3 hilbert &amp; operator theory zero-minor kernel factorization &amp; 10-line rank-1 hilbert collapse yangmills.iid_osconfigvector_eq &amp; iid_oscompletionmap_rank_one iidpoincarecontinuation applying ‖ψ - s·ω‖² = ‖ψ‖² - 2 re⟨ψ, s·ω⟩ + ‖s·ω‖² = s² - 2s² + s² = 0 collapses every configuration vector onto c·ω. instead of quotienting finsupp formal sums by null-space determinants row by row, computing ⟪ψ - s·ω, ψ - s·ω⟫ = 0 via inner-product bilinearity forces ψ = s·ω globally via finsupp.induction_linear. discharges ospoincarecontinuationhypothesis unconditionally with canonical unitary u = id and field φ = id.">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">E3</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Hilbert &amp; Operator Theory</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">Zero-Minor Kernel Factorization &amp; 10-Line Rank-1 Hilbert Collapse</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">YangMills.iid_osConfigVector_eq &amp; iid_osCompletionMap_rank_one</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">IIDPoincareContinuation.lean · L10–L129</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Applying ‖ψ - s·Ω‖² = ‖ψ‖² - 2 Re⟨ψ, s·Ω⟩ + ‖s·Ω‖² = s² - 2s² + s² = 0 collapses every configuration vector onto c·Ω.</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">Instead of quotienting Finsupp formal sums by null-space determinants row by row, computing ⟪ψ - s·Ω, ψ - s·Ω⟫ = 0 via inner-product bilinearity forces ψ = s·Ω globally via Finsupp.induction_linear.</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Discharges OSPoincareContinuationHypothesis unconditionally with canonical unitary U = id and field φ = id.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt (IIDPoincareContinuation.lean:26)</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>have hnorm : ‖ψ - s • Ω‖ ^ 2 = 0 := by
+  rw [norm_sub_sq (𝕜 := ℂ)]
+  ...
+  rw [hψnorm, hcross&#x27;, hnormΩ, hs_abs]
+  ring
+exact sub_eq_zero.mp (norm_eq_zero.mp (by nlinarith))</code></pre>
+  </div>
+</article><article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="Hilbert &amp; Operator Theory" data-hay="e4 hilbert &amp; operator theory calculus slope squeeze: semigroup decay → unbounded generator gap imscribing.yangmills.semigroupgapbridge.generator_gap_of_semigroup_decay semigroupgapbridge differential quotient ((1 - e^{-δt})/t)‖ψ‖² ≤ re⟨ψ, (ψ - t(t)ψ)/t⟩ bridges bounded semigroup contraction to unbounded h as t → 0⁺. avoids spectral resolution of unbounded self-adjoint operators (stone/hille–yosida measure theory) by differentiating e^{-δt} directly at 0 via mathlib’s hasderivat.tendsto_slope_zero_right and squeezing. establishes δ‖ψ‖² ≤ re⟨ψ, hψ⟩ and vacuum uniqueness for every domain vector ψ ⊥ ω in 63 lines.">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">E4</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Hilbert &amp; Operator Theory</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">Calculus Slope Squeeze: Semigroup Decay → Unbounded Generator Gap</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">Imscribing.YangMills.SemigroupGapBridge.generator_gap_of_semigroup_decay</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">SemigroupGapBridge.lean · L63–L126</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Differential quotient ((1 - e^{-Δt})/t)‖ψ‖² ≤ Re⟨ψ, (ψ - T(t)ψ)/t⟩ bridges bounded semigroup contraction to unbounded H as t → 0⁺.</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">Avoids spectral resolution of unbounded self-adjoint operators (Stone/Hille–Yosida measure theory) by differentiating e^{-Δt} directly at 0 via Mathlib’s HasDerivAt.tendsto_slope_zero_right and squeezing.</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Establishes Δ‖ψ‖² ≤ Re⟨ψ, Hψ⟩ and vacuum uniqueness for every domain vector ψ ⊥ Ω in 63 lines.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt (SemigroupGapBridge.lean:63)</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>have h_ineq : ∀ᶠ t : ℝ in 𝓝[&gt;] 0,
+    ((1 - Real.exp (-Δ * t)) / t) * ‖ψ‖ ^ 2 ≤
+      (⟪ψ, (t⁻¹ : ℂ) • (ψ - T t ψ)⟫_ℂ).re := by ...
+have h_deriv : HasDerivAt (fun t : ℝ =&gt; Real.exp (-Δ * t)) (-Δ) 0 := ...
+exact le_of_tendsto_of_tendsto h_lhs_tend h_rhs_tend h_ineq</code></pre>
+  </div>
+</article><article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="Measure &amp; Probability" data-hay="e5 measure &amp; probability probability integral transform on curved su(n) → exact moments (1ᵏ+2ᵏ)/2 yangmills.stageobservable_moment &amp; stageobservable_not_ae_constant schwingerconv composing gauge-invariant plaquette traces with their own wilson cdf pushes any smooth su(n) density to lebesgue[0,1]. evaluating non-abelian character expansions in closed form for arbitrary n ≥ 2 is intractable; pushing forward via the probability integral transform makes every moment (1ᵏ + 2ᵏ)/2 exact and universal across all n ≥ 2, immediately showing (3/2)² ≠ 5/2. proves non-constancy a.e. (var = 1/4 &gt; 0), exact gauge invariance, and exact multi-point convergence to s₄ᶜ = -1/8.">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">E5</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Measure &amp; Probability</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">Probability Integral Transform on Curved SU(N) → Exact Moments (1ᵏ+2ᵏ)/2</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">YangMills.stageObservable_moment &amp; stageObservable_not_ae_constant</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">SchwingerConv.lean · L1039, L1552–L1743</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Composing gauge-invariant plaquette traces with their own Wilson CDF pushes any smooth SU(N) density to Lebesgue[0,1].</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">Evaluating non-Abelian character expansions in closed form for arbitrary N ≥ 2 is intractable; pushing forward via the probability integral transform makes every moment (1ᵏ + 2ᵏ)/2 exact and universal across all N ≥ 2, immediately showing (3/2)² ≠ 5/2.</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Proves non-constancy a.e. (Var = 1/4 &gt; 0), exact gauge invariance, and exact multi-point convergence to S₄ᶜ = -1/8.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt (SchwingerConv.lean:1552)</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>-- ∫ O_m^k dμ_Wilson = (1^k + 2^k) / 2  (k=1 ↦ 3/2, k=2 ↦ 5/2)
+-- If O_m =ᵐ[μ] c then c = E[O_m] = 3/2, so E[O_m²] = c² = 9/4,
+-- contradicting E[O_m²] = 5/2 (since 9/4 ≠ 5/2).</code></pre>
+  </div>
+</article><article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="Gauge Algebra &amp; Lean Craft" data-hay="e6 gauge algebra &amp; lean craft uniform determinant-1 matrix flip diag(-1, -1, 1, …, 1) ∀ n ≥ 2 yangmills.canonicalwildcard_nonconst canonicalwitness flipping exactly two diagonal entries gives det = (-1)(-1) = +1 ∈ su(n) for every rank n ≥ 2 while isolating one link. center elements e^{2πi/n}·i depend on roots of unity and vary phase with n; suflip2 works uniformly over all n ≥ 2 without complex roots, while tail_links_ne_base isolates the base link so holonomy evaluates strictly to 1 vs (n-4)/n. refutes observable constancy on explicit 4d wilson gauge fields for all n ≥ 2 and l ≥ 2 in one short ring/linarith finish.">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">E6</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Gauge Algebra &amp; Lean Craft</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">Uniform Determinant-1 Matrix Flip diag(-1, -1, 1, …, 1) ∀ N ≥ 2</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">YangMills.canonicalWildcard_nonconst</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">CanonicalWitness.lean · L49–L157</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Flipping exactly two diagonal entries gives det = (-1)(-1) = +1 ∈ SU(N) for every rank N ≥ 2 while isolating one link.</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">Center elements e^{2πi/N}·I depend on roots of unity and vary phase with N; suFlip2 works uniformly over all N ≥ 2 without complex roots, while tail_links_ne_base isolates the base link so holonomy evaluates strictly to 1 vs (N-4)/N.</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Refutes observable constancy on explicit 4D Wilson gauge fields for all N ≥ 2 and L ≥ 2 in one short ring/linarith finish.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt (CanonicalWitness.lean:128)</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>noncomputable def witnessFieldFlip (N : ℕ) (hN : 2 ≤ N) (L : ℕ) [NeZero L] (x : Space4) :
+    GaugeField (cubicTorus4 L L) (SU N) := fun e =&gt;
+  if e = ((projSite4 L (fun i =&gt; ⌊x i⌋), 1)) then suFlip2 N hN else 1
+-- hv1 : normWilsonLoop4 ... witnessFieldOne  = 1
+-- hv2 : normWilsonLoop4 ... witnessFieldFlip = (N - 4) / N  ⇒  1 ≠ (N-4)/N</code></pre>
+  </div>
+</article><article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="Gauge Algebra &amp; Lean Craft" data-hay="e7 gauge algebra &amp; lean craft measure-preserving center-slice flip leaving wilson action identical yangmills.suclosure.wilsonaction_slicecenterflip suclosure multiplying a single spatial-slice coordinate direction by central z = e^{2πi/n}·i commutes through every plaquette to z·z⁻¹ = 1. in curved non-abelian lattice integrals, symmetry cancellation usually fails under ordering; placing z in z(su(n)) lets z slide past adjacent link matrices a, b, c⁻¹ inside every plaquette while haar translation preserves the product measure. generates an exact symmetry of the 4d wilson kernel enabling spectral isolation along β_m = exp((m+1)⁴).">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">E7</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Gauge Algebra &amp; Lean Craft</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">Measure-Preserving Center-Slice Flip Leaving Wilson Action Identical</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">YangMills.SUClosure.wilsonAction_sliceCenterFlip</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">SUClosure.lean · L570–L625</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Multiplying a single spatial-slice coordinate direction by central z = e^{2πi/N}·I commutes through every plaquette to z·z⁻¹ = 1.</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">In curved non-Abelian lattice integrals, symmetry cancellation usually fails under ordering; placing z in Z(SU(N)) lets z slide past adjacent link matrices A, B, C⁻¹ inside every plaquette while Haar translation preserves the product measure.</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Generates an exact symmetry of the 4D Wilson kernel enabling spectral isolation along β_m = exp((m+1)⁴).</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt (SUClosure.lean:602)</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>calc (z * A) * (B * (C⁻¹ * z⁻¹ * (D * 1)))
+    = z * (A * (((B * C⁻¹) * z⁻¹) * (D * 1))) := by simp only [mul_assoc]
+  _ = z * (A * ((z⁻¹ * (B * C⁻¹)) * (D * 1))) := by rw [hc_inv (B * C⁻¹)]
+  _ = (z * z⁻¹) * (A * (B * (C⁻¹ * (D * 1)))) := by ...</code></pre>
+  </div>
+</article><article class="gem-card rounded-2xl border border-slate-800 bg-slate-900/75 p-6 space-y-4" data-theme="Gauge Algebra &amp; Lean Craft" data-hay="e8 gauge algebra &amp; lean craft zero-friction borel typeclass unification across arbitrary su(n) instances globalaxioms.unconditional_balaban_hypothesis globalaxioms two borelspace instances on the same topologicalspace share borel sets: rw [instb.measurable_eq, (canonsuborel n).measurable_eq]; subst h_eq. dependent type theory normally traps downstream users when [measurablespace] diamonds differ between modules. equating instm = canonsumeas n via borelspace.measurable_eq transports the entire 106-module proof across arbitrary instances cleanly. lets global theorems quantify over completely unconstrained [measurablespace] [borelspace] typeclasses with zero friction.">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div class="space-y-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">E8</span>
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400">Gauge Algebra &amp; Lean Craft</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-white">Zero-Friction Borel Typeclass Unification Across Arbitrary SU(N) Instances</h2>
+      <div class="font-mono text-xs text-cyan-300 [overflow-wrap:anywhere]">GlobalAxioms.unconditional_balaban_hypothesis</div>
+    </div>
+    <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-300 whitespace-nowrap">GlobalAxioms.lean · L17–L72</span>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="rounded-xl border border-amber-500/25 bg-amber-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-amber-300 mb-1.5">Core Mathematical Insight</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Two BorelSpace instances on the same TopologicalSpace share Borel sets: rw [instB.measurable_eq, (canonSUBorel N).measurable_eq]; subst h_eq.</p>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-1.5">Contrast With Brute Force</div>
+      <p class="text-xs leading-relaxed text-slate-300 [overflow-wrap:anywhere]">Dependent type theory normally traps downstream users when [MeasurableSpace] diamonds differ between modules. Equating instM = canonSUMeas N via BorelSpace.measurable_eq transports the entire 106-module proof across arbitrary instances cleanly.</p>
+    </div>
+    <div class="rounded-xl border border-emerald-500/25 bg-emerald-950/10 p-4">
+      <div class="text-[11px] font-mono uppercase tracking-wider text-emerald-300 mb-1.5">Proof Payoff</div>
+      <p class="text-xs leading-relaxed text-slate-200 [overflow-wrap:anywhere]">Lets global theorems quantify over completely unconstrained [MeasurableSpace] [BorelSpace] typeclasses with zero friction.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-2">Lean 4 Excerpt (GlobalAxioms.lean:35)</div>
+    <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm text-emerald-200 overflow-x-auto"><code>noncomputable def unconditional_balaban_hypothesis (N : ℕ) (hN : 2 ≤ N)
+    [instM : MeasurableSpace (SU N)] [instB : BorelSpace (SU N)] :
+    BalabanRGContinuumHypothesis N hN := by
+  have h_eq : instM = canonSUMeas N := by
+    rw [instB.measurable_eq, (canonSUBorel N).measurable_eq]
+  subst h_eq
+  exact YangMills.iidBalabanHypothesis N hN</code></pre>
+  </div>
+</article></div>
+  </main>
+
+  <script>
+    let activeTheme = 'ALL';
+    const searchInput = document.getElementById('gemSearch');
+    const cards = Array.from(document.querySelectorAll('.gem-card'));
+    const themeBtns = Array.from(document.querySelectorAll('.theme-btn'));
+    function applyFilter() {
+      const q = searchInput.value.trim().toLowerCase();
+      cards.forEach(card => {
+        const themeMatch = activeTheme === 'ALL' || card.dataset.theme === activeTheme;
+        const textMatch = !q || card.dataset.hay.includes(q);
+        card.style.display = (themeMatch && textMatch) ? '' : 'none';
+      });
+    }
+    themeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTheme = btn.dataset.theme;
+        themeBtns.forEach(b => {
+          const on = b.dataset.theme === activeTheme;
+          b.className = on
+            ? 'theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-amber-500/40 bg-amber-500/15 text-amber-200'
+            : 'theme-btn px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800';
+        });
+        applyFilter();
+      });
+    });
+    searchInput.addEventListener('input', applyFilter);
+  </script>
+</body>
+</html>

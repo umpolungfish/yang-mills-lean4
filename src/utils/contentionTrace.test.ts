@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
 import { CONTENTIONS_CATALOG, REPLAY_AXIOM_SAMPLES } from '../data/contentionsData';
 import { MODULE_BY_ID } from '../data/theoremsCatalog';
@@ -85,4 +87,12 @@ test('ELEGANT_PROOFS gems resolve to valid Lean modules and lines and filter cle
   const slopeHits = filterElegantProofs(ELEGANT_PROOFS, 'HasDerivAt', 'ALL');
   assert.equal(slopeHits.length, 1);
   assert.equal(slopeHits[0].code, 'E4');
+});
+
+test('scripts/site_showcase.json stays in sync with contentionsData & elegantProofsData', () => {
+  const raw = fs.readFileSync(path.resolve(process.cwd(), 'scripts/site_showcase.json'), 'utf8');
+  const parsed = JSON.parse(raw);
+  assert.deepEqual(parsed.contentions, CONTENTIONS_CATALOG);
+  assert.deepEqual(parsed.elegantProofs, ELEGANT_PROOFS);
+  assert.deepEqual(parsed.scopeMatrix, getScopeComparisonMatrix());
 });
