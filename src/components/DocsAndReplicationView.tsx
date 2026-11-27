@@ -222,7 +222,7 @@ EOF`;
                   onClick={() =>
                     copyCommand(
                       'build',
-                      'git clone https://github.com/umpolungfish/yang-mills-lean4.git && cd yang-mills-lean4 && lake build Imscribing.YangMills',
+                      'git clone https://github.com/umpolungfish/yang-mills-lean4.git && cd yang-mills-lean4 && lake build Imscribing.YangMills && lake build Imscribing.YangMills.ContinuumClosure Imscribing.YangMills.BalabanRGMaster',
                     )
                   }
                   className="inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-900 px-2 py-1 font-mono text-[11px] text-slate-300 hover:bg-slate-800"
@@ -234,7 +234,9 @@ EOF`;
               <pre className="overflow-x-auto font-mono text-xs text-emerald-300">
                 <code>{`git clone https://github.com/umpolungfish/yang-mills-lean4.git
 cd yang-mills-lean4
-lake build Imscribing.YangMills`}</code>
+lake build Imscribing.YangMills
+lake build Imscribing.YangMills.ContinuumClosure
+lake build Imscribing.YangMills.BalabanRGMaster`}</code>
               </pre>
             </div>
 
