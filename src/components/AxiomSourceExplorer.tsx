@@ -18,9 +18,17 @@ import {
 } from '../data/theoremsCatalog';
 import { CORPUS_MODULES } from '../data/proofData';
 
+export interface SourceJumpTarget {
+  moduleId: string;
+  line?: number;
+  theoremName?: string;
+  nonce: number;
+}
+
 interface AxiomSourceExplorerProps {
   selectedModuleId: string;
   onSelectModule: (moduleId: string) => void;
+  jumpTarget?: SourceJumpTarget | null;
 }
 
 interface ParsedSectionAnchor {
@@ -182,6 +190,7 @@ const HEADLINE_QUICK_MODULES = [
 export function AxiomSourceExplorer({
   selectedModuleId,
   onSelectModule,
+  jumpTarget,
 }: AxiomSourceExplorerProps) {
   const [leftTab, setLeftTab] = useState<'theorems' | 'modules'>('theorems');
   const [theoremQuery, setTheoremQuery] = useState('');
@@ -226,9 +235,9 @@ export function AxiomSourceExplorer({
     setLoadingSource(true);
     setSourceError(null);
 
-    const pending = pendingJumpRef.current;
-    const isTargetedJump = pending && pending.moduleId === selectedModule.id;
-    if (!isTargetedJump) {
+    const initialPending = pendingJumpRef.current;
+    const isInitialTargetedJump = initialPending && initialPending.moduleId === selectedModule.id;
+    if (!isInitialTargetedJump && !(jumpTarget && jumpTarget.moduleId === selectedModule.id && jumpTarget.line)) {
       setStartLine(1);
       setHighlightedLine(null);
       setActiveTheoremName(null);
@@ -245,11 +254,12 @@ export function AxiomSourceExplorer({
           setSourceLines(lines);
           setLoadingSource(false);
 
-          if (pending && pending.moduleId === selectedModule.id) {
-            const clampedLine = Math.max(1, Math.min(lines.length, pending.line));
+          const activePending = pendingJumpRef.current;
+          if (activePending && activePending.moduleId === selectedModule.id) {
+            const clampedLine = Math.max(1, Math.min(lines.length, activePending.line));
             setStartLine(Math.max(1, clampedLine - 14));
             setHighlightedLine(clampedLine);
-            setActiveTheoremName(pending.theoremName ?? null);
+            setActiveTheoremName(activePending.theoremName ?? null);
             pendingJumpRef.current = null;
           }
         }
@@ -279,6 +289,18 @@ export function AxiomSourceExplorer({
       onSelectModule(moduleId);
     }
   };
+
+  useEffect(() => {
+    if (!jumpTarget) return;
+    if (jumpTarget.line && jumpTarget.line > 0) {
+      jumpToModuleLine(jumpTarget.moduleId, jumpTarget.line, jumpTarget.theoremName);
+    } else {
+      setSourceSearch('');
+      pendingJumpRef.current = null;
+      onSelectModule(jumpTarget.moduleId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jumpTarget?.nonce]);
 
   const handleClickTheorem = (thm: LinkedTheoremAudit) => {
     if (!thm.module || !thm.line) return;

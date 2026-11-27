@@ -1,27 +1,45 @@
 import { useState } from 'react';
 import { Code2, ExternalLink } from 'lucide-react';
-import { AxiomSourceExplorer } from './components/AxiomSourceExplorer';
+import { AxiomSourceExplorer, type SourceJumpTarget } from './components/AxiomSourceExplorer';
 import { ComponentsAuditView } from './components/ComponentsAuditView';
+import { ContentionDefenseView } from './components/ContentionDefenseView';
 import { DocsAndReplicationView } from './components/DocsAndReplicationView';
+import { ElegantProofsView } from './components/ElegantProofsView';
 import { InteractiveLabsView } from './components/InteractiveLabsView';
 import { UnconditionalProofOverview } from './components/UnconditionalProofOverview';
 
-type MainTab = 'proof' | 'labs' | 'matrix' | 'explorer' | 'docs';
+type MainTab = 'defense' | 'elegant' | 'proof' | 'labs' | 'matrix' | 'explorer' | 'docs';
 
 const NAV_ITEMS: Array<{ id: MainTab; label: string }> = [
-  { id: 'proof', label: 'Unconditional Proof' },
-  { id: 'labs', label: 'Interactive Labs' },
-  { id: 'matrix', label: '27-Component & Bridge Audit' },
-  { id: 'explorer', label: 'Axiom & Source Explorer' },
-  { id: 'docs', label: 'Docs & Replication' },
+  { id: 'defense', label: 'Contention Defense' },
+  { id: 'elegant', label: 'Elegant Proofs' },
+  { id: 'proof', label: 'Proof Overview' },
+  { id: 'labs', label: '4D Labs' },
+  { id: 'matrix', label: '27-Component Audit' },
+  { id: 'explorer', label: 'Source Explorer' },
+  { id: 'docs', label: 'Docs' },
 ];
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<MainTab>('proof');
+  const [activeTab, setActiveTab] = useState<MainTab>('defense');
   const [selectedModuleId, setSelectedModuleId] = useState<string>('GlobalAxioms');
+  const [jumpTarget, setJumpTarget] = useState<SourceJumpTarget | null>(null);
 
   const handleOpenModule = (moduleId: string) => {
     setSelectedModuleId(moduleId);
+    setJumpTarget(null);
+    setActiveTab('explorer');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenSourceLine = (moduleId: string, line?: number, theoremName?: string) => {
+    setSelectedModuleId(moduleId);
+    setJumpTarget({
+      moduleId,
+      line,
+      theoremName,
+      nonce: Date.now() + Math.random(),
+    });
     setActiveTab('explorer');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -32,7 +50,7 @@ export function App() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#070b14] text-slate-200">
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-[#070b14] text-slate-200">
       {/* 3-Zone Sticky Header */}
       <header className="sticky top-0 z-40 border-b border-slate-800/90 bg-[#070b14]/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-2.5 sm:px-6 lg:flex-nowrap lg:py-3">
@@ -40,7 +58,7 @@ export function App() {
           <div className="flex shrink-0 items-center gap-3">
             <button
               type="button"
-              onClick={() => handleNavigateTab('proof')}
+              onClick={() => handleNavigateTab('defense')}
               className="flex items-center gap-2.5 text-left"
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/40 bg-emerald-500/15 font-mono text-xs font-bold text-emerald-300">
@@ -70,7 +88,7 @@ export function App() {
                   type="button"
                   onClick={() => handleNavigateTab(item.id)}
                   aria-current={active ? 'page' : undefined}
-                  className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  className={`whitespace-nowrap rounded-lg px-2 py-1.5 text-xs font-medium transition-colors ${
                     active
                       ? 'bg-emerald-500/15 font-semibold text-emerald-300 ring-1 ring-inset ring-emerald-500/40'
                       : 'text-slate-400 hover:bg-slate-900 hover:text-slate-100'
@@ -96,7 +114,7 @@ export function App() {
             </a>
             <button
               type="button"
-              onClick={() => handleOpenModule('GlobalAxioms')}
+              onClick={() => handleOpenSourceLine('GlobalAxioms', 64, 'clay_yang_mills_strict_on_os_completion_unconditional')}
               className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg border border-emerald-500/40 bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-emerald-500"
             >
               <Code2 className="h-3.5 w-3.5" />
@@ -108,6 +126,15 @@ export function App() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-7 sm:px-6 sm:py-9">
+        {activeTab === 'defense' && (
+          <ContentionDefenseView
+            onOpenSourceLine={handleOpenSourceLine}
+            onOpenElegantProofs={() => handleNavigateTab('elegant')}
+          />
+        )}
+        {activeTab === 'elegant' && (
+          <ElegantProofsView onOpenSourceLine={handleOpenSourceLine} />
+        )}
         {activeTab === 'proof' && (
           <UnconditionalProofOverview
             onOpenModule={handleOpenModule}
@@ -120,6 +147,7 @@ export function App() {
           <AxiomSourceExplorer
             selectedModuleId={selectedModuleId}
             onSelectModule={setSelectedModuleId}
+            jumpTarget={jumpTarget}
           />
         )}
         {activeTab === 'docs' && <DocsAndReplicationView />}
