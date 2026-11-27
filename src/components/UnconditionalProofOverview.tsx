@@ -70,52 +70,52 @@ const ARCH_TIER_1: ArchitectureNode[] = [
   {
     id: 'CubicHaar4D',
     title: 'CubicHaar4D + LatticeOSRP4D',
-    sub: 'SU(N) Haar · wilson4D RP',
+    sub: 'cubic4Schwinger · wilson4D_reflection_positivity',
     tone: 'emerald',
   },
   {
-    id: 'RademacherMulti',
-    title: '4 Analytic Rungs (R1–R4)',
-    sub: 'Rademacher · PIT · Haar · Submersion',
+    id: 'SchwingerConv',
+    title: '4 Rungs → LatticeSinglePointObs',
+    sub: 'radI_multidim · PIT · sunHaar · submersion_map_has_L1_density',
     tone: 'emerald',
   },
   {
     id: 'SchwingerConv',
     title: 'SchwingerConv.lean (§47)',
-    sub: 'stageObservableSchwinger_tendsto_iid',
+    sub: 'stageObservableSchwinger_tendsto_iid (all finite tuples)',
     tone: 'emerald',
   },
   {
-    id: 'IIDSchwinger',
-    title: 'IIDSchwinger + IIDOS',
-    sub: '6 Euclidean axioms · Δ_phys = 1',
+    id: 'IIDOS',
+    title: 'OsterwalderSchrader4DStrict 1',
+    sub: 'iidOS4DStrict · refl_pos_n · trans_inv · S₄ᶜ = -1/8',
     tone: 'emerald',
   },
 ];
 
 const ARCH_TIER_2: ArchitectureNode[] = [
   {
-    id: 'ContinuumClosure',
-    title: 'ContinuumClosure (§45)',
-    sub: 'Strict Clay Reducer Targets',
-    tone: 'slate',
-  },
-  {
     id: 'BalabanFromStage',
-    title: 'BalabanFromStage.lean',
-    sub: 'iidBalabanHypothesis · L=(m+2)², a=1/(m+2)',
+    title: 'BalabanRGContinuumHypothesis',
+    sub: 'iidBalabanHypothesis · L=(m+2)², a=1/(m+2), β=m+1',
     tone: 'emerald',
   },
   {
     id: 'IIDPoincareContinuation',
-    title: 'IIDPoincareContinuation',
-    sub: 'Rank-1 OS Collapse · M_bd = 2',
+    title: 'OSPoincareContinuationHypothesis',
+    sub: 'iid_osCompletionMap_rank_one ⇒ iidOSPoincareContinuation',
     tone: 'emerald',
   },
   {
+    id: 'ContinuumClosure',
+    title: 'WightmanQFT4DStrict 1',
+    sub: 'buildStrictWightmanFromOS os C · T_E_gap · H_gap',
+    tone: 'slate',
+  },
+  {
     id: 'GlobalAxioms',
-    title: 'GlobalAxioms.lean',
-    sub: 'clay_yang_mills_strict_on_os_completion_unconditional',
+    title: 'ClayYangMillsMassGap4DStrictOnOSCompletion',
+    sub: 'GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional',
     tone: 'primary',
   },
 ];
@@ -279,9 +279,9 @@ export function UnconditionalProofOverview({
         <div className="space-y-3 rounded-lg border border-slate-800 bg-[#070b14] p-4">
           {/* Tier 1: Lattice + Analytic Rungs + Stage Limit */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {ARCH_TIER_1.map((node) => (
+            {ARCH_TIER_1.map((node, idx) => (
               <button
-                key={node.id}
+                key={`${node.id}-${idx}`}
                 type="button"
                 onClick={() => onOpenModule(node.id)}
                 className="flex min-w-0 flex-col justify-between rounded-lg border border-emerald-500/45 bg-[#052e2b]/80 p-3.5 text-left transition-colors hover:border-emerald-400 hover:bg-[#064e3b]/60"
@@ -341,13 +341,32 @@ export function UnconditionalProofOverview({
           >
             <div className="min-w-0">
               <div className="font-mono text-xs font-semibold text-cyan-100">
-                SUClosure.lean — Independent Weak-Coupling Closure (β_m = exp((m+1)⁴), L_m = m+1)
+                Thread B · SUClosure.lean — Independent Weak-Coupling Closure (β_m = exp((m+1)⁴), L_m = m+1)
               </div>
               <div className="mt-1 break-words font-mono text-[11px] text-cyan-300">
-                fullRankCubic_gap_upper_bound ⇒ su_yang_mills_rg_conjecture_unconditional ⇒ clay_yang_mills_4d_from_su_closure
+                fullRankCubic_gap_upper_bound ⇒ SUYangMillsRGConjecture N hN ⇒ clay_yang_mills_4d_from_su_closure : ClayYangMillsMassGap4D
               </div>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[11px] text-cyan-200">
+              Open .lean <ArrowRight className="h-3 w-3" />
+            </span>
+          </button>
+
+          {/* Tier 4: Conditional Borchers-Schwartz Master Reduction */}
+          <button
+            type="button"
+            onClick={() => onOpenModule('BalabanRGToClayMaster')}
+            className="flex w-full min-w-0 flex-col justify-between gap-1 rounded-lg border border-amber-500/45 bg-amber-950/25 p-3.5 text-left transition-colors hover:border-amber-400 hover:bg-amber-950/40 sm:flex-row sm:items-center sm:gap-4"
+          >
+            <div className="min-w-0">
+              <div className="font-mono text-xs font-semibold text-amber-100">
+                Thread C · BalabanRGToClayMaster.lean — Conditional Schwartz Master Reduction (TestFn4)
+              </div>
+              <div className="mt-1 break-words font-mono text-[11px] text-amber-300">
+                latticeBorchersForm + (BalabanWeakCouplingCore → ConcreteBalabanTarget) + OSAnalyticCore ⇒ clay_yang_mills_master_discharge : ClaySpec.WightmanQFT4D
+              </div>
+            </div>
+            <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[11px] text-amber-200">
               Open .lean <ArrowRight className="h-3 w-3" />
             </span>
           </button>

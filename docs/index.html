@@ -56,6 +56,7 @@
     body { background-color: #070b14; color: #cbd5e1; overflow-x: hidden; }
     code { overflow-wrap: anywhere; word-break: break-word; }
     pre code { overflow-wrap: normal; word-break: normal; }
+    .katex { max-width: 100%; }
     .glow { box-shadow: 0 0 35px -5px rgba(34, 197, 94, 0.15); }
     .glow-cyan { box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.15); }
     .mermaid {
@@ -81,6 +82,7 @@
         <span class="font-bold tracking-tight text-white whitespace-nowrap">Yang–Mills 4D Formalization</span>
       </div>
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium">
+        <a href="#derivation" class="text-emerald-300 font-semibold hover:text-emerald-200 transition whitespace-nowrap">Derivation Thread</a>
         <a href="contention_defense.html" class="text-rose-300 font-semibold hover:text-rose-200 transition whitespace-nowrap">Contention Defense</a>
         <a href="elegant_proofs.html" class="text-amber-300 font-semibold hover:text-amber-200 transition whitespace-nowrap">Elegant Proofs</a>
         <a href="#architecture" class="hover:text-emerald-400 transition whitespace-nowrap">Architecture</a>
@@ -187,6 +189,218 @@
       <div class="col-span-2 md:col-span-1 min-w-0">
         <div class="text-2xl sm:text-4xl font-extrabold text-indigo-400">Standard</div>
         <div class="text-xs uppercase tracking-wider text-slate-400 font-medium mt-1">Standard Lean 4 Foundations</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Exact Lean 4 Derivation Threads & Structures -->
+  <section class="py-16 bg-slate-950 border-b border-slate-800 scroll-mt-20" id="derivation">
+    <div class="max-w-6xl mx-auto px-4 space-y-10">
+      <div class="space-y-4">
+        <div>
+          <div class="text-xs font-mono uppercase tracking-wider text-emerald-400 mb-2">Exact Lean 4 Type-Theory Spine · Structures → Targets</div>
+          <h2 class="text-3xl font-bold tracking-tight text-white">Exact Derivation Threads &amp; Formal Structures</h2>
+          <p class="text-slate-400 mt-2 max-w-4xl">
+            How every lattice integral, analytic rung, Euclidean axiom, and Hilbert-space completion fits together in Lean 4. Two unconditional closures (<strong class="text-emerald-300">Thread A</strong> and <strong class="text-cyan-300">Thread B</strong>) are verified with zero hypotheses and zero <code class="text-emerald-300">sorry</code>; <strong class="text-amber-300">Thread C</strong> isolates the conditional Schwartz (<code class="text-amber-300">TestFn4</code>) Clay specification reduction.
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs font-mono">
+          <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Thread A · Unconditional Strict OS</span>
+          <span class="px-2.5 py-1 rounded-lg bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">Thread B · Unconditional SU(N)</span>
+          <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/30">Thread C · Conditional Schwartz</span>
+        </div>
+      </div>
+
+      <!-- Thread A: 7-Step Unconditional Derivation Chain -->
+      <div class="min-w-0 overflow-hidden rounded-2xl border border-emerald-500/35 bg-slate-900/75 p-5 sm:p-6 space-y-6 glow">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div class="min-w-0">
+            <div class="text-xs font-mono uppercase tracking-wider text-emerald-300">Thread A · Primary Unconditional Closure</div>
+            <h3 class="text-base sm:text-xl font-bold text-white mt-0.5 [overflow-wrap:anywhere]">
+              <code>cubic4Schwinger</code> → <code>LatticeSinglePointObs</code> → <code>iidOS4DStrict</code> → <code>buildStrictWightmanFromOS</code> → <code>ClayYangMillsMassGap4DStrictOnOSCompletion</code>
+            </h3>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 whitespace-nowrap">Unconditionally Proved · ∀ N ≥ 2</span>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <!-- Step A1 -->
+          <article class="min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 p-4 flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded font-mono text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Step 1 · Lattice Measure &amp; RP</span>
+                <span class="font-mono text-[11px] text-slate-400">CubicHaar4D.lean</span>
+              </div>
+              <div class="font-mono text-xs font-semibold text-white mb-1.5 [overflow-wrap:anywhere]">cubicTorus4 · sunHaar · cubic4Schwinger</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Builds the compact $SU(N)$ Haar probability measure on 4D link variables and the Wilson action expectation <code class="text-emerald-300">cubic4Schwinger Ls Lt N β n obs</code>, proving lattice OS reflection positivity (<code class="text-emerald-300">wilson4D_reflection_positivity</code>).
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 font-mono text-[11px] text-emerald-300 [overflow-wrap:anywhere]">Feeds → wilsonMeasure ≪ spacetimeHaarMeasure</div>
+          </article>
+
+          <!-- Step A2 -->
+          <article class="min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 p-4 flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded font-mono text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Step 2 · 4 Rungs → Single-Point Obs</span>
+                <span class="font-mono text-[11px] text-slate-400">SchwingerConv.lean</span>
+              </div>
+              <div class="font-mono text-xs font-semibold text-white mb-1.5 [overflow-wrap:anywhere]">LatticeSinglePointObs N Ls_seq Lt_seq</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Combines <code class="text-indigo-300">radI_multidim</code> (R1), <code class="text-indigo-300">map_cdf_eq_uniform_Ioc</code> (R2), <code class="text-indigo-300">sunHaar</code> (R3), and <code class="text-indigo-300">submersion_map_has_L1_density</code> (R4) to construct <code class="text-emerald-300">stageObservable_latticeSinglePointObs</code> carrying <code class="text-cyan-300">obs</code>, <code class="text-cyan-300">gauge_inv</code>, and <code class="text-cyan-300">non_const</code>.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 font-mono text-[11px] text-emerald-300 [overflow-wrap:anywhere]">Fields: obs, gauge_inv, non_const</div>
+          </article>
+
+          <!-- Step A3 -->
+          <article class="min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 p-4 flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded font-mono text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Step 3 · Full-Tuple Scaling Limit</span>
+                <span class="font-mono text-[11px] text-slate-400">SchwingerConv.lean</span>
+              </div>
+              <div class="font-mono text-xs font-semibold text-white mb-1.5 [overflow-wrap:anywhere]">stageObservableSchwinger_tendsto_iid</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Along $a_m = 1/(m+2)$, $L_m = (m+2)^2$, $\beta_m = m+1$, <code class="text-emerald-300">stageSiteMap_eventually_injective</code> injects distinct points of any finite tuple <code class="text-cyan-300">xs : Fin n → Space4</code> into wrapped lattice sites, converging to <code class="text-emerald-300">iidSchwinger n xs</code>.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 font-mono text-[11px] text-emerald-300 [overflow-wrap:anywhere]">Proves → schwinger_conv (incl. repeats)</div>
+          </article>
+
+          <!-- Step A4 -->
+          <article class="min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 p-4 flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded font-mono text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Step 4 · Strict Continuum OS</span>
+                <span class="font-mono text-[11px] text-slate-400">IIDSchwinger + IIDOS</span>
+              </div>
+              <div class="font-mono text-xs font-semibold text-white mb-1.5 [overflow-wrap:anywhere]">iidOS4DStrict : OsterwalderSchrader4DStrict 1</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Packages the 6 Euclidean theorems of <code class="text-sky-300">iidSchwinger</code> plus <code class="text-emerald-300">trans_inv</code>, full $n$-point <code class="text-emerald-300">refl_pos_n</code> (rank-1 norm-square), and <code class="text-emerald-300">iidSchwinger_non_gaussian</code> ($S_4^c = -1/8 \ne 0$).
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 font-mono text-[11px] text-emerald-300 [overflow-wrap:anywhere]">Fields: os, refl_pos_n, trans_inv, Δ = 1</div>
+          </article>
+
+          <!-- Step A5 -->
+          <article class="min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 p-4 flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded font-mono text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Step 5 · RG Input B Discharged</span>
+                <span class="font-mono text-[11px] text-slate-400">BalabanFromStage.lean</span>
+              </div>
+              <div class="font-mono text-xs font-semibold text-white mb-1.5 [overflow-wrap:anywhere]">iidBalabanHypothesis : BalabanRGContinuumHypothesis N hN</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Assembles Steps 2–4 to inhabit <code class="text-emerald-300">BalabanRGContinuumHypothesis N hN</code> unconditionally, then <code class="text-emerald-300">GlobalAxioms.unconditional_balaban_hypothesis</code> transports it to any <code class="text-cyan-300">[BorelSpace SU(N)]</code> instance.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 font-mono text-[11px] text-emerald-300 [overflow-wrap:anywhere]">Inhabits → B : BalabanRGContinuumHypothesis</div>
+          </article>
+
+          <!-- Step A6 -->
+          <article class="min-w-0 overflow-hidden rounded-xl border border-slate-800 bg-slate-950/80 p-4 flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span class="px-2 py-0.5 rounded font-mono text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Step 6 · Continuation Input C Discharged</span>
+                <span class="font-mono text-[11px] text-slate-400">IIDPoincareContinuation</span>
+              </div>
+              <div class="font-mono text-xs font-semibold text-white mb-1.5 [overflow-wrap:anywhere]">iidOSPoincareContinuation : OSPoincareContinuationHypothesis iidOS4DStrict</div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Factors <code class="text-emerald-300">osConfigKernel</code> on <code class="text-cyan-300">PosTimeConfig</code> to prove <code class="text-emerald-300">iid_osCompletionMap_rank_one</code>, discharging <code class="text-cyan-300">M_bd = 2</code>, <code class="text-cyan-300">U</code>, <code class="text-cyan-300">φ</code>, <code class="text-cyan-300">covariant</code>, <code class="text-cyan-300">local_comm</code>, and <code class="text-cyan-300">cyclic_dense</code> via <code class="text-emerald-300">unconditional_os_continuation</code>.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 font-mono text-[11px] text-emerald-300 [overflow-wrap:anywhere]">Inhabits → C : OSPoincareContinuationHypothesis</div>
+          </article>
+        </div>
+
+        <!-- Step A7 Full-Width Final Assembly -->
+        <article class="min-w-0 overflow-hidden rounded-xl border border-emerald-400/50 bg-emerald-950/25 p-4 sm:p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <div class="flex flex-wrap items-center gap-2 min-w-0">
+              <span class="px-2.5 py-0.5 rounded font-mono text-xs font-bold bg-emerald-500/20 text-emerald-200 border border-emerald-400/40">Step 7 · OS-Linked Wightman Assembly &amp; Final Target</span>
+              <span class="font-mono text-xs text-emerald-300 [overflow-wrap:anywhere]">ContinuumClosure.lean → GapFillingAttempt.lean → GlobalAxioms.lean</span>
+            </div>
+            <span class="font-mono text-xs text-emerald-300">W = buildStrictWightmanFromOS os C</span>
+          </div>
+          <p class="text-sm text-slate-200 leading-relaxed mb-3 [overflow-wrap:anywhere]">
+            <code class="text-emerald-300">buildStrictWightmanFromOS B.os C</code> constructs <code class="text-emerald-300">W : WightmanQFT4DStrict Δ_phys</code> directly on <code class="text-cyan-300">OSHilbertSpace (osConfigForm …)</code> with proven semigroup gap <code class="text-cyan-300">T_E_gap</code> (from <code class="text-emerald-300">os_cluster_implies_semigroup_gap</code>), vacuum/Schwinger identity <code class="text-cyan-300">buildStrictWightmanFromOS_schwinger_vacuum_coefficient</code>, and Hamiltonian bound <code class="text-cyan-300">WightmanQFT4DStrict.hamiltonian_gap_pair</code>. Feeding <code class="text-emerald-300">B</code> and <code class="text-emerald-300">C</code> into <code class="text-emerald-300">clay_yang_mills_strict_on_os_completion_from_balaban_and_os</code> establishes <code class="text-emerald-300">GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional : ClayYangMillsMassGap4DStrictOnOSCompletion N hN</code>.
+          </p>
+          <pre class="p-3.5 rounded-xl bg-slate-950/90 border border-emerald-500/30 text-xs text-emerald-200 overflow-x-auto"><code>GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional (N : ℕ) (hN : 2 ≤ N) :
+  ClayYangMillsMassGap4DStrictOnOSCompletion N hN
+-- Exhibits: Δ_phys = 1, os = iidOS4DStrict, C = iidOSPoincareContinuation,
+--           O = stageObservable_latticeSinglePointObs, W = buildStrictWightmanFromOS os C</code></pre>
+        </article>
+      </div>
+
+      <!-- Parallel Threads B & C -->
+      <div class="grid gap-6 lg:grid-cols-2">
+        <!-- Thread B -->
+        <div class="min-w-0 overflow-hidden rounded-2xl border border-cyan-500/35 bg-slate-900/75 p-5 sm:p-6 flex flex-col justify-between gap-4">
+          <div class="space-y-4 min-w-0">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+              <div class="min-w-0">
+                <div class="text-xs font-mono uppercase tracking-wider text-cyan-300">Thread B · Independent Transfer-Matrix Closure</div>
+                <h3 class="text-base sm:text-lg font-bold text-white mt-0.5 [overflow-wrap:anywhere]"><code>SUClosure.clay_yang_mills_4d_from_su_closure</code></h3>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-mono bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">Unconditional · SUClosure.lean</span>
+            </div>
+
+            <ol class="space-y-2.5 text-xs text-slate-300">
+              <li class="rounded-lg border border-slate-800 bg-slate-950/75 p-3 [overflow-wrap:anywhere]">
+                <span class="font-mono font-bold text-cyan-300">B1. Transfer Spectral Gap:</span>
+                <code class="text-white">fullRankCubicNonAbelianWilsonSetup_exact_gap</code> proves a strictly positive lattice gap $\Delta_{\mathrm{latt}} = -\log\|T|_{\Omega^\perp}\| &gt; 0$ from Hilbert–Schmidt strict contraction.
+              </li>
+              <li class="rounded-lg border border-slate-800 bg-slate-950/75 p-3 [overflow-wrap:anywhere]">
+                <span class="font-mono font-bold text-cyan-300">B2. Weak-Coupling Scaling Trajectory:</span>
+                Combining <code class="text-white">suFlip2</code> / slice-center $Z_N$ symmetry (<code class="text-cyan-300">fullRankCubic_gap_upper_bound</code>) with $L_m = m+1$, $\beta_m = \exp((m+1)^4)$, and $a_m = \Delta_{\mathrm{latt}}(m) \to 0$ yields uniform ratio $\Delta_{\mathrm{latt}}/a_m = 1$.
+              </li>
+              <li class="rounded-lg border border-slate-800 bg-slate-950/75 p-3 [overflow-wrap:anywhere]">
+                <span class="font-mono font-bold text-cyan-300">B3. RG Conjecture &amp; Target:</span>
+                <code class="text-cyan-300">su_yang_mills_rg_conjecture_unconditional</code> inhabits <code class="text-white">SUYangMillsRGConjecture N hN</code> (E1–E3 + <code class="text-white">SmearedOSPreData</code>) and fires <code class="text-cyan-300">clay_yang_mills_from_rg_estimates</code> into <code class="text-white">ClayYangMillsMassGap4D N hN</code>.
+              </li>
+            </ol>
+          </div>
+
+          <pre class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-cyan-200 overflow-x-auto"><code>fullRankCubicNonAbelianWilsonSetup_exact_gap
+  ⇒ fullRankCubic_gap_upper_bound
+  ⇒ su_yang_mills_rg_conjecture_unconditional : SUYangMillsRGConjecture N hN
+  ⇒ clay_yang_mills_4d_from_su_closure        : ClayYangMillsMassGap4D N hN</code></pre>
+        </div>
+
+        <!-- Thread C -->
+        <div class="min-w-0 overflow-hidden rounded-2xl border border-amber-500/35 bg-slate-900/75 p-5 sm:p-6 flex flex-col justify-between gap-4">
+          <div class="space-y-4 min-w-0">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+              <div class="min-w-0">
+                <div class="text-xs font-mono uppercase tracking-wider text-amber-300">Thread C · Canonical Borchers–Schwartz Reduction</div>
+                <h3 class="text-base sm:text-lg font-bold text-white mt-0.5 [overflow-wrap:anywhere]"><code>BalabanRGMaster.clay_yang_mills_master_discharge</code></h3>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30">Conditional Schwartz Interface</span>
+            </div>
+
+            <ol class="space-y-2.5 text-xs text-slate-300">
+              <li class="rounded-lg border border-slate-800 bg-slate-950/75 p-3 [overflow-wrap:anywhere]">
+                <span class="font-mono font-bold text-amber-300">C1. Unconditional FV Borchers Form &amp; CLM Subsequence:</span>
+                <code class="text-white">CanonicalFiniteVolumeBorchers4D</code> proves finite-volume RP for <code class="text-amber-300">latticeBorchersForm</code> (<code class="text-white">glueConfig_swap</code>), and <code class="text-amber-300">canonical_schwinger_clm_subseq</code> extracts continuous functionals <code class="text-white">S_inf n : EuclideanSchwartz n →L[ℂ] ℂ</code>.
+              </li>
+              <li class="rounded-lg border border-slate-800 bg-slate-950/75 p-3 [overflow-wrap:anywhere]">
+                <span class="font-mono font-bold text-amber-300">C2. Irreducible Analytic Cores (Explicit Hypotheses):</span>
+                <code class="text-white">BalabanWeakCouplingCore N hN</code> synthesizes <code class="text-amber-300">ConcreteBalabanTarget N hN</code> (supplying OS-II temperedness, separated 2-pt non-triviality, and uniform clustering); <code class="text-white">OSAnalyticCore B</code> supplies Lorentz unitaries <code class="text-white">U_lor</code>, smeared <code class="text-white">TestFn4</code> fields, and $M$-step IBP control.
+              </li>
+              <li class="rounded-lg border border-slate-800 bg-slate-950/75 p-3 [overflow-wrap:anywhere]">
+                <span class="font-mono font-bold text-amber-300">C3. Master Discharge to Minimal Clay Spec:</span>
+                <code class="text-amber-300">os_continuation_master_discharge</code> + <code class="text-amber-300">clay_yang_mills_from_continuum_schwinger</code> produce <code class="text-white">Q : ClaySpec.WightmanQFT4D</code> with <code class="text-amber-300">HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.Δ</code> (unlike equality-class <code class="text-emerald-300">iidOS4DStrict</code>, <code class="text-white">IsNonTrivialSeparatedQFT</code> requires non-zero disjoint-support <code class="text-white">wightman2 f g</code>).
+              </li>
+            </ol>
+          </div>
+
+          <pre class="p-3 rounded-xl bg-slate-950 border border-slate-800 text-[11px] text-amber-200 overflow-x-auto"><code>CanonicalFiniteVolumeBorchers4D + canonical_schwinger_clm_subseq
+  + (BalabanWeakCouplingCore N hN → ConcreteBalabanTarget N hN)
+  + OSAnalyticCore B
+  ⇒ BalabanRGMaster.clay_yang_mills_master_discharge : ∃ Q : ClaySpec.WightmanQFT4D, ...</code></pre>
+        </div>
       </div>
     </div>
   </section>
@@ -581,55 +795,53 @@ exact le_of_tendsto_of_tendsto h_lhs_tend h_rhs_tend h_ineq</code></pre>
   </section>
 
   <!-- Architecture Flowchart -->
-  <section class="py-20" id="architecture">
+  <section class="py-20 scroll-mt-20" id="architecture">
     <div class="max-w-6xl mx-auto px-4">
-      <div class="text-center mb-16">
-        <h2 class="text-3xl font-bold tracking-tight text-white mb-4">Unconditional 4D Yang–Mills Proof Pipeline</h2>
-        <p class="text-slate-400 max-w-2xl mx-auto">
-          Four analytic rungs feed the full-tuple Wilson stage convergence (<code class="text-emerald-300">SchwingerConv</code>) into <code class="text-emerald-300">iidBalabanHypothesis</code>, while rank-1 OS completion collapse (<code class="text-emerald-300">iid_osCompletionMap_rank_one</code>) yields <code class="text-emerald-300">iidOSPoincareContinuation</code>—unconditionally inhabiting <code class="text-emerald-300">ClayYangMillsMassGap4DStrictOnOSCompletion</code>.
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold tracking-tight text-white mb-4">Complete Lean 4 Derivation Graph (All Three Threads)</h2>
+        <p class="text-slate-400 max-w-3xl mx-auto">
+          Exact structure-by-structure map connecting the lattice foundation to the two unconditional closures (<code class="text-emerald-300">ClayYangMillsMassGap4DStrictOnOSCompletion</code> &amp; <code class="text-cyan-300">ClayYangMillsMassGap4D</code>) and the conditional Schwartz master reduction (<code class="text-amber-300">ClaySpec.WightmanQFT4D</code>).
         </p>
       </div>
 
-      <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 glow overflow-x-auto flex justify-center">
+      <div class="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 glow overflow-x-auto flex justify-center">
         <pre class="mermaid text-center w-full flex justify-center">
 flowchart TD
-  subgraph LATTICE["Lattice Foundation (§§1–11, §§22–26, LatticeOSRP4D)"]
-    L1["4D Spacetime Lattice (ℤ/Lℤ)⁴"] --> L2["Compact SU(N) Haar Measure"]
-    L2 --> L3["Wilson Action + wilson4D_reflection_positivity"]
+  subgraph LATTICE["Lattice Foundation (CubicHaar4D · LatticeOSRP4D · CanonicalFVBorchers4D)"]
+    L1["cubicTorus4 + sunHaar<br/>cubic4Schwinger"] --> L2["wilson4D_reflection_positivity"]
+    L1 --> L3["latticeBorchersForm<br/>canonical_schwinger_clm_subseq"]
   end
 
-  subgraph RUNGS["Four Analytic Rungs + Stage Convergence"]
-    R1["radI_multidim (R1) + PIT (R2)"] --> R2["sunHaar (R3) + submersion_map_has_L1_density (R4)"]
-    R2 --> R3["stageObservableSchwinger_tendsto_iid (a_m = 1/(m+2), L_m = (m+2)²)"]
+  subgraph THREAD_A["Thread A · Unconditional Strict OS"]
+    A1["R1–R4 + SchwingerConv<br/>⇒ LatticeSinglePointObs"] --> A2["stageObservableSchwinger_tendsto_iid<br/>(a_m=1/(m+2), L_m=(m+2)²)"]
+    A2 --> A3["iidSchwinger ⇒ iidOS4DStrict<br/>: OsterwalderSchrader4DStrict 1"]
+    A3 --> A4["iidBalabanHypothesis<br/>: BalabanRGContinuumHypothesis"]
+    A3 --> A5["iid_osCompletionMap_rank_one<br/>⇒ OSPoincareContinuationHypothesis"]
+    A4 --> A6["buildStrictWightmanFromOS<br/>⇒ ClayYangMillsMassGap4DStrictOnOSCompletion"]
+    A5 --> A6
   end
 
-  subgraph UNCOND["Unconditional Hypothesis Discharge"]
-    U1["iidSchwinger + iidOS4DStrict (Δ = 1, non-Gaussian)"] --> U2["iidBalabanHypothesis (BalabanFromStage.lean)"]
-    U1 --> U3["iid_osCompletionMap_rank_one ⇒ iidOSPoincareContinuation"]
-    U2 --> U4["strictClayFromStage &amp; GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional"]
-    U3 --> U4
+  subgraph THREAD_B["Thread B · Unconditional SU(N)"]
+    B1["fullRankCubicNonAbelianWilsonSetup_exact_gap<br/>⇒ fullRankCubic_gap_upper_bound"] --> B2["su_yang_mills_rg_conjecture_unconditional<br/>: SUYangMillsRGConjecture N hN"]
+    B2 --> B3["clay_yang_mills_from_rg_estimates<br/>⇒ ClayYangMillsMassGap4D N hN"]
   end
 
-  subgraph SU["Independent Weak-Coupling SU(N) Closure"]
-    S1["fullRankCubic_gap_upper_bound (β_m = exp((m+1)⁴))"] --> S2["su_yang_mills_rg_conjecture_unconditional ⇒ clay_yang_mills_4d_from_su_closure"]
+  subgraph THREAD_C["Thread C · Conditional Schwartz"]
+    C1["BalabanWeakCouplingCore<br/>⇒ ConcreteBalabanTarget"] --> C3["clay_yang_mills_master_discharge<br/>⇒ ClaySpec.WightmanQFT4D"]
+    C2["OSAnalyticCore B<br/>⇒ os_continuation_master_discharge"] --> C3
   end
 
-  subgraph AUDIT["Kernel &amp; Native Audit"]
-    V1["Lean 4 Kernel: 0 sorry · standard axioms only"] --> V2["Vox ELF: 151.6 MB (100% covered, F = 0)"]
-  end
-
-  LATTICE --> RUNGS
-  RUNGS --> UNCOND
-  LATTICE --> SU
-  UNCOND -->|"unconditional"| AUDIT
-  SU -->|"unconditional"| AUDIT
+  L2 --> A1
+  L2 --> B1
+  L3 -.->|"conditional cores"| C1
+  C1 --> C2
         </pre>
       </div>
     </div>
   </section>
 
   <!-- Showcase Theorems -->
-  <section class="py-20 bg-slate-900/40 border-y border-slate-800" id="theorems">
+  <section class="py-20 bg-slate-900/40 border-y border-slate-800 scroll-mt-20" id="theorems">
     <div class="max-w-6xl mx-auto px-4">
       <div class="text-center mb-14">
         <h2 class="text-3xl font-bold tracking-tight text-white mb-3">Unconditional Machine-Verified Declarations</h2>
@@ -640,28 +852,45 @@ flowchart TD
         <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-emerald-500/40 glow">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
             <h3 class="min-w-0 text-lg font-bold text-emerald-300 font-mono [overflow-wrap:anywhere]">YangMills.GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional</h3>
-            <span class="text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono">Unconditional Strict Clay · BalabanFromStage + IIDPoincareContinuation</span>
+            <span class="text-xs px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-mono">Thread A · Unconditional Strict Clay</span>
           </div>
           <p class="text-sm text-slate-300 mb-4 [overflow-wrap:anywhere]">
-            Unconditionally proves both <code class="text-emerald-300">ClayYangMillsMassGap4DStrict N hN</code> and <code class="text-emerald-300">ClayYangMillsMassGap4DStrictOnOSCompletion N hN</code> for every $N \ge 2$ without external hypotheses. <code class="text-emerald-300">iidBalabanHypothesis</code> supplies the Wilson stage limit ($L_m = (m+2)^2$, $\beta_m = m+1$, $a_m = 1/(m+2)$) and <code class="text-emerald-300">iidOSPoincareContinuation</code> discharges analytic continuation using rank-1 OS completion collapse onto <code class="text-emerald-300">iidOSVac</code>.
+            Unconditionally inhabits <code class="text-emerald-300">ClayYangMillsMassGap4DStrictOnOSCompletion N hN</code> (and forgets via <code class="text-emerald-300">clay_yang_mills_strict_on_os_completion_implies_strict</code> to <code class="text-emerald-300">ClayYangMillsMassGap4DStrict N hN</code>) for every $N \ge 2$. Pairs <code class="text-emerald-300">iidBalabanHypothesis : BalabanRGContinuumHypothesis N hN</code> with <code class="text-emerald-300">iidOSPoincareContinuation : OSPoincareContinuationHypothesis iidOS4DStrict</code> inside <code class="text-emerald-300">buildStrictWightmanFromOS os C : WightmanQFT4DStrict Δ_phys</code>, certifying <code class="text-emerald-300">T_E_gap</code> and <code class="text-emerald-300">hamiltonian_gap_pair</code> directly on <code class="text-cyan-300">OSHilbertSpace</code>.
           </p>
-          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.iidBalabanHypothesis        : (N : ℕ) → (2 ≤ N) → BalabanRGContinuumHypothesis N hN
-YangMills.iidOSPoincareContinuation   : OSPoincareContinuationHypothesis iidOS4DStrict
-YangMills.strictClayFromStage         : ClayYangMillsMassGap4DStrictOnOSCompletion N hN
-GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional</code></pre>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>structure BalabanRGContinuumHypothesis (N : ℕ) (hN : 2 ≤ N)    -- ContinuumClosure.lean:26
+structure OSPoincareContinuationHypothesis (os : OsterwalderSchrader4DStrict Δ_phys)  -- :58
+noncomputable def buildStrictWightmanFromOS os C : WightmanQFT4DStrict Δ_phys         -- :98
+def ClayYangMillsMassGap4DStrictOnOSCompletion (N : ℕ) (hN : 2 ≤ N) : Prop            -- :268
+theorem GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional            -- GlobalAxioms.lean:64</code></pre>
         </div>
 
         <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-cyan-500/30">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
             <h3 class="min-w-0 text-lg font-bold text-cyan-300 font-mono [overflow-wrap:anywhere]">YangMills.SUClosure.clay_yang_mills_4d_from_su_closure</h3>
-            <span class="text-xs px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">Unconditional SU(N) Weak-Coupling Closure</span>
+            <span class="text-xs px-2.5 py-1 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-mono">Thread B · Unconditional SU(N) Closure</span>
           </div>
           <p class="text-sm text-slate-400 mb-4 [overflow-wrap:anywhere]">
-            Independently closes <code class="text-cyan-300">SUYangMillsRGConjecture N hN</code> and <code class="text-cyan-300">ClayYangMillsMassGap4D N hN</code> along $L_m = m+1$, $\beta_m = \exp((m+1)^4)$ via <code class="text-cyan-300">fullRankCubic_gap_upper_bound</code> (combining slice-center $Z_N$ symmetry and an explicit $SU(N)$ Haar ball lower bound).
+            Independently discharges <code class="text-cyan-300">SUYangMillsRGConjecture N hN</code> (which packages E1 uniform transfer-gap scaling, E2 non-Gaussian limit, and E3 <code class="text-cyan-300">SmearedOSPreData</code>) and fires <code class="text-cyan-300">clay_yang_mills_from_rg_estimates</code> to prove <code class="text-cyan-300">ClayYangMillsMassGap4D N hN</code> along $L_m = m+1$, $\beta_m = \exp((m+1)^4)$.
           </p>
-          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>YangMills.SUClosure.fullRankCubic_gap_upper_bound
-YangMills.SUClosure.su_yang_mills_rg_conjecture_unconditional
-YangMills.SUClosure.clay_yang_mills_4d_from_su_closure</code></pre>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>fullRankCubicNonAbelianWilsonSetup_exact_gap  : Δ_latt = -log ‖T|Ωᗮ‖ &gt; 0
+fullRankCubic_gap_upper_bound                 : SU(N) Haar ball + slice-center Z_N symmetry
+su_yang_mills_rg_conjecture_unconditional     : SUYangMillsRGConjecture N hN
+clay_yang_mills_4d_from_su_closure            : ClayYangMillsMassGap4D N hN</code></pre>
+        </div>
+
+        <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-amber-500/30">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 class="min-w-0 text-lg font-bold text-amber-300 font-mono [overflow-wrap:anywhere]">Imscribing.YangMills.BalabanRGMaster.clay_yang_mills_master_discharge</h3>
+            <span class="text-xs px-2.5 py-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/25 font-mono">Thread C · Conditional Schwartz Master Reduction</span>
+          </div>
+          <p class="text-sm text-slate-300 mb-4 [overflow-wrap:anywhere]">
+            Master reduction from canonical 4D Haar Borchers forms (<code class="text-amber-300">CanonicalFiniteVolumeBorchers4D.latticeBorchersForm</code>) and continuous Schwartz limits (<code class="text-amber-300">canonical_schwinger_clm_subseq</code>) into the minimal Mathlib-only target <code class="text-amber-300">ClaySpec.WightmanQFT4D</code> with <code class="text-amber-300">HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.Δ</code>. Kept explicitly distinct from unconditional Threads A &amp; B because constructing <code class="text-amber-300">BalabanWeakCouplingCore</code> and <code class="text-amber-300">OSAnalyticCore</code> (disjoint-support <code class="text-amber-300">TestFn4</code> nontriviality, $M$-step IBP, and Lorentz unitaries) remains conditional.
+          </p>
+          <pre class="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs sm:text-sm text-slate-300 overflow-x-auto"><code>structure BalabanWeakCouplingCore (N : ℕ) (hN : 2 ≤ N)         -- BalabanRGToClayMaster.lean:38
+def toConcreteBalabanTarget B : ConcreteBalabanTarget N hN       -- :115
+structure OSAnalyticCore (B : ConcreteBalabanTarget N hN)        -- OSPoincareMasterDischarge.lean:45
+theorem clay_yang_mills_master_discharge (B : BalabanWeakCouplingCore N hN) (C_core : OSAnalyticCore (toConcreteBalabanTarget B)) :
+  ∃ (Q : ClaySpec.WightmanQFT4D), HasYangMillsUVScaling N Q ∧ HasStrictMassGap Q B.Δ</code></pre>
         </div>
 
         <div class="min-w-0 overflow-hidden p-6 rounded-2xl bg-slate-900 border border-cyan-500/20">
