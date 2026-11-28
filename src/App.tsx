@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Code2, ExternalLink } from 'lucide-react';
 import { AxiomSourceExplorer, type SourceJumpTarget } from './components/AxiomSourceExplorer';
 import { ComponentsAuditView } from './components/ComponentsAuditView';
@@ -6,15 +6,25 @@ import { ContentionDefenseView } from './components/ContentionDefenseView';
 import { DocsAndReplicationView } from './components/DocsAndReplicationView';
 import { ElegantProofsView } from './components/ElegantProofsView';
 import { InteractiveLabsView } from './components/InteractiveLabsView';
+import { TrilatticeLabsView } from './components/TrilatticeLabsView';
 import { UnconditionalProofOverview } from './components/UnconditionalProofOverview';
 
-type MainTab = 'defense' | 'elegant' | 'proof' | 'labs' | 'matrix' | 'explorer' | 'docs';
+type MainTab =
+  | 'defense'
+  | 'elegant'
+  | 'proof'
+  | 'labs'
+  | 'route_a_labs'
+  | 'matrix'
+  | 'explorer'
+  | 'docs';
 
 const NAV_ITEMS: Array<{ id: MainTab; label: string }> = [
   { id: 'defense', label: 'Contention Defense' },
   { id: 'elegant', label: 'Elegant Proofs' },
   { id: 'proof', label: 'Proof Overview' },
   { id: 'labs', label: '4D Labs' },
+  { id: 'route_a_labs', label: 'Route A Labs' },
   { id: 'matrix', label: '27-Component Audit' },
   { id: 'explorer', label: 'Source Explorer' },
   { id: 'docs', label: 'Docs' },
@@ -24,6 +34,12 @@ export function App() {
   const [activeTab, setActiveTab] = useState<MainTab>('defense');
   const [selectedModuleId, setSelectedModuleId] = useState<string>('GlobalAxioms');
   const [jumpTarget, setJumpTarget] = useState<SourceJumpTarget | null>(null);
+
+  useEffect(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    if (hash === '#route-a-labs') setActiveTab('route_a_labs');
+    else if (hash === '#4d-labs') setActiveTab('labs');
+  }, []);
 
   const handleOpenModule = (moduleId: string) => {
     setSelectedModuleId(moduleId);
@@ -142,6 +158,7 @@ export function App() {
           />
         )}
         {activeTab === 'labs' && <InteractiveLabsView />}
+        {activeTab === 'route_a_labs' && <TrilatticeLabsView />}
         {activeTab === 'matrix' && <ComponentsAuditView />}
         {activeTab === 'explorer' && (
           <AxiomSourceExplorer

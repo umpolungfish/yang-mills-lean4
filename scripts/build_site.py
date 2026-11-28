@@ -1467,7 +1467,8 @@ def _route_section(number, title, body, code=None):
 </section>"""
 
 
-def _route_page(active_key, title, description, accent, kicker, headline, lead, metrics, sections):
+def _route_page(active_key, title, description, accent, kicker, headline, lead, metrics, sections,
+                explorer_href="explorer/index.html"):
     metric_html = "".join(
         f'<div class="min-w-0"><div class="text-xl sm:text-3xl font-extrabold {accent}">{_html.escape(value)}</div>'
         f'<div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium mt-1">{_html.escape(label)}</div></div>'
@@ -1492,7 +1493,7 @@ def _route_page(active_key, title, description, accent, kicker, headline, lead, 
   {section_html}
   <div class="pt-6 flex flex-wrap gap-4">
     <a href="index.html" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold border border-slate-700 transition">← Choose the other route</a>
-    <a href="explorer/index.html" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition">Open Source Explorer →</a>
+    <a href="{explorer_href}" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition">Open Interactive Labs →</a>
   </div>
 </main>
 <footer class="border-t border-slate-800/80 py-6 text-xs text-slate-400">
@@ -1515,7 +1516,7 @@ route_trilattice_html = _route_page(
      ("κ Λ/α", "Physical mass gap"), ("0", "Sorries / custom axioms")],
     [
         _route_section("1", "Re-entrant trilattice substrate",
-            "Belnap's four-valued logic and its sixteen states carry three independent orders — information, truth, and falsity "
+            "Shramko and Wansing's SIXTEEN₃ trilattice and its sixteen states carry three independent orders — information, truth, and falsity "
             "(<code>orders_mutually_distinct</code>). The <code>ReentrantTrilattice</code> structure axiomatizes inclosure, "
             "non-commutative re-entry, glut through a surjective-but-non-injective folding, and the reversible core law "
             "<code>μ ∘ δ = id</code>. The canonical model <code>canonicalSixteen3</code> realizes every axiom.",
@@ -1524,7 +1525,7 @@ route_trilattice_html = _route_page(
             "walk_iter_le · walk_step_monotone · walk_fixed_at_top"),
         _route_section("2", "Universal SIC dual frame and ζ(−1)",
             "The four-projector pairing $g_{ij} = \\tfrac23\\delta_{ij}+\\tfrac13$ is the $d=4$ instance of a universal dual frame. "
-            "The Belnap multilattice is the unconditional SIC-POVM in every $d=2^n$; <code>sic_inverse_general</code> inverts the "
+            "The multilattice SIC realization of the SIXTEEN₃ trilattice is the unconditional SIC-POVM in every $d=2^n$; <code>sic_inverse_general</code> inverts the "
             "isotropic Gram in all positive dimensions, and $\\zeta(-1)=-1/12$ fixes the ququart coefficients "
             "$5/4 = 1-3\\zeta(-1)$, $-1/16 = \\tfrac34\\zeta(-1)$.",
             "zeta_neg_one : riemannZeta (-1) = (-1/12 : ℂ)\n"
@@ -1569,6 +1570,7 @@ route_trilattice_html = _route_page(
             "yang_mills_operator_gap_unconditional : ∀ sys, 0 < Δ ∧ ⟨ψ,Tψ⟩ ≤ exp(−Δℓ)⟨ψ,ψ⟩\n"
             "ym_kernel_soundness_unconditional : terminal witness = true ↔ ∃ cert, cert.mass_gap > 0"),
     ],
+    explorer_href="explorer/index.html#route-a-labs",
 )
 
 route_wilson_html = _route_page(
