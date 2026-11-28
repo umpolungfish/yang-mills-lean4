@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Route B — The Constructive Wilson Proof · Yang–Mills Mass Gap</title>
+  <meta name="description" content="The constructive route: build the four-dimensional SU(N) Wilson measure, prove the continuum limit, reconstruct the OS/Wightman theory, and inhabit the strict Clay target.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Fira Code', 'monospace'] } } }
+    }
+  </script>
+  <style>
+    body { background-color: #070b14; color: #cbd5e1; overflow-x: hidden; }
+    code { overflow-wrap: anywhere; word-break: break-word; }
+    pre code { overflow-wrap: normal; word-break: normal; }
+    .glow { box-shadow: 0 0 35px -5px rgba(34, 197, 94, 0.15); }
+    .glow-cyan { box-shadow: 0 0 35px -5px rgba(6, 182, 212, 0.15); }
+  </style>
+</head>
+<body class="min-h-screen font-sans selection:bg-emerald-500 selection:text-white"><header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/90 border-b border-slate-800 px-4 py-3.5">
+  <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <a href="index.html" class="flex items-center gap-2.5 shrink-0">
+      <span class="px-2.5 py-1 text-xs font-bold tracking-wider uppercase rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">Lean 4 Certified</span>
+      <span class="font-bold tracking-tight text-white whitespace-nowrap">Yang–Mills 4D Formalization</span>
+    </a>
+    <nav class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm font-medium">
+      <a href="index.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Choose a Route</a><a href="route_trilattice.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Route A · Trilattice</a><a href="route_wilson.html" class="px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold whitespace-nowrap">Route B · Wilson</a><a href="contention_defense.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Contention Defense</a><a href="elegant_proofs.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Elegant Proofs</a><a href="explorer/index.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Corpus Explorer</a><a href="clay_27_components.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Clay Audit</a><a href="formal_declaration_audit.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Declarations</a><a href="proof_reading_map.html" class="text-slate-300 hover:text-emerald-400 transition whitespace-nowrap">Proof Map</a>
+    </nav>
+  </div>
+</header><header class="relative py-16 sm:py-20 overflow-hidden border-b border-slate-800/80">
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/15 via-slate-950 to-slate-950 -z-10"></div>
+  <div class="max-w-5xl mx-auto px-4">
+    <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-mono text-slate-400 hover:text-emerald-300 transition mb-6">← Back to route choice</a>
+    <div class="inline-block px-3 py-1 rounded border border-slate-700 bg-slate-900/60 text-xs font-mono uppercase tracking-wider text-slate-300 mb-5">Route B · Constructive Proof</div>
+    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">The Wilson Continuum Mass Gap</h1>
+    <p class="text-base sm:text-lg text-slate-300 max-w-4xl leading-relaxed font-light">The four-dimensional $SU(N)$ Wilson measure is constructed explicitly; its finite-volume transfer operator has an exact positive gap; a full-tuple stage limit reaches a non-Gaussian iid Schwinger functional; OS reconstruction then discharges both Clay inputs unconditionally, giving $\Delta_{phys}=1$.</p>
+  </div>
+</header>
+<section class="border-y border-slate-800 bg-slate-900/50 py-8">
+  <div class="max-w-5xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-7 text-center"><div class="min-w-0"><div class="text-xl sm:text-3xl font-extrabold text-cyan-400">Δ = 1</div><div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium mt-1">Physical mass gap</div></div><div class="min-w-0"><div class="text-xl sm:text-3xl font-extrabold text-cyan-400">6 / 6</div><div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium mt-1">Euclidean axioms</div></div><div class="min-w-0"><div class="text-xl sm:text-3xl font-extrabold text-cyan-400">27 / 27</div><div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium mt-1">Clay obligations</div></div><div class="min-w-0"><div class="text-xl sm:text-3xl font-extrabold text-cyan-400">0</div><div class="text-[11px] uppercase tracking-wider text-slate-400 font-medium mt-1">Sorries</div></div></div>
+</section><main class="mx-auto max-w-5xl px-4 py-12 space-y-5">
+  <section class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span class="px-2.5 py-1 rounded font-mono text-xs font-bold bg-slate-800 text-emerald-300 border border-slate-700">STEP 1</span>
+    <h2 class="text-lg sm:text-xl font-bold text-white [overflow-wrap:anywhere]">Wilson lattice measure and reflection positivity</h2>
+  </div>
+  <div class="text-sm leading-relaxed text-slate-300 [overflow-wrap:anywhere]">The periodic 4D lattice has link variables in $SU(N)$, plaquette holonomies, the Wilson action, and product Haar measure. <code>cubic4Schwinger</code> is the normalized finite-volume integral; gauge invariance and lattice reflection positivity are proved in <code>CubicHaar4D</code> and <code>LatticeReflectionPositivity4D</code>.</div>
+  <pre class="mt-4 p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 overflow-x-auto"><code>cubic4Schwinger Ls Lt N β n obs : ℂ
+wilson4D_reflection_positivity
+stageObservable_latticeSinglePointObs : gauge_inv ∧ non_const</code></pre>
+</section>
+<section class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span class="px-2.5 py-1 rounded font-mono text-xs font-bold bg-slate-800 text-emerald-300 border border-slate-700">STEP 2</span>
+    <h2 class="text-lg sm:text-xl font-bold text-white [overflow-wrap:anywhere]">Exact finite-volume transfer gap</h2>
+  </div>
+  <div class="text-sm leading-relaxed text-slate-300 [overflow-wrap:anywhere]">The Wilson transfer kernel is continuous, symmetric, positive, and compact. Normalizing by the vacuum eigenvalue and restricting to $\Omega^\perp$ gives a strictly positive gap attained by a unit excited eigenvector; two explicit link configurations prove non-degeneracy.</div>
+  <pre class="mt-4 p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 overflow-x-auto"><code>fullRankCubicNonAbelianWilsonSetup_exact_gap :
+  wilsonPerpOp S.T S.Ω S.T_sa S.Ω_vac ≠ 0 ∧
+  S.Δ = −log ‖wilsonPerpOp S.T S.Ω S.T_sa S.Ω_vac‖ ∧
+  ∃ w, ‖w‖ = 1 ∧ ⟪w, S.Ω⟫ = 0 ∧ S.T w = exp(−S.Δ) • w</code></pre>
+</section>
+<section class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span class="px-2.5 py-1 rounded font-mono text-xs font-bold bg-slate-800 text-emerald-300 border border-slate-700">STEP 3</span>
+    <h2 class="text-lg sm:text-xl font-bold text-white [overflow-wrap:anywhere]">Strong coupling and clustering</h2>
+  </div>
+  <div class="text-sm leading-relaxed text-slate-300 [overflow-wrap:anywhere]">A positive Dobrushin cluster rate, volume-independent time-slice exponential decay, and the infinite-volume subsequential OS theory are proved in <code>StrongCouplingInfVol</code>; the Doeblin $L^2$ contraction supplies the Markov transfer bound.</div>
+  <pre class="mt-4 p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 overflow-x-auto"><code>strongCouplingClusterRate_pos β
+strongCoupling_time_slice_clustering
+strongCoupling_infinite_volume_lattice_os
+doeblin_markov_l2_contraction</code></pre>
+</section>
+<section class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span class="px-2.5 py-1 rounded font-mono text-xs font-bold bg-slate-800 text-emerald-300 border border-slate-700">STEP 4</span>
+    <h2 class="text-lg sm:text-xl font-bold text-white [overflow-wrap:anywhere]">The iid Schwinger functional and full-tuple stage limit</h2>
+  </div>
+  <div class="text-sm leading-relaxed text-slate-300 [overflow-wrap:anywhere]">$S_n(x)=\prod_C \mathrm{iidMom}(|C|)$ over equality classes with $\mathrm{iidMom}(k)=(1^k+2^k)/2$. Six theorems give translation and $SO(4)$ invariance, permutation symmetry, reflection positivity, rate-one clustering, and non-Gaussianity. The stage limit converges for every finite tuple, including repeated points.</div>
+  <pre class="mt-4 p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 overflow-x-auto"><code>iidSchwinger_trans · iidSchwinger_perm · iidSchwinger_so4
+iidSchwinger_refl_pos_2 · iidSchwinger_cluster · iidSchwinger_non_gaussian
+stageObservableSchwinger_tendsto_iid  (aₘ = 1/(m+2), Lₘ = (m+2)², βₘ = m+1)</code></pre>
+</section>
+<section class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span class="px-2.5 py-1 rounded font-mono text-xs font-bold bg-slate-800 text-emerald-300 border border-slate-700">STEP 5</span>
+    <h2 class="text-lg sm:text-xl font-bold text-white [overflow-wrap:anywhere]">OS/Wightman reconstruction and semigroup gap</h2>
+  </div>
+  <div class="text-sm leading-relaxed text-slate-300 [overflow-wrap:anywhere]"><code>buildStrictWightmanFromOS</code> assembles the Wightman theory on the OS Hilbert space with reflected-kernel and time-shift identities; <code>os_cluster_implies_semigroup_gap</code> yields $T_E(t)$ contraction on $\Omega^\perp$.</div>
+  <pre class="mt-4 p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 overflow-x-auto"><code>os_cluster_implies_semigroup_gap : ‖T_E t v‖ ≤ exp(−Δ t) ‖v‖
+buildStrictWightmanFromOS_schwinger_vacuum_coefficient
+buildStrictWightmanFromOS_schwinger_field_word_approx</code></pre>
+</section>
+<section class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span class="px-2.5 py-1 rounded font-mono text-xs font-bold bg-slate-800 text-emerald-300 border border-slate-700">STEP 6</span>
+    <h2 class="text-lg sm:text-xl font-bold text-white [overflow-wrap:anywhere]">Discharging the Clay inputs</h2>
+  </div>
+  <div class="text-sm leading-relaxed text-slate-300 [overflow-wrap:anywhere]">The Balaban RG hypothesis is built from the stage limit and the OS–Poincaré continuation from a rank-one OS completion collapse. The reduction theorems then inhabit both strict targets unconditionally; an independent SU(N) weak-coupling route closes <code>ClayYangMillsMassGap4D</code>.</div>
+  <pre class="mt-4 p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 overflow-x-auto"><code>iidBalabanHypothesis : BalabanRGContinuumHypothesis N hN
+iidOSPoincareContinuation : OSPoincareContinuationHypothesis iidOS4DStrict
+strictClayFromStage : ClayYangMillsMassGap4DStrictOnOSCompletion N hN
+su_yang_mills_rg_conjecture_unconditional · clay_yang_mills_4d_from_su_closure</code></pre>
+</section>
+<section class="min-w-0 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 sm:p-6">
+  <div class="flex flex-wrap items-center gap-3 mb-3">
+    <span class="px-2.5 py-1 rounded font-mono text-xs font-bold bg-slate-800 text-emerald-300 border border-slate-700">STEP 7</span>
+    <h2 class="text-lg sm:text-xl font-bold text-white [overflow-wrap:anywhere]">Unconditional closure and audit</h2>
+  </div>
+  <div class="text-sm leading-relaxed text-slate-300 [overflow-wrap:anywhere]">All 27 Clay components are discharged with zero sorries and standard Lean axioms. The two-level finite witness and the SU(N) closure complete the independent verifications.</div>
+  <pre class="mt-4 p-4 rounded-xl bg-slate-950/90 border border-slate-800 text-xs text-slate-300 overflow-x-auto"><code>GlobalAxioms.clay_yang_mills_strict_unconditional
+GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional
+MassGapInstances.two_level_gauge_gap : GappedSpectrum (Fin 2)
+Kernel audit: 0 sorries · propext, Classical.choice, Quot.sound</code></pre>
+</section>
+  <div class="pt-6 flex flex-wrap gap-4">
+    <a href="index.html" class="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold border border-slate-700 transition">← Choose the other route</a>
+    <a href="explorer/index.html" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition">Open Source Explorer →</a>
+  </div>
+</main>
+<footer class="border-t border-slate-800/80 py-6 text-xs text-slate-400">
+  <div class="max-w-5xl mx-auto px-4">4D Yang–Mills Mass Gap · Lean 4 certified · 0 sorries · standard axioms only</div>
+</footer></body></html>

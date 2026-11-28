@@ -134,5 +134,9 @@ globs = [
   "Imscribing.YangMills.OSCanonicalSemigroupContinuity",
   "Imscribing.YangMills.BalabanFromStage",
   "Imscribing.YangMills.GapFillingAttempt",
-  "Imscribing.YangMills.SUClosure"
+  "Imscribing.YangMills.SUClosure",
+
+  "Imscribing.TrilatticeYM.YM_Closure_Bridge",
+  "Imscribing.TrilatticeYM.UnconditionalMassGap",
+  "Imscribing.TrilatticeYM.GNSReconstruction"
 ]

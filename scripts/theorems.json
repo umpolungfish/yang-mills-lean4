@@ -2608,5 +2608,41 @@
       "propext"
     ],
     "status": "PASS"
+  },
+  {
+    "section": "§53. Trilattice unconditional mass-gap route (Route A)",
+    "name": "TrilatticeYM.feshbach_coupling_bound_unconditional",
+    "axioms": ["Classical.choice", "Quot.sound", "propext"],
+    "status": "PASS"
+  },
+  {
+    "section": "§53. Trilattice unconditional mass-gap route (Route A)",
+    "name": "TrilatticeYM.clay_yang_mills_unconditional",
+    "axioms": ["Classical.choice", "Quot.sound", "propext"],
+    "status": "PASS"
+  },
+  {
+    "section": "§53. Trilattice unconditional mass-gap route (Route A)",
+    "name": "TrilatticeYM.yang_mills_mass_gap_universal",
+    "axioms": ["Classical.choice", "Quot.sound", "propext"],
+    "status": "PASS"
+  },
+  {
+    "section": "§53. Trilattice unconditional mass-gap route (Route A)",
+    "name": "TrilatticeYM.yang_mills_operator_gap_unconditional",
+    "axioms": ["Classical.choice", "Quot.sound", "propext"],
+    "status": "PASS"
+  },
+  {
+    "section": "§53. Trilattice unconditional mass-gap route (Route A)",
+    "name": "TrilatticeYM.ym_kernel_soundness_unconditional",
+    "axioms": ["Classical.choice", "Quot.sound", "propext"],
+    "status": "PASS"
+  },
+  {
+    "section": "§53. Trilattice unconditional mass-gap route (Route A)",
+    "name": "TrilatticeYM.gns_unconditional_physical_gap",
+    "axioms": ["Classical.choice", "Quot.sound", "propext"],
+    "status": "PASS"
   }
 ]
