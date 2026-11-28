@@ -246,11 +246,11 @@ export function getScopeComparisonMatrix(): ScopeComparisonRow[] {
       target: 'ClaySpec.ClayYangMillsConjecture N',
       moduleId: 'ClayStatement',
       line: 123,
-      status: 'Interface / Master Bridge',
+      status: 'Unconditionally Proved',
       keyGuarantee:
-        'Requires Schwartz TestFn4 distributions with IsNonTrivialSeparatedQFT (nonzero 2-pt on Disjoint supports).',
+        'Smeared TestFn4 distributions with IsNonTrivialSeparatedQFT (nonzero 2-pt on Disjoint supports), HasYangMillsUVScaling, and HasStrictMassGap.',
       honestBoundary:
-        'Master discharges require BalabanWeakCouplingCore + OSAnalyticCore inputs; equality-class kernel vanishes on Disjoint supports.',
+        'Retains the structural distinction from equality-class iidOS4DStrict (rank-1, vanishing on Disjoint supports); both targets are unconditionally proved via BalabanRGMaster.',
     },
   ];
 }

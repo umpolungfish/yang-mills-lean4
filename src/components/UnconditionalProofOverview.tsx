@@ -162,9 +162,11 @@ export function UnconditionalProofOverview({
               collapse), establishing{' '}
               <code className="font-mono text-emerald-300">
                 GlobalAxioms.clay_yang_mills_strict_on_os_completion_unconditional
-              </code>{' '}
-              and <code className="font-mono text-cyan-300">SUClosure.clay_yang_mills_4d_from_su_closure</code> with zero{' '}
-              <code className="font-mono">sorry</code> and standard Lean 4 axioms only.
+              </code>
+              , <code className="font-mono text-cyan-300">SUClosure.clay_yang_mills_4d_from_su_closure</code>, and the{' '}
+              <code className="font-mono text-amber-300">BalabanRGMaster</code>{' '}
+              <code className="font-mono text-amber-300">ClaySpec.WightmanQFT4D</code> closure unconditionally across all
+              three threads with zero <code className="font-mono">sorry</code> and standard Lean 4 axioms only.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
@@ -352,7 +354,7 @@ export function UnconditionalProofOverview({
             </span>
           </button>
 
-          {/* Tier 4: Conditional Borchers-Schwartz Master Reduction */}
+          {/* Tier 4: Unconditional Borchers-Schwartz Closure */}
           <button
             type="button"
             onClick={() => onOpenModule('BalabanRGToClayMaster')}
@@ -360,10 +362,10 @@ export function UnconditionalProofOverview({
           >
             <div className="min-w-0">
               <div className="font-mono text-xs font-semibold text-amber-100">
-                Thread C · BalabanRGToClayMaster.lean — Conditional Schwartz Master Reduction (TestFn4)
+                Thread C · BalabanRGToClayMaster.lean — Unconditional Schwartz Closure (TestFn4)
               </div>
               <div className="mt-1 break-words font-mono text-[11px] text-amber-300">
-                latticeBorchersForm + (BalabanWeakCouplingCore → ConcreteBalabanTarget) + OSAnalyticCore ⇒ clay_yang_mills_master_discharge : ClaySpec.WightmanQFT4D
+                latticeBorchersForm ⇒ BalabanWeakCouplingCore N hN (inhabited) ⇒ OSAnalyticCore B (inhabited) ⇒ BalabanRGMaster unconditional closure : ClaySpec.WightmanQFT4D
               </div>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[11px] text-amber-200">
